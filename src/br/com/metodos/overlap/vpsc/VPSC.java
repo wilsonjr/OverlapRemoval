@@ -2,6 +2,10 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package br.com.metodos.overlap.vpsc;
@@ -15,17 +19,18 @@ import java.util.TreeSet;
 
 /**
  *
- * @author Thaís
+ * @author Wilson
  */
-public class UtilVPSC {
-  
+public class VPSC {
     
+    public static ArrayList<Retangulo> apply(ArrayList<Retangulo> rectangles, double epsX, double epsY) {
+        ArrayList<Retangulo> projected = new ArrayList<>();
+        
+        
+        return projected;        
+    }
     
     public static void solveVPSC(ArrayList<Variavel> vars, ArrayList<Restricao> res) {
-        for( int i = 0; i < res.size(); ++i ) {
-            res.get(i).setAtiva(false);
-        }
-        
         Blocos blocos = new Blocos(vars);
         
         satisfyVPSC(blocos, vars, res);
@@ -59,40 +64,28 @@ public class UtilVPSC {
             
         } while( true );
         
-        
-        
-        
-        
-        
-        
-        
-        
     }
     
     
     
-    public static void satisfyVPSC(Blocos blocos, ArrayList<Variavel> vars, ArrayList<Restricao> res) {
-        for( int i = 0; i < res.size(); ++i ) {
+    private static void satisfyVPSC(Blocos blocos, ArrayList<Variavel> vars, ArrayList<Restricao> res) {
+        for( int i = 0; i < res.size(); ++i )
             res.get(i).setAtiva(false);
-        }
-        
-        
-        
+    
         ArrayList<Variavel> varsOrdered = blocos.totalOrder();
         
-        for( int i = 0; i < varsOrdered.size(); ++i ) {
-            if( !varsOrdered.get(i).getBloco().getDeleted()) {                
+        for( int i = 0; i < varsOrdered.size(); ++i )
+            if( !varsOrdered.get(i).getBloco().getDeleted()) 
                 blocos.mergeLeft(varsOrdered.get(i).getBloco());                
-            } 
-                
-        }
+                             
+        
         for( int i = blocos.size()-1; i >= 0; --i )
                 if( blocos.get(i).getDeleted() )
                     blocos.remove(i);
     }
     
     
-    public static int geraRestricoesVerticais(ArrayList<Retangulo> retangulos, ArrayList<Variavel> vars, ArrayList<Restricao> restricoes) {
+    private static int geraRestricoesVerticais(ArrayList<Retangulo> retangulos, ArrayList<Variavel> vars, ArrayList<Restricao> restricoes) {
         ArrayList<Event> eventos = new ArrayList<>();
         
         for( int i = 0; i < retangulos.size(); ++i ) {
@@ -181,62 +174,19 @@ public class UtilVPSC {
         return restricoes.size();
     }
     
-    
-    public static void mquickSort(Event array[], int start, int end)
-    {
-            int i = start;                          // index of left-to-right scan
-            int k = end;                            // index of right-to-left scan
-
-            if (end - start >= 1)                   // check that there are at least two elements to sort
-            {
-                    Event pivot = array[start];       // set the pivot as the first element in the partition
-
-                    while (k > i)                   // while the scan indices from left and right have not met,
-                    {
-                            while (array[i].getPosition() <= pivot.getPosition() && i <= end && k > i)  // from the left, look for the first
-                                    i++;                                    // element greater than the pivot
-                            while (array[k].getPosition() > pivot.getPosition() && k >= start && k >= i) // from the right, look for the first
-                                k--;                                        // element not greater than the pivot
-                            if (k > i)                                       // if the left seekindex is still smaller than
-                                    swap(array, i, k);                      // the right index, swap the corresponding elements
-                    }
-                    swap(array, start, k);          // after the indices have crossed, swap the last element in
-                                                    // the left partition with the pivot 
-                    mquickSort(array, start, k - 1); // quicksort the left partition
-                    mquickSort(array, k + 1, end);   // quicksort the right partition
-            }
-            else    // if there is only one element in the partition, do not do any sorting
-            {
-                    return;                     // the array is sorted, so exit
-            }
-    }
-
-    public static void swap(Event array[], int index1, int index2) 
-    // pre: array is full and index1, index2 < array.length
-    // post: the values at indices 1 and 2 have been swapped
-    {
-            Event temp = array[index1];           // store the first value in a temp
-            array[index1] = array[index2];      // copy the value of the second into the first
-            array[index2] = temp;               // copy the value of the temp into the second
-    }
-    
-    
     public static int geraRestricoesHorizontais(ArrayList<Retangulo> retangulos, ArrayList<Variavel> vars, ArrayList<Restricao> restricoes) {
-      //  ArrayList<Event> eventos = new ArrayList<>();
-        Event eventos[] = new Event[retangulos.size()*2];
-        int c = 0;
+        ArrayList<Event> eventos = new ArrayList<>();
+        
         for( int i = 0; i < retangulos.size(); ++i ) {
-            vars.get(i).setDesiredPosition(retangulos.get(i).getCenterX());
-            
+            vars.get(i).setDesiredPosition(retangulos.get(i).getCenterX());            
             No no = new No(vars.get(i), retangulos.get(i), retangulos.get(i).getCenterX());
-            
-            eventos[c++] = (new Event("OPEN", no, retangulos.get(i).getMinY()));
-            eventos[c++] = (new Event("CLOSE", no, retangulos.get(i).getMaxY()));
+            eventos.add( (new Event("OPEN", no, retangulos.get(i).getMinY())));
+            eventos.add( (new Event("CLOSE", no, retangulos.get(i).getMaxY())));
         }
         
         
         
-        /*Collections.sort(eventos, new Comparator<Event>() {
+        Collections.sort(eventos, new Comparator<Event>() {
             @Override
             public int compare(Event o1, Event o2) {
                 if( o1.getNo().getRect() == o2.getNo().getRect() ) {
@@ -244,17 +194,17 @@ public class UtilVPSC {
                         return -1;
                     return 1;
                 } else 
-                    return new Double(o1.getPosition()).compareTo(new Double(o2.getPosition()));
+                    return new Double(o1.getPosition()).compareTo(o2.getPosition());
             }
-        });*/
-        mquickSort(eventos, 0, eventos.length-1);
+        });
+        
         
         
         TreeSet<No> scanline = new TreeSet<>(new NoComparator());
-        for( int i = 0; i < eventos.length; ++i ) {
+        for( int i = 0; i < eventos.size(); ++i ) {
             
-            No v = eventos[i].getNo();            
-            if( eventos[i].getTipo().equals("OPEN") ) {
+            No v = eventos.get(i).getNo();            
+            if( eventos.get(i).getTipo().equals("OPEN") ) {
                 
                 scanline.add(v);
                 

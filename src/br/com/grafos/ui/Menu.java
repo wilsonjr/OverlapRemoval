@@ -8,7 +8,9 @@ package br.com.grafos.ui;
 
 
 import br.com.grafos.desenho.color.RainbowScale;
-import br.com.metodos.overlap.IDShape;
+import br.com.metodos.overlap.rwordle.IDShape;
+import br.com.metodos.overlap.rwordle.RWordleC;
+import br.com.metodos.overlap.rwordle.RWordleL;
 import br.com.metodos.utils.Retangulo;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -179,206 +181,18 @@ public class Menu extends javax.swing.JFrame {
     }
     
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        double xmin = rectangles.get(0).getMinX(), xmax = rectangles.get(0).getMaxX(), 
-               ymin = rectangles.get(0).getMinY(), ymax = rectangles.get(0).getMaxY();
-               
-        for( Retangulo r: rectangles ) {
-            if( r.getMinX() < xmin ) 
-                xmin = r.getMinX();
-            if( r.getMaxX() > xmax )
-                xmax = r.getMaxX();
-            if( r.getMinY() < ymin )
-                ymin = r.getMinY();
-            if( r.getMaxY() > ymax )
-                ymax = r.getMaxY();
-        }
-        
-        Shape r = new Rectangle((int)xmin, (int)ymin, (int)distanciaEuclideana(xmin, ymin, xmax, ymin), (int)distanciaEuclideana(xmin, ymin, xmin, ymax));
-        
-        double centerX = r.getBounds().getCenterX();
-        double centerY = r.getBounds().getCenterY();
-        
-        System.out.println(centerX+"  "+centerY);
-        
-        ArrayList<IDShape> shapes = new ArrayList<>();
-        for( int i = 0; i < rectangles.size(); ++i ) {
-           shapes.add(new IDShape(new Retangulo(rectangles.get(i).x, rectangles.get(i).y, 
-                                                rectangles.get(i).width, rectangles.get(i).height,
-                                                rectangles.get(i).cor, rectangles.get(i).numero),
-                    (int) distanciaEuclideana(centerX, centerY, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY())));
-            
-        }
-        
-        Collections.sort(shapes, new Comparator<IDShape>() {
-
-            @Override
-            public int compare(IDShape o1, IDShape o2) {
-                return o1.getDistance() - o2.getDistance();
-            }
-            
-        });
-            
-        
-        ArrayList<Retangulo> projected = new ArrayList<>();
-        for( int i = 0; i < shapes.size(); ++i ) {
-            double angle = 2;
-            double adjust = .5;
-            
-            boolean flag;  
-            
-            Area areaS = null;
-            do {
-                
-                flag = true;
-                
-                double x = shapes.get(i).getRect().getCenterX() + Math.sin(angle)*angle*adjust;
-                double y = shapes.get(i).getRect().getCenterY() + Math.cos(angle)*angle*adjust;                
-                
-                Shape s = new Rectangle.Double(x, y, 50, 50);
-                areaS = new Area(s);
-                for( Retangulo rect: projected ) {
-                    Shape s1 = new Rectangle.Double(rect.x, rect.y, rect.width, rect.height);
-                    Area areaS1 = new Area(s1);
-                    areaS1.intersect(areaS);
-                    if( !areaS1.isEmpty() ) {
-                        flag = false;
-                        break;
-                    }                        
-                } 
-                angle += (0.5/angle); 
-            } while( !flag );
-            
-            
-            projected.add(new Retangulo(areaS.getBounds().x, areaS.getBounds().y, areaS.getBounds().getWidth(), 
-                                        areaS.getBounds().getHeight(), shapes.get(i).getRect().cor, shapes.get(i).getRect().numero));
-                
-                
-            
-        }
+        ArrayList<Retangulo> projected = RWordleC.apply(rectangles);
         
         rectangles.clear();
         //rectangles.add(new Retangulo(new Rectangle((int)centerX, (int)centerY, 5, 5), Color.RED));
         for( Retangulo e: projected )            
             rectangles.add(new Retangulo(e.x, e.y, e.width, e.height, e.cor, e.numero));           
-            
-        
-        
-        
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void rwordlelJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordlelJMenuItemActionPerformed
-        double xmin = rectangles.get(0).getMinX(), xmax = rectangles.get(0).getMaxX(), 
-               ymin = rectangles.get(0).getMinY(), ymax = rectangles.get(0).getMaxY();
-               
-        for( Retangulo r: rectangles ) {
-            if( r.getMinX() < xmin ) 
-                xmin = r.getMinX();
-            if( r.getMaxX() > xmax )
-                xmax = r.getMaxX();
-            if( r.getMinY() < ymin )
-                ymin = r.getMinY();
-            if( r.getMaxY() > ymax )
-                ymax = r.getMaxY();
-        }
-        
-        double initialCenterX = (xmin+xmax)/2;
-        double initialCenterY = (ymin+ymax)/2;
-        
-        
-        novos = new ArrayList<>();
-        for( int i = 0; i < rectangles.size(); ++i ) {
-            int aux = (int)distanciaEuclideana(0, 0, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
-                        
-            novos.add(new Retangulo(
-                        (rectangles.get(i).x-aux), (rectangles.get(i).y-aux), rectangles.get(i).width, 
-                        rectangles.get(i).height, 
-                        rectangles.get(i).cor,
-                        rectangles.get(i).numero
-                      ));            
-        }
-        
-        for( int i = 0; i < novos.size(); ++i ) {
-            double x = novos.get(i).x;
-            double y = novos.get(i).y;
-            
-            novos.get(i).x =  (x*Math.cos(Math.toRadians(alpha)) - y*Math.sin(Math.toRadians(alpha)));
-            novos.get(i).y =  (x*Math.sin(Math.toRadians(alpha)) + y*Math.cos(Math.toRadians(alpha)));
-        }
-        
-        
-        for( int i = 0; i < novos.size(); ++i ) {
-            double aux = distanciaEuclideana(0, 0, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
-            novos.get(i).x += aux;
-            novos.get(i).y += aux;
-        }
-        
-        
-        
-        Collections.sort(novos, new Comparator<Retangulo>() {
-
-            @Override
-            public int compare(Retangulo o1, Retangulo o2) {
-                return (int)o1.x - (int)o2.x;
-            }
-            
-        });
-        
-        Rectangle r = new Rectangle(0, 0, 10, 10);        
-        xmin = 99999; xmax = -1; ymin = 99999; ymax = -1;
-       
-        int xlinha = 0, ylinha = 0;
-        ArrayList<Retangulo> projected = new ArrayList<>();
-        for( int i = 0; i < novos.size(); ++i ) {
-            double angle = 3;
-            double adjust = .5;
-            
-            boolean flag;  
-            
-            Area areaS = null;
-            do {
-                
-                flag = true;
-                
-                double x = (novos.get(i).getCenterX()+xlinha) + Math.sin(angle)*angle*adjust;
-                double y = (novos.get(i).getCenterY()+ylinha) + Math.cos(angle)*angle*adjust;                
-                
-                Shape s = new Rectangle.Double(x, y, novos.get(i).width, novos.get(i).height);
-                areaS = new Area(s);
-                for( Retangulo rect: projected ) {
-                    Shape s1 = new Rectangle.Double(rect.x, rect.y, rect.width, rect.height);
-                    Area areaS1 = new Area(s1);
-                    areaS1.intersect(areaS);
-                    if( !areaS1.isEmpty() ) {
-                        flag = false;
-                        break;
-                    }                        
-                } 
-                angle += (0.5/angle); 
-            } while( !flag );
-                        
-            projected.add(new Retangulo(areaS.getBounds().x, areaS.getBounds().y, 
-                                        areaS.getBounds().width, areaS.getBounds().height,
-                                        novos.get(i).cor, novos.get(i).numero));
-                        
-            if( recentralizarJCheckBox.isSelected() ) {
-                if( areaS.getBounds().getMinX() < xmin || areaS.getBounds().getMaxX() > xmax || 
-                    areaS.getBounds().getMinY() < ymin || areaS.getBounds().getMaxY() > ymax ) {
-                    xmin = Math.min(xmin, areaS.getBounds().getMinX());
-                    xmax = Math.max(xmax, areaS.getBounds().getMaxX());
-                    ymin = Math.min(ymin, areaS.getBounds().getMinY());
-                    ymax = Math.max(ymax, areaS.getBounds().getMaxY());
-
-
-                    r.setBounds((int)xmin, (int)ymin, (int)distanciaEuclideana(xmin, ymin, xmax, ymin), (int)distanciaEuclideana(xmin, ymin, xmin, ymax));
-
-                    xlinha = (int)initialCenterX - (int)r.getCenterX();
-                    ylinha = (int)initialCenterY - (int)r.getCenterY();
-                }
-            }   
-            
-        }
+        ArrayList<Retangulo> projected  = RWordleL.apply(rectangles, alpha, recentralizarJCheckBox.isSelected());
         rectangles.clear();
         for( Retangulo e: projected )            
             rectangles.add(new Retangulo(e.x, e.y, e.width, e.height, e.cor, e.numero));           

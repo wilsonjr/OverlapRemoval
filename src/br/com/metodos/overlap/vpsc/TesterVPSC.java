@@ -33,14 +33,14 @@ public class TesterVPSC {
             vars.add(new Variavel(i));
         
         ArrayList<Restricao> restricoes = new ArrayList<>();
-        int m = UtilVPSC.geraRestricoesHorizontais(rects, vars, restricoes);
+        int m = VPSC.geraRestricoesHorizontais(rects, vars, restricoes);
         /*double oldx[] = new double[rects.size()];
         for( int i = 0; i < oldx.length; ++i ) 
             oldx[i] = vars.get(i).getDes();                    */
         System.out.println("Numero de restricoes horizontais: "+m);
         for( Restricao r: restricoes )
             System.out.println(r);        
-        UtilVPSC.solveVPSC(vars, restricoes);      
+        VPSC.solveVPSC(vars, restricoes);      
         //UtilVPSC.satisfyVPSC(new Blocos(vars), vars, restricoes);
         for( int i = 0; i < vars.size(); ++i ) {
           System.out.println(vars.get(i).getPosition());
@@ -48,11 +48,11 @@ public class TesterVPSC {
         }
       /*  
         restricoes = new ArrayList<>();
-        m = UtilVPSC.geraRestricoesVerticais(rects, vars, restricoes);
+        m = VPSC.geraRestricoesVerticais(rects, vars, restricoes);
         System.out.println("NUMERO DE RESTRICOES VERTICAIS: "+m);
         for( Restricao r: restricoes )
             System.out.println(r);
-        UtilVPSC.solveVPSC(vars, restricoes);
+        VPSC.solveVPSC(vars, restricoes);
         for( int i = 0; i < rects.size(); ++i )  {
             rects.get(i).moveCentreY(vars.get(i).getPosition());            
             System.out.println(vars.get(i).getPosition()+" "+vars.get(i).getId());

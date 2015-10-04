@@ -12,7 +12,7 @@ import java.util.PriorityQueue;
 
 /**
  *
- * @author Thaís
+ * @author Wilson
  */
 public class Bloco {
     private ArrayList<Variavel> vars;

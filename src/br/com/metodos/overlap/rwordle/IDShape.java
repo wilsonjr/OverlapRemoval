@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package br.com.metodos.overlap;
+package br.com.metodos.overlap.rwordle;
 
 import br.com.metodos.utils.Retangulo;
 
@@ -14,9 +14,9 @@ import br.com.metodos.utils.Retangulo;
  */
 public class IDShape {
     private Retangulo rect;
-    private int distance;
+    private double distance;
         
-    public IDShape(Retangulo rect, int distance) {
+    public IDShape(Retangulo rect, double distance) {
         this.rect = rect;
         this.distance = distance;
     }
@@ -25,12 +25,8 @@ public class IDShape {
         return rect;
     }
     
-    public int getDistance() {
+    public double getDistance() {
         return distance;
-    }   
-            
-            
-            
-            
+    }       
    
 }

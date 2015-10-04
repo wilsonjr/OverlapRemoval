@@ -8,7 +8,7 @@ package br.com.metodos.overlap.vpsc;
 
 /**
  *
- * @author Thaís
+ * @author Wilson
  */
 public class RetanguloVPSC {
     private double minX, maxX, minY, maxY;    
