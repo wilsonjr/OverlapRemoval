@@ -8,7 +8,6 @@ package br.com.metodos.overlap.vpsc;
 
 
 import br.com.metodos.utils.Retangulo;
-import java.awt.Color;
 import java.util.ArrayList;
 
 /*
@@ -18,15 +17,31 @@ import java.util.ArrayList;
 public class TesterVPSC {
     public static void main(String... args) {
         ArrayList<Retangulo> rects = new ArrayList<>();
-        rects.add(new Retangulo(1, 2, 3-1, 4-2, Color.WHITE, 0));
-        rects.add(new Retangulo(2, 3, 5-2, 5-3, Color.WHITE, 0));
-        rects.add(new Retangulo(9, 3, 11-9, 5-3, Color.WHITE, 0));
-        rects.add(new Retangulo(4, 4, 8-4, 8-4, Color.WHITE, 0));
-        rects.add(new Retangulo(7, 6, 9-7, 8-6, Color.WHITE, 0));
-        rects.add(new Retangulo(3, 7, 5-3, 10-7, Color.WHITE, 0));
-        rects.add(new Retangulo(11, 7, 13-11, 9-7, Color.WHITE, 0));
-        rects.add(new Retangulo(7, 9, 9-7, 11-9, Color.WHITE, 0));
-        rects.add(new Retangulo(12, 9, 14-12, 11-9, Color.WHITE, 0));
+//        rects.add(new Retangulo(1, 2, 3-1, 4-2));
+//        rects.add(new Retangulo(2, 3, 5-2, 5-3));
+//        rects.add(new Retangulo(9, 3, 11-9, 5-3));
+//        rects.add(new Retangulo(4, 4, 8-4, 8-4));
+//        rects.add(new Retangulo(7, 6, 9-7, 8-6));
+//        rects.add(new Retangulo(3, 7, 5-3, 10-7));
+//        rects.add(new Retangulo(11, 7, 13-11, 9-7));
+//        rects.add(new Retangulo(7, 9, 9-7, 11-9));
+//        rects.add(new Retangulo(12, 9, 14-12, 11-9));
+        
+        rects.add(new Retangulo(140,  158, 50, 50));
+    rects.add(new Retangulo(153,  130, 50, 50));
+    rects.add(new Retangulo(128,  103, 50, 50));
+    rects.add(new Retangulo(89 , 82, 50, 50));
+    rects.add(new Retangulo(75 , 130, 50, 50));
+    rects.add(new Retangulo(88 , 191, 50, 50));
+    rects.add(new Retangulo(153,  191, 50, 50));
+    rects.add(new Retangulo(216,  189, 50, 50));
+    rects.add(new Retangulo(200,  99, 50, 50));
+    rects.add(new Retangulo(157,  83, 50, 50));
+    rects.add(new Retangulo(196,  154, 50, 50));
+    rects.add(new Retangulo(108,  149, 50, 50));
+    rects.add(new Retangulo(115,  226, 50, 50)); 
+    rects.add(new Retangulo(175,  213, 50, 50));
+        
         
         ArrayList<Variavel> vars = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i ) 
@@ -44,9 +59,12 @@ public class TesterVPSC {
         //UtilVPSC.satisfyVPSC(new Blocos(vars), vars, restricoes);
         for( int i = 0; i < vars.size(); ++i ) {
           System.out.println(vars.get(i).getPosition());
-            rects.get(i).moveX(vars.get(i).getPosition());
+           rects.get(i).moveX(vars.get(i).getPosition());
         }
-      /*  
+       
+      
+        for( int i = 0; i < vars.size(); ++i ) 
+            vars.get(i).init(i);
         restricoes = new ArrayList<>();
         m = VPSC.geraRestricoesVerticais(rects, vars, restricoes);
         System.out.println("NUMERO DE RESTRICOES VERTICAIS: "+m);
@@ -54,11 +72,11 @@ public class TesterVPSC {
             System.out.println(r);
         VPSC.solveVPSC(vars, restricoes);
         for( int i = 0; i < rects.size(); ++i )  {
-            rects.get(i).moveCentreY(vars.get(i).getPosition());            
-            System.out.println(vars.get(i).getPosition()+" "+vars.get(i).getId());
+            rects.get(i).moveY(vars.get(i).getPosition());            
+            System.out.println(vars.get(i).getPosition());
             
         }
-        */
+       
         
         for( Retangulo r: rects )
             System.out.println(r);

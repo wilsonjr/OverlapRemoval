@@ -24,6 +24,10 @@ public class Variavel {
     private boolean deletado;
     
     public Variavel(int id) {
+        init(id);
+    }
+    
+    public void init(int id) {
         this.id = id;
         des = 0;
         weight = 1;
@@ -33,6 +37,7 @@ public class Variavel {
         in = new ArrayList<>();
         out = new ArrayList<>();
     }
+    
     
     public void setOffset(double offset) {
         this.offset = offset;

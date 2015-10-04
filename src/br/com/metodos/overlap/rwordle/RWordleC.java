@@ -27,18 +27,18 @@ public class RWordleC {
         /**
          * Finds the min and max x and y coordinates in rectangles
          */
-        double xmin = rectangles.get(0).getMinX(), xmax = rectangles.get(0).getMaxX(), 
-               ymin = rectangles.get(0).getMinY(), ymax = rectangles.get(0).getMaxY();                      
+        double xmin = rectangles.get(0).getUX(), xmax = rectangles.get(0).getLX(), 
+               ymin = rectangles.get(0).getUY(), ymax = rectangles.get(0).getLY();                      
         
         for( Retangulo r: rectangles ) {
-            if( r.getMinX() < xmin ) 
-                xmin = r.getMinX();
-            if( r.getMaxX() > xmax )
-                xmax = r.getMaxX();
-            if( r.getMinY() < ymin )
-                ymin = r.getMinY();
-            if( r.getMaxY() > ymax )
-                ymax = r.getMaxY();
+            if( r.getUX() < xmin ) 
+                xmin = r.getUX();
+            if( r.getLX() > xmax )
+                xmax = r.getLX();
+            if( r.getUY() < ymin )
+                ymin = r.getUY();
+            if( r.getLY() > ymax )
+                ymax = r.getLY();
         }
         
         /**
@@ -49,8 +49,7 @@ public class RWordleC {
         
         ArrayList<IDShape> shapes = new ArrayList<>();
         for( int i = 0; i < rectangles.size(); ++i ) {
-            shapes.add(new IDShape(new Retangulo(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(i).width, rectangles.get(i).height,
-                                                 rectangles.get(i).cor, rectangles.get(i).numero),
+            shapes.add(new IDShape(new Retangulo(rectangles.get(i).getUX(), rectangles.get(i).getUY(), rectangles.get(i).getWidth(), rectangles.get(i).getHeight()),
                                                  Util.distanciaEuclideana(centerX, centerY, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY())));            
         }        
         
@@ -85,7 +84,7 @@ public class RWordleC {
                 /**
                  * creates a area object for simple check for overlaps
                  */                 
-                Shape s = new Rectangle.Double(x, y, shapes.get(i).getRect().width, shapes.get(i).getRect().height);
+                Shape s = new Rectangle.Double(x, y, shapes.get(i).getRect().getWidth(), shapes.get(i).getRect().getHeight());
                 areaS = new Area(s);
                 
                 /**
@@ -93,7 +92,7 @@ public class RWordleC {
                  */                 
                 for( Retangulo rect: projected ) {                    
                     
-                    Shape s1 = new Rectangle.Double(rect.x, rect.y, rect.width, rect.height);
+                    Shape s1 = new Rectangle.Double(rect.getUX(), rect.getUY(), rect.getWidth(), rect.getHeight());
                     Area areaS1 = new Area(s1);
                     areaS1.intersect(areaS);
                     if( !areaS1.isEmpty() ) {
@@ -109,7 +108,7 @@ public class RWordleC {
             } while( !flag );
                         
             projected.add(new Retangulo(areaS.getBounds().x, areaS.getBounds().y, areaS.getBounds().getWidth(), 
-                                        areaS.getBounds().getHeight(), shapes.get(i).getRect().cor, shapes.get(i).getRect().numero));
+                                        areaS.getBounds().getHeight()));
         }
         
         return projected;

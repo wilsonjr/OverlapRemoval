@@ -6,6 +6,8 @@
 
 package br.com.metodos.utils;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author wilson
@@ -23,4 +25,25 @@ public class Util {
     public static double distanciaEuclideana(double p1x, double p1y, double p2x, double p2y) {
         return Math.sqrt(Math.pow(p1x-p2x, 2) + Math.pow(p1y-p2y, 2));
     }
+    
+    
+    public static ArrayList<Retangulo> toRetangulo(ArrayList<RetanguloVis> rects) {
+        ArrayList<Retangulo> rs = new ArrayList<>();
+        
+        for( RetanguloVis r: rects ) 
+            rs.add(new Retangulo(r.getUX(), r.getUY(), r.getWidth(), r.getHeight()));
+        
+        return rs;
+    }
+        
+    public static void toRetanguloVis(ArrayList<RetanguloVis> ori, ArrayList<Retangulo> rects) {
+        
+        for( int i = 0; i < rects.size(); ++i ) {
+            ori.get(i).setUX(rects.get(i).getUX());
+            ori.get(i).setUY(rects.get(i).getUY());
+            ori.get(i).setWidth(rects.get(i).getWidth());
+            ori.get(i).setHeight(rects.get(i).getHeight());
+        }   
+    }
+    
 }

@@ -108,5 +108,33 @@ public class No {
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
+
+    public void removeRightNeighbour(No v) {
+        Iterator<No> it = rightNeighbours.iterator();
+        No toRemove = null;
+        while( it.hasNext() ) {
+            toRemove = it.next();
+            if( toRemove == v )
+                break;
+        }
+        
+        if( toRemove != null ) {
+            toRemove.setDeleted(true);            
+        }
+    }
+
+    public void removeLeftNeighbour(No v) {
+        Iterator<No> it = leftNeighbours.iterator();
+        No toRemove = null;
+        while( it.hasNext() ) {
+            toRemove = it.next();
+            if( toRemove == v )
+                break;
+        }
+        
+        if( toRemove != null ) {
+            toRemove.setDeleted(true);            
+        }
+    }
     
 }

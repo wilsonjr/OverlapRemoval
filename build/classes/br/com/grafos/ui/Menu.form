@@ -60,15 +60,19 @@
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="recentralizarJCheckBox" min="-2" max="-2" attributes="0"/>
-                  <Component id="rwordleCJButton" min="-2" max="-2" attributes="0"/>
-                  <Component id="embaralhaJButton" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Component id="embaralhaJButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="vpscJButton" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                      <Component id="rwordleCJButton" alignment="0" pref="0" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="anguloJTextField" max="32767" attributes="0"/>
                       </Group>
-                      <Component id="rwordleLJButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="rwordleLJButton" alignment="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace pref="10" max="32767" attributes="0"/>
@@ -80,7 +84,10 @@
           <Component id="telaJScrollPane" alignment="0" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="embaralhaJButton" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="embaralhaJButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="vpscJButton" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="rwordleCJButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -139,6 +146,14 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="embaralhaJButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="vpscJButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="VPSC"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="vpscJButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

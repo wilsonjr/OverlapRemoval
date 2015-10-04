@@ -1,4 +1,4 @@
-/*
+    /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -28,18 +28,18 @@ public class RWordleL {
         /**
          * Finds the min and max x and y coordinates in rectangles
          */
-        double xmin = rectangles.get(0).getMinX(), xmax = rectangles.get(0).getMaxX(), 
-               ymin = rectangles.get(0).getMinY(), ymax = rectangles.get(0).getMaxY();
+        double xmin = rectangles.get(0).getUX(), xmax = rectangles.get(0).getLX(), 
+               ymin = rectangles.get(0).getUY(), ymax = rectangles.get(0).getLY();
                
         for( Retangulo r: rectangles ) {
-            if( r.getMinX() < xmin ) 
-                xmin = r.getMinX();
-            if( r.getMaxX() > xmax )
-                xmax = r.getMaxX();
-            if( r.getMinY() < ymin )
-                ymin = r.getMinY();
-            if( r.getMaxY() > ymax )
-                ymax = r.getMaxY();
+            if( r.getUX() < xmin ) 
+                xmin = r.getUX();
+            if( r.getLX() > xmax )
+                xmax = r.getLX();
+            if( r.getUY() < ymin )
+                ymin = r.getUY();
+            if( r.getLY() > ymax )
+                ymax = r.getLY();
         }
         
          /**
@@ -56,19 +56,19 @@ public class RWordleL {
         for( int i = 0; i < rectangles.size(); ++i ) {
             double distance = Util.distanciaEuclideana(0, 0, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
                         
-            novos.add(new Retangulo((rectangles.get(i).x-distance), (rectangles.get(i).y-distance), rectangles.get(i).width, 
-                         rectangles.get(i).height, rectangles.get(i).cor, rectangles.get(i).numero));            
+            novos.add(new Retangulo((rectangles.get(i).getUX()-distance), (rectangles.get(i).getUY()-distance), 
+                                    rectangles.get(i).getWidth(), rectangles.get(i).getHeight()));            
         }
         
         /**
          * perform a rotation in alpha degrees 
          */         
         for( int i = 0; i < novos.size(); ++i ) {
-            double x = novos.get(i).x;
-            double y = novos.get(i).y;
+            double x = novos.get(i).getUX();
+            double y = novos.get(i).getUY();
             
-            novos.get(i).x =  (x*Math.cos(Math.toRadians(alpha)) - y*Math.sin(Math.toRadians(alpha)));
-            novos.get(i).y =  (x*Math.sin(Math.toRadians(alpha)) + y*Math.cos(Math.toRadians(alpha)));
+            novos.get(i).setUX((x*Math.cos(Math.toRadians(alpha)) - y*Math.sin(Math.toRadians(alpha))));
+            novos.get(i).setUY((x*Math.sin(Math.toRadians(alpha)) + y*Math.cos(Math.toRadians(alpha))));
         }
         
         /**
@@ -76,8 +76,8 @@ public class RWordleL {
          */
         for( int i = 0; i < novos.size(); ++i ) {
             double aux = distanciaEuclideana(0, 0, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
-            novos.get(i).x += aux;
-            novos.get(i).y += aux;
+            novos.get(i).setUX(novos.get(i).getUX()+aux);
+            novos.get(i).setUY(novos.get(i).getUY()+aux);
         }
         
         /**
@@ -86,7 +86,7 @@ public class RWordleL {
         Collections.sort(novos, new Comparator<Retangulo>() {
             @Override
             public int compare(Retangulo o1, Retangulo o2) {
-                return new Double(o1.x).compareTo(o2.x);
+                return new Double(o1.getUX()).compareTo(o2.getUX());
             }            
         });
         
@@ -116,14 +116,14 @@ public class RWordleL {
                  /**
                  * creates a area object for simple check for overlaps
                  */    
-                Shape s = new Rectangle.Double(x, y, novos.get(i).width, novos.get(i).height);
+                Shape s = new Rectangle.Double(x, y, novos.get(i).getWidth(), novos.get(i).getHeight());
                 areaS = new Area(s);
                 
                 /**
                  * searches for overlaps in projected set
                  */    
                 for( Retangulo rect: projected ) {
-                    Shape s1 = new Rectangle.Double(rect.x, rect.y, rect.width, rect.height);
+                    Shape s1 = new Rectangle.Double(rect.getUX(), rect.getUY(), rect.getWidth(), rect.getHeight());
                     Area areaS1 = new Area(s1);
                     areaS1.intersect(areaS);
                     if( !areaS1.isEmpty() ) {
@@ -135,8 +135,7 @@ public class RWordleL {
             } while( !flag );
                         
             projected.add(new Retangulo(areaS.getBounds().x, areaS.getBounds().y, 
-                                        areaS.getBounds().width, areaS.getBounds().height,
-                                        novos.get(i).cor, novos.get(i).numero));
+                                        areaS.getBounds().width, areaS.getBounds().height));
                         
             /**
              * here, we discover the x and y amount to translate the position of elements

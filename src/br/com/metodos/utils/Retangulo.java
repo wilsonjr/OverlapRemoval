@@ -6,59 +6,118 @@
 
 package br.com.metodos.utils;
 
-import java.awt.Color;
-import java.awt.Rectangle;
-
 /**
  *
  * @author wilson
  */
-public class Retangulo extends Rectangle.Double {    
-    public Color cor;
-    public int numero;
-    private double epsX, epsY;
-    
-    public Retangulo() {
-        epsX = epsY = 0;
-    }
+public class Retangulo  {    
+    private double ux, uy, lx, ly;    
+    private double epsX = 0, epsY = 0;
         
-    public Retangulo(double xMin, double yMin, double width, double height, Color cor, int i) {        
-        super(xMin, yMin, width, height);        
-        this.cor = cor;
-        this.numero = i;
-        epsX = epsY = 0;       
+    public Retangulo(double minX, double minY, double width, double height) {
+        ux = minX;
+        lx = minX+width;
+        uy = minY;
+        ly = minY+height;
+    }    
+    
+    public void setLX(double x) {
+        lx = x;
     }
     
-    public void moveX(double step) {
-        setRect(step-width/2, y, (width+(step-width/2))-(step-width/2), height);
+    public void setUX(double x) {
+        double w = getWidth();
+        ux = x;
+        lx = ux+w;
     }
     
-    public void moveY(double step) {
-        setRect(x, step-height/2, width, (height+(step-width/2))-(step-height/2));
+    public void setLY(double y) {
+        ly = y;
     }
     
-    @Override
-    public double getMaxX() { 
-        return super.getMaxX()+epsX; 
+    public void setUY(double y) {
+        double h = getHeight();
+        uy = y;
+        ly = uy+h;
     }
     
-    @Override
-    public double getMaxY() { 
-        return super.getMaxY()+epsY; 
+    public void setWidth(double w) {
+        setLX(ux+w);
     }
-        
+    
+    public void setHeight(double h)  {
+        setLY(uy+h);
+    }
+    
+    
+    public double getLX() {
+        return lx+epsX; 
+    }
+    
+    public double getLY() { 
+        return ly+epsY; 
+    }
+    
+    public double getUX() { 
+        return ux; 
+    }
+    
+    public double getUY() { 
+        return uy; 
+    }
+    
+    public double getCenterX() { 
+        return ux+getWidth()/2.0; 
+    }
+    
+    public double getCenterY() { 
+        return uy+getHeight()/2.0; 
+    }
+    
+    public double getWidth()  { 
+        return lx-ux; 
+    }
+    
+    public double getHeight()  { 
+        return ly-uy; 
+    }
+    
+    public void moveX(double x) {
+        double q = (x-getWidth()/2.);
+        lx = q+getWidth();
+        ux = q;        
+    }
+    
+    public void moveY(double y) {
+        double q = (y-getHeight()/2.);
+        ly = q+getHeight();
+        uy = q;
+    }
+    
     public double olapX(Retangulo r) {
-        return (width + r.width)/2. - Math.abs(getCenterX() - r.getCenterX());
+       /* if( getCenterX() <= r.getCenterX() && r.getUX() <getLX() )
+            return getLX()-r.getUX();
+        if( r.getCenterX() <= getCenterX() && getUX() < r.getLX() )
+           return r.getLX()-getUX();
+        return 0;*/
+        return (getWidth() + r.getWidth())/2. - Math.abs(getCenterX() - r.getCenterX());
     }    
     
     public double olapY(Retangulo r) {
-        return (height + r.height)/2 - Math.abs(getCenterY() - r.getCenterY());
+        /* if( getCenterY() <= r.getCenterY() && r.getUY() < getLY() )
+            return getLY()-r.getUY();
+        if( r.getCenterY() <= getCenterY() && getUY() < r.getLY() )
+            return r.getLY()-getUY();
+        return 0;*/
+        return (getHeight() + r.getHeight())/2 - Math.abs(getCenterY() - r.getCenterY());
     }
     
     @Override
     public String toString() {
-        return "<"+getMinX()+", "+getMaxX()+", "+getMinY()+", "+getMaxY()+">";
+        return "<"+ux+", "+lx+", "+uy+", "+ly+">";
     }
+    
+    
     
     
 }
