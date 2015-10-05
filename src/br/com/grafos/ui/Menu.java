@@ -324,6 +324,7 @@ public class Menu extends javax.swing.JFrame {
                                                  rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
                     cleanImage();
                     repaint();    
+                    System.out.println(">> "+e.getX()+" "+e.getY());
                 }   
             }); 
             

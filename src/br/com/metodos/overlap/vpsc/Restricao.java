@@ -65,7 +65,6 @@ public class Restricao {
     }
     
     public double getSlack() {
-        System.out.println(right.getPosition()+" "+gap+" "+left.getPosition());
         return right.getPosition()-gap-left.getPosition();
     }
     

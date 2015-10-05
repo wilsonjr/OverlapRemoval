@@ -64,7 +64,7 @@ public class Blocos extends ArrayList<Bloco> {
         b.heapifyInConstraints();
         Restricao r = b.getMinInConstraint();
         
-        while( r != null  ) {
+        while( r != null && r.getViolation() > 0 ) {
             
             b.removeMinInConstraint();           
             
@@ -81,7 +81,7 @@ public class Blocos extends ArrayList<Bloco> {
                 b = leftBlock;
                 leftBlock = aux;
             }
-            
+            incrementTimeBlock();
             b.merge(leftBlock, r, distancia);
             b.mergeIn(leftBlock);
             b.setTimeStamp(timeBlock);
@@ -92,32 +92,32 @@ public class Blocos extends ArrayList<Bloco> {
     }
     
     public void mergeRight(Bloco b) {
-        incrementTimeBlock();
-        b.setTimeStamp(timeBlock);
-        b.heapifyInConstraints();
-        Restricao r = b.getMinInConstraint();
+     //   incrementTimeBlock();
+    //    b.setTimeStamp(timeBlock);
+        b.heapifyOutConstraints();
+        Restricao r = b.getMinOutConstraint();
         
         while( r != null && r.getViolation() > 0 ) {
-            b.removeMinInConstraint();
+            b.removeMinOutConstraint();
             
-            Bloco leftBlock = r.getLeft().getBloco();
+            Bloco rightBlock = r.getRight().getBloco();
             
-            if( leftBlock.getIn() == null )
-                leftBlock.heapifyInConstraints();
-            double distancia = r.getRight().getOffset()-r.getLeft().getOffset()-r.getGap();
-            //double distancia =  r.getLeft().getOffset()+r.getGap()-r.getRight().getOffset();
-            if( b.getVars().size() < leftBlock.getVars().size() ) {
+            //if( rightBlock.getOut() == null )
+                rightBlock.heapifyOutConstraints();
+            //double distancia = r.getRight().getOffset()-r.getLeft().getOffset()-r.getGap();
+            double distancia =  r.getLeft().getOffset()+r.getGap()-r.getRight().getOffset();
+            if( b.getVars().size() > rightBlock.getVars().size() ) {
                 distancia = -distancia;
                 Bloco aux = b;
-                b = leftBlock;
-                leftBlock = aux;
+                b = rightBlock;
+                rightBlock = aux;
             }
             System.out.println("OLHA A DISTANCIA: "+distancia);
-            b.merge(leftBlock, r, distancia);
-            b.mergeIn(leftBlock);
-            b.setTimeStamp(timeBlock);
-            leftBlock.setDeleted(true);
-            r = b.getMinInConstraint();
+            b.merge(rightBlock, r, distancia);
+            b.mergeOut(rightBlock);
+           // b.setTimeStamp(timeBlock);
+            rightBlock.setDeleted(true);
+            r = b.getMinOutConstraint();
         }
     }
     

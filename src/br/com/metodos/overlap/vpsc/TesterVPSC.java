@@ -27,20 +27,9 @@ public class TesterVPSC {
 //        rects.add(new Retangulo(7, 9, 9-7, 11-9));
 //        rects.add(new Retangulo(12, 9, 14-12, 11-9));
         
-        rects.add(new Retangulo(140,  158, 50, 50));
-    rects.add(new Retangulo(153,  130, 50, 50));
-    rects.add(new Retangulo(128,  103, 50, 50));
-    rects.add(new Retangulo(89 , 82, 50, 50));
-    rects.add(new Retangulo(75 , 130, 50, 50));
-    rects.add(new Retangulo(88 , 191, 50, 50));
-    rects.add(new Retangulo(153,  191, 50, 50));
-    rects.add(new Retangulo(216,  189, 50, 50));
-    rects.add(new Retangulo(200,  99, 50, 50));
-    rects.add(new Retangulo(157,  83, 50, 50));
-    rects.add(new Retangulo(196,  154, 50, 50));
-    rects.add(new Retangulo(108,  149, 50, 50));
-    rects.add(new Retangulo(115,  226, 50, 50)); 
-    rects.add(new Retangulo(175,  213, 50, 50));
+        rects.add(new Retangulo(250,  201, 50, 50));
+    rects.add(new Retangulo(235,  213, 50, 50));
+    rects.add(new Retangulo(234,  190, 50, 50));
         
         
         ArrayList<Variavel> vars = new ArrayList<>();

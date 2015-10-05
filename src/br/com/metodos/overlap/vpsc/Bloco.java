@@ -181,6 +181,9 @@ public class Bloco {
     public void removeMinInConstraint() {
         in.poll();
     }
+    public void removeMinOutConstraint() {
+        out.poll();
+    }
     
     public PriorityQueue<Restricao> getIn() {
         return in;
@@ -265,6 +268,26 @@ public class Bloco {
         
     }
     
+    private void resetActiveLm(Variavel v, Variavel u) {
+        for( int i = 0; i < v.getOut().size(); ++i ) {
+            if( v.getOut().get(i).getRight().getBloco() == this && v.getOut().get(i).getAtiva() &&
+                v.getOut().get(i).getRight() != u ) {
+                
+                v.getOut().get(i).setLm(0);
+                resetActiveLm(v.getOut().get(i).getRight(), v);
+            }
+        }
+        
+        for( int i = 0; i < v.getIn().size(); ++i ) {
+            if( v.getIn().get(i).getLeft().getBloco() == this && v.getIn().get(i).getAtiva() && 
+                v.getIn().get(i).getLeft() != u ) {
+                
+                v.getIn().get(i).setLm(0);
+                resetActiveLm(v.getIn().get(i).getLeft(), v);
+            }
+        }    
+    }
+    
     private double compDfDv(Variavel v, Variavel u) {
         double dfdv = v.getWeight() * (v.getPosition()-v.getDes());
         
@@ -274,12 +297,10 @@ public class Bloco {
                 v.getOut().get(i).setLm(compDfDv(v.getOut().get(i).getRight(), v));
                 dfdv += v.getOut().get(i).getLm();
                 if( menor == null ) {
-                    menor = v.getOut().get(i);
-                    System.out.println("Bug no sistema");
+                    menor = v.getOut().get(i);                    
                 }
                 if( menor.getLm() > v.getOut().get(i).getLm() ) {
-                    menor = v.getOut().get(i);
-                    System.out.println("Bug no sistema");
+                    menor = v.getOut().get(i);                    
                 }
             }
         }
@@ -290,12 +311,11 @@ public class Bloco {
                 v.getIn().get(i).setLm(-compDfDv(v.getIn().get(i).getLeft(), v));
                 dfdv -= v.getIn().get(i).getLm();
                 if( menor == null ) {
-                    menor = v.getIn().get(i);
-                    System.out.println("Bug no sistema");
+                    menor = v.getIn().get(i);                    
                 }
                 if( menor.getLm() > v.getIn().get(i).getLm() ) {
                     menor = v.getIn().get(i);
-                    System.out.println("Bug no sistema");
+                    
                 }
             }
         }        
@@ -307,11 +327,7 @@ public class Bloco {
 
     public Restricao findMinLM() {
        
-        System.out.println("OLAAA");
-        for( int i = 0; i < vars.get(0).getIn().size(); ++i )
-            vars.get(0).getIn().get(i).setLm(0);
-        for( int i = 0; i < vars.get(0).getOut().size(); ++i )
-            vars.get(0).getOut().get(i).setLm(0);
+        resetActiveLm(vars.get(0), null);
         
         menor = null;
         compDfDv(vars.get(0), null);

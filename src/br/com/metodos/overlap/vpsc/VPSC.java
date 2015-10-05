@@ -166,6 +166,13 @@ public class VPSC {
 //        });
         mquickSort(eventos, 0, eventos.length-1);
 
+        for( int i = 1; i < eventos.length; ++i )
+            if( eventos[i-1].getNo().getRect() == eventos[i].getNo().getRect() ) {
+                Event temp = eventos[i-1];           // store the first value in a temp
+                eventos[i-1] = eventos[i];      // copy the value of the second into the first
+                eventos[i] = temp;               // copy the value of the temp into the second
+            }
+        
         System.out.println("Sequencia y constraint");
         for( int i = 0; i < eventos.length; ++i ) 
             System.out.println(eventos[i].getNo().getRect()+" "+eventos[i].getTipo());
@@ -270,13 +277,13 @@ public class VPSC {
                                 k--;                                        // element not greater than the pivot
                             if (k > i)                                       // if the left seekindex is still smaller than
                                     swap(array, i, k);                      // the right index, swap the corresponding elements
-                            else if( array[i].getNo().getRect() == array[k].getNo().getRect() ) {
+                           /* else if( array[i].getNo().getRect() == array[k].getNo().getRect() ) {
                                 if( array[k].getTipo().equals("OPEN") ) {
                                     System.out.println("OPA ENTROU");
                                     swap(array, i, k);
                                 }
                                 
-                            }
+                            }*/
                     }
                     swap(array, start, k);          // after the indices have crossed, swap the last element in
                                                     // the left partition with the pivot 
@@ -321,7 +328,15 @@ public class VPSC {
             }
         });*/
         mquickSort(eventos, 0, eventos.length-1);
-        for( int i = 0; i < eventos.length; ++i )  
+        
+        for( int i = 1; i < eventos.length; ++i )
+            if( eventos[i-1].getNo().getRect() == eventos[i].getNo().getRect() ) {
+                Event temp = eventos[i-1];           // store the first value in a temp
+                eventos[i-1] = eventos[i];      // copy the value of the second into the first
+                eventos[i] = temp;               // copy the value of the temp into the second
+            }
+        
+        for( int i = 0; i < eventos.length; ++i ) 
           System.out.println(eventos[i].getNo().getRect()+" "+eventos[i].getTipo());
         
         TreeSet<No> scanline = new TreeSet<>(new NoComparator());
@@ -358,24 +373,24 @@ public class VPSC {
                 while( it.hasNext() ) {
                     
                     No u = it.next();             
-                        double separation = (v.getRect().getWidth()+u.getRect().getWidth())/2.;
+                    double separation = (v.getRect().getWidth()+u.getRect().getWidth())/2.;
 
-                        if( !u.getDeleted() && canAddConstraint(restricoes, u.getVar(), v.getVar(), separation) ) {                    
-                            restricoes.add(new Restricao(u.getVar(), v.getVar(), separation));
-                            u.removeRightNeighbour(v);
-                        }
+                    if( !u.getDeleted() && canAddConstraint(restricoes, u.getVar(), v.getVar(), separation) ) {                    
+                        restricoes.add(new Restricao(u.getVar(), v.getVar(), separation));
+                        u.removeRightNeighbour(v);
+                    }
                     
                 }
                 
                 it = v.getRightNeighbours().iterator();
                 while( it.hasNext() ) {
                     No u = it.next();         
-                        double separation = (v.getRect().getWidth()+u.getRect().getWidth())/2.;
-                        if( !u.getDeleted() && canAddConstraint(restricoes, v.getVar(), u.getVar(), separation) )  {
-                            restricoes.add(new Restricao(v.getVar(), u.getVar(), separation));
-                            u.removeLeftNeighbour(v);
-                            //removeScanline(u.getLeftNeighbours(), v);
-                        }
+                    double separation = (v.getRect().getWidth()+u.getRect().getWidth())/2.;
+                    if( !u.getDeleted() && canAddConstraint(restricoes, v.getVar(), u.getVar(), separation) )  {
+                        restricoes.add(new Restricao(v.getVar(), u.getVar(), separation));
+                        u.removeLeftNeighbour(v);
+                        //removeScanline(u.getLeftNeighbours(), v);
+                    }
                     
                 }
                 
