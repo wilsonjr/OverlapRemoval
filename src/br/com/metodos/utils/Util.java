@@ -6,6 +6,7 @@
 
 package br.com.metodos.utils;
 
+import br.com.metodos.overlap.vpsc.Event;
 import java.util.ArrayList;
 
 /**
@@ -45,5 +46,34 @@ public class Util {
             ori.get(i).setHeight(rects.get(i).getHeight());
         }   
     }
+        
+    public static void quickSort(Event array[], int start, int end) {
+        int i = start;                          
+        int k = end;                            
+
+        if( end - start >= 1 ) {
+            Event pivot = array[start];       
+
+            while( k > i ) {
+                while( array[i].getPosition() <= pivot.getPosition() && i <= end && k > i )  
+                    i++;                                    
+                while( array[k].getPosition() > pivot.getPosition() && k >= start && k >= i ) 
+                    k--;                                        
+                if( k > i)                                      
+                     swap(array, i, k);                                    
+            }
+            swap(array, start, k);          
+            quickSort(array, start, k - 1);
+            quickSort(array, k + 1, end);  
+        }
+        
+    }
+
+    private static void swap(Event array[], int index1, int index2)  {
+            Event temp = array[index1];           
+            array[index1] = array[index2];      
+            array[index2] = temp;               
+    }
+    
     
 }
