@@ -95,7 +95,7 @@ public class Bloco {
             ArrayList<Restricao> rest = vars.get(i).getIn();
             for( int j = 0; j < rest.size(); ++j )  {
                 Restricao r = rest.get(j);
-                r.setTimeStamp(timeStamp);
+          //      r.setTimeStamp(timeStamp);
                 if( r.getLeft().getBloco() != this && in != null || r.getRight().getBloco() != this && in == null )
                     in.add(r);
             }
@@ -122,7 +122,7 @@ public class Bloco {
             ArrayList<Restricao> rest = vars.get(i).getOut();
             for( int j = 0; j < rest.size(); ++j )  {
                 Restricao r = rest.get(j);
-                r.setTimeStamp(timeStamp);
+           //     r.setTimeStamp(timeStamp);
                 if( r.getLeft().getBloco() != this && out != null || r.getRight().getBloco() != this && out == null )
                     out.add(r);
             }
@@ -168,7 +168,7 @@ public class Bloco {
                 
         for( int i = 0; i < forDelete.size(); ++i ) {
             rest = forDelete.get(i);
-            rest.setTimeStamp(timeStamp);
+       //     rest.setTimeStamp(timeStamp);
             
             in.add(rest);
         }
@@ -243,25 +243,7 @@ public class Bloco {
         
     }
     
-    private void resetActiveLm(Variavel v, Variavel u) {
-        for( int i = 0; i < v.getOut().size(); ++i ) {
-            if( v.getOut().get(i).getRight().getBloco() == this && v.getOut().get(i).getAtiva() &&
-                v.getOut().get(i).getRight() != u ) {
-                
-                v.getOut().get(i).setLm(0);
-                resetActiveLm(v.getOut().get(i).getRight(), v);
-            }
-        }
-        
-        for( int i = 0; i < v.getIn().size(); ++i ) {
-            if( v.getIn().get(i).getLeft().getBloco() == this && v.getIn().get(i).getAtiva() && 
-                v.getIn().get(i).getLeft() != u ) {
-                
-                v.getIn().get(i).setLm(0);
-                resetActiveLm(v.getIn().get(i).getLeft(), v);
-            }
-        }    
-    }
+ 
     
     private double compDfDv(Variavel v, Variavel u) {
         double dfdv = v.getWeight() * (v.getPosition()-v.getDes());
@@ -302,7 +284,14 @@ public class Bloco {
 
     public Restricao findMinLM() {
        
-        resetActiveLm(vars.get(0), null);
+        //resetActiveLm(vars.get(0), null);
+        for( int i = 0; i < vars.size(); ++i ) {
+            for( int j  = 0; j < vars.get(i).getIn().size(); ++j )
+                vars.get(i).getIn().get(j).setLm(0);
+            for( int j  = 0; j < vars.get(i).getOut().size(); ++j )
+                vars.get(i).getOut().get(j).setLm(0);
+        }
+        
         
         menor = null;
         compDfDv(vars.get(0), null);

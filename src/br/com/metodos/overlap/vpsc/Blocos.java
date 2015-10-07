@@ -12,16 +12,18 @@ import java.util.ArrayList;
  *
  * @author wilson
  */
-public class Blocos extends ArrayList<Bloco> {
+public class Blocos  {
     private ArrayList<Variavel> vars;
+    private ArrayList<Bloco> blocos;
     private long timeBlock;
     
     public Blocos(ArrayList<Variavel> vars) {
         timeBlock = 0;
         this.vars = vars;
+        blocos = new ArrayList<>();
         
         for( int i = 0; i < vars.size(); ++i ) 
-            add(new Bloco(vars.get(i)));
+            blocos.add(new Bloco(vars.get(i)));
        
     }
     
@@ -75,14 +77,14 @@ public class Blocos extends ArrayList<Bloco> {
             
             
             if( b.getVars().size() > bl.getVars().size() ) {
-                incrementTimeBlock();
+             //   incrementTimeBlock();
                 b.mergeBlockLeft(bl, r, distbltob);
-                b.setTimeStamp(timeBlock);              
+             //   b.setTimeStamp(timeBlock);              
                 r = b.getMinInConstraint();
             } else {
-                incrementTimeBlock();
+             //   incrementTimeBlock();
                 bl.mergeBlockLeft(b, r, -distbltob);
-                bl.setTimeStamp(timeBlock);
+              //  bl.setTimeStamp(timeBlock);
                 r = bl.getMinInConstraint();
                 b = bl;
             }
@@ -135,8 +137,12 @@ public class Blocos extends ArrayList<Bloco> {
         mergeRight(rb);        
         
         b.setDeleted(true);
-        add(lb);
-        add(rb);
+        blocos.add(lb);
+        blocos.add(rb);
     }
     
+    
+    public ArrayList<Bloco> getBlocos() {
+        return blocos;
+    }
 }

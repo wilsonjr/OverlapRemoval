@@ -76,15 +76,15 @@ public class VPSC {
         satisfyVPSC(blocos, vars, res);
         while( true ) {
             
-            for( int i = 0; i < blocos.size(); ++i ) {
-                blocos.get(i).heapifyInConstraints();
-                blocos.get(i).heapifyOutConstraints();
+            for( int i = 0; i < blocos.getBlocos().size(); ++i ) {
+                blocos.getBlocos().get(i).heapifyInConstraints();
+                blocos.getBlocos().get(i).heapifyOutConstraints();
             }
             
-            Restricao r1 = blocos.get(0).findMinLM();
+            Restricao r1 = blocos.getBlocos().get(0).findMinLM();
             int idx = 0;
-            for( int i = 1; i < blocos.size(); ++i ) {
-                Restricao r2 = blocos.get(i).findMinLM();
+            for( int i = 1; i < blocos.getBlocos().size(); ++i ) {
+                Restricao r2 = blocos.getBlocos().get(i).findMinLM();
                 if( r1 == null || r2 != null && r1.getLm() > r2.getLm() )  {
                     r1 = r2;                
                     idx = i;
@@ -95,11 +95,11 @@ public class VPSC {
             
             Bloco lb = new Bloco();
             Bloco rb = new Bloco();
-            blocos.restrict_block(blocos.get(idx), lb, rb, r1);
+            blocos.restrict_block(blocos.getBlocos().get(idx), lb, rb, r1);
 
-            for( int j = blocos.size()-1; j >= 0; --j )
-                if( blocos.get(j).getDeleted() )
-                    blocos.remove(j);
+            for( int j = blocos.getBlocos().size()-1; j >= 0; --j )
+                if( blocos.getBlocos().get(j).getDeleted() )
+                    blocos.getBlocos().remove(j);
             
             
         } 
@@ -119,9 +119,9 @@ public class VPSC {
                 blocos.mergeLeft(varsOrdered.get(i).getBloco());                
                              
         
-        for( int i = blocos.size()-1; i >= 0; --i )
-                if( blocos.get(i).getDeleted() )
-                    blocos.remove(i);
+        for( int i = blocos.getBlocos().size()-1; i >= 0; --i )
+                if( blocos.getBlocos().get(i).getDeleted() )
+                    blocos.getBlocos().remove(i);
     }
     
     
