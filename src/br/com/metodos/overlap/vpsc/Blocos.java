@@ -60,36 +60,31 @@ public class Blocos extends ArrayList<Bloco> {
         incrementTimeBlock();
         b.setTimeStamp(timeBlock);
         b.heapifyInConstraints();
-        Restricao r = b.getMinInConstraint();
-        
+     
+        Restricao r = b.getMinInConstraint();        
         while( r != null && r.getViolationLeft() > 0 ) {
             
             b.removeMinInConstraint();           
             
             
-            Bloco leftBlock = r.getLeft().getBloco();
+            Bloco bl = r.getLeft().getBloco();
             
-            if( leftBlock.getIn() == null )
-                leftBlock.heapifyInConstraints();
-            double distancia = r.getRight().getOffset()-r.getLeft().getOffset()-r.getGap();
+            if( bl.getIn() == null )
+                bl.heapifyInConstraints();
+            double distbltob = r.getRight().getOffset()-r.getLeft().getOffset()-r.getGap();
             
             
-            if( b.getVars().size() > leftBlock.getVars().size() ) {
+            if( b.getVars().size() > bl.getVars().size() ) {
                 incrementTimeBlock();
-                b.mergeBlock(leftBlock, r, distancia);
-              //  b.merge(leftBlock, r, distancia);
-              //  b.mergeIn(leftBlock);
-                b.setTimeStamp(timeBlock);
-              //  leftBlock.setDeleted(true);
+                b.mergeBlockLeft(bl, r, distbltob);
+                b.setTimeStamp(timeBlock);              
                 r = b.getMinInConstraint();
             } else {
                 incrementTimeBlock();
-                leftBlock.merge(b, r, -distancia);
-                leftBlock.mergeIn(b);
-                leftBlock.setTimeStamp(timeBlock);
-                b.setDeleted(true);
-                r = leftBlock.getMinInConstraint();
-                b= leftBlock;
+                bl.mergeBlockLeft(b, r, -distbltob);
+                bl.setTimeStamp(timeBlock);
+                r = bl.getMinInConstraint();
+                b = bl;
             }
         }
         
@@ -109,14 +104,10 @@ public class Blocos extends ArrayList<Bloco> {
             double distancia =  r.getLeft().getOffset()+r.getGap()-r.getRight().getOffset();
            
             if( b.getVars().size() > rightBlock.getVars().size() ) {
-                b.merge(rightBlock, r, distancia);
-                b.mergeOut(rightBlock);
-                rightBlock.setDeleted(true);
+                b.mergeBlockRight(rightBlock, r, distancia);
                 r = b.getMinOutConstraint();
             } else {
-                rightBlock.merge(b, r, -distancia);
-                rightBlock.mergeOut(b);
-                b.setDeleted(true);
+                rightBlock.mergeBlockRight(b, r, -distancia);
                 r = rightBlock.getMinOutConstraint();
                 b = rightBlock;
             }

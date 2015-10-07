@@ -41,7 +41,7 @@ public class VPSC {
          * generate horizontal constraints and solve vpsc for x
          */
         ArrayList<Restricao> restricoes = new ArrayList<>();
-        int count = VPSC.geraRestricoesHorizontais(projected, vars, restricoes);
+        int count = VPSC.generateCx(projected, vars, restricoes);
         
         // solve vpsc for x
         VPSC.solveVPSC(vars, restricoes);
@@ -56,7 +56,7 @@ public class VPSC {
         
         // generate constraint for y coordinate
         restricoes = new ArrayList<>();
-        count = VPSC.geraRestricoesVerticais(projected, vars, restricoes);
+        count = VPSC.generateCy(projected, vars, restricoes);
         
         // solve vpsc for y and move rectangles in y direction to remove all overlap remaining
         VPSC.solveVPSC(vars, restricoes);
@@ -74,8 +74,7 @@ public class VPSC {
         Blocos blocos = new Blocos(vars);
         
         satisfyVPSC(blocos, vars, res);
-        int limit = 0;
-        do {
+        while( true ) {
             
             for( int i = 0; i < blocos.size(); ++i ) {
                 blocos.get(i).heapifyInConstraints();
@@ -103,7 +102,7 @@ public class VPSC {
                     blocos.remove(j);
             
             
-        } while( limit++ < 1000 );
+        } 
         
     }
     
@@ -126,9 +125,20 @@ public class VPSC {
     }
     
     
+    /**
+     * The code for generateCy, the procedure to generetate vertical non-overlap
+     * constraints is essentially dual to that of generateCx. The only difference is
+     * that any remaining overlap must be removed vertically. This means that we
+     * need only find the closest node in the analogue of the functions get_left_nbours
+     * and get_right_nbours since any other nodes in the scan line will be constrained to
+     * be above or below these.
+     * @param retangulos
+     * @param vars
+     * @param restricoes
+     * @return 
+     */
     
-    
-    public static int geraRestricoesVerticais(ArrayList<Retangulo> retangulos, ArrayList<Variavel> vars, ArrayList<Restricao> restricoes) {
+    public static int generateCy(ArrayList<Retangulo> retangulos, ArrayList<Variavel> vars, ArrayList<Restricao> restricoes) {
         Event eventos[] = new Event[2*retangulos.size()];
         int j = 0;
         for( int i = 0; i < retangulos.size(); ++i ) {
@@ -208,20 +218,16 @@ public class VPSC {
                 
                 No a = v.getAboveNeighbour();
                 if( a != null ) {
-                    double separation = (v.getRect().getHeight()+a.getRect().getHeight())/2.;
-                    restricoes.add(new Restricao(a.getVar(), v.getVar(), separation));
-                    a.setBelowNeighbour(v.getBelowNeighbour());
+                    double gap = (v.getRect().getHeight()+a.getRect().getHeight())/2.;
+                    restricoes.add(new Restricao(a.getVar(), v.getVar(), gap));
                 }
                 
                 No b = v.getBelowNeighbour();
                 if( b != null ) {
-                    double separation = (v.getRect().getHeight()+b.getRect().getHeight())/2.;
-                    restricoes.add(new Restricao(v.getVar(), b.getVar(), separation));
-                    b.setAboveNeighbour(v.getAboveNeighbour());
+                    double gap = (v.getRect().getHeight()+b.getRect().getHeight())/2.;
+                    restricoes.add(new Restricao(v.getVar(), b.getVar(), gap));                    
                 }
-                
-                
-                //scanline.remove(v);
+
                 removeScanline(scanline, v);
             }
         }
@@ -233,7 +239,7 @@ public class VPSC {
     
     
     
-    public static int geraRestricoesHorizontais(ArrayList<Retangulo> retangulos, ArrayList<Variavel> vars, ArrayList<Restricao> restricoes) {
+    public static int generateCx(ArrayList<Retangulo> retangulos, ArrayList<Variavel> vars, ArrayList<Restricao> restricoes) {
         /**
          * Adiciona os eventos de abertura e fechamento dos retangulos 
          */
@@ -270,36 +276,28 @@ public class VPSC {
                 
                 scanline.add(v);
                 
-                System.out.print("elementos: ");
+                TreeSet<No> leftv = getLeftNeighbours(scanline, v);                
+                TreeSet<No> rightv = getRightNeighbours(scanline, v);               
                 
-                Iterator<No> it = scanline.iterator();
-                while( it.hasNext() ) {
-                    
-                    No u = it.next();             
-                    if( !u.getDeleted() )
-                        System.out.print(u.getPosition()+" ");
-                    
-                }
-                System.out.println();
-                
-                TreeSet<No> leftNeighbours = getLeftNeighbours(scanline, v);                
-                TreeSet<No> rightNeighbours = getRightNeighbours(scanline, v);               
-                
-                System.out.println(v.getVar().getId()+": Founded "+leftNeighbours.size()+" in left and "+rightNeighbours.size()+" in right");
-                
-                v.setLeftNeighbours(leftNeighbours);
-                v.setRightNeighbours(rightNeighbours);
+                v.setLeftNeighbours(leftv);
+                v.setRightNeighbours(rightv);
                 
             } else { /* ei.kind == close*/
-                System.out.println("Close: "+v.getVar().getId());
+                
+                /**
+                * Uma constraint é definida como left(c) + gap(c) <= right(c)
+                * onde gap(c) é o menor separação entre left(c) e right(c).
+                * Assim, neste caso é (left(c).width + right(c).width)/2.
+                */  
+                
                 Iterator<No> it = v.getLeftNeighbours().iterator();
                 while( it.hasNext() ) {
                     
-                    No u = it.next();             
-                    double separation = (v.getRect().getWidth()+u.getRect().getWidth())/2.;
-
-                    if( !u.getDeleted() && canAddConstraint(restricoes, u.getVar(), v.getVar(), separation) ) {                    
-                        restricoes.add(new Restricao(u.getVar(), v.getVar(), separation));
+                    No u = it.next();          
+                    double gap = (v.getRect().getWidth()+u.getRect().getWidth())/2.;
+                    
+                    if( !u.getDeleted() && canAddConstraint(restricoes, u.getVar(), v.getVar(), gap) ) {                    
+                        restricoes.add(new Restricao(u.getVar(), v.getVar(), gap));
                         u.removeRightNeighbour(v);
                     }
                     
@@ -308,16 +306,14 @@ public class VPSC {
                 it = v.getRightNeighbours().iterator();
                 while( it.hasNext() ) {
                     No u = it.next();         
-                    double separation = (v.getRect().getWidth()+u.getRect().getWidth())/2.;
-                    if( !u.getDeleted() && canAddConstraint(restricoes, v.getVar(), u.getVar(), separation) )  {
-                        restricoes.add(new Restricao(v.getVar(), u.getVar(), separation));
-                        u.removeLeftNeighbour(v);
-                        //removeScanline(u.getLeftNeighbours(), v);
-                    }
-                    
-                }
+                    double gap = (v.getRect().getWidth()+u.getRect().getWidth())/2.;
+                    if( !u.getDeleted() && canAddConstraint(restricoes, v.getVar(), u.getVar(), gap) )  {
+                        restricoes.add(new Restricao(v.getVar(), u.getVar(), gap));
+                        u.removeLeftNeighbour(v);                        
+                    }                    
+                }                
                 
-                //scanline.remove(v);
+                // "remove" o elemento da scanline
                 removeScanline(scanline, v);
             }
         }
@@ -325,7 +321,11 @@ public class VPSC {
         return restricoes.size();
     }
     
-    
+    /**
+     * Método usado para setar um flag de removido da scanline
+     * @param scanline
+     * @param v 
+     */
     private static void removeScanline(TreeSet<No> scanline, No v) {
         Iterator<No> it = scanline.iterator();
         No toRemove = null;
@@ -335,17 +335,14 @@ public class VPSC {
                 break;
         }
         
-        if( toRemove != null ) {
+        if( toRemove != null )
             toRemove.setDeleted(true);            
-        }
-            
-        
     }
     
     private static TreeSet<No> getLeftNeighbours(TreeSet<No> scanline, No v) {
         TreeSet<No> leftv = new TreeSet<>(new NoComparator());
         
-        
+        // neste caso, são os elementos menores que v
         Iterator<No> it = scanline.descendingIterator();        
         while( it.hasNext() ) {
             No no = it.next();
@@ -364,23 +361,20 @@ public class VPSC {
         
         while( u != null ) {      
             
-            if( u.getRect().olapX(v.getRect()) <= 0 ) {
-                leftv.add(u);
-                System.out.println("left inseriu 1");
+            if( u.getRect().olapX(v.getRect()) <= 0.000 ) {
+                leftv.add(u);                
                 return leftv;
-            }            
-            if( u.getRect().olapX(v.getRect()) <= u.getRect().olapY(v.getRect()) )  {
-                leftv.add(u);
-                System.out.println("left inseriu 2");
             }
+            
+            if( u.getRect().olapX(v.getRect()) <= u.getRect().olapY(v.getRect()) )  
+                leftv.add(u);
             
             u = null;
             while( it.hasNext() ) {
-                u = it.next();//scanline.floor(u);//lower;//scanline.lower(u);
+                u = it.next();
                 if( !u.getDeleted() ) 
                     break;
-                u = null;
-                
+                u = null;               
             }
         }
         
@@ -389,7 +383,6 @@ public class VPSC {
 
     private static TreeSet<No> getRightNeighbours(TreeSet<No> scanline, No v) {
         TreeSet<No> rightv = new TreeSet<>(new NoComparator());
-        System.out.println("origin pos: "+v.getPosition());
         Iterator<No> it = scanline.iterator();
         while( it.hasNext() ) {
             No no = it.next();
@@ -400,30 +393,26 @@ public class VPSC {
         
         No u = null;
         while( it.hasNext() ) {
-            u = it.next();//scanline.ceiling(v);//higher;//scanline.higher(v);
+            u = it.next();
             if( !u.getDeleted() )
                 break;
             u = null;
         }
         while( u != null ) {
-            System.out.println("pos : "+u.getPosition());
-            System.out.println(">> "+u.getRect().olapX(v.getRect())+" "+u.getRect().olapY(v.getRect()));
+            
             if( u.getRect().olapX(v.getRect()) <= 0.000 ) {
-                rightv.add(u);
-                System.out.println("right inseriu 1");
+                rightv.add(u);                
                 return rightv;
             }            
             
             
-            if( u.getRect().olapX(v.getRect()) <= u.getRect().olapY(v.getRect()) )  {
-                rightv.add(u);            
-                System.out.println("right inseriu 2");
-            }
+            if( u.getRect().olapX(v.getRect()) <= u.getRect().olapY(v.getRect()) ) 
+                rightv.add(u);                            
+            
              
             u = null;
             while( it.hasNext() ) {
-                u = it.next();//scanline.ceiling(u);//higher; //scanline.higher(u);
-                
+                u = it.next();                
                 if( !u.getDeleted() )
                     break;
                 u = null;
@@ -433,11 +422,19 @@ public class VPSC {
         return rightv;
     }
 
+    /**
+     * Método que evita adicionar constraints redundantes
+     * @param restricoes
+     * @param v1
+     * @param v2
+     * @param separation
+     * @return 
+     */
     private static boolean canAddConstraint(ArrayList<Restricao> restricoes, Variavel v1, Variavel v2, double separation) {
         
-    //    for( int i = 0; i < restricoes.size(); ++i )
-    //        if( restricoes.get(i).getLeft() == v1 && restricoes.get(i).getRight() == v2 && restricoes.get(i).getGap() == separation )
-    //            return false;
+        for( int i = 0; i < restricoes.size(); ++i )
+            if( restricoes.get(i).getLeft() == v1 && restricoes.get(i).getRight() == v2 && restricoes.get(i).getGap() == separation )
+                return false;
         
         
         return true;

@@ -37,7 +37,7 @@ public class TesterVPSC {
             vars.add(new Variavel(i));
         
         ArrayList<Restricao> restricoes = new ArrayList<>();
-        int m = VPSC.geraRestricoesHorizontais(rects, vars, restricoes);
+        int m = VPSC.generateCx(rects, vars, restricoes);
         /*double oldx[] = new double[rects.size()];
         for( int i = 0; i < oldx.length; ++i ) 
             oldx[i] = vars.get(i).getDes();                    */
@@ -55,7 +55,7 @@ public class TesterVPSC {
         for( int i = 0; i < vars.size(); ++i ) 
             vars.get(i).init(i);
         restricoes = new ArrayList<>();
-        m = VPSC.geraRestricoesVerticais(rects, vars, restricoes);
+        m = VPSC.generateCy(rects, vars, restricoes);
         System.out.println("NUMERO DE RESTRICOES VERTICAIS: "+m);
         for( Restricao r: restricoes )
             System.out.println(r);

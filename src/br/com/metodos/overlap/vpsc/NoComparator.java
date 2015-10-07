@@ -21,6 +21,9 @@ public class NoComparator implements Comparator<No> {
             return -1;
         else if( o1.getPosition() > o2.getPosition() )
             return 1;
+        
+        // se for igual (0) a coleção descartaria, mas neste caso temos que guardar
+        // caso contrário, não poderíamos remover sobreposição de retângulos coincidentes
         return 1;
     }
     

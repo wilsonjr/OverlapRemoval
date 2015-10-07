@@ -205,31 +205,6 @@ public class Bloco {
         return deleted;
     }
 
-    public void merge(Bloco bloco, Restricao r, double distancia) {
-        r.setAtiva(true);
-        wposn += bloco.getWPosn() - distancia*bloco.getWeight();
-        weight += bloco.getWeight();
-        posn = wposn/weight;
-        
-        for( int i = 0; i < bloco.getVars().size(); ++i ) {
-            bloco.getVars().get(i).setBloco(this);
-            bloco.getVars().get(i).setOffset(bloco.getVars().get(i).getOffset()+distancia);
-            vars.add(bloco.getVars().get(i));
-        }
-        bloco.setDeleted(true);
-    }
-
-    public void mergeIn(Bloco bloco) {
-        getMinInConstraint();
-        bloco.getMinInConstraint();
-        in.addAll(bloco.getIn());               
-    }
-    
-    public void mergeOut(Bloco bloco) {
-        getMinOutConstraint();
-        bloco.getMinOutConstraint();
-        out.addAll(bloco.getOut());
-    }
     
     public void setWeight(double weight) {
         this.weight = weight;
@@ -337,7 +312,7 @@ public class Bloco {
         return menor;
     }
 
-    public void mergeBlock(Bloco bloco, Restricao r, double distancia) {
+    public void mergeBlockLeft(Bloco bloco, Restricao r, double distancia) {
         r.setAtiva(true);
         wposn += bloco.getWPosn() - distancia*bloco.getWeight();
         weight += bloco.getWeight();
@@ -353,6 +328,26 @@ public class Bloco {
         getMinInConstraint();
         bloco.getMinInConstraint();
         in.addAll(bloco.getIn());       
+    }
+    
+    public void mergeBlockRight(Bloco bloco, Restricao r, double distancia) {
+        r.setAtiva(true);
+        wposn += bloco.getWPosn() - distancia*bloco.getWeight();
+        weight += bloco.getWeight();
+        posn = wposn/weight;
+        
+        for( int i = 0; i < bloco.getVars().size(); ++i ) {
+            bloco.getVars().get(i).setBloco(this);
+            bloco.getVars().get(i).setOffset(bloco.getVars().get(i).getOffset()+distancia);
+            vars.add(bloco.getVars().get(i));
+        }
+        bloco.setDeleted(true);
+        
+        
+        
+        getMinOutConstraint();
+        bloco.getMinOutConstraint();
+        out.addAll(bloco.getOut());
     }
 
 }
