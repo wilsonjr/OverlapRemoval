@@ -60,13 +60,14 @@ public class Restricao {
         this.gap = gap;
     }
     
-    public double getViolation() {
+    public double getViolationLeft() {
         return left.getPosition()+gap-right.getPosition();
     }
     
-    public double getSlack() {
-        return right.getPosition()-gap-left.getPosition();
+    public double getViolationRight() {
+        return right.getPosition()-left.getPosition()-gap;
     }
+    
     
     public long getTimeStamp() {
         return timeStamp;

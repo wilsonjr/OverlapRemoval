@@ -54,8 +54,6 @@ public class Blocos extends ArrayList<Bloco> {
         }
         
         order.add(0, v);
-        
-        
     }
     
     public void mergeLeft(Bloco b) {
@@ -64,7 +62,7 @@ public class Blocos extends ArrayList<Bloco> {
         b.heapifyInConstraints();
         Restricao r = b.getMinInConstraint();
         
-        while( r != null && r.getViolation() > 0 ) {
+        while( r != null && r.getViolationLeft() > 0 ) {
             
             b.removeMinInConstraint();           
             
@@ -74,50 +72,55 @@ public class Blocos extends ArrayList<Bloco> {
             if( leftBlock.getIn() == null )
                 leftBlock.heapifyInConstraints();
             double distancia = r.getRight().getOffset()-r.getLeft().getOffset()-r.getGap();
-            //double distancia =  r.getLeft().getOffset()+r.getGap()-r.getRight().getOffset();
-            if( b.getVars().size() < leftBlock.getVars().size() ) {
-                distancia = -distancia;
-                Bloco aux = b;
-                b = leftBlock;
-                leftBlock = aux;
+            
+            
+            if( b.getVars().size() > leftBlock.getVars().size() ) {
+                incrementTimeBlock();
+                b.mergeBlock(leftBlock, r, distancia);
+              //  b.merge(leftBlock, r, distancia);
+              //  b.mergeIn(leftBlock);
+                b.setTimeStamp(timeBlock);
+              //  leftBlock.setDeleted(true);
+                r = b.getMinInConstraint();
+            } else {
+                incrementTimeBlock();
+                leftBlock.merge(b, r, -distancia);
+                leftBlock.mergeIn(b);
+                leftBlock.setTimeStamp(timeBlock);
+                b.setDeleted(true);
+                r = leftBlock.getMinInConstraint();
+                b= leftBlock;
             }
-            incrementTimeBlock();
-            b.merge(leftBlock, r, distancia);
-            b.mergeIn(leftBlock);
-            b.setTimeStamp(timeBlock);
-            leftBlock.setDeleted(true);            
-            r = b.getMinInConstraint();
         }
         
     }
     
     public void mergeRight(Bloco b) {
-     //   incrementTimeBlock();
-    //    b.setTimeStamp(timeBlock);
         b.heapifyOutConstraints();
         Restricao r = b.getMinOutConstraint();
         
-        while( r != null && r.getViolation() > 0 ) {
+        while( r != null && r.getViolationRight() < 0 ) {
             b.removeMinOutConstraint();
             
             Bloco rightBlock = r.getRight().getBloco();
             
-            //if( rightBlock.getOut() == null )
-                rightBlock.heapifyOutConstraints();
-            //double distancia = r.getRight().getOffset()-r.getLeft().getOffset()-r.getGap();
+            rightBlock.heapifyOutConstraints();
+            
             double distancia =  r.getLeft().getOffset()+r.getGap()-r.getRight().getOffset();
+           
             if( b.getVars().size() > rightBlock.getVars().size() ) {
-                distancia = -distancia;
-                Bloco aux = b;
+                b.merge(rightBlock, r, distancia);
+                b.mergeOut(rightBlock);
+                rightBlock.setDeleted(true);
+                r = b.getMinOutConstraint();
+            } else {
+                rightBlock.merge(b, r, -distancia);
+                rightBlock.mergeOut(b);
+                b.setDeleted(true);
+                r = rightBlock.getMinOutConstraint();
                 b = rightBlock;
-                rightBlock = aux;
             }
-            System.out.println("OLHA A DISTANCIA: "+distancia);
-            b.merge(rightBlock, r, distancia);
-            b.mergeOut(rightBlock);
-           // b.setTimeStamp(timeBlock);
-            rightBlock.setDeleted(true);
-            r = b.getMinOutConstraint();
+            
         }
     }
     

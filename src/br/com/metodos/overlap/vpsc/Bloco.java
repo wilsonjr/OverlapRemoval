@@ -80,9 +80,9 @@ public class Bloco {
         in = new PriorityQueue<>(vars.size(), new Comparator<Restricao>() {
            @Override
            public int compare(Restricao a, Restricao b) {
-               if( a.getViolation() < b.getViolation() )
+               if( a.getViolationLeft() < b.getViolationLeft() )
                    return 1;
-               else if( a.getViolation() > b.getViolation() )
+               else if( a.getViolationLeft() > b.getViolationLeft() )
                    return -1;
                return 0;
                
@@ -109,9 +109,9 @@ public class Bloco {
         out = new PriorityQueue<>(vars.size(), new Comparator<Restricao>() {
            @Override
            public int compare(Restricao a, Restricao b) {
-               if( a.getViolation() < b.getViolation() )
+               if( a.getViolationRight()< b.getViolationRight() )
                    return -1;
-               else if( a.getViolation() > b.getViolation() )
+               else if( a.getViolationRight() > b.getViolationRight() )
                    return 1;
                return 0;
                
@@ -335,6 +335,24 @@ public class Bloco {
             System.out.println("ATENCAO, ESTOU RETORNANDO...");
         
         return menor;
+    }
+
+    public void mergeBlock(Bloco bloco, Restricao r, double distancia) {
+        r.setAtiva(true);
+        wposn += bloco.getWPosn() - distancia*bloco.getWeight();
+        weight += bloco.getWeight();
+        posn = wposn/weight;
+        
+        for( int i = 0; i < bloco.getVars().size(); ++i ) {
+            bloco.getVars().get(i).setBloco(this);
+            bloco.getVars().get(i).setOffset(bloco.getVars().get(i).getOffset()+distancia);
+            vars.add(bloco.getVars().get(i));
+        }
+        bloco.setDeleted(true);
+        
+        getMinInConstraint();
+        bloco.getMinInConstraint();
+        in.addAll(bloco.getIn());       
     }
 
 }
