@@ -15,10 +15,10 @@ import java.util.ArrayList;
 public class Blocos  {
     private ArrayList<Variavel> vars;
     private ArrayList<Bloco> blocos;
-    private long timeBlock;
+    
     
     public Blocos(ArrayList<Variavel> vars) {
-        timeBlock = 0;
+        
         this.vars = vars;
         blocos = new ArrayList<>();
         
@@ -27,13 +27,6 @@ public class Blocos  {
        
     }
     
-    public long getTimeBlock() {
-        return timeBlock;
-    }
-    
-    public void incrementTimeBlock() {
-        ++timeBlock;
-    }
     
     public ArrayList<Variavel> totalOrder() {
         ArrayList<Variavel> order = new ArrayList<>();
@@ -59,32 +52,21 @@ public class Blocos  {
     }
     
     public void mergeLeft(Bloco b) {
-        incrementTimeBlock();
-        b.setTimeStamp(timeBlock);
-        b.heapifyInConstraints();
-     
+        b.heapifyInConstraints();     
         Restricao r = b.getMinInConstraint();        
         while( r != null && r.getViolationLeft() > 0 ) {
             
             b.removeMinInConstraint();           
-            
-            
-            Bloco bl = r.getLeft().getBloco();
-            
+            Bloco bl = r.getLeft().getBloco();            
             if( bl.getIn() == null )
                 bl.heapifyInConstraints();
-            double distbltob = r.getRight().getOffset()-r.getLeft().getOffset()-r.getGap();
             
-            
-            if( b.getVars().size() > bl.getVars().size() ) {
-             //   incrementTimeBlock();
+            double distbltob = r.getRight().getOffset()-r.getLeft().getOffset()-r.getGap();                        
+            if( b.getVars().size() > bl.getVars().size() ) {           
                 b.mergeBlockLeft(bl, r, distbltob);
-             //   b.setTimeStamp(timeBlock);              
                 r = b.getMinInConstraint();
             } else {
-             //   incrementTimeBlock();
                 bl.mergeBlockLeft(b, r, -distbltob);
-              //  bl.setTimeStamp(timeBlock);
                 r = bl.getMinInConstraint();
                 b = bl;
             }
@@ -101,7 +83,8 @@ public class Blocos  {
             
             Bloco rightBlock = r.getRight().getBloco();
             
-            rightBlock.heapifyOutConstraints();
+            if( rightBlock.getOut() == null )
+                rightBlock.heapifyOutConstraints();
             
             double distancia =  r.getLeft().getOffset()+r.getGap()-r.getRight().getOffset();
            
@@ -118,27 +101,14 @@ public class Blocos  {
     }
     
     
-    public void restrict_block(Bloco b, Bloco lb, Bloco rb, Restricao c) {
-        b.split(lb, rb, c);
-        
-        rb.setPosn(b.getPosn());
-        rb.setWPosn(rb.getPosn()*rb.getWeight());
-        mergeLeft(lb);
-        
-        rb = c.getRight().getBloco();
-        
-        double wposn = 0;        
-        for( int i = 0; i < rb.getVars().size(); ++i ) 
-            wposn += (rb.getVars().get(i).getWeight()*(rb.getVars().get(i).getDes() - rb.getVars().get(i).getOffset()));
-        
-        rb.setWPosn(wposn);
-        rb.setPosn(rb.getWPosn()/rb.getWeight());
-        
-        mergeRight(rb);        
-        
-        b.setDeleted(true);
-        blocos.add(lb);
-        blocos.add(rb);
+    public void restrictBlock(Bloco b, Bloco lb, Bloco rb, Restricao c) {
+        c.setAtiva(false);
+        /**
+         * We define left(b,c) to be the nodes in b.vars connected by a path of constraints from b.active \ {c} to left(c),
+         * i.e. the variables which are in the left sub-block of b if b is split by removing c.
+         */
+        b.addInSplitBlock(lb, c.getLeft());
+        b.addInSplitBlock(rb, c.getRight());
     }
     
     

@@ -76,11 +76,7 @@ public class VPSC {
         satisfyVPSC(blocos, vars, res);
         while( true ) {
             
-            for( int i = 0; i < blocos.getBlocos().size(); ++i ) {
-                blocos.getBlocos().get(i).heapifyInConstraints();
-                blocos.getBlocos().get(i).heapifyOutConstraints();
-            }
-            
+           
             Restricao r1 = blocos.getBlocos().get(0).findMinLM();
             int idx = 0;
             for( int i = 1; i < blocos.getBlocos().size(); ++i ) {
@@ -95,7 +91,28 @@ public class VPSC {
             
             Bloco lb = new Bloco();
             Bloco rb = new Bloco();
-            blocos.restrict_block(blocos.getBlocos().get(idx), lb, rb, r1);
+            blocos.restrictBlock(blocos.getBlocos().get(idx), lb, rb, r1);
+            
+                     
+            rb.setPosn(blocos.getBlocos().get(idx).getPosn());
+            rb.setWPosn(rb.getPosn()*rb.getWeight());
+            blocos.mergeLeft(lb);
+
+            rb = r1.getRight().getBloco();
+
+            double wposn = 0;        
+            for( int i = 0; i < rb.getVars().size(); ++i ) 
+                wposn += (rb.getVars().get(i).getWeight()*(rb.getVars().get(i).getDes() - rb.getVars().get(i).getOffset()));
+
+            rb.setWPosn(wposn);
+            rb.setPosn(rb.getWPosn()/rb.getWeight());
+
+            blocos.mergeRight(rb);        
+
+            blocos.getBlocos().get(idx).setDeleted(true);
+            blocos.getBlocos().add(lb);
+            blocos.getBlocos().add(rb);
+            
 
             for( int j = blocos.getBlocos().size()-1; j >= 0; --j )
                 if( blocos.getBlocos().get(j).getDeleted() )
@@ -115,7 +132,7 @@ public class VPSC {
         ArrayList<Variavel> varsOrdered = blocos.totalOrder();
         
         for( int i = 0; i < varsOrdered.size(); ++i )
-            if( !varsOrdered.get(i).getBloco().getDeleted()) 
+            if( !varsOrdered.get(i).getBloco().getDeleted() ) 
                 blocos.mergeLeft(varsOrdered.get(i).getBloco());                
                              
         

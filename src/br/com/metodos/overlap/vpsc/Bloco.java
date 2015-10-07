@@ -19,7 +19,6 @@ public class Bloco {
     private double posn;
     private double weight;
     private double wposn;
-    private long timeStamp;
     private PriorityQueue<Restricao> in;
     private PriorityQueue<Restricao> out;
     private boolean deleted;
@@ -27,7 +26,7 @@ public class Bloco {
     
     public Bloco() {
         vars = new ArrayList<>();
-          timeStamp = 0;
+          
         weight = 0;
         wposn = 0;
         in = null;
@@ -37,7 +36,7 @@ public class Bloco {
     
     public Bloco(Variavel v) { 
         vars = new ArrayList<>();
-        timeStamp = 0;
+        
         weight = 0;
         wposn = 0;
         in = null;
@@ -67,16 +66,8 @@ public class Bloco {
         return posn;
     }
     
-    public long getTimeStamp() {
-        return timeStamp;
-    }
-    
-    public void setTimeStamp(long time) {
-        timeStamp = time;
-    }    
     
     public PriorityQueue<Restricao> heapifyInConstraints() {
-        //in = new PairingHeap();
         in = new PriorityQueue<>(vars.size(), new Comparator<Restricao>() {
            @Override
            public int compare(Restricao a, Restricao b) {
@@ -85,19 +76,15 @@ public class Bloco {
                else if( a.getViolationLeft() > b.getViolationLeft() )
                    return -1;
                return 0;
-               
-               
-               
            }
         });
         
         for( int i = 0; i < vars.size(); ++i ) {
             ArrayList<Restricao> rest = vars.get(i).getIn();
             for( int j = 0; j < rest.size(); ++j )  {
-                Restricao r = rest.get(j);
-          //      r.setTimeStamp(timeStamp);
-                if( r.getLeft().getBloco() != this && in != null || r.getRight().getBloco() != this && in == null )
-                    in.add(r);
+                // evita que restrições redundantes sejam inseridas
+                if( rest.get(j).getLeft().getBloco() != this  )
+                    in.add(rest.get(j));
             }
                 
         }
@@ -105,7 +92,6 @@ public class Bloco {
     }
     
     public PriorityQueue<Restricao> heapifyOutConstraints() {
-        //in = new PairingHeap();
         out = new PriorityQueue<>(vars.size(), new Comparator<Restricao>() {
            @Override
            public int compare(Restricao a, Restricao b) {
@@ -121,10 +107,9 @@ public class Bloco {
         for( int i = 0; i < vars.size(); ++i ) {
             ArrayList<Restricao> rest = vars.get(i).getOut();
             for( int j = 0; j < rest.size(); ++j )  {
-                Restricao r = rest.get(j);
-           //     r.setTimeStamp(timeStamp);
-                if( r.getLeft().getBloco() != this && out != null || r.getRight().getBloco() != this && out == null )
-                    out.add(r);
+                // evita que restrições redundantes sejam inseridas
+                if( rest.get(j).getLeft().getBloco() != this )
+                    out.add(rest.get(j));
             }
                 
         }
@@ -135,47 +120,23 @@ public class Bloco {
     
     
     public Restricao getMinOutConstraint() {
-        if( out.isEmpty() ) 
-            return null;
-        Restricao r = out.peek();
-        while( r.getLeft().getBloco() == r.getRight().getBloco() ) {
+        Restricao constraint = out.peek();
+        while( constraint != null && constraint.getLeft().getBloco() == constraint.getRight().getBloco() ) {
             out.poll();
-            if( out.isEmpty() )
-                return null;
-            r = out.peek();
-        }
-        return r;
+            constraint = out.peek();
+        }       
+        
+        return constraint;
     }
 
     public Restricao getMinInConstraint() {
-        Restricao rest = null;
-        ArrayList<Restricao> forDelete = new ArrayList<>();
+        Restricao constraint = in.peek();
+        while( constraint != null && constraint.getLeft().getBloco() == constraint.getRight().getBloco() ) {
+            in.poll();            
+            constraint = in.peek();
+        }        
         
-        while( !in.isEmpty() ) {
-            rest = in.peek();
-            System.out.println(rest.getLeft().getId()+"  "+rest.getRight().getId());
-            Bloco lb = rest.getLeft().getBloco();
-            Bloco rb = rest.getRight().getBloco();
-            
-            if( lb == rb )  {// restrição foi juntada no mesmo bloco... 
-                in.poll();
-            } else if( rest.getTimeStamp() < lb.getTimeStamp() ) {
-                in.poll();
-                forDelete.add(rest);
-            } else 
-                break;
-        }
-                
-        for( int i = 0; i < forDelete.size(); ++i ) {
-            rest = forDelete.get(i);
-       //     rest.setTimeStamp(timeStamp);
-            
-            in.add(rest);
-        }
-        
-        if( in.isEmpty() )
-            return null;
-        return in.peek();
+        return constraint;
     }
 
     public void removeMinInConstraint() {
@@ -223,28 +184,26 @@ public class Bloco {
     }
 
     
-    public void populate(Bloco b, Variavel v, Variavel u) {
+    public void addInSplitBlock(Bloco b, Variavel v) {
         b.addVar(v);
+        
         for( int i = 0; i < v.getIn().size(); ++i ) {
-            if( v.getIn().get(i).getLeft().getBloco() == this && v.getIn().get(i).getAtiva() && u != v.getIn().get(i).getLeft() )
-                populate(b, v.getIn().get(i).getLeft(), v);            
+            if( v.getIn().get(i).getLeft().getBloco() == this && v.getIn().get(i).getAtiva() )
+                addInSplitBlock(b, v.getIn().get(i).getLeft());            
         }
         
         for( int i = 0; i < v.getOut().size(); ++i ) {
-            if( v.getOut().get(i).getRight().getBloco() == this && v.getOut().get(i).getAtiva() && u != v.getOut().get(i).getRight() )
-                populate(b, v.getOut().get(i).getRight(), v);            
+            if( v.getOut().get(i).getRight().getBloco() == this && v.getOut().get(i).getAtiva() )
+                addInSplitBlock(b, v.getOut().get(i).getRight());            
         }
     }
-
-    public void split(Bloco lb, Bloco rb, Restricao c) {
-        c.setAtiva(false);
-        populate(lb, c.getLeft(), c.getRight());
-        populate(rb, c.getRight(), c.getLeft());
-        
-    }
     
- 
-    
+    /**
+     * comDdDv
+     * @param v
+     * @param u
+     * @return 
+     */
     private double compDfDv(Variavel v, Variavel u) {
         double dfdv = v.getWeight() * (v.getPosition()-v.getDes());
         
@@ -284,27 +243,25 @@ public class Bloco {
 
     public Restricao findMinLM() {
        
-        //resetActiveLm(vars.get(0), null);
+        // inicializa o lm com 0
         for( int i = 0; i < vars.size(); ++i ) {
             for( int j  = 0; j < vars.get(i).getIn().size(); ++j )
                 vars.get(i).getIn().get(j).setLm(0);
             for( int j  = 0; j < vars.get(i).getOut().size(); ++j )
                 vars.get(i).getOut().get(j).setLm(0);
-        }
-        
+        }        
         
         menor = null;
         compDfDv(vars.get(0), null);
-        if( menor != null )
-            System.out.println("ATENCAO, ESTOU RETORNANDO...");
-        
         return menor;
     }
 
     public void mergeBlockLeft(Bloco bloco, Restricao r, double distancia) {
+        // como agora u + a = v, essa restrição torna-se ativa        
         r.setAtiva(true);
-        wposn += bloco.getWPosn() - distancia*bloco.getWeight();
-        weight += bloco.getWeight();
+        
+        wposn = wposn + bloco.getWPosn() - distancia*bloco.getWeight();
+        weight = weight + bloco.getWeight();
         posn = wposn/weight;
         
         for( int i = 0; i < bloco.getVars().size(); ++i ) {
@@ -312,31 +269,34 @@ public class Bloco {
             bloco.getVars().get(i).setOffset(bloco.getVars().get(i).getOffset()+distancia);
             vars.add(bloco.getVars().get(i));
         }
-        bloco.setDeleted(true);
         
+        // remove possíveis restrições redundantes
         getMinInConstraint();
         bloco.getMinInConstraint();
         in.addAll(bloco.getIn());       
+        
+        bloco.setDeleted(true);
     }
     
     public void mergeBlockRight(Bloco bloco, Restricao r, double distancia) {
+        // como agora u + a = v, essa restrição torna-se ativa
         r.setAtiva(true);
-        wposn += bloco.getWPosn() - distancia*bloco.getWeight();
-        weight += bloco.getWeight();
+        wposn = wposn + bloco.getWPosn() - distancia*bloco.getWeight();
+        weight = wposn + bloco.getWeight();
         posn = wposn/weight;
         
         for( int i = 0; i < bloco.getVars().size(); ++i ) {
             bloco.getVars().get(i).setBloco(this);
             bloco.getVars().get(i).setOffset(bloco.getVars().get(i).getOffset()+distancia);
             vars.add(bloco.getVars().get(i));
-        }
-        bloco.setDeleted(true);
+        }        
         
-        
-        
+        // remove possiveis restrições redundantes
         getMinOutConstraint();
         bloco.getMinOutConstraint();
         out.addAll(bloco.getOut());
+        
+        bloco.setDeleted(true);
     }
 
 }

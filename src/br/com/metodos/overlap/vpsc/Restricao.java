@@ -15,7 +15,6 @@ public class Restricao {
     private Variavel left, right;
     private double gap;
     private boolean ativa;
-    private long timeStamp;
     private double lm;
     
     public Restricao(Variavel left, Variavel right, double gap) {
@@ -66,15 +65,6 @@ public class Restricao {
     
     public double getViolationRight() {
         return right.getPosition()-left.getPosition()-gap;
-    }
-    
-    
-    public long getTimeStamp() {
-        return timeStamp;
-    }
-    
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
     }
     
     public void setAtiva(boolean ativa) {

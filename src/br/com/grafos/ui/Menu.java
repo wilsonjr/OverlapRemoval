@@ -272,33 +272,36 @@ public class Menu extends javax.swing.JFrame {
         globalCounterColor = globalCounter = 0;
         rectangles.clear();
         RainbowScale rbS = new RainbowScale();
-        rectangles.add(new RetanguloVis(140,  158, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(153,  130, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(128,  103, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(89 , 82, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(75 , 130, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(88 , 191, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(153,  191, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(216,  189, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(200,  99, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(157,  83, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(196,  154, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(108,  149, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(115,  226, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++)); 
-        rectangles.add(new RetanguloVis(175,  213, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-      /*  
-        rectangles.add(new Retangulo(new Rectangle(1*10, 2*10, (3-1)*10, (4-2)*10), rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new Retangulo(new Rectangle(2*10, 3*10, (5-2)*10, (5-3)*10), rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new Retangulo(new Rectangle(9*10, 3*10, (11-9)*10, (5-3)*10), rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new Retangulo(new Rectangle(4*10, 4*10, (8-4)*10, (8-4)*10), rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new Retangulo(new Rectangle(7*10, 6*10, (9-7)*10, (8-6)*10), rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new Retangulo(new Rectangle(3*10, 7*10, (5-3)*10, (10-7)*10), rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new Retangulo(new Rectangle(11*10, 7*10, (13-11)*10, (9-7)*10), rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new Retangulo(new Rectangle(7*10, 9*10, (9-7)*10, (11-9)*10), rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new Retangulo(new Rectangle(12*10, 9*10, (14-12)*10, (11-9)*10), rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-*/
+//        rectangles.add(new RetanguloVis(140,  158, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//        rectangles.add(new RetanguloVis(153,  130, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//        rectangles.add(new RetanguloVis(128,  103, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//        rectangles.add(new RetanguloVis(89 , 82, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//        rectangles.add(new RetanguloVis(75 , 130, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//        rectangles.add(new RetanguloVis(88 , 191, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//        rectangles.add(new RetanguloVis(153,  191, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//        rectangles.add(new RetanguloVis(216,  189, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//        rectangles.add(new RetanguloVis(200,  99, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//        rectangles.add(new RetanguloVis(157,  83, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//        rectangles.add(new RetanguloVis(196,  154, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//        rectangles.add(new RetanguloVis(108,  149, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//        rectangles.add(new RetanguloVis(115,  226, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++)); 
+//        rectangles.add(new RetanguloVis(175,  213, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+//                                        
         
-        
+        rectangles.add(new RetanguloVis(103, 113, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(81 ,144, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(118, 159, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(68 ,191, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(310 ,306, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(337 ,352, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(356 ,285, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(297 ,265, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(270 ,343, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(401 ,55, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(453 ,109, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(404 ,114, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(350 ,75, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+rectangles.add(new RetanguloVis(349 ,126, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
         if( view != null ) {
             view.cleanImage();
             view.repaint();            
