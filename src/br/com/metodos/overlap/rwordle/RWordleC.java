@@ -49,8 +49,10 @@ public class RWordleC {
         
         ArrayList<IDShape> shapes = new ArrayList<>();
         for( int i = 0; i < rectangles.size(); ++i ) {
-            shapes.add(new IDShape(new Retangulo(rectangles.get(i).getUX(), rectangles.get(i).getUY(), rectangles.get(i).getWidth(), rectangles.get(i).getHeight()),
-                                                 Util.distanciaEuclideana(centerX, centerY, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY())));            
+            shapes.add(new IDShape(new Retangulo(rectangles.get(i).getUX(), rectangles.get(i).getUY(), 
+                                                 rectangles.get(i).getWidth(), rectangles.get(i).getHeight()),
+                                                 Util.distanciaEuclideana(centerX, centerY, 
+                                                     rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY()), i) );            
         }        
         
         /**
@@ -107,9 +109,11 @@ public class RWordleC {
                 angle += (0.5/angle); 
             } while( !flag );
                         
+            
             projected.add(new Retangulo(areaS.getBounds().x, areaS.getBounds().y, areaS.getBounds().getWidth(), 
-                                        areaS.getBounds().getHeight()));
+                                        areaS.getBounds().getHeight(), shapes.get(i).getOriginalId()));
         }
+        
         
         return projected;
     }

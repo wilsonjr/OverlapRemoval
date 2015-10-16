@@ -15,10 +15,12 @@ import br.com.metodos.utils.Retangulo;
 public class IDShape {
     private Retangulo rect;
     private double distance;
+    private int originalId;
         
-    public IDShape(Retangulo rect, double distance) {
+    public IDShape(Retangulo rect, double distance, int originalId) {
         this.rect = rect;
         this.distance = distance;
+        this.originalId = originalId;
     }
     
     public Retangulo getRect() {
@@ -29,4 +31,7 @@ public class IDShape {
         return distance;
     }       
    
+    public int getOriginalId() {
+        return originalId;
+    }
 }

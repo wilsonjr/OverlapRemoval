@@ -13,13 +13,23 @@ package br.com.metodos.utils;
 public class Retangulo  {    
     private double ux, uy, lx, ly;    
     private double epsX = 0, epsY = 0;
-        
-    public Retangulo(double minX, double minY, double width, double height) {
+    private int id;
+    
+    public Retangulo(double minX, double minY, double width, double height, int id) {
         ux = minX;
         lx = minX+width;
         uy = minY;
         ly = minY+height;
+        this.id = id;
     }    
+        
+    public Retangulo(double minX, double minY, double width, double height) {
+        this(minX, minY, width, height, -1);
+    }    
+    
+    public int getId() {
+        return id;
+    }
     
     public void setLX(double x) {
         lx = x;
@@ -95,20 +105,10 @@ public class Retangulo  {
     }
     
     public double olapX(Retangulo r) {
-       /* if( getCenterX() <= r.getCenterX() && r.getUX() <getLX() )
-            return getLX()-r.getUX();
-        if( r.getCenterX() <= getCenterX() && getUX() < r.getLX() )
-           return r.getLX()-getUX();
-        return 0;*/
         return (getWidth() + r.getWidth())/2. - Math.abs(getCenterX() - r.getCenterX());
     }    
     
     public double olapY(Retangulo r) {
-        /* if( getCenterY() <= r.getCenterY() && r.getUY() < getLY() )
-            return getLY()-r.getUY();
-        if( r.getCenterY() <= getCenterY() && getUY() < r.getLY() )
-            return r.getLY()-getUY();
-        return 0;*/
         return (getHeight() + r.getHeight())/2 - Math.abs(getCenterY() - r.getCenterY());
     }
     
@@ -116,8 +116,13 @@ public class Retangulo  {
     public String toString() {
         return "<"+ux+", "+lx+", "+uy+", "+ly+">";
     }
-    
-    
+
+    @Override
+    public boolean equals(Object obj) {
+        Retangulo robj = (Retangulo) obj;
+        return getCenterX() == robj.getCenterX() && getCenterY() == robj.getCenterY();
+    }
+      
     
     
 }

@@ -57,7 +57,7 @@ public class RWordleL {
             double distance = Util.distanciaEuclideana(0, 0, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
                         
             novos.add(new Retangulo((rectangles.get(i).getUX()-distance), (rectangles.get(i).getUY()-distance), 
-                                    rectangles.get(i).getWidth(), rectangles.get(i).getHeight()));            
+                                    rectangles.get(i).getWidth(), rectangles.get(i).getHeight(), i));            
         }
         
         /**
@@ -134,8 +134,9 @@ public class RWordleL {
                 angle += (0.5/angle); 
             } while( !flag );
                         
+            System.out.println("ID: "+novos.get(i).getId());
             projected.add(new Retangulo(areaS.getBounds().x, areaS.getBounds().y, 
-                                        areaS.getBounds().width, areaS.getBounds().height));
+                                        areaS.getBounds().width, areaS.getBounds().height, novos.get(i).getId()));
                         
             /**
              * here, we discover the x and y amount to translate the position of elements
