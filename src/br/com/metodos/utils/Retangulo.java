@@ -122,6 +122,23 @@ public class Retangulo  {
         Retangulo robj = (Retangulo) obj;
         return getCenterX() == robj.getCenterX() && getCenterY() == robj.getCenterY();
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.ux) ^ (Double.doubleToLongBits(this.ux) >>> 32));
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.uy) ^ (Double.doubleToLongBits(this.uy) >>> 32));
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.lx) ^ (Double.doubleToLongBits(this.lx) >>> 32));
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.ly) ^ (Double.doubleToLongBits(this.ly) >>> 32));
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.epsX) ^ (Double.doubleToLongBits(this.epsX) >>> 32));
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.epsY) ^ (Double.doubleToLongBits(this.epsY) >>> 32));
+        hash = 97 * hash + this.id;
+        return hash;
+    }
+    
+    public void setId(int id) {
+        this.id = id;
+    }
       
     
     

@@ -8,6 +8,7 @@ package br.com.grafos.ui;
 
 
 import br.com.grafos.desenho.color.RainbowScale;
+import br.com.metodos.overlap.prism.PRISM;
 import br.com.metodos.overlap.rwordle.RWordleC;
 import br.com.metodos.overlap.rwordle.RWordleL;
 import br.com.metodos.overlap.vpsc.VPSC;
@@ -75,6 +76,11 @@ public class Menu extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         embaralhaJButton = new javax.swing.JButton();
         vpscJButton = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JSeparator();
+        jSeparator3 = new javax.swing.JSeparator();
+        jSeparator4 = new javax.swing.JSeparator();
+        jSeparator5 = new javax.swing.JSeparator();
+        prismJButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
@@ -83,7 +89,7 @@ public class Menu extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        recentralizarJCheckBox.setText("Recentralizar a cada iteração (RWordle-L)");
+        recentralizarJCheckBox.setText("Recentralizar a cada iteração");
 
         rwordleCJButton.setText("RWordle-C");
         rwordleCJButton.addActionListener(new java.awt.event.ActionListener() {
@@ -101,7 +107,7 @@ public class Menu extends javax.swing.JFrame {
 
         jLabel1.setText("Ângulo:");
 
-        embaralhaJButton.setText("Embaralha");
+        embaralhaJButton.setText("Embaralhar");
         embaralhaJButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 embaralhaJButtonActionPerformed(evt);
@@ -112,6 +118,13 @@ public class Menu extends javax.swing.JFrame {
         vpscJButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 vpscJButtonActionPerformed(evt);
+            }
+        });
+
+        prismJButton.setText("PRISM");
+        prismJButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                prismJButtonActionPerformed(evt);
             }
         });
 
@@ -145,32 +158,37 @@ public class Menu extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(telaJScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 553, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(recentralizarJCheckBox)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(embaralhaJButton)
-                        .addGap(18, 18, 18)
-                        .addComponent(vpscJButton))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(rwordleCJButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(embaralhaJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(rwordleCJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(recentralizarJCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
                             .addComponent(jLabel1)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(anguloJTextField))
-                        .addComponent(rwordleLJButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(10, Short.MAX_VALUE))
+                            .addComponent(anguloJTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(rwordleLJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(vpscJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(prismJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(69, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(telaJScrollPane)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(embaralhaJButton)
-                    .addComponent(vpscJButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(embaralhaJButton)
+                .addGap(3, 3, 3)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
                 .addComponent(rwordleCJButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(12, 12, 12)
+                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(rwordleLJButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -178,7 +196,15 @@ public class Menu extends javax.swing.JFrame {
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(recentralizarJCheckBox)
-                .addContainerGap(310, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(vpscJButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(prismJButton)
+                .addContainerGap(175, Short.MAX_VALUE))
         );
 
         pack();
@@ -215,25 +241,30 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_rwordleCJButtonActionPerformed
 
     private void vpscJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vpscJButtonActionPerformed
-//        ArrayList<Retangulo> rects = new ArrayList<>();
-//        rects.add(new Retangulo(1, 2, 3-1, 4-2));
-//        rects.add(new Retangulo(2, 3, 5-2, 5-3));
-//        rects.add(new Retangulo(9, 3, 11-9, 5-3));
-//        rects.add(new Retangulo(4, 4, 8-4, 8-4));
-//        rects.add(new Retangulo(7, 6, 9-7, 8-6));
-//        rects.add(new Retangulo(3, 7, 5-3, 10-7));
-//        rects.add(new Retangulo(11, 7, 13-11, 9-7));
-//        rects.add(new Retangulo(7, 9, 9-7, 11-9));
-//        rects.add(new Retangulo(12, 9, 14-12, 11-9));
-        
         ArrayList<Retangulo> projected = VPSC.apply(Util.toRetangulo(rectangles), 0, 0);
-        for( Retangulo r: projected )
+        int i = 0;
+        for( Retangulo r: projected ) {
+            r.setId(i++);
             System.out.println(r);
+        }
         Util.toRetanguloVis(rectangles, projected);
         
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_vpscJButtonActionPerformed
+
+    private void prismJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJButtonActionPerformed
+        ArrayList<Retangulo> projected = PRISM.apply(Util.toRetangulo(rectangles));
+        int i = 0;
+        for( Retangulo r: projected ) {
+            r.setId(i++);
+            System.out.println(r);
+        }
+        Util.toRetanguloVis(rectangles, projected);
+        
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_prismJButtonActionPerformed
 
            
     
@@ -399,6 +430,11 @@ rectangles.add(new RetanguloVis(349 ,126, 50, 50, rbS.getColor((globalCounterCol
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JButton prismJButton;
     private javax.swing.JCheckBox recentralizarJCheckBox;
     private javax.swing.JButton rwordleCJButton;
     private javax.swing.JButton rwordleLJButton;

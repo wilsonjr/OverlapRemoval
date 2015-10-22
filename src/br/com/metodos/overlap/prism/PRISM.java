@@ -23,9 +23,6 @@ import java.util.Iterator;
  */
 public class PRISM {
     
-   
-    
-    
     public static PRISMEdge[] findRestOverlaps(ArrayList<Retangulo> retangulos) {
         /**
          * copy rectangles 
@@ -37,25 +34,40 @@ public class PRISM {
         /**
          *  init all variables
          */         
-        ArrayList<Variavel> vars = new ArrayList<>();
-        for( int i = 0; i < projected.size(); ++i ) 
-            vars.add(new Variavel(i));
-                
+        ArrayList<Variavel> varsx = new ArrayList<>();
+        ArrayList<Variavel> varsy = new ArrayList<>();
+        for( int i = 0; i < projected.size(); ++i ) {
+            varsx.add(new Variavel(i));
+            varsy.add(new Variavel(i));
+        }
+        
         /**
          * generate horizontal constraints and solve vpsc for x
          */
-        ArrayList<Restricao> restricoes = new ArrayList<>();
-        int count = VPSC.generateCx(projected, vars, restricoes);
+        ArrayList<Restricao> restricoesx = new ArrayList<>();
+        ArrayList<Restricao> restricoesy = new ArrayList<>();
+        VPSC.generateCx(projected, varsx, restricoesx);
+        VPSC.generateCy(projected, varsy, restricoesy);        
         
-        PRISMEdge[] newOverlaps = new PRISMEdge[restricoes.size()];
-        for( int i = 0; i < restricoes.size(); ++i ) {
-            int u = restricoes.get(i).getLeft().getId();
-            int v = restricoes.get(i).getRight().getId();
+        PRISMEdge[] newOverlaps = new PRISMEdge[restricoesx.size()+restricoesy.size()];
+        for( int i = 0; i < restricoesx.size(); ++i ) {
+            int u = restricoesx.get(i).getLeft().getId();
+            int v = restricoesx.get(i).getRight().getId();
             newOverlaps[i] = new PRISMEdge(new PRISMPoint(retangulos.get(u).getCenterX(), retangulos.get(u).getCenterY(), 
                                                           retangulos.get(u), u),
                                            new PRISMPoint(retangulos.get(v).getCenterX(), retangulos.get(v).getCenterY(), 
                                                           retangulos.get(v), v));
         }
+        
+        for( int j = restricoesx.size(), i = 0; i < restricoesy.size(); ++i, ++j ) {
+            int u = restricoesy.get(i).getLeft().getId();
+            int v = restricoesy.get(i).getRight().getId();
+            newOverlaps[j] = new PRISMEdge(new PRISMPoint(retangulos.get(u).getCenterX(), retangulos.get(u).getCenterY(), 
+                                                          retangulos.get(u), u),
+                                           new PRISMPoint(retangulos.get(v).getCenterX(), retangulos.get(v).getCenterY(), 
+                                                          retangulos.get(v), v));
+        }
+        
         return newOverlaps;
     }
     
@@ -95,20 +107,18 @@ public class PRISM {
                         edges.add(e);
                 }
             }
+            
             if( augmentGp ) {
                 PRISMEdge[] restEdge = findRestOverlaps(projected);
                 for( int i = 0; i < restEdge.length; ++i ) {
                     if( !edges.contains(restEdge[i]) ) {
-                        System.out.println("NAO CONTEM");
+//                        System.out.println("NAO CONTEM");
                         edges.add(restEdge[i]);
                         
-                    } else
-                        System.out.println("JA CONTEM");
+                    } 
                 }
             }
-            
-            
-            System.out.println("EDGES SIZE - ARRAYLIST: "+edges.size());
+//            System.out.println("EDGES SIZE - ARRAYLIST: "+edges.size());
             
             PRISMEdge[] arestas = new PRISMEdge[edges.size()];
             boolean flag = false;
@@ -126,10 +136,10 @@ public class PRISM {
                         projected.get(i).setUX(pontos[i].getRect().getCenterX()-pontos[i].getRect().getWidth()/2.);
                         projected.get(i).setUY(pontos[i].getRect().getCenterY()-pontos[i].getRect().getHeight()/2.);
                     }
-                    System.out.println("Novos pontos:");
-                    for( int i = 0; i < points.length; ++i ) {
-                        System.out.println(points[i].getRect().getCenterX()+", "+points[i].getRect().getCenterY());
-                    }
+//                    System.out.println("Novos pontos:");
+//                    for( int i = 0; i < points.length; ++i ) {
+//                        System.out.println(points[i].getRect().getCenterX()+", "+points[i].getRect().getCenterY());
+//                    }
                     if( Util.getFinished() )                         
                         break;                    
                 }                
@@ -154,16 +164,22 @@ public class PRISM {
     public static void main(String... args) {
         
         ArrayList<Retangulo> projected = new ArrayList<>();
-        projected.add(new Retangulo(-2, 2, 4, 4)); // 0
-        projected.add(new Retangulo(9, 2, 2, 2)); // 1
-        projected.add(new Retangulo(-1, 11, 2, 2)); // 2
-        projected.add(new Retangulo(9, 11, 2, 2)); // 3
-        projected.add(new Retangulo(1, 5, 4, 4)); // 4
+        projected.add(new Retangulo(2, 10, 1, 1)); // 0
+        projected.add(new Retangulo(4, 8, 3, 5)); // 1
+        projected.add(new Retangulo(8, 10, 1, 1)); // 2
+        projected.add(new Retangulo(6, 7, 9, 2)); // 3
+        projected.add(new Retangulo(10, 4, 1, 1)); // 4
+        projected.add(new Retangulo(8, 1, 1, 1)); // 5
+        projected.add(new Retangulo(5, 2, 1, 1)); // 6
+        projected.add(new Retangulo(2, 1, 1, 1)); // 7
+        projected.add(new Retangulo(0, 4, 1, 1)); // 8
+        projected.add(new Retangulo(0, 7, 1, 1)); // 9
+        projected.add(new Retangulo(5, 5, 1, 1)); // 10
 
         ArrayList<Retangulo> reprojected = apply(projected);
         System.out.println("REPROJECTED ELEMENTS: ");
         for( Retangulo r: reprojected ) {
-            System.out.println(r.getUX()+" "+r.getUY());
+            System.out.println((r.getUX())+" "+(r.getUY()));
         }
 //        PRISMEdge[] e = findRestOverlaps(projected);
 //        for( PRISMEdge edge: e ) {

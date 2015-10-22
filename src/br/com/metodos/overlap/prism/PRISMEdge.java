@@ -46,6 +46,11 @@ public class PRISMEdge {
         return hash;
     }
     
+    @Override
+    public String toString() {
+        return u+" --> "+v;
+    }
+    
     
     
     

@@ -51,6 +51,7 @@ public class Util {
     public static void toRetanguloVis(ArrayList<RetanguloVis> ori, ArrayList<Retangulo> rects) {
         
         for( int i = 0; i < rects.size(); ++i ) {
+            
             ori.get(rects.get(i).getId()).setUX(rects.get(i).getUX());
             ori.get(rects.get(i).getId()).setUY(rects.get(i).getUY());
             ori.get(rects.get(i).getId()).setWidth(rects.get(i).getWidth());
@@ -244,7 +245,7 @@ public class Util {
         double[] y = new double[layout.length];
        
         double stress0 = stress(edges);
-        System.out.println("old stress: "+stress0);
+//        System.out.println("old stress: "+stress0);
         int limit = 10000;
         
         do {
@@ -270,10 +271,10 @@ public class Util {
                 bx[i] = -bx[i];
             
             boolean retorno = Util.gradConjugados(matrizx, rx, vx, px, bx);
-            if( retorno )
-                System.out.println("Gradiente Conjugado para X convergiu");
-            else
-                System.out.println("Gradiente Conjugado para X não convergiu");
+//            if( retorno )
+//                System.out.println("Gradiente Conjugado para X convergiu");
+//            else
+//                System.out.println("Gradiente Conjugado para X não convergiu");
             
             
             /** solve for y **/
@@ -291,10 +292,10 @@ public class Util {
                 by[i] = -by[i];
             
             retorno = Util.gradConjugados(matrizy, ry, vy, py, by);
-            if( retorno )
-                System.out.println("Gradiente Conjugado para Y convergiu");
-            else
-                System.out.println("Gradiente Conjugado para Y não convergiu");
+//            if( retorno )
+//                System.out.println("Gradiente Conjugado para Y convergiu");
+//            else
+//                System.out.println("Gradiente Conjugado para Y não convergiu");
             
             for( int i = 0; i < by.length; ++i ) {
                 layout[i].getRect().setUX(vx[2][i]-layout[i].getRect().getWidth()/2.);
@@ -302,7 +303,7 @@ public class Util {
             }
             
             double stress1 = stress(edges);
-            System.out.println("new stress: "+stress1);
+//            System.out.println("new stress: "+stress1);
             if( Math.abs(stress0-stress1) < stress1*EPS )
                 return layout;
             stress0 = stress1;
@@ -409,7 +410,7 @@ public class Util {
             double a = Math.abs(v[i].getU().getRect().getCenterX() - v[i].getV().getRect().getCenterX());
             double b = Math.abs(v[i].getU().getRect().getCenterY() - v[i].getV().getRect().getCenterY());
             double c = Math.max(a, b);
-            System.out.println(Util.tij(v[i].getU().getRect(), v[i].getV().getRect()));
+    //        System.out.println(Util.tij(v[i].getU().getRect(), v[i].getV().getRect()));
             s += Util.wij(v[i]) * Math.pow(c - Util.dij(v[i]), 2);
         }
         
