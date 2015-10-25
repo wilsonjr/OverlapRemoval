@@ -169,16 +169,12 @@ public class PRISM {
     private static ArrayList<Retangulo> naivePRISM(ArrayList<Retangulo> rects) {
         
         double x = Math.abs(olapx(rects.get(0), rects.get(1)));
-        double y = Math.abs(olapy(rects.get(0), rects.get(1)));
+        double y = Math.abs(olapy(rects.get(0), rects.get(1)));        
         
-        
-        if( x < y ) {
+        if( x < y )
             rects.get(0).setUX(rects.get(0).getUX()-x);
-        } else {
+        else
             rects.get(0).setUY(rects.get(0).getUY()-y);
-        }
-        
-        System.out.println(">> "+x+"  "+y+" <<");
         return rects;
     }
     
