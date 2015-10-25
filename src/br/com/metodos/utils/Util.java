@@ -112,22 +112,7 @@ public class Util {
     public static double wij(PRISMEdge e) {
         return Math.pow(dij(e), -2.);
     }
-    
-    
-//    private static boolean isSolution(double[][] v) {
-//        double norma1 = Math.abs(v[2][0] - v[1][0]), norma2 = Math.abs(v[2][0]);
-//        
-//        for( int j = 1; j < v[0].length; ++j ) {
-//            if( Math.abs(v[2][j] - v[1][j]) > norma1 )
-//                norma1 = Math.abs(v[2][j]-v[1][j]);
-//            if( Math.abs(v[2][j]) > norma2 )
-//                norma2 = Math.abs(v[2][j]);
-//        }
-//        
-//        double res = norma1/norma2;
-//        return res <= E;
-//    }
-    
+        
     private static boolean isSolution(double[] residuo) {
         double maior = Math.abs(residuo[0]);
         for( int i = 1; i < residuo.length; ++i )
@@ -410,11 +395,43 @@ public class Util {
             double a = Math.abs(v[i].getU().getRect().getCenterX() - v[i].getV().getRect().getCenterX());
             double b = Math.abs(v[i].getU().getRect().getCenterY() - v[i].getV().getRect().getCenterY());
             double c = Math.max(a, b);
-    //        System.out.println(Util.tij(v[i].getU().getRect(), v[i].getV().getRect()));
             s += Util.wij(v[i]) * Math.pow(c - Util.dij(v[i]), 2);
         }
         
         return s;
     }
+    
+    public static double getMinX(ArrayList<Retangulo> rects) {
+        double min = rects.get(0).getUX();
+        
+        for( int i = 1; i < rects.size(); ++i )
+            min = Math.min(min, rects.get(i).getUX());
+        
+        return min;
+    }
+    
+    public static double getMinY(ArrayList<Retangulo> rects) {
+        double min = rects.get(0).getUY();
+                
+        for( int i = 1; i < rects.size(); ++i )
+            min = Math.min(min, rects.get(i).getUY());
+       
+        return min;
+    }
+    
+    public static void normalize(ArrayList<Retangulo> rects) {
+        double minX = getMinX(rects);
+        double minY = getMinY(rects);
+        if( minX < 0 || minY < 0 ) {
+            for( int i = 0; i < rects.size(); ++i ) {
+                if( minX < 0 )
+                    rects.get(i).setUX(rects.get(i).getUX()-minX);
+                if( minY < 0 )
+                    rects.get(i).setUY(rects.get(i).getUY()-minY);
+            }
+        }
+    }
+    
+    
     
 }
