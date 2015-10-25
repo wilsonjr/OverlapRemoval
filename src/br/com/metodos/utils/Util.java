@@ -231,7 +231,7 @@ public class Util {
        
         double stress0 = stress(edges);
 //        System.out.println("old stress: "+stress0);
-        int limit = 10000;
+        int limit = layout.length;
         
         do {
             double[][] lz = generateLz(edges, layout.length);

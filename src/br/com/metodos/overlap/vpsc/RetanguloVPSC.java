@@ -51,27 +51,16 @@ public class RetanguloVPSC {
     
     
     public double olapx(RetanguloVPSC r) {
-        /*if( getCenterX() <= r.getCenterX() && r.getMinX() <getMaxX() )
-            return getMaxX()-r.getMinX();
-        if( r.getCenterX() <= getCenterX() && getMinX() < r.getMaxX() )
-           return r.getMaxX()-getMinX();
-        return 0;*/
         return (getWidth()+r.getWidth())/2 - Math.abs(getCenterX()-r.getCenterX());
     }
     
     
     public double olapy(RetanguloVPSC r) {
-       /* if( getCenterY() <= r.getCenterY() && r.getMinY() < getMaxY() )
-            return getMaxY()-r.getMinY();
-        if( r.getCenterY() <= getCenterY() && getMinY() < r.getMaxY() )
-            return r.getMaxY()-getMinY();
-        return 0;*/
         return (getHeight()+r.getHeight())/2 - Math.abs(getCenterY()-r.getCenterY());
     }
     
     @Override
     public String toString() {
-        //return "X: "+getMinX()+", Y: "+getMinY()+", WIDTH: "+getWidth()+", HEIGHT: "+getHeight();
         return "<"+getMinX()+", "+getMaxX()+", "+getMinY()+", "+getMaxY()+">";
     }
     

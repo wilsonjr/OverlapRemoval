@@ -7,6 +7,7 @@
 package br.com.metodos.overlap.prism;
 
 import br.com.metodos.overlap.vpsc.Restricao;
+import br.com.metodos.overlap.vpsc.RetanguloVPSC;
 import br.com.metodos.overlap.vpsc.VPSC;
 import br.com.metodos.overlap.vpsc.Variavel;
 import br.com.metodos.utils.Retangulo;
@@ -86,25 +87,27 @@ public class PRISM {
             for( int i = 0; i < projected.size(); ++i )
                 points[i] = new PRISMPoint(projected.get(i).getCenterX(), projected.get(i).getCenterY(), projected.get(i), i);
             
-            Delaunay_Triangulation dt = new Delaunay_Triangulation(points);
+            
             ArrayList<PRISMEdge> edges = new ArrayList<>();
-           
-            Iterator<Triangle_dt> trianglesIterator = dt.trianglesIterator();
-            while( trianglesIterator.hasNext() ) {
-                Triangle_dt t = trianglesIterator.next();
-                if( !t.isHalfplane() ) {            
-                    
-                    PRISMEdge e = new PRISMEdge((PRISMPoint)t.p1(), (PRISMPoint)t.p2());
-                    if( !edges.contains(e) )
-                        edges.add(e);
-                    
-                    e = new PRISMEdge((PRISMPoint)t.p1(), (PRISMPoint)t.p3());
-                    if( !edges.contains(e) )
-                        edges.add(e);
-                    
-                    e = new PRISMEdge((PRISMPoint)t.p2(), (PRISMPoint)t.p3());
-                    if( !edges.contains(e) )
-                        edges.add(e);
+            if( rects.size() > 2 ) {
+                Delaunay_Triangulation dt = new Delaunay_Triangulation(points);
+                Iterator<Triangle_dt> trianglesIterator = dt.trianglesIterator();
+                while( trianglesIterator.hasNext() ) {
+                    Triangle_dt t = trianglesIterator.next();
+                    if( !t.isHalfplane() ) {            
+
+                        PRISMEdge e = new PRISMEdge((PRISMPoint)t.p1(), (PRISMPoint)t.p2());
+                        if( !edges.contains(e) )
+                            edges.add(e);
+
+                        e = new PRISMEdge((PRISMPoint)t.p1(), (PRISMPoint)t.p3());
+                        if( !edges.contains(e) )
+                            edges.add(e);
+
+                        e = new PRISMEdge((PRISMPoint)t.p2(), (PRISMPoint)t.p3());
+                        if( !edges.contains(e) )
+                            edges.add(e);
+                    }
                 }
             }
             
@@ -112,7 +115,7 @@ public class PRISM {
                 PRISMEdge[] restEdge = findRestOverlaps(projected);
                 for( int i = 0; i < restEdge.length; ++i ) {
                     if( !edges.contains(restEdge[i]) ) {
-//                        System.out.println("NAO CONTEM");
+                        System.out.println("NAO CONTEM");
                         edges.add(restEdge[i]);
                         
                     } 
@@ -154,7 +157,37 @@ public class PRISM {
         return null;
     }
     
+    private static double olapx(Retangulo s, Retangulo r) {
+        return (s.getWidth()+r.getWidth())/2 - Math.abs(s.getCenterX()-r.getCenterX());
+    }
+    
+    
+    private static double olapy(Retangulo s, Retangulo r) {
+        return (s.getHeight()+r.getHeight())/2 - Math.abs(s.getCenterY()-r.getCenterY());
+    }
+    
+    private static ArrayList<Retangulo> naivePRISM(ArrayList<Retangulo> rects) {
+        
+        double x = Math.abs(olapx(rects.get(0), rects.get(1)));
+        double y = Math.abs(olapy(rects.get(0), rects.get(1)));
+        
+        
+        if( x < y ) {
+            rects.get(0).setUX(rects.get(0).getUX()-x);
+        } else {
+            rects.get(0).setUY(rects.get(0).getUY()-y);
+        }
+        
+        System.out.println(">> "+x+"  "+y+" <<");
+        return rects;
+    }
+    
+    
     public static ArrayList<Retangulo> apply(ArrayList<Retangulo> rects) {
+        if( rects.size() <= 1 ) 
+            return rects;
+        if( rects.size() == 2 )
+            return naivePRISM(rects);
         ArrayList<Retangulo> firstPass = apply(rects, false);
         ArrayList<Retangulo> secondPass = apply(firstPass, true);
         return secondPass;
