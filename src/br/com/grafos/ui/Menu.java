@@ -15,8 +15,6 @@ import br.com.metodos.overlap.vpsc.VPSC;
 import br.com.metodos.utils.Retangulo;
 import br.com.metodos.utils.RetanguloVis;
 import br.com.metodos.utils.Util;
-import static br.com.metodos.utils.Util.getMinX;
-import static br.com.metodos.utils.Util.getMinY;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -86,9 +84,7 @@ public class Menu extends javax.swing.JFrame {
         prismJButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        rwordlelJMenuItem = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        sairJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -132,23 +128,14 @@ public class Menu extends javax.swing.JFrame {
         });
 
         jMenu1.setText("Algoritmos");
-        jMenu1.add(jSeparator1);
 
-        rwordlelJMenuItem.setText("RWordle-L");
-        rwordlelJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        sairJMenuItem.setText("Sair");
+        sairJMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rwordlelJMenuItemActionPerformed(evt);
+                sairJMenuItemActionPerformed(evt);
             }
         });
-        jMenu1.add(rwordlelJMenuItem);
-
-        jMenuItem1.setText("RWordle-C");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        jMenu1.add(jMenuItem1);
+        jMenu1.add(sairJMenuItem);
 
         jMenuBar1.add(jMenu1);
 
@@ -214,31 +201,18 @@ public class Menu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        ArrayList<Retangulo> projected = RWordleC.apply(Util.toRetangulo(rectangles));
-        Util.normalize(projected);
-        Util.toRetanguloVis(rectangles, projected);
-        
-        view.cleanImage();
-        view.repaint();
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
-
-    private void rwordlelJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordlelJMenuItemActionPerformed
-        ArrayList<Retangulo> projected  = RWordleL.apply(Util.toRetangulo(rectangles), alpha, recentralizarJCheckBox.isSelected());                   
-        Util.normalize(projected);
-        Util.toRetanguloVis(rectangles, projected);
-        
-        view.cleanImage();
-        view.repaint();
-    }//GEN-LAST:event_rwordlelJMenuItemActionPerformed
-
     private void rwordleLJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordleLJButtonActionPerformed
         try {
             alpha = Double.parseDouble(anguloJTextField.getText());
         } catch( NumberFormatException e ) {
             alpha = 0;
         }
-        rwordlelJMenuItemActionPerformed(null);
+        ArrayList<Retangulo> projected  = RWordleL.apply(Util.toRetangulo(rectangles), alpha, recentralizarJCheckBox.isSelected());
+        Util.normalize(projected);
+        Util.toRetanguloVis(rectangles, projected);
+
+        view.cleanImage();
+        view.repaint();
     }//GEN-LAST:event_rwordleLJButtonActionPerformed
 
     private void embaralhaJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_embaralhaJButtonActionPerformed
@@ -246,7 +220,12 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_embaralhaJButtonActionPerformed
 
     private void rwordleCJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordleCJButtonActionPerformed
-        jMenuItem1ActionPerformed(null);
+        ArrayList<Retangulo> projected = RWordleC.apply(Util.toRetangulo(rectangles));
+        Util.normalize(projected);
+        Util.toRetanguloVis(rectangles, projected);
+
+        view.cleanImage();
+        view.repaint();
     }//GEN-LAST:event_rwordleCJButtonActionPerformed
 
     private void vpscJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vpscJButtonActionPerformed
@@ -274,6 +253,10 @@ public class Menu extends javax.swing.JFrame {
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_prismJButtonActionPerformed
+
+    private void sairJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sairJMenuItemActionPerformed
+        dispose();
+    }//GEN-LAST:event_sairJMenuItemActionPerformed
 
            
     
@@ -311,37 +294,7 @@ public class Menu extends javax.swing.JFrame {
     private void embaralha() {
         globalCounterColor = globalCounter = 0;
         rectangles.clear();
-        RainbowScale rbS = new RainbowScale();
-//        rectangles.add(new RetanguloVis(140,  158, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//        rectangles.add(new RetanguloVis(153,  130, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//        rectangles.add(new RetanguloVis(128,  103, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//        rectangles.add(new RetanguloVis(89 , 82, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//        rectangles.add(new RetanguloVis(75 , 130, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//        rectangles.add(new RetanguloVis(88 , 191, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//        rectangles.add(new RetanguloVis(153,  191, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//        rectangles.add(new RetanguloVis(216,  189, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//        rectangles.add(new RetanguloVis(200,  99, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//        rectangles.add(new RetanguloVis(157,  83, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//        rectangles.add(new RetanguloVis(196,  154, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//        rectangles.add(new RetanguloVis(108,  149, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//        rectangles.add(new RetanguloVis(115,  226, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++)); 
-//        rectangles.add(new RetanguloVis(175,  213, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-//                                        
-        
-        rectangles.add(new RetanguloVis(103, 113, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(81 ,144, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(118, 159, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(68 ,191, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(310 ,306, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(337 ,352, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(356 ,285, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(297 ,265, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(270 ,343, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(401 ,55, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(453 ,109, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(404 ,114, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(350 ,75, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-        rectangles.add(new RetanguloVis(349 ,126, 50, 50, rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+       
         if( view != null ) {
             view.cleanImage();
             view.repaint();            
@@ -438,8 +391,6 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
@@ -448,7 +399,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JCheckBox recentralizarJCheckBox;
     private javax.swing.JButton rwordleCJButton;
     private javax.swing.JButton rwordleLJButton;
-    private javax.swing.JMenuItem rwordlelJMenuItem;
+    private javax.swing.JMenuItem sairJMenuItem;
     private javax.swing.JScrollPane telaJScrollPane;
     private javax.swing.JButton vpscJButton;
     // End of variables declaration//GEN-END:variables
