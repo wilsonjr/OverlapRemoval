@@ -433,5 +433,38 @@ public class Util {
     }
     
     
+    public static double[] getCenter(ArrayList<Retangulo> rects) {
+        double xmin = rects.get(0).getUX(), xmax = rects.get(0).getLX(), 
+               ymin = rects.get(0).getUY(), ymax = rects.get(0).getLY();                      
+        
+        for( Retangulo r: rects ) {
+            if( r.getUX() < xmin ) 
+                xmin = r.getUX();
+            if( r.getLX() > xmax )
+                xmax = r.getLX();
+            if( r.getUY() < ymin )
+                ymin = r.getUY();
+            if( r.getLY() > ymax )
+                ymax = r.getLY();
+        }
+        
+        /**
+         * Compute the center of mass of set 
+         */        
+        double centerX = (xmin+xmax)/2;
+        double centerY = (ymin+ymax)/2;
+        
+        
+        double[] center = {centerX, centerY};
+        return center;
+    }
+    
+    public static void translate(ArrayList<Retangulo> rects, double ammountX, double ammountY) {
+        for( int i = 0; i < rects.size(); ++i ) {
+            rects.get(i).setUX(rects.get(i).getUX()+ammountX);
+            rects.get(i).setUY(rects.get(i).getUY()+ammountY);
+        }
+    }
+    
     
 }

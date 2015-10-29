@@ -6,7 +6,7 @@
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="jMenu1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Algoritmos"/>
+            <Property name="text" type="java.lang.String" value="Arquivo"/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="sairJMenuItem">
@@ -46,28 +46,32 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="telaJScrollPane" pref="540" max="32767" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="embaralhaJButton" alignment="0" max="32767" attributes="0"/>
-                      <Component id="rwordleCJButton" alignment="0" max="32767" attributes="0"/>
-                      <Component id="recentralizarJCheckBox" alignment="0" pref="168" max="32767" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="anguloJTextField" min="-2" pref="42" max="-2" attributes="0"/>
+              <Component id="telaJScrollPane" pref="536" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="limparJButton" alignment="0" max="32767" attributes="0"/>
+                          <Component id="rwordleCJButton" alignment="0" max="32767" attributes="0"/>
+                          <Component id="recentralizarJCheckBox" alignment="0" pref="168" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="anguloJTextField" min="-2" pref="42" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="rwordleLJButton" alignment="0" max="32767" attributes="0"/>
+                          <Component id="vpscJButton" alignment="0" max="32767" attributes="0"/>
+                          <Component id="prismJButton" alignment="0" max="32767" attributes="0"/>
+                          <Component id="jSeparator3" alignment="0" min="-2" pref="103" max="-2" attributes="0"/>
+                          <Component id="jSeparator2" alignment="1" min="-2" pref="116" max="-2" attributes="0"/>
+                          <Component id="jSeparator5" alignment="0" min="-2" pref="104" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="rwordleLJButton" alignment="0" max="32767" attributes="0"/>
-                      <Component id="vpscJButton" alignment="0" max="32767" attributes="0"/>
-                      <Component id="prismJButton" alignment="0" max="32767" attributes="0"/>
-                      <Component id="jSeparator3" alignment="0" min="-2" pref="103" max="-2" attributes="0"/>
-                      <Component id="jSeparator2" alignment="1" min="-2" pref="116" max="-2" attributes="0"/>
-                      <Component id="jSeparator5" alignment="0" min="-2" pref="104" max="-2" attributes="0"/>
+                      <Component id="jSeparator4" min="-2" pref="104" max="-2" attributes="0"/>
+                      <Component id="jSeparator1" alignment="1" min="-2" pref="102" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jSeparator4" min="-2" pref="104" max="-2" attributes="0"/>
+                  <Component id="projSnippetJButton" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="26" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -76,7 +80,7 @@
           <Component id="telaJScrollPane" alignment="0" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="embaralhaJButton" min="-2" max="-2" attributes="0"/>
+              <Component id="limparJButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
               <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
@@ -100,7 +104,11 @@
               <Component id="jSeparator5" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="prismJButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="175" max="32767" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+              <Component id="projSnippetJButton" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="121" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -141,12 +149,12 @@
         <Property name="text" type="java.lang.String" value="&#xc2;ngulo:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="embaralhaJButton">
+    <Component class="javax.swing.JButton" name="limparJButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Embaralhar"/>
+        <Property name="text" type="java.lang.String" value="Limpar"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="embaralhaJButtonActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="limparJButtonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="vpscJButton">
@@ -172,6 +180,16 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prismJButtonActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="projSnippetJButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="ProjSnippet"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="projSnippetJButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JSeparator" name="jSeparator1">
     </Component>
   </SubComponents>
 </Form>

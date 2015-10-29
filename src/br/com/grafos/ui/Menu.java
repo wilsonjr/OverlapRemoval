@@ -26,11 +26,11 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ArrayList;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -75,13 +75,15 @@ public class Menu extends javax.swing.JFrame {
         rwordleLJButton = new javax.swing.JButton();
         anguloJTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        embaralhaJButton = new javax.swing.JButton();
+        limparJButton = new javax.swing.JButton();
         vpscJButton = new javax.swing.JButton();
         jSeparator2 = new javax.swing.JSeparator();
         jSeparator3 = new javax.swing.JSeparator();
         jSeparator4 = new javax.swing.JSeparator();
         jSeparator5 = new javax.swing.JSeparator();
         prismJButton = new javax.swing.JButton();
+        projSnippetJButton = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         sairJMenuItem = new javax.swing.JMenuItem();
@@ -106,10 +108,10 @@ public class Menu extends javax.swing.JFrame {
 
         jLabel1.setText("Ângulo:");
 
-        embaralhaJButton.setText("Embaralhar");
-        embaralhaJButton.addActionListener(new java.awt.event.ActionListener() {
+        limparJButton.setText("Limpar");
+        limparJButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                embaralhaJButtonActionPerformed(evt);
+                limparJButtonActionPerformed(evt);
             }
         });
 
@@ -127,7 +129,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
 
-        jMenu1.setText("Algoritmos");
+        projSnippetJButton.setText("ProjSnippet");
+        projSnippetJButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                projSnippetJButtonActionPerformed(evt);
+            }
+        });
+
+        jMenu1.setText("Arquivo");
 
         sairJMenuItem.setText("Sair");
         sairJMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -146,32 +155,35 @@ public class Menu extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(telaJScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(embaralhaJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(rwordleCJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(recentralizarJCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel1)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(anguloJTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(rwordleLJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(vpscJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(prismJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(telaJScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(limparJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(rwordleCJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(recentralizarJCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(anguloJTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(rwordleLJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(vpscJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(prismJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(projSnippetJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(telaJScrollPane)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(embaralhaJButton)
+                .addComponent(limparJButton)
                 .addGap(3, 3, 3)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(5, 5, 5)
@@ -194,7 +206,11 @@ public class Menu extends javax.swing.JFrame {
                 .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(prismJButton)
-                .addContainerGap(175, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(projSnippetJButton)
+                .addContainerGap(121, Short.MAX_VALUE))
         );
 
         pack();
@@ -207,7 +223,16 @@ public class Menu extends javax.swing.JFrame {
         } catch( NumberFormatException e ) {
             alpha = 0;
         }
-        ArrayList<Retangulo> projected  = RWordleL.apply(Util.toRetangulo(rectangles), alpha, recentralizarJCheckBox.isSelected());
+        
+        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        double[] center0 = Util.getCenter(rects);
+        ArrayList<Retangulo> projected  = RWordleL.apply(rects, alpha, recentralizarJCheckBox.isSelected());
+        double[] center1 = Util.getCenter(projected);
+                
+        double ammountX = center0[0]-center1[0];
+        double ammountY = center0[1]-center1[1];
+        Util.translate(projected, ammountX, ammountY);
+        
         Util.normalize(projected);
         Util.toRetanguloVis(rectangles, projected);
 
@@ -215,12 +240,20 @@ public class Menu extends javax.swing.JFrame {
         view.repaint();
     }//GEN-LAST:event_rwordleLJButtonActionPerformed
 
-    private void embaralhaJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_embaralhaJButtonActionPerformed
+    private void limparJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limparJButtonActionPerformed
         embaralha();
-    }//GEN-LAST:event_embaralhaJButtonActionPerformed
+    }//GEN-LAST:event_limparJButtonActionPerformed
 
     private void rwordleCJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordleCJButtonActionPerformed
-        ArrayList<Retangulo> projected = RWordleC.apply(Util.toRetangulo(rectangles));
+        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        double[] center0 = Util.getCenter(rects);
+        ArrayList<Retangulo> projected = RWordleC.apply(rects);
+        double[] center1 = Util.getCenter(projected);
+        
+        double ammountX = center0[0]-center1[0];
+        double ammountY = center0[1]-center1[1];
+        Util.translate(projected, ammountX, ammountY);
+        
         Util.normalize(projected);
         Util.toRetanguloVis(rectangles, projected);
 
@@ -229,11 +262,20 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_rwordleCJButtonActionPerformed
 
     private void vpscJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vpscJButtonActionPerformed
-        ArrayList<Retangulo> projected = VPSC.apply(Util.toRetangulo(rectangles), 0, 0);
+        
+        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        double[] center0 = Util.getCenter(rects);
+        ArrayList<Retangulo> projected = VPSC.apply(rects, 0, 0);
+        double[] center1 = Util.getCenter(projected);
+        
         int i = 0;
         for( Retangulo r: projected ) 
             r.setId(i++);       
         
+        double ammountX = center0[0]-center1[0];
+        double ammountY = center0[1]-center1[1];
+        Util.translate(projected, ammountX, ammountY);
+                
         Util.normalize(projected);        
         Util.toRetanguloVis(rectangles, projected);
         
@@ -242,10 +284,19 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_vpscJButtonActionPerformed
 
     private void prismJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJButtonActionPerformed
-        ArrayList<Retangulo> projected = PRISM.apply(Util.toRetangulo(rectangles));
+        
+        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);        
+        double[] center0 = Util.getCenter(rects);
+        ArrayList<Retangulo> projected = PRISM.apply(rects);
+        double[] center1 = Util.getCenter(projected);
+        
         int i = 0;
         for( Retangulo r: projected )
             r.setId(i++);        
+        
+        double ammountX = center0[0]-center1[0];
+        double ammountY = center0[1]-center1[1];
+        Util.translate(projected, ammountX, ammountY);
         
         Util.normalize(projected);
         Util.toRetanguloVis(rectangles, projected);
@@ -257,6 +308,10 @@ public class Menu extends javax.swing.JFrame {
     private void sairJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sairJMenuItemActionPerformed
         dispose();
     }//GEN-LAST:event_sairJMenuItemActionPerformed
+
+    private void projSnippetJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projSnippetJButtonActionPerformed
+        JOptionPane.showMessageDialog(this, "AINDA NÃO FOI IMPLEMENTADO...");
+    }//GEN-LAST:event_projSnippetJButtonActionPerformed
 
            
     
@@ -320,18 +375,8 @@ public class Menu extends javax.swing.JFrame {
                                                  rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
                     cleanImage();
                     repaint();    
-                    System.out.println(">> "+e.getX()+" "+e.getY());
                 }   
             }); 
-            
-            addMouseMotionListener(new MouseMotionAdapter() {            
-                @Override
-                public void mouseDragged(MouseEvent e) {
-                    System.out.println("*> "+e.getX()+"  "+e.getY());
-                }            
-            });
-            
-         //   embaralha();
             cleanImage();
             repaint();            
         }
@@ -387,15 +432,17 @@ public class Menu extends javax.swing.JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField anguloJTextField;
-    private javax.swing.JButton embaralhaJButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JButton limparJButton;
     private javax.swing.JButton prismJButton;
+    private javax.swing.JButton projSnippetJButton;
     private javax.swing.JCheckBox recentralizarJCheckBox;
     private javax.swing.JButton rwordleCJButton;
     private javax.swing.JButton rwordleLJButton;
