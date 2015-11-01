@@ -9,6 +9,7 @@ package br.com.grafos.ui;
 
 import br.com.grafos.desenho.color.RainbowScale;
 import br.com.metodos.overlap.prism.PRISM;
+import br.com.metodos.overlap.projsnippet.ProjSnippet;
 import br.com.metodos.overlap.rwordle.RWordleC;
 import br.com.metodos.overlap.rwordle.RWordleL;
 import br.com.metodos.overlap.vpsc.VPSC;
@@ -310,7 +311,25 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_sairJMenuItemActionPerformed
 
     private void projSnippetJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projSnippetJButtonActionPerformed
-        JOptionPane.showMessageDialog(this, "AINDA NÃO FOI IMPLEMENTADO...");
+        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        double[] center0 = Util.getCenter(rects);
+        ArrayList<Retangulo> projected = ProjSnippet.e_o(rects);
+        double[] center1 = Util.getCenter(projected);
+        
+         int i = 0;
+        for( Retangulo r: projected )
+            r.setId(i++);        
+        
+        double ammountX = center0[0]-center1[0];
+        double ammountY = center0[1]-center1[1];
+        Util.translate(projected, ammountX, ammountY);
+        
+        Util.normalize(projected);
+        Util.toRetanguloVis(rectangles, projected);
+        
+        view.cleanImage();
+        view.repaint();
+        
     }//GEN-LAST:event_projSnippetJButtonActionPerformed
 
            

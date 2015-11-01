@@ -230,7 +230,6 @@ public class Util {
         double[] y = new double[layout.length];
        
         double stress0 = stress(edges);
-//        System.out.println("old stress: "+stress0);
         int limit = layout.length;
         
         do {
@@ -255,12 +254,7 @@ public class Util {
             for( int i = 0; i < bx.length; ++i )
                 bx[i] = -bx[i];
             
-            boolean retorno = Util.gradConjugados(matrizx, rx, vx, px, bx);
-//            if( retorno )
-//                System.out.println("Gradiente Conjugado para X convergiu");
-//            else
-//                System.out.println("Gradiente Conjugado para X não convergiu");
-            
+            boolean retorno = Util.gradConjugados(matrizx, rx, vx, px, bx);            
             
             /** solve for y **/
            double[] by = LzX(lz, y);
