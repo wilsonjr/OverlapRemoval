@@ -35,14 +35,15 @@ public class ProjSnippet {
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             BufferedWriter bw = new BufferedWriter(fw);
             for( Retangulo r: retangulos )
-                bw.write(r.getUX()+" "+r.getLY()+"\n");
+                bw.write(r.getUX()+" "+r.getLY()+" "+r.getWidth()+" "+r.getHeight()+"\n");
             bw.close();
             
             
             Process p = null;
             try {
                 //p = Runtime.getRuntime().exec("C:\\Python27\\python.exe teste_minimization.py");
-                p = Runtime.getRuntime().exec("cmd /c teste_nlopt.exe");
+                //p = Runtime.getRuntime().exec("cmd /c teste_nlopt.exe");
+                p = Runtime.getRuntime().exec("cmd /c energia_sobreposicao.exe");
             } catch (IOException ex) {
                 Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
             }
