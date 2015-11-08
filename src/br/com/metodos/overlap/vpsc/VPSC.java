@@ -64,9 +64,6 @@ public class VPSC {
             projected.get(i).moveY(vars.get(i).getPosition());           
         
         return projected;      
-        
-        
-        
            
     }
     
@@ -74,6 +71,11 @@ public class VPSC {
         Blocos blocos = new Blocos(vars);
         
         satisfyVPSC(blocos, vars, res);
+        /**
+         * tenta remover todas sobreposições, em seguida verifica se o menor coeficiente de Lagrande é negativo;
+         * Caso seja negativo, continua "quebrando" e juntando os blocos e removendo as sobreposições
+         */
+        
         while( true ) {
             
            
@@ -86,9 +88,13 @@ public class VPSC {
                     idx = i;
                 }
             }
+            
+            // caso o menor coeficiente de Lagrange seja positivo, todas as sobreposições já foram removidas;
+            // então o método termina
             if( r1 == null || r1.getLm() >= 0 )
                 break;
-            
+           
+            // caso contrário, recuperamos o menor coeficiente e quebramos seu bloco em dois novos...
             Bloco lb = new Bloco();
             Bloco rb = new Bloco();
             blocos.restrictBlock(blocos.getBlocos().get(idx), lb, rb, r1);
@@ -117,20 +123,28 @@ public class VPSC {
             for( int j = blocos.getBlocos().size()-1; j >= 0; --j )
                 if( blocos.getBlocos().get(j).getDeleted() )
                     blocos.getBlocos().remove(j);
-            
-            
-        } 
-        
+        }         
     }
     
     
-    
+    /**
+     * Primeiramente um bloco fora criado para cada variável v (b.posn = v.des).
+     * Alguma restrição pode ser violada com essas atribuições. Assim, caso haja alguma violação,
+     * a restrição com maior valor de violation() é encontrada e seus blocos são mesclados.
+     * @param blocos
+     * @param vars
+     * @param res 
+     */
     private static void satisfyVPSC(Blocos blocos, ArrayList<Variavel> vars, ArrayList<Restricao> res) {
         for( int i = 0; i < res.size(); ++i )
             res.get(i).setAtiva(false);
     
+        // recupera a ordenação topológica
         ArrayList<Variavel> varsOrdered = blocos.totalOrder();
         
+        
+        // esse algoritmo é quase ótimo, trabalha junta as variaveis em blocos cada vez maiores
+        // de variaveis conectadas por um árvore geradora
         for( int i = 0; i < varsOrdered.size(); ++i )
             if( !varsOrdered.get(i).getBloco().getDeleted() ) 
                 blocos.mergeLeft(varsOrdered.get(i).getBloco());                
@@ -148,7 +162,8 @@ public class VPSC {
      * that any remaining overlap must be removed vertically. This means that we
      * need only find the closest node in the analogue of the functions get_left_nbours
      * and get_right_nbours since any other nodes in the scan line will be constrained to
-     * be above or below these.
+     * be above or below these. This means that the number of left and right neighbours
+     * is always 1 or less.
      * @param retangulos
      * @param vars
      * @param restricoes
@@ -356,6 +371,13 @@ public class VPSC {
             toRemove.setDeleted(true);            
     }
     
+    /**
+     * Recupera os vizinhos mais próximos que requerem uma restrição de não sobreposição.
+     * Executa até o primeiro vizinho que não contém sobreposição.
+     * @param scanline
+     * @param v
+     * @return 
+     */
     private static TreeSet<No> getLeftNeighbours(TreeSet<No> scanline, No v) {
         TreeSet<No> leftv = new TreeSet<>(new NoComparator());
         
@@ -378,11 +400,13 @@ public class VPSC {
         
         while( u != null ) {      
             
+            // achou um nó que não sobrepõe, como é armazenado em uma árvore, não há mais nenhuma em que existe sobreposição
             if( u.getRect().olapX(v.getRect()) <= 0.000 ) {
                 leftv.add(u);                
                 return leftv;
             }
             
+            // adiciona somente se a sobreposição horizontal for menor que a sobreposição vertical            
             if( u.getRect().olapX(v.getRect()) <= u.getRect().olapY(v.getRect()) )  
                 leftv.add(u);
             
@@ -398,6 +422,13 @@ public class VPSC {
         return leftv;
     }
 
+    /**
+     * * Recupera os vizinhos mais próximos que requerem uma restrição de não sobreposição.
+     * Executa até o primeiro vizinho que não contém sobreposição.
+     * @param scanline
+     * @param v
+     * @return 
+     */
     private static TreeSet<No> getRightNeighbours(TreeSet<No> scanline, No v) {
         TreeSet<No> rightv = new TreeSet<>(new NoComparator());
         Iterator<No> it = scanline.iterator();
@@ -417,12 +448,13 @@ public class VPSC {
         }
         while( u != null ) {
             
+            // achou um nó que não sobrepõe, como é armazenado em uma árvore, não há mais nenhuma em que existe sobreposição
             if( u.getRect().olapX(v.getRect()) <= 0.000 ) {
                 rightv.add(u);                
                 return rightv;
             }            
             
-            
+            // adiciona somente se a sobreposição horizontal for menor que a sobreposição vertical            
             if( u.getRect().olapX(v.getRect()) <= u.getRect().olapY(v.getRect()) ) 
                 rightv.add(u);                            
             

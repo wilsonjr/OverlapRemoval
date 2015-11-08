@@ -52,8 +52,11 @@ public class Blocos  {
     }
     
     public void mergeLeft(Bloco b) {
+        // inicializa as in constraints e recupera a restrição que possui maior violação
         b.heapifyInConstraints();     
         Restricao r = b.getMinInConstraint();        
+        
+        // caso essa violação seja maior que 0 é necessário mesclar os blocos
         while( r != null && r.getViolationLeft() > 0 ) {
             
             b.removeMinInConstraint();           

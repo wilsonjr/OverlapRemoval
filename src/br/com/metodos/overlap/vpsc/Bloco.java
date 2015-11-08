@@ -15,13 +15,13 @@ import java.util.PriorityQueue;
  * @author Wilson
  */
 public class Bloco {
-    private ArrayList<Variavel> vars;
-    private double posn;
-    private double weight;
-    private double wposn;
-    private PriorityQueue<Restricao> in;
-    private PriorityQueue<Restricao> out;
-    private boolean deleted;
+    private ArrayList<Variavel> vars; // variáveis do bloco
+    private double posn; // posição de referência do bloco
+    private double weight; // soma dos pesos das variaveis nesse bloco
+    private double wposn;  // soma ponderada das posições desejadas das variaveis nesse bloco
+    private PriorityQueue<Restricao> in; // in constraints
+    private PriorityQueue<Restricao> out; // out constraints
+    private boolean deleted; // usamos uma estratégia para nao ter problema de ponteiro nulo
     private Restricao menor = null;
     
     public Bloco() {
@@ -35,8 +35,7 @@ public class Bloco {
     }
     
     public Bloco(Variavel v) { 
-        vars = new ArrayList<>();
-        
+        vars = new ArrayList<>();        
         weight = 0;
         wposn = 0;
         in = null;
@@ -54,8 +53,6 @@ public class Bloco {
         weight += v.getWeight();
         wposn += v.getWeight()*(v.getDes()-v.getOffset());
         posn = wposn/weight;
-        
-                
     }
     
     public void setPosn(double posn) {
@@ -64,8 +61,7 @@ public class Bloco {
     
     public double getPosn() {
         return posn;
-    }
-    
+    }    
     
     public PriorityQueue<Restricao> heapifyInConstraints() {
         in = new PriorityQueue<>(vars.size(), new Comparator<Restricao>() {
@@ -117,10 +113,14 @@ public class Bloco {
     }
     
     
-    
-    
     public Restricao getMinOutConstraint() {
         Restricao constraint = out.peek();
+        
+        // o autor diz que é importante reduzir restrições redundantes quando encontra-las:
+        /**
+         * The only slight catch is that some of the constraints in b.in may be internal constraints, i.e. constraints
+         * which are between variables in the same block. Such internal constraints are removed from the queue when encountered.
+         */
         while( constraint != null && constraint.getLeft().getBloco() == constraint.getRight().getBloco() ) {
             out.poll();
             constraint = out.peek();
@@ -131,6 +131,8 @@ public class Bloco {
 
     public Restricao getMinInConstraint() {
         Restricao constraint = in.peek();
+        
+        // o autor diz que é importante reduzir restrições redundantes quando encontra-las
         while( constraint != null && constraint.getLeft().getBloco() == constraint.getRight().getBloco() ) {
             in.poll();            
             constraint = in.peek();
@@ -187,11 +189,13 @@ public class Bloco {
     public void addInSplitBlock(Bloco b, Variavel v) {
         b.addVar(v);
         
+        // visita a subarvore da esquerda
         for( int i = 0; i < v.getIn().size(); ++i ) {
             if( v.getIn().get(i).getLeft().getBloco() == this && v.getIn().get(i).getAtiva() )
                 addInSplitBlock(b, v.getIn().get(i).getLeft());            
         }
         
+        // visita a subarvore da direita
         for( int i = 0; i < v.getOut().size(); ++i ) {
             if( v.getOut().get(i).getRight().getBloco() == this && v.getOut().get(i).getAtiva() )
                 addInSplitBlock(b, v.getOut().get(i).getRight());            
@@ -199,7 +203,8 @@ public class Bloco {
     }
     
     /**
-     * comDdDv
+     * compDfDv - Busca em profundidade nas restrições ativas do bloco
+     * somando v.weight * (posn(v)-v.des)
      * @param v
      * @param u
      * @return 
@@ -252,6 +257,7 @@ public class Bloco {
         }        
         
         menor = null;
+        // computa o diferencial para cada bloco.
         compDfDv(vars.get(0), null);
         return menor;
     }

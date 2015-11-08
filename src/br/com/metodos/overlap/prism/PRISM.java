@@ -7,7 +7,6 @@
 package br.com.metodos.overlap.prism;
 
 import br.com.metodos.overlap.vpsc.Restricao;
-import br.com.metodos.overlap.vpsc.RetanguloVPSC;
 import br.com.metodos.overlap.vpsc.VPSC;
 import br.com.metodos.overlap.vpsc.Variavel;
 import br.com.metodos.utils.Retangulo;
@@ -50,6 +49,7 @@ public class PRISM {
         VPSC.generateCx(projected, varsx, restricoesx);
         VPSC.generateCy(projected, varsy, restricoesy);        
         
+        // aumenta o grafo de proximidade com as arestas encontradas pelo VPSC
         PRISMEdge[] newOverlaps = new PRISMEdge[restricoesx.size()+restricoesy.size()];
         for( int i = 0; i < restricoesx.size(); ++i ) {
             int u = restricoesx.get(i).getLeft().getId();
@@ -92,10 +92,12 @@ public class PRISM {
             if( rects.size() > 2 ) {
                 Delaunay_Triangulation dt = new Delaunay_Triangulation(points);
                 Iterator<Triangle_dt> trianglesIterator = dt.trianglesIterator();
+                
                 while( trianglesIterator.hasNext() ) {
                     Triangle_dt t = trianglesIterator.next();
                     if( !t.isHalfplane() ) {            
 
+                        // adiciona as arestas de cada triangulo ao grafo de proximidade
                         PRISMEdge e = new PRISMEdge((PRISMPoint)t.p1(), (PRISMPoint)t.p2());
                         if( !edges.contains(e) )
                             edges.add(e);
@@ -111,17 +113,13 @@ public class PRISM {
                 }
             }
             
+            // na segunda parte do algoritmo deve-se adicionar as arestas encontradas pelo VPSC
             if( augmentGp ) {
                 PRISMEdge[] restEdge = findRestOverlaps(projected);
-                for( int i = 0; i < restEdge.length; ++i ) {
-                    if( !edges.contains(restEdge[i]) ) {
-                        System.out.println("NAO CONTEM");
+                for( int i = 0; i < restEdge.length; ++i ) 
+                    if( !edges.contains(restEdge[i]) ) 
                         edges.add(restEdge[i]);
-                        
-                    } 
-                }
             }
-//            System.out.println("EDGES SIZE - ARRAYLIST: "+edges.size());
             
             PRISMEdge[] arestas = new PRISMEdge[edges.size()];
             boolean flag = false;
@@ -131,7 +129,9 @@ public class PRISM {
                 if( Util.tij(arestas[i].getU().getRect(), arestas[i].getV().getRect()) != 1.0000000 )
                     flag = true;
             }
+            
             if( flag ) {
+                // chama stress majorization somente se há sobreposição entre dois nós
                 PRISMPoint[] pontos = Util.stressMajorization(arestas, points);
                 if( pontos != null ) {
                     for( int i = 0; i < pontos.length; ++i ) {
@@ -139,10 +139,7 @@ public class PRISM {
                         projected.get(i).setUX(pontos[i].getRect().getCenterX()-pontos[i].getRect().getWidth()/2.);
                         projected.get(i).setUY(pontos[i].getRect().getCenterY()-pontos[i].getRect().getHeight()/2.);
                     }
-//                    System.out.println("Novos pontos:");
-//                    for( int i = 0; i < points.length; ++i ) {
-//                        System.out.println(points[i].getRect().getCenterX()+", "+points[i].getRect().getCenterY());
-//                    }
+                    
                     if( Util.getFinished() )                         
                         break;                    
                 }                
@@ -180,11 +177,19 @@ public class PRISM {
     
     
     public static ArrayList<Retangulo> apply(ArrayList<Retangulo> rects) {
+        
+        // para um nó apenas não há o que fazer
         if( rects.size() <= 1 ) 
             return rects;
+        
+        // para dois nós a remoção é trivial
         if( rects.size() == 2 )
             return naivePRISM(rects);
+        
+        // remove a sobreposição por meio de uma visão local
         ArrayList<Retangulo> firstPass = apply(rects, false);
+        
+        // remove o restante da sobreposição por meio de uma visão global
         ArrayList<Retangulo> secondPass = apply(firstPass, true);
         return secondPass;
     }

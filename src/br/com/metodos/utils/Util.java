@@ -271,10 +271,6 @@ public class Util {
                 by[i] = -by[i];
             
             retorno = Util.gradConjugados(matrizy, ry, vy, py, by);
-//            if( retorno )
-//                System.out.println("Gradiente Conjugado para Y convergiu");
-//            else
-//                System.out.println("Gradiente Conjugado para Y não convergiu");
             
             for( int i = 0; i < by.length; ++i ) {
                 layout[i].getRect().setUX(vx[2][i]-layout[i].getRect().getWidth()/2.);
@@ -282,7 +278,6 @@ public class Util {
             }
             
             double stress1 = stress(edges);
-//            System.out.println("new stress: "+stress1);
             if( Math.abs(stress0-stress1) < stress1*EPS )
                 return layout;
             stress0 = stress1;

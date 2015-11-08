@@ -33,6 +33,8 @@ public class PRISMEdge {
     @Override
     public boolean equals(Object obj) {
         PRISMEdge o = (PRISMEdge)obj;
+        
+        // simplesmente verifica se u == v  || v == u
         return getU().x() == o.getU().x() &&  getU().y() == o.getU().y() && getV().x() == o.getV().x() &&  getV().y() == o.getV().y() ||
                getU().x() == o.getV().x() &&  getU().y() == o.getV().y() && getV().x() == o.getU().x() &&  getV().y() == o.getU().y();
         
