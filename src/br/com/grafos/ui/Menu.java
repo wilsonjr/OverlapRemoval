@@ -28,10 +28,14 @@ import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Scanner;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -85,9 +89,12 @@ public class Menu extends javax.swing.JFrame {
         prismJButton = new javax.swing.JButton();
         projSnippetJButton = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
+        projSnippetAlphaJTextField = new javax.swing.JTextField();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         sairJMenuItem = new javax.swing.JMenuItem();
+        saveJMenuItem = new javax.swing.JMenuItem();
+        loadJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -147,6 +154,22 @@ public class Menu extends javax.swing.JFrame {
         });
         jMenu1.add(sairJMenuItem);
 
+        saveJMenuItem.setText("Salvar Projeção");
+        saveJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(saveJMenuItem);
+
+        loadJMenuItem.setText("Carregar Projeção");
+        loadJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(loadJMenuItem);
+
         jMenuBar1.add(jMenu1);
 
         setJMenuBar(jMenuBar1);
@@ -158,25 +181,27 @@ public class Menu extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(telaJScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(limparJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(rwordleCJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(recentralizarJCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(anguloJTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(rwordleLJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(vpscJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(prismJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(projSnippetJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(limparJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(rwordleCJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(recentralizarJCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel1)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(anguloJTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(rwordleLJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(vpscJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(prismJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(projSnippetJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(projSnippetAlphaJTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(26, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -211,7 +236,9 @@ public class Menu extends javax.swing.JFrame {
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10)
                 .addComponent(projSnippetJButton)
-                .addContainerGap(121, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(projSnippetAlphaJTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(90, Short.MAX_VALUE))
         );
 
         pack();
@@ -313,24 +340,80 @@ public class Menu extends javax.swing.JFrame {
     private void projSnippetJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projSnippetJButtonActionPerformed
         ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
         double[] center0 = Util.getCenter(rects);
-        ArrayList<Retangulo> projected = ProjSnippet.e_o(rects);
-        double[] center1 = Util.getCenter(projected);
-        
          int i = 0;
-        for( Retangulo r: projected )
-            r.setId(i++);        
-        
-        double ammountX = center0[0]-center1[0];
-        double ammountY = center0[1]-center1[1];
-        Util.translate(projected, ammountX, ammountY);
-        
-        Util.normalize(projected);
-        Util.toRetanguloVis(rectangles, projected);
-        
-        view.cleanImage();
-        view.repaint();
-        
+        for( Retangulo r: rects )
+            r.setId(i++);
+        ArrayList<Retangulo> projected = ProjSnippet.e_o(rects, Double.parseDouble(projSnippetAlphaJTextField.getText()));
+        if( projected != null ) {
+            double[] center1 = Util.getCenter(projected);
+
+             i = 0;
+            for( Retangulo r: projected )
+                r.setId(i++);        
+
+            double ammountX = center0[0]-center1[0];
+            double ammountY = center0[1]-center1[1];
+            Util.translate(projected, ammountX, ammountY);
+
+            Util.normalize(projected);
+            Util.toRetanguloVis(rectangles, projected);
+
+            view.cleanImage();
+            view.repaint();
+        }
     }//GEN-LAST:event_projSnippetJButtonActionPerformed
+
+    private void saveJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveJMenuItemActionPerformed
+        try
+        {
+            File file = new File("projection.proj");
+               
+            if( !file.exists() )
+                file.createNewFile();
+
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            try( BufferedWriter bw = new BufferedWriter(fw) ) {
+                bw.write(rectangles.size()+"\n");
+                for( Retangulo r: rectangles )
+                    bw.write(r.getUX()+" "+r.getUY()+" "+r.getWidth()+" "+r.getHeight()+"\n");
+            }
+        } catch( IOException e ) {
+            
+        }
+    }//GEN-LAST:event_saveJMenuItemActionPerformed
+
+    private void loadJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadJMenuItemActionPerformed
+        try {
+            globalCounterColor = globalCounter = 0;
+            rectangles.clear();
+
+            if( view != null ) {
+                view.cleanImage();
+                view.repaint();            
+            }
+            Scanner scn = new Scanner(new File("projection.proj"));
+            RainbowScale rbS = new RainbowScale();
+            if( scn.hasNext() ) {
+                scn.nextInt();
+                while( scn.hasNext() ) {
+
+                    double ux = Double.parseDouble(scn.next());                    
+                    double uy = Double.parseDouble(scn.next());
+                    double width = Double.parseDouble(scn.next());
+                    double height = Double.parseDouble(scn.next());                    
+                     rectangles.add(new RetanguloVis(ux, uy, width, height, 
+                                             rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+                    
+                }
+            }
+             if( view != null ) {
+                view.cleanImage();
+                view.repaint();            
+            }
+        } catch( IOException e ) {
+            
+        }
+    }//GEN-LAST:event_loadJMenuItemActionPerformed
 
            
     
@@ -460,12 +543,15 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JButton limparJButton;
+    private javax.swing.JMenuItem loadJMenuItem;
     private javax.swing.JButton prismJButton;
+    private javax.swing.JTextField projSnippetAlphaJTextField;
     private javax.swing.JButton projSnippetJButton;
     private javax.swing.JCheckBox recentralizarJCheckBox;
     private javax.swing.JButton rwordleCJButton;
     private javax.swing.JButton rwordleLJButton;
     private javax.swing.JMenuItem sairJMenuItem;
+    private javax.swing.JMenuItem saveJMenuItem;
     private javax.swing.JScrollPane telaJScrollPane;
     private javax.swing.JButton vpscJButton;
     // End of variables declaration//GEN-END:variables
