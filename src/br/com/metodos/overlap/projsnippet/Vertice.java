@@ -96,4 +96,12 @@ public class Vertice implements HeapElement {
     }
     
     
+    public boolean has(long v) {
+        for( Edge q: adj )
+            if( q.getV() == v )
+                return true;
+        
+        return false;
+    }
+    
 }

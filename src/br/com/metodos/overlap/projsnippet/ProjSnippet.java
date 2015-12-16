@@ -27,23 +27,27 @@ import nu.thiele.mllib.data.Data;
  * @author wilson
  */
 public class ProjSnippet {
+     private static int resultado;
+     private static int kNeighbours;
     
-    
-     public static ArrayList<Retangulo> e_o(ArrayList<Retangulo> retangulos, double alpha) {
+     public static ArrayList<Retangulo> apply(ArrayList<Retangulo> retangulos, double alpha, int kNeighbours) {
+        ProjSnippet.resultado = -1;
+        ProjSnippet.kNeighbours = kNeighbours;
         
         double[][] l = formGraph(retangulos);
         ArrayList<Retangulo> projected = new ArrayList<>();        
+        
         try {
             File file = new File("points.rect");        
             if( !file.exists() )
                 file.createNewFile();
-            
+ 
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             try( BufferedWriter bw = new BufferedWriter(fw) ) {
                 bw.write(retangulos.size()+"\n");
                 for( Retangulo r: retangulos )
                     bw.write(r.getUX()+" "+r.getLY()+" "+r.getWidth()+" "+r.getHeight()+"\n");
-                bw.write("0.5\n");
+                bw.write("1\n"); // w inicial
                 bw.write(String.valueOf(alpha));
             }
             
@@ -61,62 +65,51 @@ public class ProjSnippet {
                 }
             }
             
-            
-            
-            System.out.println("Chamando rotina C++");
-            
-            Process p = null;
             try {
-                //p = Runtime.getRuntime().exec("C:\\Python27\\python.exe teste_minimization.py");
-                //p = Runtime.getRuntime().exec("cmd /c teste_nlopt.exe");
-                p = Runtime.getRuntime().exec("cmd /c energia.exe "+alpha);
+                final Process p = Runtime.getRuntime().exec("cmd /c energia.exe");
+                System.out.println("Esperando rotina C++");
+                new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {  
+                            resultado = p.waitFor();
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(ProjSnippet.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }.run();
+               
             } catch (IOException ex) {
                 Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            int waitFor = 1;
-            try {  
-                System.out.println("Esperando rotina C++");
-                waitFor = p.waitFor();
-                System.out.println(waitFor);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(ProjSnippet.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
             System.out.println("Recuperando resultados...");
-            if( waitFor == 0 ) {
-                
+            if( resultado == 0 ) {
                 Scanner scn = new Scanner(new File("point_solve.rect"));
                 int idx = 0;
+                
                 if( scn.hasNext() ) {
-                    scn.nextInt();
+                    scn.nextInt();                
                     while( scn.hasNext() ) {
                     
                         double ux = Double.parseDouble(scn.next());
                         if( scn.hasNext() ) {
                             double ly = Double.parseDouble(scn.next());
-                            System.out.println(ux+" <<-->> "+ly);
                             double uy = ly-retangulos.get(idx).getHeight();
                             projected.add(new Retangulo(ux, uy, retangulos.get(idx).getWidth(), retangulos.get(idx).getHeight()));
                             scn.next(); scn.next();
                         }
-                    }
+                    }                    
                 }
-                System.out.println("size: "+projected.size());
                 return projected;
             } 
-            
-            
-            
             
         } catch( IOException e ) {
             
         }
         
-        
-        
-        return null;
-       
+        return null;       
      }
      
      
@@ -127,18 +120,20 @@ public class ProjSnippet {
          Vertice[] grafo = new Vertice[retangulos.size()];
          
          for (int i = 0; i < data.size(); ++i) {
-            Data.DataEntry[] e = NearestNeighbour.getKNearestNeighbours(data, data.get(i).getX(), 5);
+            //System.out.println("RETANGULOS SIZE: "+retangulos.size());
+            Data.DataEntry[] e = NearestNeighbour.getKNearestNeighbours(data, data.get(i).getX(), 
+                    ProjSnippet.kNeighbours > retangulos.size() ? retangulos.size() : ProjSnippet.kNeighbours);
             Vertice v = new Vertice(i);
-            System.out.println("i: "+i);
+            //System.out.println("i: "+i);
             for( int j = 0; j < e.length; ++j ) {
-                System.out.println(e[j].getX()[0]+" "+e[j].getX()[1]+" "+e[j].getY());
+                //System.out.println(e[j].getX()[0]+" "+e[j].getX()[1]+" "+e[j].getY());
                 if( v.getId() != (long)e[j].getY() )
                     v.add(new Edge(i, (Long)e[j].getY(), Util.distanciaEuclideana(data.get(i).getX()[0], 
                                                                                   data.get(i).getX()[1], 
                                                                                   e[j].getX()[0],
                                                                                   e[j].getX()[1])));
             }
-            System.out.println();
+            //System.out.println();
             grafo[i] = v;
             
          }
@@ -165,15 +160,25 @@ public class ProjSnippet {
          for( Vertice v: grafo )
              System.out.println(v);
          
+         for( Vertice v: grafo ) {
+             for( Edge e: v.getAdj() ) {
+                 if( !grafo[(int)e.getV()].has(e.getU()) )
+                     grafo[(int)e.getV()].add(new Edge(e.getV(), e.getU(), e.getPeso()));
+             }
+         }
+         System.out.println("--------------------");
+          for( Vertice v: grafo )
+             System.out.println(v);
+         
          
          double[][] l = new double[grafo.length][grafo.length];
          for( Vertice v: grafo ) {
-             for( Edge e: v.getAdj() ) 
-                 l[(int)e.getU()][(int)e.getV()] = -1.0/((double)v.getAdj().size());
+             for( Edge e: v.getAdj() ) {
+                 System.out.println("Adj size: "+v.getAdj().size());
+                 l[(int)e.getU()][(int)e.getV()] = -1.0/((double)v.getAdj().size()+2.0);
+             }
          }
          for( int i = 0; i < l.length; ++i ) {
-             for( int j = 0; j < l.length; ++j )
-                 l[i][i] = 0.0;
              l[i][i] = 1.0;
          }
              

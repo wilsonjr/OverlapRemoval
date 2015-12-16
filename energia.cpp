@@ -91,13 +91,12 @@ vector<double> Lxy(vector<vector<double> >& l, vector<double>& xy)
 
 inline double norma(const vector<double>& c)
 {
-    /*double maior = pow(c[0], 2.);
-    for( int i = 1; i < c.size(); ++i )
-        //if( maior < c[i] )
-            maior += pow(c[i], 2.);
+    double maior = 0;
+    for( int i = 0; i < c.size(); ++i )
+        maior += pow(c[i], 2.);
 
-    return sqrt(maior);*/
-    return *max_element(c.begin(), c.end());
+    return sqrt(maior);
+    //return *max_element(c.begin(), c.end());
 }
 /*
 double delta(const vector<double>& pontos, int idx, int add)
@@ -127,22 +126,21 @@ vector<double> delta_x()
                 dx[i] += orig_x[j];
         dx[i] = orig_x[i] - dx[i]/valencia[i];
     }
-*/
-//    return dx;//*/
+    return dx;*/
     vector<double> dx = Lxy(L, orig_x);
 
-   // cout << "vetor dx: ";
-   // for( int i = 0; i < dx.size(); ++i )
-   //     cout << dx[i] << " ";
-   // cout << endl;
+    //cout << "vetor dx: ";
+    //for( int i = 0; i < dx.size(); ++i )
+    //    cout << dx[i] << " ";
+    //cout << endl;
 
     return dx;
 }
 
 vector<double> delta_y()
 {
-/*
-    vector<double> dy(orig_y.size(), 0 );
+
+   /* vector<double> dy(orig_y.size(), 0 );
 
     for( int i = 0; i < L.size(); ++i ) {
         for( int j = 0; j < L[i].size(); ++j )
@@ -153,7 +151,7 @@ vector<double> delta_y()
     }
 
     return dy;*/
-    vector<double> dy = Lxy(L, orig_y);
+  vector<double> dy = Lxy(L, orig_y);
 
     //cout << "vetor dy: ";
     //for( int i = 0; i < dy.size(); ++i )
@@ -252,7 +250,7 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
         for( int i = 0; i < N; i += 2 )
             for( int j = i+2; j < N; j += 2 ) {
 
-                //grad[i] += d_O_dx(x[i], width[i/2], x[j], width[j/2], -1) * O(x[i+1], height[i/2], x[j+1], height[j/2]);
+               // grad[i] += d_O_dx(x[i], width[i/2], x[j], width[j/2], -1) * O(x[i+1], height[i/2], x[j+1], height[j/2]);
                 if( x[i] >= x[j] ) {
                     q = pow(width[j/2], 2.) - pow(x[i]-x[j], 2.);
                     grad[i] += (1.-alpha)*(2./(n*(n-1.)))*((-4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[j/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
@@ -261,7 +259,7 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
                     grad[i] += (1.-alpha)*(2./(n*(n-1.)))*((-4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[i/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
                 }
 
-                //grad[i+1] += d_O_dx(x[i+1], height[i/2], x[j+1], height[j/2], -1) * O(x[i], width[i/2], x[j], width[j/2]);
+               // grad[i+1] += d_O_dx(x[i+1], height[i/2], x[j+1], height[j/2], -1) * O(x[i], width[i/2], x[j], width[j/2]);
                 if( x[i+1] >= x[j+1] ) {
                     q = pow(height[j/2], 2.) - pow(x[i+1]-x[j+1], 2.);
                     grad[i+1] += (1.-alpha)*(2./(n*(n-1.)))*((-4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[j/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
@@ -270,7 +268,7 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
                     grad[i+1] += (1.-alpha)*(2./(n*(n-1.)))*((-4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[i/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
                 }
 
-                //grad[j] += d_O_dx(x[i], width[i/2], x[j], width[j/2], 1) * O(x[i+1], height[i/2], x[j+1], height[j/2]);
+               // grad[j] += d_O_dx(x[i], width[i/2], x[j], width[j/2], 1) * O(x[i+1], height[i/2], x[j+1], height[j/2]);
                 if( x[i] >= x[j] ) {
                     q = pow(width[j/2], 2.) - pow(x[i]-x[j], 2.);
                     grad[j] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[j/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
@@ -279,7 +277,7 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
                     grad[j] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[i/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
                 }
 
-             //   grad[j+1] += d_O_dx(x[i+1], height[i/2], x[j+1], height[j/2], 1) * O(x[i], width[i/2], x[j], width[j/2]);
+              //  grad[j+1] += d_O_dx(x[i+1], height[i/2], x[j+1], height[j/2], 1) * O(x[i], width[i/2], x[j], width[j/2]);
                 if( x[i+1] >= x[j+1] ) {
                     q = pow(height[j/2], 2.) - pow(x[i+1]-x[j+1], 2.);
                     grad[j+1] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[j/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
@@ -331,13 +329,15 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
 
     double energia_o = 0.0;
     for( int i = 0; i < N; i += 2 )
-        for( int j = i+2; j < N; j += 2 )
+        for( int j = i+2; j < N; j += 2 ) {
             energia_o += O(x[i], width[i/2], x[j], width[j/2]) * O(x[i+1], height[i/2], x[j+1], height[j/2]);
+            //energia_o += O(x[i], 30, x[j], 30) * O(x[i+1], 30, x[j+1], 30);
+            }
     energia_o *= (2.0/(n*(n-1)));
 
     double energia_n = e_n(x);
 
-    cout << "energia_o: " << energia_o << ", energia_n: " << energia_n << endl;
+   // cout << "energia_o: " << energia_o << ", energia_n: " << energia_n << endl;
     return (1.-alpha)*energia_o + alpha*energia_n;
 }
 
@@ -361,11 +361,13 @@ vector<double> read_elems()
             orig_y.push_back(y);
         }
         ifs >> x;
-        elems.push_back(0);
+        elems.push_back(x);
         ifs >> alpha;
-        cout << "alpha: " << alpha << endl;
+        //alpha = 0.3;
+        //cout << "alpha: " << alpha << endl;
 
         originais = vector<double>(elems.begin(), elems.end());
+        ifs.close();
     }
 
     return elems;
@@ -393,12 +395,9 @@ vector<vector<double> > read_matrix() {
 int main(int argc, char** argv) {
     vector<double> x = read_elems();
 
-    for( int i = 0; i < x.size(); ++i )
-        cout << x[i] << endl;
 
-    cout << "-----------------------------------------" << endl;
     L = read_matrix();
-/*
+    /*
     for( int i = 0; i < L.size(); ++i ) {
         for( int j = 0; j < L.size(); ++j ) {
             if( L[i][j] != 0 && i != j )
@@ -406,20 +405,33 @@ int main(int argc, char** argv) {
             else
                 L[i][j] = L[j][i];
         }
+    }
+
+    for( int i = 0; i < L.size(); ++i ) {
+        for( int j = 0; j < L.size(); ++j ) {
+            cout << L[i][j] << " ";
+        }
+
+        cout << endl;
     }*/
+
 
     valencia = vector<double>(L.size(), 0);
     for( int i = 0; i < L.size(); ++i ) {
         for( int j = 0; j < L.size(); ++j )
             if( L[i][j] && i != j )
-            valencia[i]++;
+                valencia[i]++;
+            else
+                if( i == j )
+                    valencia[i] += 2;
+
     }
 
     int n = x.size();
-    cout << "Dimencoes: " << n << endl;
+    //cout << "Dimencoes: " << n << endl;
 	nlopt::opt opt(nlopt::LD_MMA, n);
     vector<double> lb(n, 0);
-    vector<double> up(n, 800);
+    vector<double> up(n, 5000);
     opt.set_lower_bounds(lb);
     opt.set_upper_bounds(up);
 
@@ -431,14 +443,14 @@ int main(int argc, char** argv) {
     nlopt::result result = opt.optimize(x, minf);
 
 	// actually perform the optimization
-	if( result < 0 )
-        printf("nlopt failed!\n");
-    else {
-        printf("found minimum after %d evaluations\n", counter);
-        for( int i = 0; i < x.size(); ++i )
-            cout << x[i] << endl;
-        printf("found minimum at %0.10g\n", minf);
-    }
+	//if( result < 0 )
+        //printf("nlopt failed!\n");
+    //else {
+       // printf("found minimum after %d evaluations\n", counter);
+       // for( int i = 0; i < x.size(); ++i )
+      //      cout << x[i] << endl;
+      //  printf("found minimum at %0.10g\n", minf);
+    //}
     ofstream ofs("point_solve.rect");
     if( ofs ) {
         ofs << x.size()/2 << endl;
@@ -446,6 +458,7 @@ int main(int argc, char** argv) {
             ofs << x[i] << " " << x[i+1] << " " << height[i/2] << " " << width[i/2] << endl;
         }
         ofs << x[x.size()-1];
+        ofs.close();
     }
 
 

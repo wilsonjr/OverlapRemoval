@@ -1,0 +1,1673 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<graph description="">
+<source-type value="Points"/>
+<projection-technique value="Interactive Document Map (IDMAP)"/>
+<distance-type value="Euclidean"/>
+<source-file value="C:\Users\wilson\Desktop\FAPESP\gpu e visualization\PEx\dados\Iris.data"/>
+<number-iterations value="50"/>
+<fraction-delta value="8.0"/>
+<projection-type value="Fastmap"/>
+<luhn-lower-cut value="10"/>
+<luhn-upper-cut value="-1"/>
+<number-grams value="1"/>
+<compressor-type value="Bzip2"/>
+<cluster-factor value="4.5"/>
+<number-neighbors value="10"/>
+<number-control-points value="10"/>
+<number-objects value="150"/>
+<number-dimensions value="4"/>
+<dimensionality-reduction value="None"/>
+<resulting-dimensions value="0"/>
+<!--   vertex   -->
+<vertex id="0">
+<valid value="1"/>
+<x-coordinate value="127.46159"/>
+<y-coordinate value="144.37344"/>
+<url value="0"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="0"/>
+</labels>
+</vertex>
+<vertex id="1">
+<valid value="1"/>
+<x-coordinate value="60.794662"/>
+<y-coordinate value="233.10942"/>
+<url value="1"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="1"/>
+</labels>
+</vertex>
+<vertex id="2">
+<valid value="1"/>
+<x-coordinate value="586.06415"/>
+<y-coordinate value="285.95465"/>
+<url value="2"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="2"/>
+</labels>
+</vertex>
+<vertex id="3">
+<valid value="1"/>
+<x-coordinate value="539.6433"/>
+<y-coordinate value="267.64194"/>
+<url value="3"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="3"/>
+</labels>
+</vertex>
+<vertex id="4">
+<valid value="1"/>
+<x-coordinate value="622.7801"/>
+<y-coordinate value="254.94034"/>
+<url value="4"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="4"/>
+</labels>
+</vertex>
+<vertex id="5">
+<valid value="1"/>
+<x-coordinate value="410.86563"/>
+<y-coordinate value="358.91205"/>
+<url value="5"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="5"/>
+</labels>
+</vertex>
+<vertex id="6">
+<valid value="1"/>
+<x-coordinate value="700.5022"/>
+<y-coordinate value="328.72775"/>
+<url value="6"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="6"/>
+</labels>
+</vertex>
+<vertex id="7">
+<valid value="1"/>
+<x-coordinate value="615.6701"/>
+<y-coordinate value="349.68515"/>
+<url value="7"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="7"/>
+</labels>
+</vertex>
+<vertex id="8">
+<valid value="1"/>
+<x-coordinate value="860.5244"/>
+<y-coordinate value="261.21472"/>
+<url value="8"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="8"/>
+</labels>
+</vertex>
+<vertex id="9">
+<valid value="1"/>
+<x-coordinate value="95.43579"/>
+<y-coordinate value="224.04689"/>
+<url value="9"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="9"/>
+</labels>
+</vertex>
+<vertex id="10">
+<valid value="1"/>
+<x-coordinate value="153.04184"/>
+<y-coordinate value="85.837585"/>
+<url value="10"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="10"/>
+</labels>
+</vertex>
+<vertex id="11">
+<valid value="1"/>
+<x-coordinate value="120.288345"/>
+<y-coordinate value="212.71848"/>
+<url value="11"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="11"/>
+</labels>
+</vertex>
+<vertex id="12">
+<valid value="1"/>
+<x-coordinate value="159.26006"/>
+<y-coordinate value="170.4939"/>
+<url value="12"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="12"/>
+</labels>
+</vertex>
+<vertex id="13">
+<valid value="1"/>
+<x-coordinate value="415.00592"/>
+<y-coordinate value="389.73907"/>
+<url value="13"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="13"/>
+</labels>
+</vertex>
+<vertex id="14">
+<valid value="1"/>
+<x-coordinate value="337.55933"/>
+<y-coordinate value="414.69077"/>
+<url value="14"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="14"/>
+</labels>
+</vertex>
+<vertex id="15">
+<valid value="1"/>
+<x-coordinate value="611.76654"/>
+<y-coordinate value="259.76874"/>
+<url value="15"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="15"/>
+</labels>
+</vertex>
+<vertex id="16">
+<valid value="1"/>
+<x-coordinate value="468.25867"/>
+<y-coordinate value="309.4756"/>
+<url value="16"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="16"/>
+</labels>
+</vertex>
+<vertex id="17">
+<valid value="1"/>
+<x-coordinate value="594.43884"/>
+<y-coordinate value="428.82498"/>
+<url value="17"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="17"/>
+</labels>
+</vertex>
+<vertex id="18">
+<valid value="1"/>
+<x-coordinate value="610.081"/>
+<y-coordinate value="333.3389"/>
+<url value="18"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="18"/>
+</labels>
+</vertex>
+<vertex id="19">
+<valid value="1"/>
+<x-coordinate value="629.17017"/>
+<y-coordinate value="377.45148"/>
+<url value="19"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="19"/>
+</labels>
+</vertex>
+<vertex id="20">
+<valid value="1"/>
+<x-coordinate value="671.0812"/>
+<y-coordinate value="321.48056"/>
+<url value="20"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="20"/>
+</labels>
+</vertex>
+<vertex id="21">
+<valid value="1"/>
+<x-coordinate value="91.794846"/>
+<y-coordinate value="185.31401"/>
+<url value="21"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="21"/>
+</labels>
+</vertex>
+<vertex id="22">
+<valid value="1"/>
+<x-coordinate value="125.620125"/>
+<y-coordinate value="183.04094"/>
+<url value="22"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="22"/>
+</labels>
+</vertex>
+<vertex id="23">
+<valid value="1"/>
+<x-coordinate value="131.89954"/>
+<y-coordinate value="145.98196"/>
+<url value="23"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="23"/>
+</labels>
+</vertex>
+<vertex id="24">
+<valid value="1"/>
+<x-coordinate value="445.4778"/>
+<y-coordinate value="363.03424"/>
+<url value="24"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="24"/>
+</labels>
+</vertex>
+<vertex id="25">
+<valid value="1"/>
+<x-coordinate value="479.86212"/>
+<y-coordinate value="311.75952"/>
+<url value="25"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="25"/>
+</labels>
+</vertex>
+<vertex id="26">
+<valid value="1"/>
+<x-coordinate value="121.88654"/>
+<y-coordinate value="140.8211"/>
+<url value="26"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="26"/>
+</labels>
+</vertex>
+<vertex id="27">
+<valid value="1"/>
+<x-coordinate value="69.705414"/>
+<y-coordinate value="246.33694"/>
+<url value="27"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="27"/>
+</labels>
+</vertex>
+<vertex id="28">
+<valid value="1"/>
+<x-coordinate value="209.30644"/>
+<y-coordinate value="92.89583"/>
+<url value="28"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="28"/>
+</labels>
+</vertex>
+<vertex id="29">
+<valid value="1"/>
+<x-coordinate value="317.42865"/>
+<y-coordinate value="374.93924"/>
+<url value="29"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="29"/>
+</labels>
+</vertex>
+<vertex id="30">
+<valid value="1"/>
+<x-coordinate value="512.08594"/>
+<y-coordinate value="371.069"/>
+<url value="30"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="30"/>
+</labels>
+</vertex>
+<vertex id="31">
+<valid value="1"/>
+<x-coordinate value="443.51337"/>
+<y-coordinate value="377.49673"/>
+<url value="31"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="31"/>
+</labels>
+</vertex>
+<vertex id="32">
+<valid value="1"/>
+<x-coordinate value="524.7765"/>
+<y-coordinate value="298.85797"/>
+<url value="32"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="32"/>
+</labels>
+</vertex>
+<vertex id="33">
+<valid value="1"/>
+<x-coordinate value="733.72644"/>
+<y-coordinate value="406.1652"/>
+<url value="33"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="33"/>
+</labels>
+</vertex>
+<vertex id="34">
+<valid value="1"/>
+<x-coordinate value="667.4117"/>
+<y-coordinate value="308.8745"/>
+<url value="34"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="34"/>
+</labels>
+</vertex>
+<vertex id="35">
+<valid value="1"/>
+<x-coordinate value="578.43964"/>
+<y-coordinate value="426.66797"/>
+<url value="35"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="35"/>
+</labels>
+</vertex>
+<vertex id="36">
+<valid value="1"/>
+<x-coordinate value="620.0459"/>
+<y-coordinate value="368.55164"/>
+<url value="36"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="36"/>
+</labels>
+</vertex>
+<vertex id="37">
+<valid value="1"/>
+<x-coordinate value="571.2852"/>
+<y-coordinate value="274.11163"/>
+<url value="37"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="37"/>
+</labels>
+</vertex>
+<vertex id="38">
+<valid value="1"/>
+<x-coordinate value="591.22955"/>
+<y-coordinate value="363.35846"/>
+<url value="38"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="38"/>
+</labels>
+</vertex>
+<vertex id="39">
+<valid value="1"/>
+<x-coordinate value="550.64606"/>
+<y-coordinate value="332.23618"/>
+<url value="39"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="39"/>
+</labels>
+</vertex>
+<vertex id="40">
+<valid value="1"/>
+<x-coordinate value="556.62476"/>
+<y-coordinate value="311.41714"/>
+<url value="40"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="40"/>
+</labels>
+</vertex>
+<vertex id="41">
+<valid value="1"/>
+<x-coordinate value="715.105"/>
+<y-coordinate value="376.37427"/>
+<url value="41"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="41"/>
+</labels>
+</vertex>
+<vertex id="42">
+<valid value="1"/>
+<x-coordinate value="594.5333"/>
+<y-coordinate value="335.63443"/>
+<url value="42"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="42"/>
+</labels>
+</vertex>
+<vertex id="43">
+<valid value="1"/>
+<x-coordinate value="779.12885"/>
+<y-coordinate value="326.00644"/>
+<url value="43"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="43"/>
+</labels>
+</vertex>
+<vertex id="44">
+<valid value="1"/>
+<x-coordinate value="112.41878"/>
+<y-coordinate value="200.7682"/>
+<url value="44"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="44"/>
+</labels>
+</vertex>
+<vertex id="45">
+<valid value="1"/>
+<x-coordinate value="131.4604"/>
+<y-coordinate value="149.17691"/>
+<url value="45"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="45"/>
+</labels>
+</vertex>
+<vertex id="46">
+<valid value="1"/>
+<x-coordinate value="508.02585"/>
+<y-coordinate value="355.25992"/>
+<url value="46"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="46"/>
+</labels>
+</vertex>
+<vertex id="47">
+<valid value="1"/>
+<x-coordinate value="596.6152"/>
+<y-coordinate value="290.85965"/>
+<url value="47"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="47"/>
+</labels>
+</vertex>
+<vertex id="48">
+<valid value="1"/>
+<x-coordinate value="586.17554"/>
+<y-coordinate value="260.24057"/>
+<url value="48"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="48"/>
+</labels>
+</vertex>
+<vertex id="49">
+<valid value="1"/>
+<x-coordinate value="564.2098"/>
+<y-coordinate value="324.27606"/>
+<url value="49"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="49"/>
+</labels>
+</vertex>
+<vertex id="50">
+<valid value="1"/>
+<x-coordinate value="460.7959"/>
+<y-coordinate value="330.77643"/>
+<url value="50"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="50"/>
+</labels>
+</vertex>
+<vertex id="51">
+<valid value="1"/>
+<x-coordinate value="571.19586"/>
+<y-coordinate value="253.2645"/>
+<url value="51"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="51"/>
+</labels>
+</vertex>
+<vertex id="52">
+<valid value="1"/>
+<x-coordinate value="530.32117"/>
+<y-coordinate value="354.60083"/>
+<url value="52"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="52"/>
+</labels>
+</vertex>
+<vertex id="53">
+<valid value="1"/>
+<x-coordinate value="611.4481"/>
+<y-coordinate value="403.47034"/>
+<url value="53"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="53"/>
+</labels>
+</vertex>
+<vertex id="54">
+<valid value="1"/>
+<x-coordinate value="788.82874"/>
+<y-coordinate value="290.88962"/>
+<url value="54"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="54"/>
+</labels>
+</vertex>
+<vertex id="55">
+<valid value="1"/>
+<x-coordinate value="892.0674"/>
+<y-coordinate value="184.50461"/>
+<url value="55"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="55"/>
+</labels>
+</vertex>
+<vertex id="56">
+<valid value="1"/>
+<x-coordinate value="703.92737"/>
+<y-coordinate value="274.02167"/>
+<url value="56"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="56"/>
+</labels>
+</vertex>
+<vertex id="57">
+<valid value="1"/>
+<x-coordinate value="767.8563"/>
+<y-coordinate value="340.2303"/>
+<url value="57"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="57"/>
+</labels>
+</vertex>
+<vertex id="58">
+<valid value="1"/>
+<x-coordinate value="146.05008"/>
+<y-coordinate value="123.0382"/>
+<url value="58"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="58"/>
+</labels>
+</vertex>
+<vertex id="59">
+<valid value="1"/>
+<x-coordinate value="156.0716"/>
+<y-coordinate value="206.48483"/>
+<url value="59"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="59"/>
+</labels>
+</vertex>
+<vertex id="60">
+<valid value="1"/>
+<x-coordinate value="147.82825"/>
+<y-coordinate value="174.21837"/>
+<url value="60"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="60"/>
+</labels>
+</vertex>
+<vertex id="61">
+<valid value="1"/>
+<x-coordinate value="93.26872"/>
+<y-coordinate value="166.30298"/>
+<url value="61"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="61"/>
+</labels>
+</vertex>
+<vertex id="62">
+<valid value="1"/>
+<x-coordinate value="140.65817"/>
+<y-coordinate value="104.35597"/>
+<url value="62"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="62"/>
+</labels>
+</vertex>
+<vertex id="63">
+<valid value="1"/>
+<x-coordinate value="57.321453"/>
+<y-coordinate value="304.77905"/>
+<url value="63"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="63"/>
+</labels>
+</vertex>
+<vertex id="64">
+<valid value="1"/>
+<x-coordinate value="439.63083"/>
+<y-coordinate value="389.10522"/>
+<url value="64"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="64"/>
+</labels>
+</vertex>
+<vertex id="65">
+<valid value="1"/>
+<x-coordinate value="550.11725"/>
+<y-coordinate value="282.813"/>
+<url value="65"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="65"/>
+</labels>
+</vertex>
+<vertex id="66">
+<valid value="1"/>
+<x-coordinate value="747.79944"/>
+<y-coordinate value="358.91077"/>
+<url value="66"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="66"/>
+</labels>
+</vertex>
+<vertex id="67">
+<valid value="1"/>
+<x-coordinate value="726.8407"/>
+<y-coordinate value="302.441"/>
+<url value="67"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="67"/>
+</labels>
+</vertex>
+<vertex id="68">
+<valid value="1"/>
+<x-coordinate value="628.92633"/>
+<y-coordinate value="440.67685"/>
+<url value="68"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="68"/>
+</labels>
+</vertex>
+<vertex id="69">
+<valid value="1"/>
+<x-coordinate value="763.8527"/>
+<y-coordinate value="309.71704"/>
+<url value="69"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="69"/>
+</labels>
+</vertex>
+<vertex id="70">
+<valid value="1"/>
+<x-coordinate value="746.13806"/>
+<y-coordinate value="313.7899"/>
+<url value="70"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="70"/>
+</labels>
+</vertex>
+<vertex id="71">
+<valid value="1"/>
+<x-coordinate value="708.4695"/>
+<y-coordinate value="376.7891"/>
+<url value="71"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="71"/>
+</labels>
+</vertex>
+<vertex id="72">
+<valid value="1"/>
+<x-coordinate value="828.2331"/>
+<y-coordinate value="280.37744"/>
+<url value="72"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="72"/>
+</labels>
+</vertex>
+<vertex id="73">
+<valid value="1"/>
+<x-coordinate value="723.387"/>
+<y-coordinate value="288.44937"/>
+<url value="73"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="73"/>
+</labels>
+</vertex>
+<vertex id="74">
+<valid value="1"/>
+<x-coordinate value="104.099434"/>
+<y-coordinate value="209.11806"/>
+<url value="74"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="74"/>
+</labels>
+</vertex>
+<vertex id="75">
+<valid value="1"/>
+<x-coordinate value="30.0"/>
+<y-coordinate value="228.78584"/>
+<url value="75"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="75"/>
+</labels>
+</vertex>
+<vertex id="76">
+<valid value="1"/>
+<x-coordinate value="143.2106"/>
+<y-coordinate value="144.7278"/>
+<url value="76"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="76"/>
+</labels>
+</vertex>
+<vertex id="77">
+<valid value="1"/>
+<x-coordinate value="153.28316"/>
+<y-coordinate value="74.24519"/>
+<url value="77"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="77"/>
+</labels>
+</vertex>
+<vertex id="78">
+<valid value="1"/>
+<x-coordinate value="578.4242"/>
+<y-coordinate value="240.7383"/>
+<url value="78"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="78"/>
+</labels>
+</vertex>
+<vertex id="79">
+<valid value="1"/>
+<x-coordinate value="897.1969"/>
+<y-coordinate value="280.77478"/>
+<url value="79"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="79"/>
+</labels>
+</vertex>
+<vertex id="80">
+<valid value="1"/>
+<x-coordinate value="663.1215"/>
+<y-coordinate value="363.12442"/>
+<url value="80"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="80"/>
+</labels>
+</vertex>
+<vertex id="81">
+<valid value="1"/>
+<x-coordinate value="764.39606"/>
+<y-coordinate value="246.69308"/>
+<url value="81"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="81"/>
+</labels>
+</vertex>
+<vertex id="82">
+<valid value="1"/>
+<x-coordinate value="736.01044"/>
+<y-coordinate value="354.62033"/>
+<url value="82"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="82"/>
+</labels>
+</vertex>
+<vertex id="83">
+<valid value="1"/>
+<x-coordinate value="201.9425"/>
+<y-coordinate value="30.0"/>
+<url value="83"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="83"/>
+</labels>
+</vertex>
+<vertex id="84">
+<valid value="1"/>
+<x-coordinate value="51.99656"/>
+<y-coordinate value="146.70389"/>
+<url value="84"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="84"/>
+</labels>
+</vertex>
+<vertex id="85">
+<valid value="1"/>
+<x-coordinate value="168.56834"/>
+<y-coordinate value="182.26979"/>
+<url value="85"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="85"/>
+</labels>
+</vertex>
+<vertex id="86">
+<valid value="1"/>
+<x-coordinate value="61.363255"/>
+<y-coordinate value="216.04903"/>
+<url value="86"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="86"/>
+</labels>
+</vertex>
+<vertex id="87">
+<valid value="1"/>
+<x-coordinate value="117.35644"/>
+<y-coordinate value="168.4046"/>
+<url value="87"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="87"/>
+</labels>
+</vertex>
+<vertex id="88">
+<valid value="1"/>
+<x-coordinate value="628.68085"/>
+<y-coordinate value="221.40099"/>
+<url value="88"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="88"/>
+</labels>
+</vertex>
+<vertex id="89">
+<valid value="1"/>
+<x-coordinate value="414.7929"/>
+<y-coordinate value="299.72787"/>
+<url value="89"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="89"/>
+</labels>
+</vertex>
+<vertex id="90">
+<valid value="1"/>
+<x-coordinate value="915.9008"/>
+<y-coordinate value="291.1873"/>
+<url value="90"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="90"/>
+</labels>
+</vertex>
+<vertex id="91">
+<valid value="1"/>
+<x-coordinate value="611.4481"/>
+<y-coordinate value="403.47034"/>
+<url value="91"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="91"/>
+</labels>
+</vertex>
+<vertex id="92">
+<valid value="1"/>
+<x-coordinate value="193.85817"/>
+<y-coordinate value="106.41862"/>
+<url value="92"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="92"/>
+</labels>
+</vertex>
+<vertex id="93">
+<valid value="1"/>
+<x-coordinate value="149.3779"/>
+<y-coordinate value="133.0423"/>
+<url value="93"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="93"/>
+</labels>
+</vertex>
+<vertex id="94">
+<valid value="1"/>
+<x-coordinate value="166.02415"/>
+<y-coordinate value="54.029755"/>
+<url value="94"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="94"/>
+</labels>
+</vertex>
+<vertex id="95">
+<valid value="1"/>
+<x-coordinate value="429.57913"/>
+<y-coordinate value="348.00772"/>
+<url value="95"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="95"/>
+</labels>
+</vertex>
+<vertex id="96">
+<valid value="1"/>
+<x-coordinate value="591.54114"/>
+<y-coordinate value="327.6577"/>
+<url value="96"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="96"/>
+</labels>
+</vertex>
+<vertex id="97">
+<valid value="1"/>
+<x-coordinate value="391.66443"/>
+<y-coordinate value="318.919"/>
+<url value="97"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="97"/>
+</labels>
+</vertex>
+<vertex id="98">
+<valid value="1"/>
+<x-coordinate value="470.0041"/>
+<y-coordinate value="465.45456"/>
+<url value="98"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="98"/>
+</labels>
+</vertex>
+<vertex id="99">
+<valid value="1"/>
+<x-coordinate value="661.28107"/>
+<y-coordinate value="419.21005"/>
+<url value="99"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="99"/>
+</labels>
+</vertex>
+<vertex id="100">
+<valid value="1"/>
+<x-coordinate value="748.7942"/>
+<y-coordinate value="331.4809"/>
+<url value="100"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="100"/>
+</labels>
+</vertex>
+<vertex id="101">
+<valid value="1"/>
+<x-coordinate value="84.46311"/>
+<y-coordinate value="194.56314"/>
+<url value="101"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="101"/>
+</labels>
+</vertex>
+<vertex id="102">
+<valid value="1"/>
+<x-coordinate value="178.66656"/>
+<y-coordinate value="149.83319"/>
+<url value="102"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="102"/>
+</labels>
+</vertex>
+<vertex id="103">
+<valid value="1"/>
+<x-coordinate value="135.34552"/>
+<y-coordinate value="158.75606"/>
+<url value="103"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="103"/>
+</labels>
+</vertex>
+<vertex id="104">
+<valid value="1"/>
+<x-coordinate value="153.65561"/>
+<y-coordinate value="123.27448"/>
+<url value="104"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="104"/>
+</labels>
+</vertex>
+<vertex id="105">
+<valid value="1"/>
+<x-coordinate value="542.8111"/>
+<y-coordinate value="390.39822"/>
+<url value="105"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="105"/>
+</labels>
+</vertex>
+<vertex id="106">
+<valid value="1"/>
+<x-coordinate value="449.90625"/>
+<y-coordinate value="324.0412"/>
+<url value="106"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="106"/>
+</labels>
+</vertex>
+<vertex id="107">
+<valid value="1"/>
+<x-coordinate value="607.4208"/>
+<y-coordinate value="377.10278"/>
+<url value="107"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="107"/>
+</labels>
+</vertex>
+<vertex id="108">
+<valid value="1"/>
+<x-coordinate value="305.18195"/>
+<y-coordinate value="342.05878"/>
+<url value="108"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="108"/>
+</labels>
+</vertex>
+<vertex id="109">
+<valid value="1"/>
+<x-coordinate value="577.1305"/>
+<y-coordinate value="409.1322"/>
+<url value="109"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="109"/>
+</labels>
+</vertex>
+<vertex id="110">
+<valid value="1"/>
+<x-coordinate value="128.89847"/>
+<y-coordinate value="165.17474"/>
+<url value="110"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="110"/>
+</labels>
+</vertex>
+<vertex id="111">
+<valid value="1"/>
+<x-coordinate value="93.61444"/>
+<y-coordinate value="214.21848"/>
+<url value="111"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="111"/>
+</labels>
+</vertex>
+<vertex id="112">
+<valid value="1"/>
+<x-coordinate value="115.59295"/>
+<y-coordinate value="211.2194"/>
+<url value="112"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="112"/>
+</labels>
+</vertex>
+<vertex id="113">
+<valid value="1"/>
+<x-coordinate value="116.7851"/>
+<y-coordinate value="201.28769"/>
+<url value="113"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="113"/>
+</labels>
+</vertex>
+<vertex id="114">
+<valid value="1"/>
+<x-coordinate value="114.82554"/>
+<y-coordinate value="147.82446"/>
+<url value="114"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="114"/>
+</labels>
+</vertex>
+<vertex id="115">
+<valid value="1"/>
+<x-coordinate value="197.76294"/>
+<y-coordinate value="137.84735"/>
+<url value="115"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="115"/>
+</labels>
+</vertex>
+<vertex id="116">
+<valid value="1"/>
+<x-coordinate value="155.92711"/>
+<y-coordinate value="115.93755"/>
+<url value="116"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="116"/>
+</labels>
+</vertex>
+<vertex id="117">
+<valid value="1"/>
+<x-coordinate value="488.53284"/>
+<y-coordinate value="289.70953"/>
+<url value="117"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="117"/>
+</labels>
+</vertex>
+<vertex id="118">
+<valid value="1"/>
+<x-coordinate value="323.39526"/>
+<y-coordinate value="377.21774"/>
+<url value="118"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="118"/>
+</labels>
+</vertex>
+<vertex id="119">
+<valid value="1"/>
+<x-coordinate value="483.8548"/>
+<y-coordinate value="323.75186"/>
+<url value="119"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="119"/>
+</labels>
+</vertex>
+<vertex id="120">
+<valid value="1"/>
+<x-coordinate value="688.2985"/>
+<y-coordinate value="376.72055"/>
+<url value="120"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="120"/>
+</labels>
+</vertex>
+<vertex id="121">
+<valid value="1"/>
+<x-coordinate value="833.3368"/>
+<y-coordinate value="228.34619"/>
+<url value="121"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="121"/>
+</labels>
+</vertex>
+<vertex id="122">
+<valid value="1"/>
+<x-coordinate value="946.8213"/>
+<y-coordinate value="321.0443"/>
+<url value="122"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="122"/>
+</labels>
+</vertex>
+<vertex id="123">
+<valid value="1"/>
+<x-coordinate value="794.892"/>
+<y-coordinate value="262.7944"/>
+<url value="123"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="123"/>
+</labels>
+</vertex>
+<vertex id="124">
+<valid value="1"/>
+<x-coordinate value="162.63156"/>
+<y-coordinate value="109.47278"/>
+<url value="124"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="124"/>
+</labels>
+</vertex>
+<vertex id="125">
+<valid value="1"/>
+<x-coordinate value="164.46036"/>
+<y-coordinate value="36.770287"/>
+<url value="125"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="125"/>
+</labels>
+</vertex>
+<vertex id="126">
+<valid value="1"/>
+<x-coordinate value="506.28616"/>
+<y-coordinate value="306.2302"/>
+<url value="126"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="126"/>
+</labels>
+</vertex>
+<vertex id="127">
+<valid value="1"/>
+<x-coordinate value="498.82233"/>
+<y-coordinate value="400.35065"/>
+<url value="127"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="127"/>
+</labels>
+</vertex>
+<vertex id="128">
+<valid value="1"/>
+<x-coordinate value="475.50916"/>
+<y-coordinate value="354.80264"/>
+<url value="128"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="128"/>
+</labels>
+</vertex>
+<vertex id="129">
+<valid value="1"/>
+<x-coordinate value="601.7139"/>
+<y-coordinate value="344.53983"/>
+<url value="129"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="129"/>
+</labels>
+</vertex>
+<vertex id="130">
+<valid value="1"/>
+<x-coordinate value="701.4107"/>
+<y-coordinate value="303.39844"/>
+<url value="130"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="130"/>
+</labels>
+</vertex>
+<vertex id="131">
+<valid value="1"/>
+<x-coordinate value="706.7397"/>
+<y-coordinate value="346.16324"/>
+<url value="131"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="131"/>
+</labels>
+</vertex>
+<vertex id="132">
+<valid value="1"/>
+<x-coordinate value="166.15358"/>
+<y-coordinate value="145.05293"/>
+<url value="132"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="132"/>
+</labels>
+</vertex>
+<vertex id="133">
+<valid value="1"/>
+<x-coordinate value="109.70758"/>
+<y-coordinate value="143.51617"/>
+<url value="133"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="133"/>
+</labels>
+</vertex>
+<vertex id="134">
+<valid value="1"/>
+<x-coordinate value="644.7618"/>
+<y-coordinate value="247.14256"/>
+<url value="134"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="134"/>
+</labels>
+</vertex>
+<vertex id="135">
+<valid value="1"/>
+<x-coordinate value="543.6783"/>
+<y-coordinate value="319.58887"/>
+<url value="135"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="135"/>
+</labels>
+</vertex>
+<vertex id="136">
+<valid value="1"/>
+<x-coordinate value="779.0403"/>
+<y-coordinate value="386.6498"/>
+<url value="136"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="136"/>
+</labels>
+</vertex>
+<vertex id="137">
+<valid value="1"/>
+<x-coordinate value="841.9276"/>
+<y-coordinate value="292.78436"/>
+<url value="137"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="137"/>
+</labels>
+</vertex>
+<vertex id="138">
+<valid value="1"/>
+<x-coordinate value="686.02136"/>
+<y-coordinate value="339.99796"/>
+<url value="138"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="138"/>
+</labels>
+</vertex>
+<vertex id="139">
+<valid value="1"/>
+<x-coordinate value="623.4711"/>
+<y-coordinate value="338.19397"/>
+<url value="139"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="139"/>
+</labels>
+</vertex>
+<vertex id="140">
+<valid value="1"/>
+<x-coordinate value="131.15625"/>
+<y-coordinate value="216.53685"/>
+<url value="140"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="140"/>
+</labels>
+</vertex>
+<vertex id="141">
+<valid value="1"/>
+<x-coordinate value="101.728836"/>
+<y-coordinate value="217.157"/>
+<url value="141"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="141"/>
+</labels>
+</vertex>
+<vertex id="142">
+<valid value="1"/>
+<x-coordinate value="86.34004"/>
+<y-coordinate value="205.13516"/>
+<url value="142"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="142"/>
+</labels>
+</vertex>
+<vertex id="143">
+<valid value="1"/>
+<x-coordinate value="649.22375"/>
+<y-coordinate value="283.88187"/>
+<url value="143"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="143"/>
+</labels>
+</vertex>
+<vertex id="144">
+<valid value="1"/>
+<x-coordinate value="396.48"/>
+<y-coordinate value="353.70578"/>
+<url value="144"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="144"/>
+</labels>
+</vertex>
+<vertex id="145">
+<valid value="1"/>
+<x-coordinate value="480.7085"/>
+<y-coordinate value="383.384"/>
+<url value="145"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="145"/>
+</labels>
+</vertex>
+<vertex id="146">
+<valid value="1"/>
+<x-coordinate value="458.9165"/>
+<y-coordinate value="338.31586"/>
+<url value="146"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="146"/>
+</labels>
+</vertex>
+<vertex id="147">
+<valid value="1"/>
+<x-coordinate value="473.44653"/>
+<y-coordinate value="329.90933"/>
+<url value="147"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="147"/>
+</labels>
+</vertex>
+<vertex id="148">
+<valid value="1"/>
+<x-coordinate value="918.652"/>
+<y-coordinate value="204.84622"/>
+<url value="148"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="148"/>
+</labels>
+</vertex>
+<vertex id="149">
+<valid value="1"/>
+<x-coordinate value="685.3331"/>
+<y-coordinate value="344.9797"/>
+<url value="149"/>
+<scalars>
+</scalars>
+<labels>
+<label name="file name" value="149"/>
+</labels>
+</vertex>
+<!--   edges   -->
+</graph>

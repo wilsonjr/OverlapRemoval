@@ -8,6 +8,9 @@ package br.com.grafos.ui;
 
 
 import br.com.grafos.desenho.color.RainbowScale;
+import br.com.metodos.overlap.hexboard.HexBoardExecutor;
+import br.com.metodos.overlap.incboard.IncBoardExecutor;
+import br.com.metodos.overlap.incboard.PontoItem;
 import br.com.metodos.overlap.prism.PRISM;
 import br.com.metodos.overlap.projsnippet.ProjSnippet;
 import br.com.metodos.overlap.rwordle.RWordleC;
@@ -23,6 +26,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
@@ -30,12 +35,15 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -49,12 +57,13 @@ public class Menu extends javax.swing.JFrame {
     private double alpha = 0;
     private int globalCounter = 0;
     private int globalCounterColor = 0;
-        
+    private boolean loadedData = false;
+    private ArrayList<Point> hexPoints;
     /**
      * Creates new form Menu
      */
     public Menu() {
-        
+        hexPoints = new ArrayList<>();
         view = new ViewPanel();
         initComponents();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -75,74 +84,27 @@ public class Menu extends javax.swing.JFrame {
     private void initComponents() {
 
         telaJScrollPane = new JScrollPane(view);
-        recentralizarJCheckBox = new javax.swing.JCheckBox();
-        rwordleCJButton = new javax.swing.JButton();
-        rwordleLJButton = new javax.swing.JButton();
-        anguloJTextField = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        limparJButton = new javax.swing.JButton();
-        vpscJButton = new javax.swing.JButton();
-        jSeparator2 = new javax.swing.JSeparator();
-        jSeparator3 = new javax.swing.JSeparator();
-        jSeparator4 = new javax.swing.JSeparator();
-        jSeparator5 = new javax.swing.JSeparator();
-        prismJButton = new javax.swing.JButton();
-        projSnippetJButton = new javax.swing.JButton();
-        jSeparator1 = new javax.swing.JSeparator();
-        projSnippetAlphaJTextField = new javax.swing.JTextField();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         sairJMenuItem = new javax.swing.JMenuItem();
-        saveJMenuItem = new javax.swing.JMenuItem();
-        loadJMenuItem = new javax.swing.JMenuItem();
+        loadDataJMenuItem = new javax.swing.JMenuItem();
+        saveDataCoordJMenuItem = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        limparJMenuItem = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        rwordleCJMenuItem = new javax.swing.JMenuItem();
+        rwordleLJMenuItem = new javax.swing.JMenuItem();
+        jSeparator8 = new javax.swing.JPopupMenu.Separator();
+        vpscJMenuItem = new javax.swing.JMenuItem();
+        jSeparator9 = new javax.swing.JPopupMenu.Separator();
+        prismJMenuItem = new javax.swing.JMenuItem();
+        jSeparator10 = new javax.swing.JPopupMenu.Separator();
+        projSnippetJMenuItem = new javax.swing.JMenuItem();
+        jSeparator11 = new javax.swing.JPopupMenu.Separator();
+        incBoardJMenuItem = new javax.swing.JMenuItem();
+        hexBoardJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        recentralizarJCheckBox.setText("Recentralizar a cada iteração");
-
-        rwordleCJButton.setText("RWordle-C");
-        rwordleCJButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rwordleCJButtonActionPerformed(evt);
-            }
-        });
-
-        rwordleLJButton.setText("RWordle-L");
-        rwordleLJButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rwordleLJButtonActionPerformed(evt);
-            }
-        });
-
-        jLabel1.setText("Ângulo:");
-
-        limparJButton.setText("Limpar");
-        limparJButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                limparJButtonActionPerformed(evt);
-            }
-        });
-
-        vpscJButton.setText("VPSC");
-        vpscJButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                vpscJButtonActionPerformed(evt);
-            }
-        });
-
-        prismJButton.setText("PRISM");
-        prismJButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                prismJButtonActionPerformed(evt);
-            }
-        });
-
-        projSnippetJButton.setText("ProjSnippet");
-        projSnippetJButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                projSnippetJButtonActionPerformed(evt);
-            }
-        });
 
         jMenu1.setText("Arquivo");
 
@@ -154,23 +116,96 @@ public class Menu extends javax.swing.JFrame {
         });
         jMenu1.add(sairJMenuItem);
 
-        saveJMenuItem.setText("Salvar Projeção");
-        saveJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        loadDataJMenuItem.setText("Carregar Dados");
+        loadDataJMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                saveJMenuItemActionPerformed(evt);
+                loadDataJMenuItemActionPerformed(evt);
             }
         });
-        jMenu1.add(saveJMenuItem);
+        jMenu1.add(loadDataJMenuItem);
 
-        loadJMenuItem.setText("Carregar Projeção");
-        loadJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        saveDataCoordJMenuItem.setText("Salvar Dados (Coordenadas)");
+        saveDataCoordJMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loadJMenuItemActionPerformed(evt);
+                saveDataCoordJMenuItemActionPerformed(evt);
             }
         });
-        jMenu1.add(loadJMenuItem);
+        jMenu1.add(saveDataCoordJMenuItem);
+        jMenu1.add(jSeparator1);
+
+        limparJMenuItem.setText("Limpar");
+        limparJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                limparJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(limparJMenuItem);
 
         jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Algoritmos");
+
+        rwordleCJMenuItem.setText("RWordle-C");
+        rwordleCJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rwordleCJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu2.add(rwordleCJMenuItem);
+
+        rwordleLJMenuItem.setText("RWordle-L");
+        rwordleLJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rwordleLJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu2.add(rwordleLJMenuItem);
+        jMenu2.add(jSeparator8);
+
+        vpscJMenuItem.setText("VPSC");
+        vpscJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                vpscJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu2.add(vpscJMenuItem);
+        jMenu2.add(jSeparator9);
+
+        prismJMenuItem.setText("PRISM");
+        prismJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                prismJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu2.add(prismJMenuItem);
+        jMenu2.add(jSeparator10);
+
+        projSnippetJMenuItem.setText("ProjSnippet");
+        projSnippetJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                projSnippetJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu2.add(projSnippetJMenuItem);
+        jMenu2.add(jSeparator11);
+
+        incBoardJMenuItem.setText("IncBoard");
+        incBoardJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                incBoardJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu2.add(incBoardJMenuItem);
+
+        hexBoardJMenuItem.setText("HexBoard");
+        hexBoardJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hexBoardJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu2.add(hexBoardJMenuItem);
+
+        jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
 
@@ -178,101 +213,52 @@ public class Menu extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(telaJScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(limparJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(rwordleCJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(recentralizarJCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel1)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(anguloJTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(rwordleLJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(vpscJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(prismJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(projSnippetJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(projSnippetAlphaJTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(26, Short.MAX_VALUE))
+            .addComponent(telaJScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 736, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(telaJScrollPane)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(limparJButton)
-                .addGap(3, 3, 3)
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5)
-                .addComponent(rwordleCJButton)
-                .addGap(12, 12, 12)
-                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(rwordleLJButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(anguloJTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(recentralizarJCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vpscJButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(prismJButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10)
-                .addComponent(projSnippetJButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(projSnippetAlphaJTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(90, Short.MAX_VALUE))
+            .addComponent(telaJScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     
-    private void rwordleLJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordleLJButtonActionPerformed
-        try {
-            alpha = Double.parseDouble(anguloJTextField.getText());
-        } catch( NumberFormatException e ) {
-            alpha = 0;
+    private void sairJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sairJMenuItemActionPerformed
+        dispose();
+    }//GEN-LAST:event_sairJMenuItemActionPerformed
+
+    private void loadDataJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadDataJMenuItemActionPerformed
+        JFileChooser jFileChooser = new JFileChooser();
+        int result = jFileChooser.showOpenDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            try {                 
+                File file = jFileChooser.getSelectedFile();
+                Scanner scn = new Scanner(file);
+                rectangles.clear();
+                RainbowScale rbS = new RainbowScale();
+                int id = 0;
+                while( scn.hasNext() ) {
+                    String[] linha = scn.nextLine().split(";");
+                    double x = Double.parseDouble(linha[1]);
+                    double y = Double.parseDouble(linha[2]);
+                    int grupo = Integer.parseInt(linha[3]);
+
+                    rectangles.add(new RetanguloVis(x, y, 30, 30, rbS.getColor((grupo*10)%255), id++));                
+                }
+
+                loadedData = true;
+                if( view != null ) {
+                    view.cleanImage();
+                    view.repaint();            
+                }
+            } catch( FileNotFoundException e ) {
+
+            }
         }
-        
-        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
-        double[] center0 = Util.getCenter(rects);
-        ArrayList<Retangulo> projected  = RWordleL.apply(rects, alpha, recentralizarJCheckBox.isSelected());
-        double[] center1 = Util.getCenter(projected);
-                
-        double ammountX = center0[0]-center1[0];
-        double ammountY = center0[1]-center1[1];
-        Util.translate(projected, ammountX, ammountY);
-        
-        Util.normalize(projected);
-        Util.toRetanguloVis(rectangles, projected);
+    }//GEN-LAST:event_loadDataJMenuItemActionPerformed
 
-        view.cleanImage();
-        view.repaint();
-    }//GEN-LAST:event_rwordleLJButtonActionPerformed
-
-    private void limparJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limparJButtonActionPerformed
-        embaralha();
-    }//GEN-LAST:event_limparJButtonActionPerformed
-
-    private void rwordleCJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordleCJButtonActionPerformed
+    private void rwordleCJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordleCJMenuItemActionPerformed
         ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
         double[] center0 = Util.getCenter(rects);
         ArrayList<Retangulo> projected = RWordleC.apply(rects);
@@ -287,10 +273,33 @@ public class Menu extends javax.swing.JFrame {
 
         view.cleanImage();
         view.repaint();
-    }//GEN-LAST:event_rwordleCJButtonActionPerformed
+    }//GEN-LAST:event_rwordleCJMenuItemActionPerformed
 
-    private void vpscJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vpscJButtonActionPerformed
+    private void rwordleLJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordleLJMenuItemActionPerformed
+        try {
+            alpha = 0;//Double.parseDouble(anguloJTextField.getText());
+        } catch( NumberFormatException e ) {
+            alpha = 0;
+        }
         
+        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        double[] center0 = Util.getCenter(rects);
+        //ArrayList<Retangulo> projected  = RWordleL.apply(rects, alpha, recentralizarJCheckBox.isSelected());
+        ArrayList<Retangulo> projected = RWordleL.apply(rects, alpha, false);
+        double[] center1 = Util.getCenter(projected);
+                
+        double ammountX = center0[0]-center1[0];
+        double ammountY = center0[1]-center1[1];
+        Util.translate(projected, ammountX, ammountY);
+        
+        Util.normalize(projected);
+        Util.toRetanguloVis(rectangles, projected);
+
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_rwordleLJMenuItemActionPerformed
+
+    private void vpscJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vpscJMenuItemActionPerformed
         ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
         double[] center0 = Util.getCenter(rects);
         ArrayList<Retangulo> projected = VPSC.apply(rects, 0, 0);
@@ -309,10 +318,9 @@ public class Menu extends javax.swing.JFrame {
         
         view.cleanImage();
         view.repaint();
-    }//GEN-LAST:event_vpscJButtonActionPerformed
+    }//GEN-LAST:event_vpscJMenuItemActionPerformed
 
-    private void prismJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJButtonActionPerformed
-        
+    private void prismJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJMenuItemActionPerformed
         ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);        
         double[] center0 = Util.getCenter(rects);
         ArrayList<Retangulo> projected = PRISM.apply(rects);
@@ -331,23 +339,26 @@ public class Menu extends javax.swing.JFrame {
         
         view.cleanImage();
         view.repaint();
-    }//GEN-LAST:event_prismJButtonActionPerformed
+    }//GEN-LAST:event_prismJMenuItemActionPerformed
 
-    private void sairJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sairJMenuItemActionPerformed
-        dispose();
-    }//GEN-LAST:event_sairJMenuItemActionPerformed
-
-    private void projSnippetJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projSnippetJButtonActionPerformed
+    private void projSnippetJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projSnippetJMenuItemActionPerformed
         ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
-        double[] center0 = Util.getCenter(rects);
-         int i = 0;
+        
+        int i = 0;
         for( Retangulo r: rects )
             r.setId(i++);
-        ArrayList<Retangulo> projected = ProjSnippet.e_o(rects, Double.parseDouble(projSnippetAlphaJTextField.getText()));
+        double[] center0 = Util.getCenter(rects);
+        //ArrayList<Retangulo> projected = ProjSnippet.e_o(rects, Double.parseDouble(projSnippetAlphaJTextField.getText()));
+        
+        String alpha_value = JOptionPane.showInputDialog("Por favor, insira o valor para 'alpha':");
+        String k_value = JOptionPane.showInputDialog("Por favor, insira o valor de 'k':");
+        
+        
+        ArrayList<Retangulo> projected = ProjSnippet.apply(rects, Double.parseDouble(alpha_value), Integer.parseInt(k_value)+1);
         if( projected != null ) {
+            
             double[] center1 = Util.getCenter(projected);
-
-             i = 0;
+            i = 0;
             for( Retangulo r: projected )
                 r.setId(i++);        
 
@@ -360,64 +371,158 @@ public class Menu extends javax.swing.JFrame {
 
             view.cleanImage();
             view.repaint();
-        }
-    }//GEN-LAST:event_projSnippetJButtonActionPerformed
+        } else
+            JOptionPane.showMessageDialog(this, "Houve um problema ao aplicar o método Projsnippet.");
+    }//GEN-LAST:event_projSnippetJMenuItemActionPerformed
 
-    private void saveJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveJMenuItemActionPerformed
-        try
-        {
-            File file = new File("projection.proj");
-               
-            if( !file.exists() )
-                file.createNewFile();
+    private void incBoardJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_incBoardJMenuItemActionPerformed
+        
+        JFileChooser jFileChooser = new JFileChooser();
 
-            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-            try( BufferedWriter bw = new BufferedWriter(fw) ) {
-                bw.write(rectangles.size()+"\n");
-                for( Retangulo r: rectangles )
-                    bw.write(r.getUX()+" "+r.getUY()+" "+r.getWidth()+" "+r.getHeight()+"\n");
-            }
-        } catch( IOException e ) {
-            
-        }
-    }//GEN-LAST:event_saveJMenuItemActionPerformed
+        int result = jFileChooser.showOpenDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            try {                 
+                File file = jFileChooser.getSelectedFile();
 
-    private void loadJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadJMenuItemActionPerformed
-        try {
-            globalCounterColor = globalCounter = 0;
-            rectangles.clear();
-
-            if( view != null ) {
-                view.cleanImage();
-                view.repaint();            
-            }
-            Scanner scn = new Scanner(new File("projection.proj"));
-            RainbowScale rbS = new RainbowScale();
-            if( scn.hasNext() ) {
-                scn.nextInt();
+                rectangles.clear();
+                ArrayList<PontoItem> items = new ArrayList<>();
+                Scanner scn = new Scanner(file);
+                for( int i = 0; i < 4; ++i ) 
+                    if( scn.hasNext() )
+                        scn.nextLine();
+                
+                int id = 0;
                 while( scn.hasNext() ) {
-
-                    double ux = Double.parseDouble(scn.next());                    
-                    double uy = Double.parseDouble(scn.next());
-                    double width = Double.parseDouble(scn.next());
-                    double height = Double.parseDouble(scn.next());                    
-                     rectangles.add(new RetanguloVis(ux, uy, width, height, 
-                                             rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
-                    
+                    String[] linha = scn.nextLine().split(";");
+                    int grupo = Integer.parseInt(linha[linha.length-1]);
+                    double[] dims = new double[linha.length-2];
+                    for( int i = 1, j = 0; i < linha.length-1; ++i )
+                        dims[j++] = Double.parseDouble(linha[i]);            
+                    items.add(new PontoItem(dims, String.valueOf(id), id, grupo));
+                    id++;
                 }
-            }
-             if( view != null ) {
-                view.cleanImage();
-                view.repaint();            
-            }
-        } catch( IOException e ) {
-            
-        }
-    }//GEN-LAST:event_loadJMenuItemActionPerformed
 
-           
-    
-    
+                IncBoardExecutor executor = new IncBoardExecutor();
+                executor.apply(items);
+                
+                rectangles.clear();
+                int ymin = Math.abs(executor.getMinRow());
+                int xmin = Math.abs(executor.getMinCol());
+                RainbowScale rbS = new RainbowScale();
+                for( PontoItem d: executor.getItems() ) {
+                    rectangles.add(new RetanguloVis(30*(d.getCol()+xmin), 30*(d.getRow()+ymin), 
+                                                    30, 30, rbS.getColor((d.getGrupo()*10)%255), d.getId()));
+                }
+
+                if( view != null ) {
+                    view.cleanImage();
+                    view.repaint();            
+                }
+            }catch(IOException e) {
+
+            }
+        }
+    }//GEN-LAST:event_incBoardJMenuItemActionPerformed
+
+    private void hexBoardJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hexBoardJMenuItemActionPerformed
+        
+        JFileChooser jFileChooser = new JFileChooser();
+
+        int result = jFileChooser.showOpenDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            try {                 
+                File file = jFileChooser.getSelectedFile();
+
+                rectangles.clear();
+                ArrayList<PontoItem> items = new ArrayList<>();
+                Scanner scn = new Scanner(file);
+                for( int i = 0; i < 4; ++i ) 
+                    if( scn.hasNext() )
+                        scn.nextLine();
+                
+                int id = 0;
+                while( scn.hasNext() ) {
+                    String[] linha = scn.nextLine().split(";");
+                    int grupo = Integer.parseInt(linha[linha.length-1]);
+                    double[] dims = new double[linha.length-2];
+                    for( int i = 1, j = 0; i < linha.length-1; ++i )
+                        dims[j++] = Double.parseDouble(linha[i]);            
+                    items.add(new PontoItem(dims, String.valueOf(id), id, grupo));
+                    ++id;
+                }
+
+                HexBoardExecutor executor = new HexBoardExecutor();
+                executor.apply(items);
+
+                int zMin = executor.getMinRow()-executor.getMinCol();
+                
+                int minDist = Integer.MAX_VALUE;
+                PontoItem q = null;
+                int zMIN = Integer.MAX_VALUE;
+                for( PontoItem d: executor.getItems() ) {
+                    int z = d.getRow()-d.getCol();
+                    if( z < zMIN )
+                        zMIN = z;
+                    int x;
+                    if( zMin > z )
+                        x = executor.getMinRow()+((Math.abs(zMin)+Math.abs(z))/2);
+                    else
+                        x = executor.getMinRow()-((Math.abs(zMin)+Math.abs(z))/2);
+                    int dist = d.getCol()-x;
+                    if( dist < minDist ) {
+                        minDist = dist;
+                        q = d;
+                    }                    
+                }
+
+                int xmin = 30;
+                int a  = (int)Math.sqrt( (30*30) - (Math.pow(30/2,2)) );
+                RainbowScale rbS = new RainbowScale();
+                for( PontoItem d: executor.getItems() ) {
+                    int z = d.getRow() - d.getCol();
+                    int centerHexY = (3*30/2)*(z + Math.abs(zMIN))+30;
+                    int distancia = (Math.abs(q.getRow()-d.getRow())+Math.abs(q.getCol()-d.getCol()))*a + xmin;
+
+                    rectangles.add(new RetanguloVis(distancia-(30/2), centerHexY-(30/2), 30, 30, 
+                            d.getGrupo() == 1 ? rbS.getColor(5) : d.getGrupo() == 2 ? rbS.getColor(120) : rbS.getColor(200),
+                            d.getId()));
+                    rectangles.get(rectangles.size()-1).setP(new Point(distancia, centerHexY));
+                    rectangles.get(rectangles.size()-1).setIsHexBoard(true);
+                }
+                view.cleanImage();
+                view.repaint();
+            } catch( IOException e ) {
+
+            }
+        }
+    }//GEN-LAST:event_hexBoardJMenuItemActionPerformed
+
+    private void limparJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limparJMenuItemActionPerformed
+        embaralha();
+    }//GEN-LAST:event_limparJMenuItemActionPerformed
+
+    private void saveDataCoordJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveDataCoordJMenuItemActionPerformed
+        JFileChooser jFileChooser = new JFileChooser();
+
+        int result = jFileChooser.showSaveDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            try {
+                File file = jFileChooser.getSelectedFile();
+                FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                try( BufferedWriter bw = new BufferedWriter(fw) ) {
+                    ArrayList<Retangulo> retangulos = Util.toRetangulo(rectangles);
+                    int i = 0;
+                    for( Retangulo r: retangulos ) {
+                        bw.write(i+";"+r.getLX()+";"+r.getLY()+";"+i+"\n");
+                        ++i;
+                    }
+                }
+            } catch( IOException e ) {
+                
+            }
+        }
+    }//GEN-LAST:event_saveDataCoordJMenuItemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -473,8 +578,8 @@ public class Menu extends javax.swing.JFrame {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     RainbowScale rbS = new RainbowScale();
-                    rectangles.add(new RetanguloVis(e.getX(), e.getY(), 50, 50, 
-                                                 rbS.getColor((globalCounterColor++*10)%255), globalCounter++));
+                    rectangles.add(new RetanguloVis(e.getX(), e.getY(), 30, 30, 
+                                                rbS.getColor((globalCounterColor++*10)%255), globalCounter++));                    
                     cleanImage();
                     repaint();    
                 }   
@@ -508,13 +613,30 @@ public class Menu extends javax.swing.JFrame {
                 
                 for( RetanguloVis r: rectangles ) {                    
                     g2Buffer.setColor(r.cor);
-                    g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                    
+                    if( r.isHexBoard ) {
+                        int a = (int)Math.sqrt(Math.pow(30, 2) - Math.pow(30/2, 2));
+                        Point p = r.getP();
+                        Polygon poly = new Polygon();
+                        poly.addPoint(p.x, p.y - 30);
+                        poly.addPoint(p.x + a, p.y - 30/2);
+                        poly.addPoint(p.x + a, p.y + 30/2);
+                        poly.addPoint(p.x, p.y + 30);
+                        poly.addPoint(p.x - a, p.y + 30/2);
+                        poly.addPoint(p.x - a, p.y - 30/2);
+                        g2Buffer.fillPolygon(poly);
+                        g2Buffer.setColor(Color.WHITE);
+                        g2Buffer.drawPolygon(poly);
+                    } else {
+                        g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                        g2Buffer.setColor(Color.BLACK);
+                        g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                    }
                     
                     g2Buffer.setColor(Color.WHITE);
-                    g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 20));                    
-                    g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+20, (int)r.getUY()+20);                           
+                    g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                    g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
                 }
-                
                 g2Buffer.dispose();
             } 
             if( imageBuffer != null )  {
@@ -533,26 +655,25 @@ public class Menu extends javax.swing.JFrame {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField anguloJTextField;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JMenuItem hexBoardJMenuItem;
+    private javax.swing.JMenuItem incBoardJMenuItem;
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JSeparator jSeparator5;
-    private javax.swing.JButton limparJButton;
-    private javax.swing.JMenuItem loadJMenuItem;
-    private javax.swing.JButton prismJButton;
-    private javax.swing.JTextField projSnippetAlphaJTextField;
-    private javax.swing.JButton projSnippetJButton;
-    private javax.swing.JCheckBox recentralizarJCheckBox;
-    private javax.swing.JButton rwordleCJButton;
-    private javax.swing.JButton rwordleLJButton;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator10;
+    private javax.swing.JPopupMenu.Separator jSeparator11;
+    private javax.swing.JPopupMenu.Separator jSeparator8;
+    private javax.swing.JPopupMenu.Separator jSeparator9;
+    private javax.swing.JMenuItem limparJMenuItem;
+    private javax.swing.JMenuItem loadDataJMenuItem;
+    private javax.swing.JMenuItem prismJMenuItem;
+    private javax.swing.JMenuItem projSnippetJMenuItem;
+    private javax.swing.JMenuItem rwordleCJMenuItem;
+    private javax.swing.JMenuItem rwordleLJMenuItem;
     private javax.swing.JMenuItem sairJMenuItem;
-    private javax.swing.JMenuItem saveJMenuItem;
+    private javax.swing.JMenuItem saveDataCoordJMenuItem;
     private javax.swing.JScrollPane telaJScrollPane;
-    private javax.swing.JButton vpscJButton;
+    private javax.swing.JMenuItem vpscJMenuItem;
     // End of variables declaration//GEN-END:variables
 }
