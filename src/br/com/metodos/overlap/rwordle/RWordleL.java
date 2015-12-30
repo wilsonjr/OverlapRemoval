@@ -131,7 +131,7 @@ public class RWordleL {
                         break;
                     }                        
                 } 
-                angle += (0.5/angle); 
+                angle += (0.3); 
             } while( !flag );
                         
             System.out.println("ID: "+novos.get(i).getId());

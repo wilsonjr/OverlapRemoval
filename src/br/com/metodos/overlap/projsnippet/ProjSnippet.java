@@ -99,6 +99,7 @@ public class ProjSnippet {
                             double uy = ly-retangulos.get(idx).getHeight();
                             projected.add(new Retangulo(ux, uy, retangulos.get(idx).getWidth(), retangulos.get(idx).getHeight()));
                             scn.next(); scn.next();
+                            idx++;
                         }
                     }                    
                 }
@@ -120,22 +121,17 @@ public class ProjSnippet {
          Vertice[] grafo = new Vertice[retangulos.size()];
          
          for (int i = 0; i < data.size(); ++i) {
-            //System.out.println("RETANGULOS SIZE: "+retangulos.size());
             Data.DataEntry[] e = NearestNeighbour.getKNearestNeighbours(data, data.get(i).getX(), 
                     ProjSnippet.kNeighbours > retangulos.size() ? retangulos.size() : ProjSnippet.kNeighbours);
             Vertice v = new Vertice(i);
-            //System.out.println("i: "+i);
             for( int j = 0; j < e.length; ++j ) {
-                //System.out.println(e[j].getX()[0]+" "+e[j].getX()[1]+" "+e[j].getY());
                 if( v.getId() != (long)e[j].getY() )
                     v.add(new Edge(i, (Long)e[j].getY(), Util.distanciaEuclideana(data.get(i).getX()[0], 
                                                                                   data.get(i).getX()[1], 
                                                                                   e[j].getX()[0],
                                                                                   e[j].getX()[1])));
             }
-            //System.out.println();
             grafo[i] = v;
-            
          }
          
          findComponents(grafo);
@@ -157,30 +153,23 @@ public class ProjSnippet {
              }
          }
          
-         for( Vertice v: grafo )
-             System.out.println(v);
-         
          for( Vertice v: grafo ) {
              for( Edge e: v.getAdj() ) {
                  if( !grafo[(int)e.getV()].has(e.getU()) )
                      grafo[(int)e.getV()].add(new Edge(e.getV(), e.getU(), e.getPeso()));
              }
          }
-         System.out.println("--------------------");
-          for( Vertice v: grafo )
-             System.out.println(v);
-         
          
          double[][] l = new double[grafo.length][grafo.length];
          for( Vertice v: grafo ) {
-             for( Edge e: v.getAdj() ) {
-                 System.out.println("Adj size: "+v.getAdj().size());
-                 l[(int)e.getU()][(int)e.getV()] = -1.0/((double)v.getAdj().size()+2.0);
-             }
+             for( Edge e: v.getAdj() ) 
+                 l[(int)e.getU()][(int)e.getV()] = -1.0/((double)v.getAdj().size()+2);
+             
          }
-         for( int i = 0; i < l.length; ++i ) {
+         
+         for( int i = 0; i < l.length; ++i ) 
              l[i][i] = 1.0;
-         }
+         
              
          
          return l;         

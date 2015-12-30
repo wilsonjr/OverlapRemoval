@@ -242,7 +242,7 @@ public class Menu extends javax.swing.JFrame {
                     String[] linha = scn.nextLine().split(";");
                     double x = Double.parseDouble(linha[1]);
                     double y = Double.parseDouble(linha[2]);
-                    int grupo = Integer.parseInt(linha[3]);
+                    int grupo = id;//Integer.parseInt(linha[3]);
 
                     rectangles.add(new RetanguloVis(x, y, 30, 30, rbS.getColor((grupo*10)%255), id++));                
                 }
@@ -411,7 +411,8 @@ public class Menu extends javax.swing.JFrame {
                 RainbowScale rbS = new RainbowScale();
                 for( PontoItem d: executor.getItems() ) {
                     rectangles.add(new RetanguloVis(30*(d.getCol()+xmin), 30*(d.getRow()+ymin), 
-                                                    30, 30, rbS.getColor((d.getGrupo()*10)%255), d.getId()));
+                                                    30, 30, rbS.getColor((d.getGrupo()*10)%255), 
+                                                    d.getId()));
                 }
 
                 if( view != null ) {
@@ -567,6 +568,8 @@ public class Menu extends javax.swing.JFrame {
     public class ViewPanel extends JPanel {
         private Color color = Color.RED;
         
+        private double iniX, iniY, fimX, fimY;
+        
         private BufferedImage imageBuffer;
         
         public ViewPanel() {
@@ -577,12 +580,21 @@ public class Menu extends javax.swing.JFrame {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
+                    iniX = e.getX();
+                    iniY = e.getY();
+                }   
+                
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    fimX = e.getX();
+                    fimY = e.getY();
+                    
                     RainbowScale rbS = new RainbowScale();
-                    rectangles.add(new RetanguloVis(e.getX(), e.getY(), 30, 30, 
+                    rectangles.add(new RetanguloVis(iniX, iniY, Math.abs(fimX-iniX), Math.abs(fimY-iniY), 
                                                 rbS.getColor((globalCounterColor++*10)%255), globalCounter++));                    
                     cleanImage();
                     repaint();    
-                }   
+                }                
             }); 
             cleanImage();
             repaint();            

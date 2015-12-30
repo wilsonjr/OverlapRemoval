@@ -49,10 +49,10 @@ public class RWordleC {
         
         ArrayList<IDShape> shapes = new ArrayList<>();
         for( int i = 0; i < rectangles.size(); ++i ) {
-            shapes.add(new IDShape(new Retangulo(rectangles.get(i).getUX(), rectangles.get(i).getUY(), 
-                                                 rectangles.get(i).getWidth(), rectangles.get(i).getHeight()),
+            shapes.add(new IDShape(rectangles.get(i),
                                                  Util.distanciaEuclideana(centerX, centerY, 
-                                                     rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY()), i) );            
+                                                     rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY()), 
+                                                    i) );            
         }        
         
         /**
@@ -106,7 +106,7 @@ public class RWordleC {
                 /**
                  * we think that reduce the growth rate at each iteration is a good guess
                  */
-                angle += (0.5/angle); 
+                angle += 0.3; 
             } while( !flag );
                         
             
