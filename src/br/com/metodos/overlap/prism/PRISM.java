@@ -72,7 +72,7 @@ public class PRISM {
         return newOverlaps;
     }
     
-    private static ArrayList<Retangulo> apply(ArrayList<Retangulo> rects, boolean augmentGp) {
+    private static ArrayList<Retangulo> apply(ArrayList<Retangulo> rects, boolean augmentGp, int algorithm) {
         ArrayList<Retangulo> projected = new ArrayList<>();
         
         for( int i = 0; i < rects.size(); ++i )
@@ -124,15 +124,19 @@ public class PRISM {
             PRISMEdge[] arestas = new PRISMEdge[edges.size()];
             boolean flag = false;
             for( int i = 0; i < edges.size(); ++i ) {
-                arestas[i] = edges.get(i);
-                
+                arestas[i] = edges.get(i);                
                 if( Util.tij(arestas[i].getU().getRect(), arestas[i].getV().getRect()) != 1.0000000 )
                     flag = true;
             }
             
             if( flag ) {
                 // chama stress majorization somente se há sobreposição entre dois nós
-                PRISMPoint[] pontos = Util.stressMajorization(arestas, points);
+                PRISMPoint[] pontos;
+                if( algorithm == 0 )
+                    pontos = Util.stressMajorization(arestas, points);
+                else 
+                    pontos = Util.stressMajorizationYale(arestas, points);
+                
                 if( pontos != null ) {
                     for( int i = 0; i < pontos.length; ++i ) {
                         points[i] = pontos[i];
@@ -176,7 +180,7 @@ public class PRISM {
     }
     
     
-    public static ArrayList<Retangulo> apply(ArrayList<Retangulo> rects) {
+    public static ArrayList<Retangulo> apply(ArrayList<Retangulo> rects, int algorithm) {
         
         // para um nó apenas não há o que fazer
         if( rects.size() <= 1 ) 
@@ -187,40 +191,11 @@ public class PRISM {
             return naivePRISM(rects);
         
         // remove a sobreposição por meio de uma visão local
-        ArrayList<Retangulo> firstPass = apply(rects, false);
+        ArrayList<Retangulo> firstPass = apply(rects, false, algorithm);
         
         // remove o restante da sobreposição por meio de uma visão global
-        ArrayList<Retangulo> secondPass = apply(firstPass, true);
+        ArrayList<Retangulo> secondPass = apply(firstPass, true, algorithm);
         return secondPass;
     }
-       
-   
-    public static void main(String... args) {
-        
-        ArrayList<Retangulo> projected = new ArrayList<>();
-        projected.add(new Retangulo(2, 10, 1, 1)); // 0
-        projected.add(new Retangulo(4, 8, 3, 5)); // 1
-        projected.add(new Retangulo(8, 10, 1, 1)); // 2
-        projected.add(new Retangulo(6, 7, 9, 2)); // 3
-        projected.add(new Retangulo(10, 4, 1, 1)); // 4
-        projected.add(new Retangulo(8, 1, 1, 1)); // 5
-        projected.add(new Retangulo(5, 2, 1, 1)); // 6
-        projected.add(new Retangulo(2, 1, 1, 1)); // 7
-        projected.add(new Retangulo(0, 4, 1, 1)); // 8
-        projected.add(new Retangulo(0, 7, 1, 1)); // 9
-        projected.add(new Retangulo(5, 5, 1, 1)); // 10
-
-        ArrayList<Retangulo> reprojected = apply(projected);
-        System.out.println("REPROJECTED ELEMENTS: ");
-        for( Retangulo r: reprojected ) {
-            System.out.println((r.getUX())+" "+(r.getUY()));
-        }
-//        PRISMEdge[] e = findRestOverlaps(projected);
-//        for( PRISMEdge edge: e ) {
-//            System.out.println(edge.getU()+" "+edge.getV());
-//        }
-    }   
-    
-    
     
 }

@@ -8,8 +8,12 @@ package br.com.metodos.utils;
 
 import br.com.metodos.overlap.prism.PRISMEdge;
 import br.com.metodos.overlap.prism.PRISMPoint;
+import br.com.metodos.overlap.prism.SetPoint;
 import br.com.metodos.overlap.vpsc.Event;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.TreeSet;
 
 /**
  *
@@ -21,7 +25,8 @@ public class Util {
     private static int LIMIT = 10000;
     public static final double ZERO = 0.0000000;
     private static boolean finished;
-    
+    private static ArrayList<Integer> lwZeroRow;
+    private static ArrayList<Integer> lzZeroRow;
     
     public static boolean getFinished() {
         return finished;
@@ -82,13 +87,12 @@ public class Util {
     }
 
     private static void swap(Event array[], int index1, int index2)  {
-            Event temp = array[index1];           
-            array[index1] = array[index2];      
-            array[index2] = temp;               
+        Event temp = array[index1];           
+        array[index1] = array[index2];      
+        array[index2] = temp;               
     }
-    
-    
-     public static double tij(Retangulo u, Retangulo v) {
+        
+    public static double tij(Retangulo u, Retangulo v) {
          
         return 
             Math.max(
@@ -120,13 +124,23 @@ public class Util {
                 maior = Math.abs(residuo[i]);
         return maior <= E;
     }
-    
-    
+        
     private static void multMatrizVetor(double[][] A, double[] b, double[] v, double[] r) {
         for( int i = 0; i < A.length; ++i ) {
             r[i] = b[i];
             for( int j = 0; j < A.length; ++j )
                 r[i] += A[i][j]*v[j];
+        }
+    }
+    
+    private static void multMatrizVetor(YaleMatrix A, double[] b, double[] v, double[] r) {
+        for( int i = 0, j= 0; i < b.length; ++i ) {
+            r[i] = b[i];
+            if( !lwZeroRow.contains(i) ) {
+                for( int k = A.ia[j]; k < A.ia[j+1]; k++ )
+                    r[i] += A.a[k]*v[A.ja[k]];
+                j++;
+            }
         }
     }
     
@@ -138,19 +152,31 @@ public class Util {
         }    
     }
     
+    private static void multMatrizVetor(YaleMatrix A, double[] v, double[] r) {
+        for( int i = 0, j = 0; i < r.length; ++i ) {
+            r[i] = 0.0;
+            if( !lwZeroRow.contains(i) ) {
+                for( int k = A.ia[j]; k < A.ia[j+1]; k++ ) {
+                    r[i] += A.a[k]*v[A.ja[k]];
+                }
+                j++;
+            }
+        }    
+    }
+    
     private static double innerProduct(double[] r1, double[] r2) {
         double prod = 0;
         for( int i = 0; i < r1.length; ++i )
             prod += (r1[i]*r2[i]);
         return prod;
     }
+    
     private static void atribuiVector(double[] des, double[] ori) {
         for( int i = 0; i < ori.length; ++i )
             des[i] = ori[i];
     }
              
     public static boolean gradConjugados(double[][] A, double[][] r, double[][] v, double[][] p, double[] b) {
-        
         multMatrizVetor(A, b, v[0], r[0]);
         
         for( int i = 0; i < r[0].length; ++i )
@@ -163,7 +189,7 @@ public class Util {
         
         double[] Ar0 = new double[A.length];
         multMatrizVetor(A, r[0], Ar0);
-        
+
         double Ar0r0 = innerProduct(Ar0, r[0]);
         
         double q0 = r0r0/Ar0r0;
@@ -171,11 +197,12 @@ public class Util {
         double[] Ap0 = new double[A.length];
         
         multMatrizVetor(A, p[0], Ap0);
+            
         for( int i = 0; i < A.length; ++i ) {
             v[1][i] = v[0][i] + q0*p[0][i];
             r[1][i] = r[0][i] + q0*Ap0[i];
         }
-        
+                
         int count = 0;
         
         double[] r1 = new double[r[1].length];
@@ -189,11 +216,12 @@ public class Util {
             double r1r1 = innerProduct(r1, r[1]);
             r0r0 = innerProduct(r0, r[0]);            
             double alpha = r1r1/r0r0;
-            
+
             for( int i = 0; i < A.length; ++i )
                 p[1][i] = -r[1][i] + alpha*p[0][i];
-            
+
             multMatrizVetor(A, p[1], Ap1);
+
             double Ap1p1 = innerProduct(Ap1, p[1]);
             double qk = r1r1/Ap1p1;
             
@@ -222,7 +250,81 @@ public class Util {
         return false;
     }
     
-    
+    public static boolean gradConjugados(YaleMatrix A, double[][] r, double[][] v, double[][] p, double[] b) {
+        int n = b.length;
+        multMatrizVetor(A, b, v[0], r[0]);
+        
+        for( int i = 0; i < n; ++i )
+            p[0][i] = -r[0][i];
+                
+        double[] r0product = new double[n];
+        atribuiVector(r0product, r[0]);
+        
+        double r0r0 = innerProduct(r[0], r0product);
+        
+        double[] Ar0 = new double[n];
+        multMatrizVetor(A, r[0], Ar0);
+                
+        double Ar0r0 = innerProduct(Ar0, r[0]);
+        
+        double q0 = r0r0/Ar0r0;
+        
+        double[] Ap0 = new double[n];
+        
+        multMatrizVetor(A, p[0], Ap0);
+        
+        for( int i = 0; i < n; ++i ) {
+            v[1][i] = v[0][i] + q0*p[0][i];
+            r[1][i] = r[0][i] + q0*Ap0[i];
+        }
+        
+        int count = 0;
+        
+        double[] r1 = new double[n];
+        double[] r0 = new double[n];
+        double[] Ap1 = new double[n];
+        
+        do {
+            atribuiVector(r1, r[1]);            
+            atribuiVector(r0, r[0]);
+            
+            double r1r1 = innerProduct(r1, r[1]);
+            r0r0 = innerProduct(r0, r[0]);            
+            double alpha = r1r1/r0r0;
+
+            for( int i = 0; i < n; ++i )
+                p[1][i] = -r[1][i] + alpha*p[0][i];
+            
+            multMatrizVetor(A, p[1], Ap1);            
+            
+            double Ap1p1 = innerProduct(Ap1, p[1]);
+            double qk = r1r1/Ap1p1;
+                        
+            for( int i = 0; i < n; ++i ) {
+                v[2][i] = v[1][i] + qk*p[1][i];
+                r[2][i] = r[1][i] + qk*Ap1[i];
+            }
+                        
+            if( isSolution(r[2]) )
+                return true;
+                    
+            for( int i = 0; i < n; ++i ) {
+                r[0][i] = r[1][i];
+                r[1][i] = r[2][i];
+                
+                v[0][i] = v[1][i];
+                v[1][i] = v[2][i];
+                
+                p[0][i] = p[1][i];
+            }
+            
+            
+        } while( ++count < LIMIT );
+        
+        
+        return false;
+    }
+        
     public static PRISMPoint[] stressMajorization(PRISMEdge[] edges, PRISMPoint[] layout) {
         finished = false;
         double[][] lw = generateLw(edges, layout.length);
@@ -242,6 +344,7 @@ public class Util {
             
             /** solve for x **/
             double[] bx = LzX(lz, x);
+            
             double[][] matrizx = new double[lw.length][lw.length];
             for( int i = 0; i < lw.length; ++i )
                 for( int j = 0; j < lw.length; ++j )
@@ -251,9 +354,10 @@ public class Util {
             double[][] vx = new double[3][lw.length];
             double[][] px = new double[3][lw.length];
                         
-            for( int i = 0; i < bx.length; ++i )
+            for( int i = 0; i < bx.length; ++i ) {
                 bx[i] = -bx[i];
-            
+            }
+
             boolean retorno = Util.gradConjugados(matrizx, rx, vx, px, bx);            
             
             /** solve for y **/
@@ -267,11 +371,11 @@ public class Util {
             double[][] vy = new double[3][lw.length];
             double[][] py = new double[3][lw.length];
             
-            for( int i = 0; i < by.length; ++i )
+            for( int i = 0; i < by.length; ++i ) {
                 by[i] = -by[i];
-            
+            }
+        
             retorno = Util.gradConjugados(matrizy, ry, vy, py, by);
-            
             for( int i = 0; i < by.length; ++i ) {
                 layout[i].getRect().setUX(vx[2][i]-layout[i].getRect().getWidth()/2.);
                 layout[i].getRect().setUY(vy[2][i]-layout[i].getRect().getHeight()/2.);
@@ -296,8 +400,7 @@ public class Util {
         return null;
         
     }
-    
-    
+        
     private static double[] LzX(double[][] lz, double[] xy) {
         double[] r = new double[xy.length];        
         for( int i = 0; i < lz.length; ++i ) {
@@ -308,20 +411,36 @@ public class Util {
         
         return r;            
     }
+        
+    private static double[] LzX(YaleMatrix lz, double[] xy) {
+        double[] r = new double[xy.length];        
+        for( int i = 0, j = 0; i < xy.length; ++i ) {
+            r[i] = 0;
+            if( !lzZeroRow.contains(i)  ) {
+                for( int k = lz.ia[j]; k < lz.ia[j+1]; ++k )
+                    r[i] += lz.a[k]*xy[lz.ja[k]];
+                j++;
+            }
+        }
+        
+        return r;            
+    }
     
     private static double[][] generateLw(PRISMEdge[] edges, int n) {
         double[][] temp = new double[n][n];        
         double[][] lw = new double[n][n];
+        
         for( int i = 0; i < temp.length; ++i )
             for( int j = 0; j < temp.length; ++j )
                 temp[i][j] = lw[i][j] = 0.0;
-        
+                
         for( int i = 0; i < edges.length; ++i ) {
-            temp[edges[i].getU().getIdx()][edges[i].getV().getIdx()] = Util.wij(edges[i]);
-            temp[edges[i].getV().getIdx()][edges[i].getU().getIdx()] = temp[edges[i].getU().getIdx()][edges[i].getV().getIdx()];
+            double value = Util.wij(edges[i]);
+            temp[edges[i].getU().getIdx()][edges[i].getV().getIdx()] = value;
+            temp[edges[i].getV().getIdx()][edges[i].getU().getIdx()] = value;
         }
         
-        for( int i = 0;i < lw.length; ++i ) {
+        for( int i = 0; i < lw.length; ++i ) {
             double w_ik = 0;
             for( int j = 0; j < lw.length; ++j ) {
                 if( i != j ) {
@@ -339,7 +458,237 @@ public class Util {
         return lw;
     }
     
+    private static YaleMatrix generateLwYale(PRISMEdge[] edges, int n) {
+        TreeSet<SetPoint> setPoint = new TreeSet<>(new Comparator<SetPoint>() {
+            @Override
+            public int compare(SetPoint o1, SetPoint o2) {
+                if( o1.getI() < o2.getI() )
+                    return -1;
+                else if( o1.getI() > o2.getI() ) {
+                    return 1;
+                } else {
+                    if( o1.getJ() < o2.getJ() )
+                        return -1;
+                    else if( o1.getJ() > o2.getJ() )
+                        return 1;
+               
+                    return 0;                   
+                }
+            }
+        });
+        
+        for( int i = 0; i < edges.length; ++i ) {
+            double value = Util.wij(edges[i]);
+            setPoint.add(new SetPoint(edges[i].getU().getIdx(), edges[i].getV().getIdx(), value));
+            setPoint.add(new SetPoint(edges[i].getV().getIdx(), edges[i].getU().getIdx(), value));
+        }
+        
+        return formLwYaleMatrix(setPoint, n);
+    }
+        
+    private static YaleMatrix formLwYaleMatrix(TreeSet<SetPoint> setPoint, int n) {
+        lwZeroRow = new ArrayList<>();
+        ArrayList<Double> A = new ArrayList<>();
+        ArrayList<Integer> JA = new ArrayList<>();
+        ArrayList<Integer> IA = new ArrayList<>();
+        
+        double[] diagonal = new double[n];  
+        for( int i = 0; i < diagonal.length; ++i )
+            diagonal[i] = 0.0;
+        boolean[] flag = new boolean[n];
+        for( int i = 0; i < flag.length; ++i )
+            flag[i] = false;
+        boolean[] first = new boolean[n];
+        for( int i = 0; i < first.length; ++i )
+            first[i] = false;
+        
+        SetPoint[] points = setPoint.toArray(new SetPoint[setPoint.size()]);
+        for( int i = 0; i < points.length; ++i ) 
+            diagonal[points[i].getI()] += points[i].getValue();
+        
+        if( points.length > 0 && points[0].getI() != 0 ) {
+            for( int j = 0; j < points[0].getI(); ++j ) {
+                lwZeroRow.add(j);
+            }
+        }
+        
+        for( int i = 0; i < points.length; ++i ) {
+            
+            if( i > 0 ) {
+                int linhaInicial = points[i-1].getI();
+                int linhaFinal = points[i].getI();
+                
+                for( int j = linhaInicial+1; j < linhaFinal; ++j ) {
+                    lwZeroRow.add(j);
+                }
+            }            
+            
+            SetPoint p = points[i];
+            int linha = p.getI();
+            int coluna = p.getJ();
+            double w_ij = p.getValue();
+            
+            if( i > 0 && diagonal[points[i-1].getI()] != 0.0 && !flag[points[i-1].getI()] &&  points[i-1].getI() != linha ) {
+                A.add(diagonal[points[i-1].getI()]);
+                JA.add(points[i-1].getI());
+                flag[points[i-1].getI()] = true;
+            }
+            
+            if( w_ij != Util.ZERO ) {
+                if( coluna >= linha && diagonal[linha] != 0.0 && !flag[linha] ) {
+                    A.add(diagonal[linha]);
+                    JA.add(linha);
+                    
+                    if( !first[linha] && (i == 0 || points[i-1].getI() != linha) ) {
+                        IA.add(A.size()-1);
+                        first[linha] = true;
+                    }
+                    
+                    flag[linha] = true;
+                }
+                
+                A.add(-w_ij);
+                JA.add(coluna);
+                if( !first[linha] && (i == 0 || points[i-1].getI() != linha) ) {
+                    IA.add(A.size()-1);
+                    first[linha] = true;
+                }
+            }
+        }
+        
+        if( diagonal[points[points.length-1].getI()] != 0.0 ) {
+            A.add(diagonal[points[points.length-1].getI()]);
+            JA.add(points[points.length-1].getI());
+        }
+        
+        if( points.length > 0 && points[points.length-1].getI() != n-1 ) {
+            int linhaInicial = points[points.length-1].getI();
+            for( int j = linhaInicial+1; j < n; ++j )
+                lwZeroRow.add(j);
+            
+        }
+        IA.add(A.size());
+        
+        return new YaleMatrix(A, JA, IA);
+    }
     
+    private static YaleMatrix generateLzYale(PRISMEdge[] edges, int n) {        
+        TreeSet<SetPoint> setPoint = new TreeSet<>(new Comparator<SetPoint>() {
+            @Override
+            public int compare(SetPoint o1, SetPoint o2) {
+                if( o1.getI() < o2.getI() )
+                    return -1;
+                else if( o1.getI() > o2.getI() ) {
+                    return 1;
+                } else {
+                    if( o1.getJ() < o2.getJ() )
+                        return -1;
+                    else if( o1.getJ() > o2.getJ() )
+                        return 1;
+               
+                    return 0;                   
+                }
+            }
+        });
+        
+        for( int i = 0; i < edges.length; ++i ) {
+            double a = Math.abs(edges[i].getU().getRect().getCenterX() - edges[i].getV().getRect().getCenterX());
+            double b = Math.abs(edges[i].getU().getRect().getCenterY() - edges[i].getV().getRect().getCenterY());            
+            double c = Math.max(a, b);
+            double value = -Util.wij(edges[i]) * Util.dij(edges[i]) * ( c == 0 ? 0.0 : 1./c);
+            setPoint.add(new SetPoint(edges[i].getU().getIdx(), edges[i].getV().getIdx(), value));
+            setPoint.add(new SetPoint(edges[i].getV().getIdx(), edges[i].getU().getIdx(), value));
+        }
+        
+        return formLzYaleMatrix(setPoint, n);
+    }
+      
+    private static YaleMatrix formLzYaleMatrix(TreeSet<SetPoint> setPoint, int n) {
+        lzZeroRow = new ArrayList<>();
+        ArrayList<Double> A = new ArrayList<>();
+        ArrayList<Integer> JA = new ArrayList<>();
+        ArrayList<Integer> IA = new ArrayList<>();
+        
+        double[] diagonal = new double[n];  
+        for( int i = 0; i < diagonal.length; ++i )
+            diagonal[i] = 0.0;
+        boolean[] flag = new boolean[n];
+        for( int i = 0; i < flag.length; ++i )
+            flag[i] = false;
+        boolean[] first = new boolean[n];
+        for( int i = 0; i < first.length; ++i )
+            first[i] = false;
+        
+        SetPoint[] points = setPoint.toArray(new SetPoint[setPoint.size()]);
+        for( int i = 0; i < points.length; ++i ) 
+            diagonal[points[i].getI()] += points[i].getValue();
+        
+        if( points.length > 0 && points[0].getI() != 0 ) {
+            for( int j = 0; j < points[0].getI(); ++j ) {
+                lzZeroRow.add(j);
+            }
+        }
+        
+        for( int i = 0; i < points.length; ++i ) {
+            
+            if( i > 0 ) {
+                int linhaInicial = points[i-1].getI();
+                int linhaFinal = points[i].getI();
+                
+                for( int j = linhaInicial+1; j < linhaFinal; ++j )
+                    lzZeroRow.add(j);                
+            }
+            
+            
+            SetPoint p = points[i];
+            int linha = p.getI();
+            int coluna = p.getJ();
+            double w_ij = p.getValue();
+            
+            if( i > 0 && diagonal[points[i-1].getI()] != 0.0 && !flag[points[i-1].getI()] &&  points[i-1].getI() != linha ) {
+                A.add(-diagonal[points[i-1].getI()]);
+                JA.add(points[i-1].getI());
+                flag[points[i-1].getI()] = true;
+            }
+            
+            if( w_ij != Util.ZERO ) {
+                if( coluna >= linha && diagonal[linha] != 0.0 && !flag[linha] ) {
+                    A.add(-diagonal[linha]);
+                    JA.add(linha);
+                    
+                    if( !first[linha] && (i == 0 || points[i-1].getI() != linha) ) {
+                        IA.add(A.size()-1);
+                        first[linha] = true;
+                    }
+                    
+                    flag[linha] = true;
+                }
+                
+                A.add(w_ij);
+                JA.add(coluna);
+                if( !first[linha] && (i == 0 || points[i-1].getI() != linha) ) {
+                    IA.add(A.size()-1);
+                    first[linha] = true;
+                }
+            }
+        }
+        
+        if( diagonal[points[points.length-1].getI()] != 0.0 ) {
+            A.add(-diagonal[points[points.length-1].getI()]);
+            JA.add(points[points.length-1].getI());
+        }
+        
+        if( points.length > 0 && points[points.length-1].getI() != n-1 ) {
+            int linhaInicial = points[points.length-1].getI();
+            for( int j = linhaInicial+1; j < n; ++j ) 
+                lzZeroRow.add(j);            
+        }
+        
+        IA.add(A.size());        
+        
+        return new YaleMatrix(A, JA, IA);
+    }
+        
     private static double[][] generateLz(PRISMEdge[] edges, int n) {
         double[][] temp = new double[n][n];        
         double[][] lz = new double[n][n];
@@ -349,13 +698,9 @@ public class Util {
         
         for( int i = 0; i < edges.length; ++i ) {
             double a = Math.abs(edges[i].getU().getRect().getCenterX() - edges[i].getV().getRect().getCenterX());
-            double b = Math.abs(edges[i].getU().getRect().getCenterY() - edges[i].getV().getRect().getCenterY());
+            double b = Math.abs(edges[i].getU().getRect().getCenterY() - edges[i].getV().getRect().getCenterY());            
+            double c = Math.max(a, b);
             
-            double c = //Util.distanciaEuclideana(edges[i].getU().getRect().getCenterX(), 
-                       //                         edges[i].getU().getRect().getCenterY(), 
-                       //                         edges[i].getV().getRect().getCenterX(), 
-                       //                         edges[i].getV().getRect().getCenterY());
-                    Math.max(a, b);
             temp[edges[i].getU().getIdx()][edges[i].getV().getIdx()] = -Util.wij(edges[i])*Util.dij(edges[i])*( c == 0 ? 0.0 : 1./c);
             temp[edges[i].getV().getIdx()][edges[i].getU().getIdx()] = temp[edges[i].getU().getIdx()][edges[i].getV().getIdx()];
         }
@@ -420,8 +765,7 @@ public class Util {
             }
         }
     }
-    
-    
+        
     public static double[] getCenter(ArrayList<Retangulo> rects) {
         double xmin = rects.get(0).getUX(), xmax = rects.get(0).getLX(), 
                ymin = rects.get(0).getUY(), ymax = rects.get(0).getLY();                      
@@ -453,6 +797,76 @@ public class Util {
             rects.get(i).setUX(rects.get(i).getUX()+ammountX);
             rects.get(i).setUY(rects.get(i).getUY()+ammountY);
         }
+    }
+    
+    public static PRISMPoint[] stressMajorizationYale(PRISMEdge[] edges, PRISMPoint[] layout) {
+        finished = false;
+        YaleMatrix lw = generateLwYale(edges, layout.length);
+        
+        double[] x = new double[layout.length];
+        double[] y = new double[layout.length];
+       
+        double stress0 = stress(edges);
+        int limit = layout.length;
+        
+        do {            
+            YaleMatrix lz = generateLzYale(edges, layout.length);
+
+            for( int i = 0; i < layout.length; ++i ) {
+                x[i] = layout[i].getRect().getCenterX();
+                y[i] = layout[i].getRect().getCenterY();                        
+            }
+            
+            /** solve for x **/
+            double[] bx = LzX(lz, x);
+            
+            YaleMatrix matrizx = new YaleMatrix(lw.a, lw.ja, lw.ia);
+            
+            double[][] rx = new double[3][layout.length];
+            double[][] vx = new double[3][layout.length];
+            double[][] px = new double[3][layout.length];
+                        
+            for( int i = 0; i < bx.length; ++i ) 
+                bx[i] = -bx[i];
+            
+            boolean retorno = Util.gradConjugados(matrizx, rx, vx, px, bx);            
+            
+            /** solve for y **/
+           double[] by = LzX(lz, y);
+           
+            double[][] ry = new double[3][layout.length];
+            double[][] vy = new double[3][layout.length];
+            double[][] py = new double[3][layout.length];
+            
+            for( int i = 0; i < by.length; ++i ) 
+                by[i] = -by[i];            
+            
+            YaleMatrix matrizy = new YaleMatrix(lw.a, lw.ja, lw.ia);
+            retorno = Util.gradConjugados(matrizy, ry, vy, py, by);
+            
+            for( int i = 0; i < by.length; ++i ) {
+                layout[i].getRect().setUX(vx[2][i]-layout[i].getRect().getWidth()/2.);
+                layout[i].getRect().setUY(vy[2][i]-layout[i].getRect().getHeight()/2.);
+            }
+
+            double stress1 = stress(edges);
+            if( Math.abs(stress0-stress1) < stress1*EPS )
+                return layout;
+            
+            stress0 = stress1;            
+            
+            boolean flag = true;
+            for( int i = 0; i < edges.length && flag; ++i ) 
+                if( Util.tij(edges[i].getU().getRect(), edges[i].getV().getRect()) != 1.00000000000 )
+                    flag = false;
+            if( flag ) {
+                finished = true;
+                return layout;
+            }
+        } while( limit-- > 0 );
+        
+        return null;
+        
     }
     
     

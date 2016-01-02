@@ -321,9 +321,12 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_vpscJMenuItemActionPerformed
 
     private void prismJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJMenuItemActionPerformed
+        int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
+        
+        
         ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);        
         double[] center0 = Util.getCenter(rects);
-        ArrayList<Retangulo> projected = PRISM.apply(rects);
+        ArrayList<Retangulo> projected = PRISM.apply(rects, algo);
         double[] center1 = Util.getCenter(projected);
         
         int i = 0;
@@ -582,22 +585,15 @@ public class Menu extends javax.swing.JFrame {
                 public void mousePressed(MouseEvent e) {
                     iniX = e.getX();
                     iniY = e.getY();
-                }   
-                
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    fimX = e.getX();
-                    fimY = e.getY();
                     
                     RainbowScale rbS = new RainbowScale();
-                    rectangles.add(new RetanguloVis(iniX, iniY, Math.abs(fimX-iniX), Math.abs(fimY-iniY), 
-                                                rbS.getColor((globalCounterColor++*10)%255), globalCounter++));                    
+                    rectangles.add(new RetanguloVis(iniX, iniY, 30, 30, 
+                                                rbS.getColor((globalCounterColor++*10)%255), globalCounter++));                                        
                     cleanImage();
-                    repaint();    
-                }                
+                    repaint();   
+                }                   
             }); 
-            cleanImage();
-            repaint();            
+                     
         }
              
         
