@@ -20,8 +20,7 @@ public class Event {
         this.no = no;
         this.position = position;
     }
-    
-    
+        
     public No getNo() {
         return no;
     }

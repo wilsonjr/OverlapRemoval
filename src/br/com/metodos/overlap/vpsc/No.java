@@ -56,12 +56,9 @@ public class No {
         Iterator<No> it = neighbours.iterator();
         while( it.hasNext() ) {
             No no = it.next();
-            if( !deleted && !no.getDeleted() ) {
-                no.addRightNeighbour(this);
-       }
+            if( !deleted && !no.getDeleted() ) 
+                no.addRightNeighbour(this);            
         }
-        
-        
     }
     
     public void setRightNeighbours(TreeSet<No> neighbours) {
@@ -70,11 +67,9 @@ public class No {
         Iterator<No> it = neighbours.iterator();
         while( it.hasNext() ) {
             No no = it.next();
-            if( !deleted && !no.getDeleted() ) {
-                no.addLeftNeighbour(this);
-            }
-        }
-        
+            if( !deleted && !no.getDeleted() ) 
+                no.addLeftNeighbour(this);            
+        }        
     }
     
     public TreeSet<No> getRightNeighbours() {

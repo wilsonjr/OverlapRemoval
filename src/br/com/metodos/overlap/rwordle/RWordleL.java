@@ -134,7 +134,6 @@ public class RWordleL {
                 angle += (0.3); 
             } while( !flag );
                         
-            System.out.println("ID: "+novos.get(i).getId());
             projected.add(new Retangulo(areaS.getBounds().x, areaS.getBounds().y, 
                                         areaS.getBounds().width, areaS.getBounds().height, novos.get(i).getId()));
                         

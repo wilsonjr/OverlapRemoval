@@ -7,6 +7,7 @@
 package br.com.grafos.ui;
 
 
+import br.com.grafos.desenho.color.GrayScale;
 import br.com.grafos.desenho.color.RainbowScale;
 import br.com.metodos.overlap.hexboard.HexBoardExecutor;
 import br.com.metodos.overlap.incboard.IncBoardExecutor;
@@ -236,7 +237,9 @@ public class Menu extends javax.swing.JFrame {
                 File file = jFileChooser.getSelectedFile();
                 Scanner scn = new Scanner(file);
                 rectangles.clear();
-                RainbowScale rbS = new RainbowScale();
+                //RainbowScale rbS = new RainbowScale();
+                GrayScale rbS = new GrayScale();
+                
                 int id = 0;
                 while( scn.hasNext() ) {
                     String[] linha = scn.nextLine().split(";");

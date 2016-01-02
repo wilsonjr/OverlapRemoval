@@ -25,8 +25,6 @@ public class Restricao {
         this.right.getIn().add(this);
     }
     
-    
-    
     public double getLm() {
         return lm;
     }

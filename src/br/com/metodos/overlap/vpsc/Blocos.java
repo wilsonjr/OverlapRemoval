@@ -14,8 +14,7 @@ import java.util.ArrayList;
  */
 public class Blocos  {
     private ArrayList<Variavel> vars;
-    private ArrayList<Bloco> blocos;
-    
+    private ArrayList<Bloco> blocos;    
     
     public Blocos(ArrayList<Variavel> vars) {
         
@@ -23,10 +22,8 @@ public class Blocos  {
         blocos = new ArrayList<>();
         
         for( int i = 0; i < vars.size(); ++i ) 
-            blocos.add(new Bloco(vars.get(i)));
-       
-    }
-    
+            blocos.add(new Bloco(vars.get(i)));       
+    }    
     
     public ArrayList<Variavel> totalOrder() {
         ArrayList<Variavel> order = new ArrayList<>();
@@ -98,12 +95,10 @@ public class Blocos  {
                 rightBlock.mergeBlockRight(b, r, -distancia);
                 r = rightBlock.getMinOutConstraint();
                 b = rightBlock;
-            }
-            
+            }            
         }
     }
-    
-    
+        
     public void restrictBlock(Bloco b, Bloco lb, Bloco rb, Restricao c) {
         c.setAtiva(false);
         /**
@@ -112,8 +107,7 @@ public class Blocos  {
          */
         b.addInSplitBlock(lb, c.getLeft());
         b.addInSplitBlock(rb, c.getRight());
-    }
-    
+    }    
     
     public ArrayList<Bloco> getBlocos() {
         return blocos;

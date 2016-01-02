@@ -31,24 +31,19 @@ public class HexBoardExecutor implements DataModelInterface {
     @Override
     public void moveReceived(MoveEvent event) {
         count++;
-        if(count%STEP!=0) return;
+        
+        if( count % STEP != 0 )
+            return;
         DataItemInterface moved = event.movedItem();
-        if( moved.getRow() < minRow) minRow = moved.getRow();
-        if( moved.getRow() > maxRow) maxRow = moved.getRow();       
-        if( moved.getCol() < minCol) minCol = moved.getCol();
-        if( moved.getCol() > maxCol) maxCol = moved.getCol();
-        /*for(int r = minRow;r<=maxRow;r++) {
-            for (int c = minCol; c <= maxCol; c++) {
-                System.out.print("|");
-                for(RetanguloItem d:items){
-                    if(d.getRow()==r && d.getCol()==c){
-                        System.out.print(d.getURI()+" ");
-                    }
-                }
-                System.out.print("\t");
-            }
-            System.out.println("");
-        }*/
+        
+        if( moved.getRow() < minRow ) 
+            minRow = moved.getRow();
+        if( moved.getRow() > maxRow )
+            maxRow = moved.getRow();       
+        if( moved.getCol() < minCol ) 
+            minCol = moved.getCol();
+        if( moved.getCol() > maxCol ) 
+            maxCol = moved.getCol();
     }
 
     public List<PontoItem> getItems() {

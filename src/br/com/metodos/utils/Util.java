@@ -12,7 +12,6 @@ import br.com.metodos.overlap.prism.SetPoint;
 import br.com.metodos.overlap.vpsc.Event;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.TreeSet;
 
 /**
@@ -25,8 +24,8 @@ public class Util {
     private static int LIMIT = 10000;
     public static final double ZERO = 0.0000000;
     private static boolean finished;
-    private static ArrayList<Integer> lwZeroRow;
-    private static ArrayList<Integer> lzZeroRow;
+    private static TreeSet<Integer> lwZeroRow;
+    private static TreeSet<Integer> lzZeroRow;
     
     public static boolean getFinished() {
         return finished;
@@ -156,9 +155,8 @@ public class Util {
         for( int i = 0, j = 0; i < r.length; ++i ) {
             r[i] = 0.0;
             if( !lwZeroRow.contains(i) ) {
-                for( int k = A.ia[j]; k < A.ia[j+1]; k++ ) {
-                    r[i] += A.a[k]*v[A.ja[k]];
-                }
+                for( int k = A.ia[j]; k < A.ia[j+1]; k++ ) 
+                    r[i] += A.a[k]*v[A.ja[k]];               
                 j++;
             }
         }    
@@ -487,7 +485,7 @@ public class Util {
     }
         
     private static YaleMatrix formLwYaleMatrix(TreeSet<SetPoint> setPoint, int n) {
-        lwZeroRow = new ArrayList<>();
+        lwZeroRow = new TreeSet<>();
         ArrayList<Double> A = new ArrayList<>();
         ArrayList<Integer> JA = new ArrayList<>();
         ArrayList<Integer> IA = new ArrayList<>();
@@ -604,7 +602,7 @@ public class Util {
     }
       
     private static YaleMatrix formLzYaleMatrix(TreeSet<SetPoint> setPoint, int n) {
-        lzZeroRow = new ArrayList<>();
+        lzZeroRow = new TreeSet<>();
         ArrayList<Double> A = new ArrayList<>();
         ArrayList<Integer> JA = new ArrayList<>();
         ArrayList<Integer> IA = new ArrayList<>();
