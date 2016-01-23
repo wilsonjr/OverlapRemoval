@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 /**
- *
+ * Classe Bloco que controla o posicionamento das Variaveis durante a execução do método.
  * @author Wilson
  */
 public class Bloco {
@@ -24,6 +24,9 @@ public class Bloco {
     private boolean deleted; // usamos uma estratégia para nao ter problema de ponteiro nulo
     private Restricao menor = null;
     
+    /**
+     * Inicia um novo bloco.
+     */
     public Bloco() {
         vars = new ArrayList<>();
           
@@ -31,22 +34,31 @@ public class Bloco {
         wposn = 0;
         in = null;
         out = null;
-        deleted =false;
+        deleted = false;
     }
     
+    /**
+     * Cria um novo bloco contendo uma Variavel.
+     * @param v Variavel inicial do bloco
+     */
     public Bloco(Variavel v) { 
         vars = new ArrayList<>();        
         weight = 0;
         wposn = 0;
         in = null;
         out = null;
-        deleted =false;
+        deleted = false;
         if( v != null ) {
             v.setOffset(0);
             addVar(v);
         }
+        
     }
     
+    /**
+     * Adiciona uma Variavel no bloco, fazendo com que o mesmo aumente de tamanho.
+     * @param v Variavel a ser adicionada
+     */
     public void addVar(Variavel v) {
         v.setBloco(this);
         vars.add(v);
@@ -55,14 +67,27 @@ public class Bloco {
         posn = wposn/weight;
     }
     
+    /**
+     * Define a posição de referência do bloco.
+     * @param posn Posição de referência
+     */
     public void setPosn(double posn) {
         this.posn = posn;
     }
     
+    /**
+     * Retorna a posição de referência do bloco.
+     * @return double
+     */
     public double getPosn() {
         return posn;
     }    
     
+    /**
+     * Inicia as restrições entrantes do bloco, considerando todas as variáveis pertencentes.
+     * No topo da fila está sempre a menor restrição.
+     * @return PriotyQueue de Restrições em relação as suas violações.
+     */
     public PriorityQueue<Restricao> heapifyInConstraints() {
         in = new PriorityQueue<>(vars.size(), new Comparator<Restricao>() {
            @Override
@@ -87,6 +112,11 @@ public class Bloco {
         return in;
     }
     
+    /**
+     * Inicia as restrições saintes do bloco, considerando todas as variáveis pertencentes.
+     * No topo da fila está sempre a menor restrição.
+     * @return PriotyQueue de Restrições em relação as suas violações.
+     */
     public PriorityQueue<Restricao> heapifyOutConstraints() {
         out = new PriorityQueue<>(vars.size(), new Comparator<Restricao>() {
            @Override
@@ -112,7 +142,10 @@ public class Bloco {
         return in;
     }
     
-    
+    /**
+     * Retorna a menor restrição sainte.
+     * @return Restrição sainte com menor violação.
+     */
     public Restricao getMinOutConstraint() {
         Restricao constraint = out.peek();
         
@@ -129,6 +162,10 @@ public class Bloco {
         return constraint;
     }
 
+    /**
+     * Retorna a menor restrição entrante.
+     * @return Restrição entrante com menor violação.
+     */
     public Restricao getMinInConstraint() {
         Restricao constraint = in.peek();
         
@@ -141,51 +178,101 @@ public class Bloco {
         return constraint;
     }
 
+    /**
+     * Remove a menor restrição entrante.
+     */
     public void removeMinInConstraint() {
         in.poll();
     }
+    
+    /**
+     * Remove a menor restrição sainte. 
+     */
     public void removeMinOutConstraint() {
         out.poll();
     }
     
+    /**
+     * Retorna a fila de restrições entrantes ordenadas da menor para maior.
+     * @return PriorityQueue< Restrição >
+     */
     public PriorityQueue<Restricao> getIn() {
         return in;
     }
     
+    /**
+     * Retorna a fila de restrições saintes ordenadas da menor para maior.
+     * @return PriorityQueue< Restrição >
+     */
     public PriorityQueue<Restricao> getOut() {
         return out;
     }
 
+    /**
+     * Retorna as variáveis pertencentes ao Bloco.
+     * @return ArrayList< Variavel >
+     */
     public ArrayList<Variavel> getVars() {
         return vars;
     }
-
+    
+    /**
+     * Define se o bloco será removido.
+     * @param b true para agendar remoção,
+     *          false para não agendar.
+     */
     public void setDeleted(boolean b) {
         deleted = b;
     }
     
+    /**
+     * Verifica se o Bloco fora marcado para ser removido.
+     * @return true se o bloco será removido,
+     *         false caso contrário.
+     */
     public boolean getDeleted() {
         return deleted;
     }
 
-    
+    /**
+     * Define o peso do bloco (utilizado para calcular a posição ótima do bloco).
+     * @param weight Peso do bloco
+     */
     public void setWeight(double weight) {
         this.weight = weight;
     }
 
+    /**
+     * Retorna o peso do bloco (utilizado para calcular a posição ótima do bloco).
+     * @return double
+     */
     public double getWeight() {
         return weight;
     }
     
+    /**
+     * Define a posição de referência ponderada (utilizado para calcular a posição ótima do bloco).
+     * @param wposn Posição de referência ponderada
+     */
     public void setWPosn(double wposn) {
         this.wposn = wposn;
     }
 
+    /**
+     * Retorna a posição de referência ponderada (utilizado para calcular a posição ótima do bloco).
+     * @return double
+     */
     public double getWPosn() {
         return wposn;
     }
 
-    
+    /**
+     * Adiciona Restrições no bloco que foi quebrado.
+     * Utiliza a subarvore de restrições ativas da esquerda e a
+     * subarvore de restrições ativas da direita
+     * @param b Bloco que foi quebrado
+     * @param v Variavel corrente
+     */
     public void addInSplitBlock(Bloco b, Variavel v) {
         b.addVar(v);
         
@@ -204,7 +291,7 @@ public class Bloco {
     
     /**
      * compDfDv - Busca em profundidade nas restrições ativas do bloco
-     * somando v.weight * (posn(v)-v.des)
+     * somando v.weight * (posn(v) - v.des)
      * @param v
      * @param u
      * @return 
@@ -244,8 +331,10 @@ public class Bloco {
         return dfdv;
     }
     
-   
-
+    /**
+     * Encontra o menor coeficiente de Lagrange das restrições.
+     * @return Restrição com menor coeficiente de Lagrange
+     */
     public Restricao findMinLM() {
        
         // inicializa o lm com 0
@@ -262,6 +351,12 @@ public class Bloco {
         return menor;
     }
 
+    /**
+     * Mescla o Bloco corrente com o Bloco 'b'.
+     * @param bloco Bloco a 'desaparecer'
+     * @param r Restrição em que o Bloco é left
+     * @param distancia Distância até o Bloco corrente
+     */
     public void mergeBlockLeft(Bloco bloco, Restricao r, double distancia) {
         // como agora u + a = v, essa restrição torna-se ativa        
         r.setAtiva(true);
@@ -284,6 +379,12 @@ public class Bloco {
         bloco.setDeleted(true);
     }
     
+    /**
+     * Mescla o Bloco corrente com o Bloco 'b'.
+     * @param bloco Bloco a 'desaparecer'
+     * @param r Restrição em que o Bloco é right
+     * @param distancia Distância até o Bloco corrente
+     */
     public void mergeBlockRight(Bloco bloco, Restricao r, double distancia) {
         // como agora u + a = v, essa restrição torna-se ativa
         r.setAtiva(true);

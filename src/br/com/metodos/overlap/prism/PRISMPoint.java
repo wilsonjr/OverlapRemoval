@@ -10,7 +10,8 @@ import br.com.metodos.utils.Retangulo;
 import delaunay_triangulation.Point_dt;
 
 /**
- *
+ * Classe que representa um vértice para o método.
+ * Pode depender de qual método/API utiliza-se para triangulação. Neste caso é uma especialização de Point_dt.
  * @author wilson
  */
 public class PRISMPoint extends Point_dt {
@@ -35,7 +36,5 @@ public class PRISMPoint extends Point_dt {
     
     public int getIdx() {
         return idx;
-    }
-    
-    
+    }    
 }

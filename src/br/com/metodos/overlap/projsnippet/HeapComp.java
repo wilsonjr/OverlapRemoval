@@ -7,8 +7,9 @@
 package br.com.metodos.overlap.projsnippet;
 
 /**
- *
+ * Interface para utilização da comparação no Heap Binário
  * @author wilson
+ * @param <T>
  */
 public interface HeapComp<T> {
     double compare(T e1, T e2);

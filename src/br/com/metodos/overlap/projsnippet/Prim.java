@@ -9,24 +9,36 @@ package br.com.metodos.overlap.projsnippet;
 import java.util.ArrayList;
 
 /**
- *
+ * Algoritmo PRIM
  * @author wilson
  */
 public class Prim {
     
     private ArrayList<Edge> edges = null;
     
+    /**
+     * Executa o algoritmo com base no grafo passado
+     * @param grafo Grafo em lista de adjacências.
+     */
     public void execute(Vertice[] grafo) {
         edges = prim(grafo, 0);
     }
     
+    /**
+     * Retorna as arestas pertencentes à árvore geradora mínima
+     * @return Arestas da árvore
+     */
     public ArrayList<Edge> getEdges() {
         return edges;
     }
     
-    
-    
-    public static ArrayList<Edge> prim(Vertice[] grafo, int inicio) {
+    /**
+     * Executa o algoritmo com vértice inicial especificado.
+     * @param grafo Grafo em lista de adjacências
+     * @param inicio Vértice inicial
+     * @return Arestas da árvore
+     */
+    private static ArrayList<Edge> prim(Vertice[] grafo, int inicio) {
         ArrayList<Edge> mst = new ArrayList<>();
         MinHeap priorityQueue = new MinHeap(new HeapElementComparator());
         int[] has = new int[grafo.length];

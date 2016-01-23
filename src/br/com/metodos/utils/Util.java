@@ -15,7 +15,7 @@ import java.util.Comparator;
 import java.util.TreeSet;
 
 /**
- *
+ * Classe utilizada para auxiliar nos métodos de remoção de sobreposição.
  * @author wilson
  */
 public class Util {
@@ -27,22 +27,32 @@ public class Util {
     private static TreeSet<Integer> lwZeroRow;
     private static TreeSet<Integer> lzZeroRow;
     
+    /**
+     * Verifica se o método PRISM já pode ser parado
+     * @return true se sim,
+     *         falso caso contrário.
+     */
     public static boolean getFinished() {
         return finished;
     }
     
     /**
-     * Euclidean distance between two points
-     * @param p1x x coordinate of first point
-     * @param p1y y coordinate of first point
-     * @param p2x x coordinate of second point
-     * @param p2y y coordinate of second point
+     * Calcula a distância euclideana entre dois pontos
+     * @param p1x coordenada x do primeiro ponto
+     * @param p1y coordenada y do primeiro ponto
+     * @param p2x coordenada x do segundo ponto
+     * @param p2y coordenada y do segundo ponto
      * @return distance between two points
      */
     public static double distanciaEuclideana(double p1x, double p1y, double p2x, double p2y) {
         return Math.sqrt(Math.pow(p1x-p2x, 2.) + Math.pow(p1y-p2y, 2.));
     }
     
+    /**
+     * Converte uma lista de objetos RetanguloVis em uma lista de Retangulo.
+     * @param rects RetangulosVis a ser convertido
+     * @return Lista de Retângulos
+     */
     public static ArrayList<Retangulo> toRetangulo(ArrayList<RetanguloVis> rects) {
         ArrayList<Retangulo> rs = new ArrayList<>();
         
@@ -52,17 +62,27 @@ public class Util {
         return rs;
     }
         
+    /**
+     * Converte uma lista de objetos Retangulo em uma lista de RetanguloVis.
+     * @param ori Lista de RetanguloVis original
+     * @param rects Lista de Retangulo com as novas coordenadas
+     */
     public static void toRetanguloVis(ArrayList<RetanguloVis> ori, ArrayList<Retangulo> rects) {
         
-        for( int i = 0; i < rects.size(); ++i ) {
-            
+        for( int i = 0; i < rects.size(); ++i ) {            
             ori.get(rects.get(i).getId()).setUX(rects.get(i).getUX());
             ori.get(rects.get(i).getId()).setUY(rects.get(i).getUY());
             ori.get(rects.get(i).getId()).setWidth(rects.get(i).getWidth());
             ori.get(rects.get(i).getId()).setHeight(rects.get(i).getHeight());
         }   
     }
-        
+     
+    /**
+     * Quicksort dos eventos a ser ordenada por sua posição
+     * @param array Coleção de eventos a ser ordenada
+     * @param start Índice inicial
+     * @param end Índice final
+     */
     public static void quickSort(Event array[], int start, int end) {
         int i = start;                          
         int k = end;                            
@@ -85,12 +105,24 @@ public class Util {
         
     }
 
+    /**
+     * Função para troca de posições
+     * @param array Coleção de eventos
+     * @param index1 Índice do primeiro elemento
+     * @param index2 Índice do segundo elemento
+     */
     private static void swap(Event array[], int index1, int index2)  {
         Event temp = array[index1];           
         array[index1] = array[index2];      
         array[index2] = temp;               
     }
         
+    /**
+     * Calcula o fator de sobreposição entre dois retângulos.
+     * @param u Retângulo 1
+     * @param v Retângulo 2
+     * @return double
+     */
     public static double tij(Retangulo u, Retangulo v) {
          
         return 
@@ -101,21 +133,46 @@ public class Util {
             ), 1);
     }
     
-    public static double sij(Retangulo u, Retangulo v) {
-        
+    /**
+     * Controla o fator de sobreposição entre dois Retangulos.
+     * Isso é necessário para que em cada iteração do método PRISM, a sobreposição não seja removida
+     * abruptamente.
+     * @param u
+     * @param v
+     * @return 
+     */
+    public static double sij(Retangulo u, Retangulo v) {        
         return Math.min(tij(u, v), 1.5);
     }
     
+    /**
+     * dij definida em Stress Majorization:
+     * 
+     * @param e Aresta PRISM
+     * @return double
+     */
     public static double dij(PRISMEdge e) {
         return sij(e.getU().getRect(), e.getV().getRect())*
                 Util.distanciaEuclideana(e.getU().getRect().getCenterX(), e.getU().getRect().getCenterY(), 
                                          e.getV().getRect().getCenterX(), e.getV().getRect().getCenterY());
     }
     
+    /**
+     * wij definida em Stress Majorization:
+     * 
+     * @param e Aresta PRISM
+     * @return double
+     */
     public static double wij(PRISMEdge e) {
         return Math.pow(dij(e), -2.);
     }
         
+    /**
+     * Verifica se a iteração do método Gradiente Conjudado é uma solução.
+     * @param residuo Resíduo gerado pela iteração
+     * @return true se é solução,
+     *         false caso contrário.
+     */
     private static boolean isSolution(double[] residuo) {
         double maior = Math.abs(residuo[0]);
         for( int i = 1; i < residuo.length; ++i )
@@ -174,6 +231,15 @@ public class Util {
             des[i] = ori[i];
     }
              
+    /**
+     * Método dos Gradientes Conjugados para solução de sistema linear
+     * @param A Matriz A de ordem nxn
+     * @param r Vetor auxiliar 1 de ordem 3xn
+     * @param v Vetor auxiliar 2 de ordem 3xn
+     * @param p Vetor auxiliar 3 de ordem 3xn
+     * @param b Vetor solução de ordem n
+     * @return 
+     */
     public static boolean gradConjugados(double[][] A, double[][] r, double[][] v, double[][] p, double[] b) {
         multMatrizVetor(A, b, v[0], r[0]);
         
@@ -248,6 +314,15 @@ public class Util {
         return false;
     }
     
+    /**
+     * Método dos Gradientes Conjugados para solução de sistema linear usando Matriz de Yale
+     * @param A Matriz A de com estrutura de Yale
+     * @param r Vetor auxiliar 1 de ordem 3xn
+     * @param v Vetor auxiliar 2 de ordem 3xn
+     * @param p Vetor auxiliar 3 de ordem 3xn
+     * @param b Vetor solução de ordem n
+     * @return 
+     */
     public static boolean gradConjugados(YaleMatrix A, double[][] r, double[][] v, double[][] p, double[] b) {
         int n = b.length;
         multMatrizVetor(A, b, v[0], r[0]);
@@ -323,6 +398,12 @@ public class Util {
         return false;
     }
         
+    /**
+     * Aplica Stress Majorization nas arestas passadas
+     * @param edges Arestas formadas pelo método PRISM
+     * @param layout Projeção corrente da iteração do método PRISM
+     * @return 
+     */
     public static PRISMPoint[] stressMajorization(PRISMEdge[] edges, PRISMPoint[] layout) {
         finished = false;
         double[][] lw = generateLw(edges, layout.length);
@@ -733,6 +814,12 @@ public class Util {
         return s;
     }
     
+    
+    /**
+     * Retorna a menor coordenada X da projeção.
+     * @param rects Projeção
+     * @return double
+     */
     public static double getMinX(ArrayList<Retangulo> rects) {
         double min = rects.get(0).getUX();
         
@@ -742,6 +829,11 @@ public class Util {
         return min;
     }
     
+    /**
+     * Retorna a menor coordenada Y da projeção.
+     * @param rects Projeção
+     * @return double
+     */
     public static double getMinY(ArrayList<Retangulo> rects) {
         double min = rects.get(0).getUY();
                 
@@ -751,6 +843,10 @@ public class Util {
         return min;
     }
     
+    /**
+     * Faz com que nenhuma coordenada tenha valores negativos.
+     * @param rects Projeção com coordenadas negativas.
+     */
     public static void normalize(ArrayList<Retangulo> rects) {
         double minX = getMinX(rects);
         double minY = getMinY(rects);
@@ -764,6 +860,11 @@ public class Util {
         }
     }
         
+    /**
+     * Recupera a coordenada central da projeção
+     * @param rects Projeção
+     * @return Coordenadas {x, y}
+     */
     public static double[] getCenter(ArrayList<Retangulo> rects) {
         double xmin = rects.get(0).getUX(), xmax = rects.get(0).getLX(), 
                ymin = rects.get(0).getUY(), ymax = rects.get(0).getLY();                      
@@ -790,6 +891,12 @@ public class Util {
         return center;
     }
     
+    /**
+     * Realiza a translação da projeção.
+     * @param rects Projeção corrente
+     * @param ammountX Deslocamento em X
+     * @param ammountY Deslocamento em Y
+     */
     public static void translate(ArrayList<Retangulo> rects, double ammountX, double ammountY) {
         for( int i = 0; i < rects.size(); ++i ) {
             rects.get(i).setUX(rects.get(i).getUX()+ammountX);
@@ -797,6 +904,12 @@ public class Util {
         }
     }
     
+    /**
+     * Aplica Stress Majorization nas arestas passadas utilizando a estrutura de Yale
+     * @param edges Arestas formadas pelo método PRISM
+     * @param layout Projeção corrente da iteração do método PRISM
+     * @return 
+     */
     public static PRISMPoint[] stressMajorizationYale(PRISMEdge[] edges, PRISMPoint[] layout) {
         finished = false;
         YaleMatrix lw = generateLwYale(edges, layout.length);

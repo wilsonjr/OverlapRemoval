@@ -305,7 +305,7 @@ public class Menu extends javax.swing.JFrame {
     private void vpscJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vpscJMenuItemActionPerformed
         ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
         double[] center0 = Util.getCenter(rects);
-        ArrayList<Retangulo> projected = VPSC.apply(rects, 0, 0);
+        ArrayList<Retangulo> projected = VPSC.apply(rects);
         double[] center1 = Util.getCenter(projected);
         
         int i = 0;

@@ -22,7 +22,12 @@ import java.util.TreeSet;
  */
 public class VPSC {
     
-    public static ArrayList<Retangulo> apply(ArrayList<Retangulo> rectangles, double epsX, double epsY) {
+    /**
+     * Aplica o método VPSC na projeção 'rectangles'
+     * @param rectangles Projeção inicial
+     * @return Projeção sem sobreposição
+     */
+    public static ArrayList<Retangulo> apply(ArrayList<Retangulo> rectangles) {
         /**
          * copy rectangles 
          */         
@@ -41,7 +46,7 @@ public class VPSC {
          * generate horizontal constraints and solve vpsc for x
          */
         ArrayList<Restricao> restricoes = new ArrayList<>();
-        int count = VPSC.generateCx(projected, vars, restricoes);
+        VPSC.generateCx(projected, vars, restricoes);
         
         // solve vpsc for x
         VPSC.solveVPSC(vars, restricoes);
@@ -56,7 +61,7 @@ public class VPSC {
         
         // generate constraint for y coordinate
         restricoes = new ArrayList<>();
-        count = VPSC.generateCy(projected, vars, restricoes);
+        VPSC.generateCy(projected, vars, restricoes);
         
         // solve vpsc for y and move rectangles in y direction to remove all overlap remaining
         VPSC.solveVPSC(vars, restricoes);
@@ -67,6 +72,11 @@ public class VPSC {
            
     }
     
+    /**
+     * Método principal que aplica o algoritmo VPSC segundo as Variaveis e as Restrições de não Sobreposição.
+     * @param vars Variaveis criadas com base na projeção inicial
+     * @param res Restrição de não sobreposição criadas a partir da projeção inicial
+     */
     public static void solveVPSC(ArrayList<Variavel> vars, ArrayList<Restricao> res) {
         Blocos blocos = new Blocos(vars);
         
@@ -125,8 +135,7 @@ public class VPSC {
                     blocos.getBlocos().remove(j);
         }         
     }
-    
-    
+        
     /**
      * Primeiramente um bloco fora criado para cada variável v (b.posn = v.des).
      * Alguma restrição pode ser violada com essas atribuições. Assim, caso haja alguma violação,
@@ -154,23 +163,18 @@ public class VPSC {
                 if( blocos.getBlocos().get(i).getDeleted() )
                     blocos.getBlocos().remove(i);
     }
-    
-    
+        
     /**
-     * The code for generateCy, the procedure to generetate vertical non-overlap
-     * constraints is essentially dual to that of generateCx. The only difference is
-     * that any remaining overlap must be removed vertically. This means that we
-     * need only find the closest node in the analogue of the functions get_left_nbours
-     * and get_right_nbours since any other nodes in the scan line will be constrained to
-     * be above or below these. This means that the number of left and right neighbours
-     * is always 1 or less.
-     * @param retangulos
-     * @param vars
-     * @param restricoes
-     * @return 
-     */
-    
-    public static int generateCy(ArrayList<Retangulo> retangulos, ArrayList<Variavel> vars, ArrayList<Restricao> restricoes) {
+     * Gera restrições de não sobreposição verticais. A diferença para gerar restrições de não sobreposição
+     * horizontais é que qualquer sobreposição restante deve ser removida verticalmente. Isso significa que 
+     * precisamos somente encontrar os nós mais próximos analogamente as funções getLeftNeighbours() e 
+     * getRightNeighbours(), já que qualquer outro nó na linha de varredura estará restringido acima ou abaixo.
+     * Ou seja, o número de vizinhos na esquerda ou direita é menor ou igual a 1.
+     * @param retangulos Projeção inicial
+     * @param vars Variaveis criadas a partir da projeção
+     * @param restricoes Restrições a serem preenchidas
+     */    
+    public static void generateCy(ArrayList<Retangulo> retangulos, ArrayList<Variavel> vars, ArrayList<Restricao> restricoes) {
         Event eventos[] = new Event[2*retangulos.size()];
         int j = 0;
         for( int i = 0; i < retangulos.size(); ++i ) {
@@ -262,16 +266,18 @@ public class VPSC {
 
                 removeScanline(scanline, v);
             }
-        }
-        
-        
-        return restricoes.size();
+        }        
     }
     
-    
-    
-    
-    public static int generateCx(ArrayList<Retangulo> retangulos, ArrayList<Variavel> vars, ArrayList<Restricao> restricoes) {
+    /**
+     * Gera restrições de não sobreposição horizontais. Uma linha de varredura é utilizada após configurar os eventos de
+     * entrada e saída de Variaveis. Assim é possível gerar uma restrição de não sobreposição quando um evento é aberto
+     * antes de algum outro evento ser fechado (caracteriza uma sobreposição em relação a um eixo específico).
+     * @param retangulos Projeção inicial
+     * @param vars Variaveis criadas a partir da projeção
+     * @param restricoes Restrições a serem preenchidas
+     */
+    public static void generateCx(ArrayList<Retangulo> retangulos, ArrayList<Variavel> vars, ArrayList<Restricao> restricoes) {
         /**
          * Adiciona os eventos de abertura e fechamento dos retangulos 
          */
@@ -349,14 +355,12 @@ public class VPSC {
                 removeScanline(scanline, v);
             }
         }
-        
-        return restricoes.size();
     }
     
     /**
      * Método usado para setar um flag de removido da scanline
-     * @param scanline
-     * @param v 
+     * @param scanline Linha de varredura
+     * @param v No a ser removido da linha de varredura
      */
     private static void removeScanline(TreeSet<No> scanline, No v) {
         Iterator<No> it = scanline.iterator();
@@ -374,9 +378,9 @@ public class VPSC {
     /**
      * Recupera os vizinhos mais próximos que requerem uma restrição de não sobreposição.
      * Executa até o primeiro vizinho que não contém sobreposição.
-     * @param scanline
-     * @param v
-     * @return 
+     * @param scanline Linha de varredura
+     * @param v No referência para verificar vizinhos da esquerda
+     * @return TreeSet que contém os vizinhos da esquerda do No 'v'
      */
     private static TreeSet<No> getLeftNeighbours(TreeSet<No> scanline, No v) {
         TreeSet<No> leftv = new TreeSet<>(new NoComparator());
@@ -425,9 +429,9 @@ public class VPSC {
     /**
      * * Recupera os vizinhos mais próximos que requerem uma restrição de não sobreposição.
      * Executa até o primeiro vizinho que não contém sobreposição.
-     * @param scanline
-     * @param v
-     * @return 
+     * @param scanline Linha de varredura
+     * @param v No referência para verificar vizinhos da direita
+     * @return TreeSet que contém os vizinhos da direita do No 'v'
      */
     private static TreeSet<No> getRightNeighbours(TreeSet<No> scanline, No v) {
         TreeSet<No> rightv = new TreeSet<>(new NoComparator());

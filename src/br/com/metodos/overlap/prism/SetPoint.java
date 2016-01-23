@@ -7,7 +7,7 @@
 package br.com.metodos.overlap.prism;
 
 /**
- *
+ * Utilizada para não repetir pontos.
  * @author wilson
  */
 public class SetPoint  {

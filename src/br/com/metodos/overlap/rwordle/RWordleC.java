@@ -16,12 +16,16 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
- *
+ * Classe de implementação do método RWordleC
  * @author wilson
  */
 public class RWordleC {
     
-    
+    /**
+     * Aplica o método RWordleC (Ordena os elementos de acordo com o centro para projeção)
+     * @param rectangles Projeção inicial.
+     * @return Projeção sem sobreposição.
+     */
     public static ArrayList<Retangulo> apply(ArrayList<Retangulo> rectangles) {
         
         /**

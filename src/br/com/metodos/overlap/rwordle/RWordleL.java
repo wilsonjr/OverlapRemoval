@@ -17,12 +17,18 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
- *
+ * Classe de implementação do método RWordleL
  * @author wilson
  */
 public class RWordleL {
     
-    
+    /**
+     * Aplica o método RWordleL (Ordena os elementos de acordo uma linha de varredura com orientação especificada pelo parâmetro 'alpha')
+     * @param rectangles Projeção inicial.
+     * @param alpha Ângulo da linha de varredura.
+     * @param centralize Flag que determina se o método deve centralizar após projetar cada elemento.
+     * @return Retângulos sem sobreposição.
+     */
     public static ArrayList<Retangulo> apply(ArrayList<Retangulo> rectangles, double alpha, boolean centralize) {
         
         /**

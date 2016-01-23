@@ -14,7 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Essa classe segue o modelo proposto pela API do método IncBoard.
+ * Disponível em: https://github.com/robertodepinho/incBoard-API
  * @author wilson
  */
 public class IncBoardExecutor implements DataModelInterface {

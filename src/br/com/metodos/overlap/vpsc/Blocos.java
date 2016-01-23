@@ -16,6 +16,10 @@ public class Blocos  {
     private ArrayList<Variavel> vars;
     private ArrayList<Bloco> blocos;    
     
+    /**
+     * Cria um Bloco para cada Variavel em vars
+     * @param vars Variaveis que representam cada elemento na projeção
+     */
     public Blocos(ArrayList<Variavel> vars) {
         
         this.vars = vars;
@@ -25,6 +29,10 @@ public class Blocos  {
             blocos.add(new Bloco(vars.get(i)));       
     }    
     
+    /**
+     * Realiza a ordenação topológica das Variaveis
+     * @return Ordenação topológica das Variaveis
+     */
     public ArrayList<Variavel> totalOrder() {
         ArrayList<Variavel> order = new ArrayList<>();
         for( int i = 0; i < vars.size(); ++i )
@@ -37,6 +45,11 @@ public class Blocos  {
         return order;
     }
     
+    /**
+     * Estabelece a ordenação topológica
+     * @param v Variavel sendo analisada
+     * @param order Pilha contendo a ordenação
+     */
     private void visita(Variavel v, ArrayList<Variavel> order) {
         v.setVisitado(true);
         
@@ -48,6 +61,10 @@ public class Blocos  {
         order.add(0, v);
     }
     
+    /**
+     * Mescla este bloco com o bloco do lado esquerdo.
+     * @param b Bloco na posição esquerda
+     */
     public void mergeLeft(Bloco b) {
         // inicializa as in constraints e recupera a restrição que possui maior violação
         b.heapifyInConstraints();     
@@ -74,10 +91,15 @@ public class Blocos  {
         
     }
     
+    /**
+     * Mescla este bloco com o bloco do lado direito.
+     * @param b Bloco na posição direita
+     */
     public void mergeRight(Bloco b) {
         b.heapifyOutConstraints();
         Restricao r = b.getMinOutConstraint();
         
+        // caso essa violação seja maior que 0 é necessário mesclar os blocos
         while( r != null && r.getViolationRight() < 0 ) {
             b.removeMinOutConstraint();
             
@@ -99,6 +121,14 @@ public class Blocos  {
         }
     }
         
+    /**
+     * Quebra o Bloco 'b' em dois Blocos 'lb' (left) e rb (right) segundo a restrição 'c'.
+     * Isso ocorre porque o coeficiente de 'c' é negativo e, portanto, a solução não é ótima.
+     * @param b Bloco que será quebrado
+     * @param lb Bloco do lado esquerdo
+     * @param rb Bloco do lado direito
+     * @param c Restrição sendo analisada
+     */
     public void restrictBlock(Bloco b, Bloco lb, Bloco rb, Restricao c) {
         c.setAtiva(false);
         /**
@@ -109,6 +139,10 @@ public class Blocos  {
         b.addInSplitBlock(rb, c.getRight());
     }    
     
+    /**
+     * Retorna os blocos criados
+     * @return ArrayList de Blocos
+     */
     public ArrayList<Bloco> getBlocos() {
         return blocos;
     }

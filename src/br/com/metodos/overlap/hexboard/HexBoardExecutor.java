@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Essa classe segue o modelo proposto pela API do método HexBoard.
+ * Disponível em: https://github.com/robertodepinho/HexBoard-API
  * @author wilson
  */
 public class HexBoardExecutor implements DataModelInterface {

@@ -23,6 +23,12 @@ import java.util.Iterator;
  */
 public class PRISM {
     
+    /**
+     * O método PRISM propõe utilizar a rotina do método VPSC para encontrar restrições de sobreposição.
+     * Assim, as sobreposições "escondidas" são encontradas, e adiciona-se arestas para esses vértices sobrepostos.
+     * @param retangulos Composição atual dos retângulos na projeção.
+     * @return Array de arestas que precisam ser adicionadas.
+     */
     public static PRISMEdge[] findRestOverlaps(ArrayList<Retangulo> retangulos) {
         /**
          * copy rectangles 
@@ -72,6 +78,15 @@ public class PRISM {
         return newOverlaps;
     }
     
+    /**
+     * Aplica o método PRISM
+     * @param rects Composição dos retângulos na projeção multidimensional.
+     * @param augmentGp Indicador que controla a adição de arestas encontradas pela rotina do VPSC.
+     * @param algorithm Estrutura de dados utilizada para armazenar a matriz:
+     *                  0 - Matriz normal;
+     *                  1 - Estrutura de Yale para matrizes esparsas.
+     * @return Retângulos sem sobreposição.
+     */
     private static ArrayList<Retangulo> apply(ArrayList<Retangulo> rects, boolean augmentGp, int algorithm) {
         ArrayList<Retangulo> projected = new ArrayList<>();
         
@@ -158,15 +173,31 @@ public class PRISM {
         return null;
     }
     
+    /**
+     * Calcula a quantidade de sobreposição em relação ao eixo X
+     * @param s Retângulo referência
+     * @param r Retângulo com qual irá se comparar
+     * @return Sobreposição no eixo X
+     */
     private static double olapx(Retangulo s, Retangulo r) {
         return (s.getWidth()+r.getWidth())/2 - Math.abs(s.getCenterX()-r.getCenterX());
     }
     
-    
+    /**
+     * Calcula a quantidade de sobreposição em relação ao eixo Y
+     * @param s Retângulo referência
+     * @param r Retângulo com qual irá se comparar
+     * @return Sobreposição no eixo Y
+     */
     private static double olapy(Retangulo s, Retangulo r) {
         return (s.getHeight()+r.getHeight())/2 - Math.abs(s.getCenterY()-r.getCenterY());
     }
     
+    /**
+     * Método utilizado quando existe somente 2 retângulos (não é possível formar uma triangulação).
+     * @param rects Os 2 retângulos
+     * @return 2 retângulos não sobrepostos.
+     */
     private static ArrayList<Retangulo> naivePRISM(ArrayList<Retangulo> rects) {
         
         double x = Math.abs(olapx(rects.get(0), rects.get(1)));
@@ -179,7 +210,15 @@ public class PRISM {
         return rects;
     }
     
-    
+    /**
+     * Rotina principal do método.
+     * Verifica as "condições" do conjunto e realiza as "passadas" no método PRISM.
+     * @param rects Projeção original
+     * @param algorithm Estrutura de dados utilizada para armazenar a matriz:
+     *                  0 - Matriz normal;
+     *                  1 - Estrutura de Yale para matrizes esparsas.
+     * @return Retângulos sem sobreposição.
+     */
     public static ArrayList<Retangulo> apply(ArrayList<Retangulo> rects, int algorithm) {
         
         // para um nó apenas não há o que fazer

@@ -9,7 +9,7 @@ package br.com.metodos.overlap.projsnippet;
 import java.util.LinkedList;
 
 /**
- *
+ * Representação de um vértice para aplicação do algoritmo PRIM
  * @author wilson
  */
 public class Vertice implements HeapElement {

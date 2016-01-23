@@ -13,7 +13,7 @@ package br.com.metodos.utils;
 import java.util.List;
 
 /**
- *
+ * Estrutuda para armazenar uma matriz esparsa
  * @author wilson
  */
 public class YaleMatrix {
@@ -21,6 +21,12 @@ public class YaleMatrix {
     public int[] ja;
     public double[] a;
     
+    /**
+     * Cria uma Matriz de Yale
+     * @param a
+     * @param ja
+     * @param ia 
+     */
     public YaleMatrix(List<Double> a, List<Integer> ja, List<Integer> ia) {
         this.ia = new int[ia.size()];
         this.ja = new int[ja.size()];
@@ -33,6 +39,12 @@ public class YaleMatrix {
             this.a[i] = a.get(i);                
     }
     
+    /**
+     * Cria uma Matriz de Yale
+     * @param a
+     * @param ja
+     * @param ia 
+     */
     public YaleMatrix(double[] a, int[] ja, int[] ia) {
         this.ia = new int[ia.length];
         this.ja = new int[ja.length];

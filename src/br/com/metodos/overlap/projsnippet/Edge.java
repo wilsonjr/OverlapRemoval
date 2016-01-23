@@ -7,7 +7,7 @@
 package br.com.metodos.overlap.projsnippet;
 
 /**
- *
+ * Representa uma aresta usada no algoritmo PRISM
  * @author wilson
  */
 public class Edge {

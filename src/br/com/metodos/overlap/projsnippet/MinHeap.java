@@ -9,7 +9,8 @@ package br.com.metodos.overlap.projsnippet;
 import java.util.ArrayList;
 
 /**
- *
+ * Heap Binário.
+ * Baseado em Cormen et al.
  * @author wilson
  */
 public class MinHeap {

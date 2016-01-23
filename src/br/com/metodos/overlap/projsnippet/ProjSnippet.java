@@ -23,13 +23,22 @@ import nu.thiele.mllib.data.Data;
 
 
 /**
- *
+ * Classe que prepara os elementos paraexecutar o método ProjSnippet
  * @author wilson
  */
 public class ProjSnippet {
      private static int resultado;
      private static int kNeighbours;
-    
+     
+     /**
+      * Forma o grafo e elementos necessário para execução do algoritmo ProjSnippet.
+      * Este algoritmo não está implementado em Java, mas sim em C++. 
+      * A escolha foi feita para usar a mesma biblioteca que o autor do método.
+      * @param retangulos Projeção inicial 
+      * @param alpha Parâmetro que controla a contribuição das energias de sobreposição e vizinhança
+      * @param kNeighbours Número de vizinhos mais próximas para formação do grafo e, consequentemente, a matriz L.
+      * @return 
+      */
      public static ArrayList<Retangulo> apply(ArrayList<Retangulo> retangulos, double alpha, int kNeighbours) {
         ProjSnippet.resultado = -1;
         ProjSnippet.kNeighbours = kNeighbours;
@@ -42,6 +51,9 @@ public class ProjSnippet {
             if( !file.exists() )
                 file.createNewFile();
  
+            /**
+             *  salva as coordenadas e as dimensões dos retângulos
+             */
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             try( BufferedWriter bw = new BufferedWriter(fw) ) {
                 bw.write(retangulos.size()+"\n");
@@ -51,6 +63,9 @@ public class ProjSnippet {
                 bw.write(String.valueOf(alpha));
             }
             
+            /**
+             * salva a matriz usada para a energia de vizinhança
+             */
             File fileMat = new File("matrixL.matrix");
             if( !fileMat.exists() )  
                 fileMat.createNewFile();
@@ -113,16 +128,25 @@ public class ProjSnippet {
         return null;       
      }
      
-     
-     public static double[][] formGraph(ArrayList<Retangulo> retangulos) {
+     /**
+      * Forma o grafo de vizinhos mais próximos para gerar a matriz L usada na energia de vizinhança
+      * @param retangulos Projeção inicial
+      * @return Matriz L
+      */
+     private static double[][] formGraph(ArrayList<Retangulo> retangulos) {
+         // "converte" os retângulos para usar a biblioteca kNN
          ArrayList<Data.DataEntry> data = new ArrayList<>();
          for( Retangulo r: retangulos )
              data.add(new Data.DataEntry(new double[]{r.getUX(), r.getLY()}, (long)r.getId()));
-         Vertice[] grafo = new Vertice[retangulos.size()];
          
+         
+         // Para cada vértice, encontra seus vizinhos mais próximos
+         Vertice[] grafo = new Vertice[retangulos.size()];
          for (int i = 0; i < data.size(); ++i) {
             Data.DataEntry[] e = NearestNeighbour.getKNearestNeighbours(data, data.get(i).getX(), 
                     ProjSnippet.kNeighbours > retangulos.size() ? retangulos.size() : ProjSnippet.kNeighbours);
+            
+            // forma o grafo de acordo com os vizinhos mais próximos
             Vertice v = new Vertice(i);
             for( int j = 0; j < e.length; ++j ) {
                 if( v.getId() != (long)e[j].getY() )
@@ -132,16 +156,20 @@ public class ProjSnippet {
                                                                                   e[j].getX()[1])));
             }
             grafo[i] = v;
-         }
+         }         
          
+         // encontra as componentes resultante do kNN
          findComponents(grafo);
          
+         // "aumenta" o número de arestas ligando possíveis componentes desconectadas
          Vertice[] c = completedGraph(retangulos);
+         
+         // encontra a árvore geradora mínima
          Prim p = new Prim();
          p.execute(c);
          ArrayList<Edge> edges = p.getEdges();
          
-         // aumenta o grafo
+         // utiliza a menor aresta ligando os componentes para aumentar o grafo original
          for( Edge e: edges ) {
              int i = (int)e.getU();
              int j = (int)e.getV();
@@ -159,31 +187,37 @@ public class ProjSnippet {
                      grafo[(int)e.getV()].add(new Edge(e.getV(), e.getU(), e.getPeso()));
              }
          }
-         
+                  
+         /** cria a matriz L, definida da seguinte forma:
+          * L_ii = 1
+          * L_ij = -1/|i|, se ij é uma aresta no grafo
+          * L_ij = 0, caso contrário
+          * onde |i| é a valência do nó i.
+          **/
          double[][] l = new double[grafo.length][grafo.length];
          for( Vertice v: grafo ) {
              for( Edge e: v.getAdj() ) 
-                 l[(int)e.getU()][(int)e.getV()] = -1.0/((double)v.getAdj().size()+2);
-             
-         }
-         
+                 l[(int)e.getU()][(int)e.getV()] = -1.0/((double)v.getAdj().size()+2);             
+         }                  
          for( int i = 0; i < l.length; ++i ) 
              l[i][i] = 1.0;
-         
-             
          
          return l;         
      }
      
-     public static Vertice[] completedGraph(ArrayList<Retangulo> retangulos) {
+     /**
+      * Cria um grafo completo
+      * @param retangulos Projeção inicial
+      * @return Grafo completo sem loop
+      */
+     private static Vertice[] completedGraph(ArrayList<Retangulo> retangulos) {
          Vertice[] grafo = new Vertice[retangulos.size()];
          
          for( int i = 0; i < grafo.length; ++i ) {
              Vertice v = new Vertice(i);
              for( int j = 0; j < grafo.length; ++j ) {
                  if( i == j )
-                     continue;
-                 
+                     continue;                 
                  v.add(new Edge(i, j, Util.distanciaEuclideana(retangulos.get(i).getUX(), 
                                                                retangulos.get(i).getLY(), 
                                                                retangulos.get(j).getUX(), 
@@ -194,7 +228,13 @@ public class ProjSnippet {
          
          return grafo;
      }
-              
+             
+     /**
+      * Método principal de busca de profundidade
+      * @param i Vértice corrente na busca em profundidade
+      * @param grafo Grafo em lista de adjacências
+      * @param comp Componentes ao qual o vértice pertence
+      */
      private static void visita(long i, Vertice[] grafo, int comp) {
          grafo[(int)i].setVisitado(true);
          grafo[(int)i].setComponente(comp);
@@ -205,8 +245,13 @@ public class ProjSnippet {
                  visita(e.getV(), grafo, comp);
              }
      }
-             
-     public static void findComponents(Vertice[] grafo) {
+            
+     /**
+      * Busca em profundidade para encontrar componentes do grafo.
+      * Necessário para conectar os componentes desconectados após encontrar os 'k-Neighbours'
+      * @param grafo Grafo em lista de adjacências
+      */
+     private static void findComponents(Vertice[] grafo) {
          for( int i = 0; i < grafo.length; ++i ) {
              grafo[i].setVisitado(false);
              grafo[i].setComponente(-1);
@@ -219,12 +264,4 @@ public class ProjSnippet {
                  comp++;
              }         
      }
-     
-     
-     
-     
-     public static void main(String[] args) {
-         System.out.println("ola");
-     }
-
 }

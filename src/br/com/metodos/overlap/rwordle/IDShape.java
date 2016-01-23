@@ -9,8 +9,8 @@ package br.com.metodos.overlap.rwordle;
 import br.com.metodos.utils.Retangulo;
 
 /**
- *
- * @author Thaís
+ * Utilizado para fazer um backup dos elementos quando aplicados aos métodos RWordleC e RWordleL.
+ * @author Wilson
  */
 public class IDShape {
     private Retangulo rect;

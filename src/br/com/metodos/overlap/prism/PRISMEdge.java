@@ -9,7 +9,8 @@ package br.com.metodos.overlap.prism;
 import java.util.Objects;
 
 /**
- *
+ * Representa uma aresta para o método PRISM.
+ * Esta poderá ser "esticada" de acordo com a execução do método.
  * @author wilson
  */
 public class PRISMEdge {
@@ -30,6 +31,12 @@ public class PRISMEdge {
         return v;
     }
 
+    /**
+     * Verifica se duas arestas são iguais.
+     * Neste caso é a mesma aresta se u == v || v == u.
+     * @param obj 
+     * @return True se as arestas são iguais, False caso contrário.
+     */
     @Override
     public boolean equals(Object obj) {
         PRISMEdge o = (PRISMEdge)obj;

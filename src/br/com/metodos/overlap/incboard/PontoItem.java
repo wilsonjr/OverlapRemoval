@@ -9,7 +9,8 @@ package br.com.metodos.overlap.incboard;
 import incboard.api.DataItemInterface;
 
 /**
- *
+ * Classe criada para trabalhar (nesta aplicação) com dados multidimensionais.
+ * Necessária para utilização dos métodos IncBoard e HexBoard.
  * @author wilson
  */
 public class PontoItem implements DataItemInterface {
@@ -55,6 +56,12 @@ public class PontoItem implements DataItemInterface {
         return dims;
     }
 
+    
+    /**
+     * Calcula a distância Euclideana entre dois PontoItem's (DataItemInterface)
+     * @param dii Elemento com o qual calculará a distância
+     * @return Distância Euclideana
+     */
     @Override
     public Double getDistance(DataItemInterface dii) {
         PontoItem p = (PontoItem) dii;
