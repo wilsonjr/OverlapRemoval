@@ -60,6 +60,13 @@ public class PRISMEdge {
         return u+" --> "+v;
     }
     
+    public void swap() {
+        if( u.getIdx() > v.getIdx() ) {
+            PRISMPoint aux = u;
+            u = v;
+            v = aux;
+        }
+    }
     
     
     

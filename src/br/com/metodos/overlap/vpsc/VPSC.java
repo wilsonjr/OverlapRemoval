@@ -84,11 +84,9 @@ public class VPSC {
         /**
          * tenta remover todas sobreposições, em seguida verifica se o menor coeficiente de Lagrande é negativo;
          * Caso seja negativo, continua "quebrando" e juntando os blocos e removendo as sobreposições
-         */
-        
+         */        
         while( true ) {
             
-           
             Restricao r1 = blocos.getBlocos().get(0).findMinLM();
             int idx = 0;
             for( int i = 1; i < blocos.getBlocos().size(); ++i ) {
@@ -152,7 +150,7 @@ public class VPSC {
         ArrayList<Variavel> varsOrdered = blocos.totalOrder();
         
         
-        // esse algoritmo é quase ótimo, trabalha junta as variaveis em blocos cada vez maiores
+        // esse algoritmo é quase ótimo, trabalha juntando as variaveis em blocos cada vez maiores
         // de variaveis conectadas por um árvore geradora
         for( int i = 0; i < varsOrdered.size(); ++i )
             if( !varsOrdered.get(i).getBloco().getDeleted() ) 

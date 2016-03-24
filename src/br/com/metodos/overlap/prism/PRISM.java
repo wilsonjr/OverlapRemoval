@@ -214,12 +214,12 @@ public class PRISM {
      * Rotina principal do método.
      * Verifica as "condições" do conjunto e realiza as "passadas" no método PRISM.
      * @param rects Projeção original
-     * @param algorithm Estrutura de dados utilizada para armazenar a matriz:
+     * @param structure Estrutura de dados utilizada para armazenar a matriz:
      *                  0 - Matriz normal;
      *                  1 - Estrutura de Yale para matrizes esparsas.
      * @return Retângulos sem sobreposição.
      */
-    public static ArrayList<Retangulo> apply(ArrayList<Retangulo> rects, int algorithm) {
+    public static ArrayList<Retangulo> apply(ArrayList<Retangulo> rects, int structure) {
         
         // para um nó apenas não há o que fazer
         if( rects.size() <= 1 ) 
@@ -230,10 +230,10 @@ public class PRISM {
             return naivePRISM(rects);
         
         // remove a sobreposição por meio de uma visão local
-        ArrayList<Retangulo> firstPass = apply(rects, false, algorithm);
+        ArrayList<Retangulo> firstPass = apply(rects, false, structure);
         
         // remove o restante da sobreposição por meio de uma visão global
-        ArrayList<Retangulo> secondPass = apply(firstPass, true, algorithm);
+        ArrayList<Retangulo> secondPass = apply(firstPass, true, structure);
         return secondPass;
     }
     

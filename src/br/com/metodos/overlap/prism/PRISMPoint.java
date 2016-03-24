@@ -27,7 +27,8 @@ public class PRISMPoint extends Point_dt {
     
     @Override
     public String toString() {
-        return rect.getUX()+" "+rect.getUY()+" "+rect.getWidth()+" "+rect.getHeight()+" |||";
+        //return (int)rect.getUX()+" "+(int)rect.getUY()+" "+(int)rect.getWidth()+" "+(int)rect.getHeight()+" ("+idx +") |||";
+        return String.valueOf(idx);
     }
 
     public Retangulo getRect() {

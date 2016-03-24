@@ -7,7 +7,6 @@
 package br.com.grafos.ui;
 
 
-import br.com.grafos.desenho.color.GrayScale;
 import br.com.grafos.desenho.color.RainbowScale;
 import br.com.metodos.overlap.hexboard.HexBoardExecutor;
 import br.com.metodos.overlap.incboard.IncBoardExecutor;
@@ -20,6 +19,10 @@ import br.com.metodos.overlap.vpsc.VPSC;
 import br.com.metodos.utils.Retangulo;
 import br.com.metodos.utils.RetanguloVis;
 import br.com.metodos.utils.Util;
+import br.com.overlayanalisys.definition.Metric;
+import br.com.overlayanalisys.layoutsimilarity.LayoutSimilarity;
+import br.com.overlayanalisys.neighborhoodpreservation.NeighborhoodPreservation;
+import br.com.overlayanalisys.sizeincrease.SizeIncrease;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -60,6 +63,8 @@ public class Menu extends javax.swing.JFrame {
     private int globalCounterColor = 0;
     private boolean loadedData = false;
     private ArrayList<Point> hexPoints;
+    private static final int HEXBOARD_SIZE = 20;
+    private Polygon p1, p2;
     /**
      * Creates new form Menu
      */
@@ -237,8 +242,8 @@ public class Menu extends javax.swing.JFrame {
                 File file = jFileChooser.getSelectedFile();
                 Scanner scn = new Scanner(file);
                 rectangles.clear();
-                //RainbowScale rbS = new RainbowScale();
-                GrayScale rbS = new GrayScale();
+                RainbowScale rbS = new RainbowScale();
+                //GrayScale rbS = new GrayScale();
                 
                 int id = 0;
                 while( scn.hasNext() ) {
@@ -308,9 +313,11 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<Retangulo> projected = VPSC.apply(rects);
         double[] center1 = Util.getCenter(projected);
         
-        int i = 0;
-        for( Retangulo r: projected ) 
-            r.setId(i++);       
+        for( int i = 0; i < rects.size(); ++i ) {
+            projected.get(i).setId(i);                    
+            rects.get(i).setId(i); 
+        }
+        
         
         double ammountX = center0[0]-center1[0];
         double ammountY = center0[1]-center1[1];
@@ -318,6 +325,11 @@ public class Menu extends javax.swing.JFrame {
                 
         Util.normalize(projected);        
         Util.toRetanguloVis(rectangles, projected);
+        
+        Metric ls = new SizeIncrease();
+        System.out.println("Resultado: "+ls.execute(rects, projected));
+        p1 = ((SizeIncrease)ls).getPolygon1();
+        p2 = ((SizeIncrease)ls).getPolygon2();
         
         view.cleanImage();
         view.repaint();
@@ -481,16 +493,16 @@ public class Menu extends javax.swing.JFrame {
                         q = d;
                     }                    
                 }
-
-                int xmin = 30;
-                int a  = (int)Math.sqrt( (30*30) - (Math.pow(30/2,2)) );
+                
+                int xmin = HEXBOARD_SIZE;
+                int a  = (int)Math.sqrt( (HEXBOARD_SIZE*HEXBOARD_SIZE) - (Math.pow(HEXBOARD_SIZE/2,2)) );
                 RainbowScale rbS = new RainbowScale();
                 for( PontoItem d: executor.getItems() ) {
                     int z = d.getRow() - d.getCol();
-                    int centerHexY = (3*30/2)*(z + Math.abs(zMIN))+30;
+                    int centerHexY = (3*HEXBOARD_SIZE/2)*(z + Math.abs(zMIN))+HEXBOARD_SIZE;
                     int distancia = (Math.abs(q.getRow()-d.getRow())+Math.abs(q.getCol()-d.getCol()))*a + xmin;
 
-                    rectangles.add(new RetanguloVis(distancia-(30/2), centerHexY-(30/2), 30, 30, 
+                    rectangles.add(new RetanguloVis(distancia-(HEXBOARD_SIZE/2), centerHexY-(HEXBOARD_SIZE/2), HEXBOARD_SIZE, HEXBOARD_SIZE, 
                             d.getGrupo() == 1 ? rbS.getColor(5) : d.getGrupo() == 2 ? rbS.getColor(120) : rbS.getColor(200),
                             d.getId()));
                     rectangles.get(rectangles.size()-1).setP(new Point(distancia, centerHexY));
@@ -626,15 +638,15 @@ public class Menu extends javax.swing.JFrame {
                     g2Buffer.setColor(r.cor);
                     
                     if( r.isHexBoard ) {
-                        int a = (int)Math.sqrt(Math.pow(30, 2) - Math.pow(30/2, 2));
+                        int a = (int)Math.sqrt(Math.pow(HEXBOARD_SIZE, 2) - Math.pow(HEXBOARD_SIZE/2, 2));
                         Point p = r.getP();
                         Polygon poly = new Polygon();
-                        poly.addPoint(p.x, p.y - 30);
-                        poly.addPoint(p.x + a, p.y - 30/2);
-                        poly.addPoint(p.x + a, p.y + 30/2);
-                        poly.addPoint(p.x, p.y + 30);
-                        poly.addPoint(p.x - a, p.y + 30/2);
-                        poly.addPoint(p.x - a, p.y - 30/2);
+                        poly.addPoint(p.x, p.y - HEXBOARD_SIZE);
+                        poly.addPoint(p.x + a, p.y - HEXBOARD_SIZE/2);
+                        poly.addPoint(p.x + a, p.y + HEXBOARD_SIZE/2);
+                        poly.addPoint(p.x, p.y + HEXBOARD_SIZE);
+                        poly.addPoint(p.x - a, p.y + HEXBOARD_SIZE/2);
+                        poly.addPoint(p.x - a, p.y - HEXBOARD_SIZE/2);
                         g2Buffer.fillPolygon(poly);
                         g2Buffer.setColor(Color.WHITE);
                         g2Buffer.drawPolygon(poly);
@@ -644,6 +656,13 @@ public class Menu extends javax.swing.JFrame {
                         g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                     }
                     
+                    
+                    if( p1 != null ) {
+                        g2Buffer.setColor(Color.GREEN);
+                        g2Buffer.drawPolygon(p1);
+                        g2Buffer.setColor(Color.RED);
+                        g2Buffer.drawPolygon(p2);
+                    }
                     g2Buffer.setColor(Color.WHITE);
                     g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
                     g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           

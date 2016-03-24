@@ -10,6 +10,7 @@ import br.com.metodos.overlap.prism.PRISMEdge;
 import br.com.metodos.overlap.prism.PRISMPoint;
 import br.com.metodos.overlap.prism.SetPoint;
 import br.com.metodos.overlap.vpsc.Event;
+import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeSet;
@@ -102,7 +103,6 @@ public class Util {
             quickSort(array, start, k - 1);
             quickSort(array, k + 1, end);  
         }
-        
     }
 
     /**
@@ -190,9 +190,9 @@ public class Util {
     }
     
     private static void multMatrizVetor(YaleMatrix A, double[] b, double[] v, double[] r) {
-        for( int i = 0, j= 0; i < b.length; ++i ) {
+        for( int i = 0, j = 0; i < b.length; ++i ) {
             r[i] = b[i];
-            if( !lwZeroRow.contains(i) ) {
+            if( !lwZeroRow.contains(i) ) { // verificacao necessaria, uma linha inteira pode ser nula
                 for( int k = A.ia[j]; k < A.ia[j+1]; k++ )
                     r[i] += A.a[k]*v[A.ja[k]];
                 j++;
@@ -978,6 +978,23 @@ public class Util {
         
         return null;
         
+    }
+    
+    public static double polygonArea(Polygon p) {
+        double area = 0;
+        int x[] = p.xpoints;
+        int y[] = p.ypoints;
+        
+        for( int i = 1; i+1 < x.length; ++i ) {
+            int x1 = x[i] - x[0];
+            int y1 = y[i] - y[0];
+            int x2 = x[i+1] - x[0];
+            int y2 = y[i+1] - y[0];
+            int cross = x1*y2 - x2*y1;
+            area += cross;
+        }
+        
+        return Math.abs(area/2.0);
     }
     
     
