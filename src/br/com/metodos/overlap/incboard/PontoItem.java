@@ -66,6 +66,8 @@ public class PontoItem implements DataItemInterface {
     public Double getDistance(DataItemInterface dii) {
         PontoItem p = (PontoItem) dii;
         double soma = 0;
+        System.out.println("tamanho p: "+p.getDims().length);
+        System.out.println("tamanho dims: "+dims.length);
         for( int i = 0; i < dims.length; ++i ) 
             soma += Math.pow(dims[i]-p.getDims()[i], 2.);
         

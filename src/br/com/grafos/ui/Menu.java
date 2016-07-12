@@ -16,12 +16,14 @@ import br.com.metodos.overlap.projsnippet.ProjSnippet;
 import br.com.metodos.overlap.rwordle.RWordleC;
 import br.com.metodos.overlap.rwordle.RWordleL;
 import br.com.metodos.overlap.vpsc.VPSC;
+import br.com.metodos.pivot.GNAT;
+import br.com.metodos.pivot.MST;
+import br.com.metodos.pivot.OMNI;
+import br.com.metodos.pivot.SSS;
 import br.com.metodos.utils.Retangulo;
 import br.com.metodos.utils.RetanguloVis;
 import br.com.metodos.utils.Util;
 import br.com.overlayanalisys.definition.Metric;
-import br.com.overlayanalisys.layoutsimilarity.LayoutSimilarity;
-import br.com.overlayanalisys.neighborhoodpreservation.NeighborhoodPreservation;
 import br.com.overlayanalisys.sizeincrease.SizeIncrease;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -45,6 +47,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -97,6 +100,7 @@ public class Menu extends javax.swing.JFrame {
         saveDataCoordJMenuItem = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         limparJMenuItem = new javax.swing.JMenuItem();
+        salvarImagemJMenuItem = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         rwordleCJMenuItem = new javax.swing.JMenuItem();
         rwordleLJMenuItem = new javax.swing.JMenuItem();
@@ -109,6 +113,13 @@ public class Menu extends javax.swing.JFrame {
         jSeparator11 = new javax.swing.JPopupMenu.Separator();
         incBoardJMenuItem = new javax.swing.JMenuItem();
         hexBoardJMenuItem = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        sssJMenuItem = new javax.swing.JMenuItem();
+        gnatJMenuItem = new javax.swing.JMenuItem();
+        omniJMenuItem = new javax.swing.JMenuItem();
+        mstJMenuItem = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        extractParametersJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -146,6 +157,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu1.add(limparJMenuItem);
+
+        salvarImagemJMenuItem.setText("Salvar Imagem");
+        salvarImagemJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                salvarImagemJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(salvarImagemJMenuItem);
 
         jMenuBar1.add(jMenu1);
 
@@ -212,6 +231,54 @@ public class Menu extends javax.swing.JFrame {
         jMenu2.add(hexBoardJMenuItem);
 
         jMenuBar1.add(jMenu2);
+
+        jMenu3.setText("Pivôs");
+
+        sssJMenuItem.setText("SSS");
+        sssJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sssJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu3.add(sssJMenuItem);
+
+        gnatJMenuItem.setText("GNAT");
+        gnatJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gnatJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu3.add(gnatJMenuItem);
+
+        omniJMenuItem.setText("OMNI");
+        omniJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                omniJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu3.add(omniJMenuItem);
+
+        mstJMenuItem.setText("MST");
+        mstJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mstJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mstJMenuItem);
+
+        jMenuBar1.add(jMenu3);
+
+        jMenu4.setText("Análise");
+
+        extractParametersJMenuItem.setText("Extrair Parâmetros");
+        extractParametersJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                extractParametersJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu4.add(extractParametersJMenuItem);
+
+        jMenuBar1.add(jMenu4);
 
         setJMenuBar(jMenuBar1);
 
@@ -542,6 +609,129 @@ public class Menu extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_saveDataCoordJMenuItemActionPerformed
 
+    private void sssJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sssJMenuItemActionPerformed
+        double a = Double.parseDouble(JOptionPane.showInputDialog("Insira o valor de alpha: "));
+        
+        SSS sss = new SSS();
+        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        
+        sss.selectPivots(rects, a, getMaxDistance());
+        int i = 0;
+        for( Retangulo r: rects ) {
+                r.setId(i++); 
+                r.setLevel(1);
+        }
+        Util.toRetanguloVis(rectangles, rects);
+        System.out.println("OK SSS!");
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_sssJMenuItemActionPerformed
+
+    private void gnatJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gnatJMenuItemActionPerformed
+        
+        
+        GNAT gnat = new GNAT();
+        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        
+        int k = 5*rects.size()/100; //Integer.parseInt(JOptionPane.showInputDialog("Insira o número de pivôs: "));
+        
+        gnat.selectPivots(rects, k);
+        int i = 0;
+        for( Retangulo r: rects ) {
+            r.setId(i++);
+            r.setLevel(1);
+        }
+        Util.toRetanguloVis(rectangles, rects);
+        System.out.println("OK GNAT!");
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_gnatJMenuItemActionPerformed
+
+    private void omniJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_omniJMenuItemActionPerformed
+        int card = Integer.parseInt(JOptionPane.showInputDialog("Insira a número de focos: "));
+        
+        OMNI omni = new OMNI();
+        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        
+        omni.selectPivots(rects, card);
+        int i = 0;
+        for( Retangulo r: rects ) {
+            r.setId(i++);
+            r.setLevel(1);
+        }
+        
+        Util.toRetanguloVis(rectangles, rects);
+        System.out.println("OK OMNI!");
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_omniJMenuItemActionPerformed
+
+    private void mstJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mstJMenuItemActionPerformed
+        
+        MST mst = new MST();
+        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        
+        int i = 0;
+        for( Retangulo r: rects ) 
+            r.setId(i++);
+        mst.selectPivots(rects, 20);
+        
+        Util.toRetanguloVis(rectangles, rects);
+        System.out.println("OK MST!");
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_mstJMenuItemActionPerformed
+
+    private void extractParametersJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractParametersJMenuItemActionPerformed
+        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        ArrayList<Retangulo> pivots = new ArrayList<>();
+        ArrayList<Retangulo> elements = new ArrayList<>();
+        
+        for( int i = 0; i < rects.size(); ++i ) {
+            if( rects.get(i).isPivot() )
+                pivots.add(rects.get(i));
+            else
+                elements.add(rects.get(i));
+        }
+        System.out.println("SIZE: "+pivots.size()+", "+elements.size());
+        
+        double parameters[] = Util.extractParameters(40, pivots, elements);
+        
+        JOptionPane.showMessageDialog(this, "Mean: "+parameters[0]+", #Overlap: "+parameters[1]);
+        
+    }//GEN-LAST:event_extractParametersJMenuItemActionPerformed
+
+    private void salvarImagemJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salvarImagemJMenuItemActionPerformed
+        JFileChooser jFileChooser = new JFileChooser();
+
+        int result = jFileChooser.showSaveDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            try {
+                File file = jFileChooser.getSelectedFile();
+                view.adjustPanel();
+                BufferedImage img = view.getImage();
+                ImageIO.write(img, "png", file);
+            } catch( IOException e ) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }//GEN-LAST:event_salvarImagemJMenuItemActionPerformed
+
+    
+    public double getMaxDistance() {
+        double d = Double.MIN_VALUE;
+        
+        for( int i = 0; i < rectangles.size(); ++i )
+            for( int j = 0; j <= i-1; ++j ) {
+                double dd = Util.distanciaEuclideana(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY(), 
+                                                     rectangles.get(j).getCenterX(), rectangles.get(j).getCenterY());
+                d = Math.max(d, dd);
+            }
+                
+        
+        return d;
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -610,6 +800,10 @@ public class Menu extends javax.swing.JFrame {
             }); 
                      
         }
+        
+        public BufferedImage getImage() {
+            return imageBuffer;
+        }
              
         
         @Override
@@ -625,15 +819,16 @@ public class Menu extends javax.swing.JFrame {
             g2.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
             
             if( imageBuffer == null ) {
-                setPreferredSize(new Dimension(5000, 5000));
-                this.imageBuffer = new BufferedImage(5000, 5000, BufferedImage.TYPE_INT_RGB);
+                adjustPanel();
+                setPreferredSize(getSize());
+                this.imageBuffer = new BufferedImage(getSize().width, getSize().height, BufferedImage.TYPE_INT_RGB);
 
                 java.awt.Graphics2D g2Buffer = this.imageBuffer.createGraphics();
                 g2Buffer.setColor(this.getBackground());
                 g2Buffer.fillRect(0, 0, 5000, 5000);
 
                 g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
+                ArrayList<RetanguloVis> pivots = new ArrayList<>();
                 for( RetanguloVis r: rectangles ) {                    
                     g2Buffer.setColor(r.cor);
                     
@@ -651,9 +846,13 @@ public class Menu extends javax.swing.JFrame {
                         g2Buffer.setColor(Color.WHITE);
                         g2Buffer.drawPolygon(poly);
                     } else {
-                        g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                        g2Buffer.setColor(Color.BLACK);
-                        g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                        if( r.isPivot() ) {
+                            pivots.add(r);
+                        } else {
+                            g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), 30, 30);
+                            g2Buffer.setColor(Color.BLACK);
+                            g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), 30, 30);
+                        }
                     }
                     
                     
@@ -663,10 +862,28 @@ public class Menu extends javax.swing.JFrame {
                         g2Buffer.setColor(Color.RED);
                         g2Buffer.drawPolygon(p2);
                     }
+                    if( !r.isPivot() ) {
+                        g2Buffer.setColor(Color.WHITE);
+                        g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                        g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
+                    }
+                }
+                
+                for( RetanguloVis r: pivots ) {
+                    
+                    g2Buffer.setColor(Color.RED);
+                    g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), 30, 30);
                     g2Buffer.setColor(Color.WHITE);
                     g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
                     g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
                 }
+                
+                System.out.println("Numero de itens: "+rectangles.size());
+                System.out.println("Numero de pivos: "+pivots.size());
+                
+                
+                
+                
                 g2Buffer.dispose();
             } 
             if( imageBuffer != null )  {
@@ -677,6 +894,44 @@ public class Menu extends javax.swing.JFrame {
         public void cleanImage() {
             this.imageBuffer = null;
         }
+        
+        public void adjustPanel() {
+            if( rectangles == null || rectangles.isEmpty() )
+                return;
+            
+            double iniX = rectangles.get(0).getCenterX();
+            double iniY = rectangles.get(0).getCenterY();
+            double max_x = iniX, max_y = iniX;
+            double min_x = iniY, min_y = iniY;
+            int zero = 100;//graph.getVertex().get(0).getRay() * 5 + 10;
+
+            for( int i = 1; i < rectangles.size(); i++ ) {
+                double x = rectangles.get(i).getCenterX();
+                if (max_x < x)
+                    max_x = x;
+                else if (min_x > x)
+                    min_x = x;
+                
+                double y = rectangles.get(i).getCenterY();
+                if (max_y < y)
+                    max_y = y;
+                else if (min_y > y)
+                    min_y = y;
+                
+            }
+
+          /*  for( Vertex v : graph.getVertex() ) {
+                v.setX(v.getX() + zero - min_x);
+                v.setY(v.getY() + zero - min_y);
+            }*/
+
+            Dimension d = this.getSize();
+            d.width = (int) max_x + zero;
+            d.height = (int) max_y + zero;
+            System.out.println("Dimension- width: "+d.width+", height:"+d.height);
+            this.setSize(d);
+            this.setPreferredSize(d);
+        }
 
     }
     
@@ -685,10 +940,14 @@ public class Menu extends javax.swing.JFrame {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem extractParametersJMenuItem;
+    private javax.swing.JMenuItem gnatJMenuItem;
     private javax.swing.JMenuItem hexBoardJMenuItem;
     private javax.swing.JMenuItem incBoardJMenuItem;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator10;
@@ -697,12 +956,16 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator9;
     private javax.swing.JMenuItem limparJMenuItem;
     private javax.swing.JMenuItem loadDataJMenuItem;
+    private javax.swing.JMenuItem mstJMenuItem;
+    private javax.swing.JMenuItem omniJMenuItem;
     private javax.swing.JMenuItem prismJMenuItem;
     private javax.swing.JMenuItem projSnippetJMenuItem;
     private javax.swing.JMenuItem rwordleCJMenuItem;
     private javax.swing.JMenuItem rwordleLJMenuItem;
     private javax.swing.JMenuItem sairJMenuItem;
+    private javax.swing.JMenuItem salvarImagemJMenuItem;
     private javax.swing.JMenuItem saveDataCoordJMenuItem;
+    private javax.swing.JMenuItem sssJMenuItem;
     private javax.swing.JScrollPane telaJScrollPane;
     private javax.swing.JMenuItem vpscJMenuItem;
     // End of variables declaration//GEN-END:variables

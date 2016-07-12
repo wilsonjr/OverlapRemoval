@@ -10,10 +10,15 @@ package br.com.metodos.utils;
  * Classe Retangulo usada nos métodos de remoção de sobreposição.
  * @author wilson
  */
-public class Retangulo  {    
+public class Retangulo implements Pivot {    
     private double ux, uy, lx, ly;    
     private int id;
-    
+    private boolean pivot;
+    private int level;
+    private int cluster;
+    private int health;
+            
+            
     /**
      * Cria um retângulo para aplicação do método.
      * @param minX Coordenada x superior do retângulo
@@ -28,6 +33,11 @@ public class Retangulo  {
         uy = minY;
         ly = minY+height;
         this.id = id;
+        
+        level = -1;
+        pivot = false;
+        
+        health = 0;
     }    
     
     /**
@@ -40,6 +50,17 @@ public class Retangulo  {
     public Retangulo(double minX, double minY, double width, double height) {
         this(minX, minY, width, height, -1);
     }    
+
+    public Retangulo(double ux, double uy, double width, double height, boolean pivot, int level, int cluster, int health) {
+       this(ux, uy, width, height);
+        this.pivot = pivot;
+        this.level = level;
+        this.cluster = cluster;
+        this.health = 0;
+        
+    }
+    
+    
     
     /**
      * Retorna a identificação.
@@ -231,5 +252,42 @@ public class Retangulo  {
      */
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean isPivot() {
+        return pivot;
+    }
+
+    @Override
+    public void setPivot(boolean pivot) {
+        this.pivot = pivot;
+    }
+
+    @Override
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    @Override
+    public int getLevel() {
+        return level;
+    }
+    
+    public int getCluster() {
+        return cluster;
+    }
+    
+    public void setCluster(int cluster) {
+        this.cluster = cluster;    
+    }
+    
+    public void increment() {
+        if( health < 2 )
+            health++;
+    }
+    
+    public int getHealth() {
+        return health;
     }
 }

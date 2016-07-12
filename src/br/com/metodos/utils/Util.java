@@ -57,9 +57,9 @@ public class Util {
     public static ArrayList<Retangulo> toRetangulo(ArrayList<RetanguloVis> rects) {
         ArrayList<Retangulo> rs = new ArrayList<>();
         
-        for( RetanguloVis r: rects ) 
-            rs.add(new Retangulo(r.getUX(), r.getUY(), r.getWidth(), r.getHeight()));
-        
+        for( RetanguloVis r: rects ) {
+            rs.add(new Retangulo(r.getUX(), r.getUY(), r.getWidth(), r.getHeight(), r.isPivot(), r.getLevel(), r.getCluster(), r.getHealth()));
+        }
         return rs;
     }
         
@@ -75,6 +75,8 @@ public class Util {
             ori.get(rects.get(i).getId()).setUY(rects.get(i).getUY());
             ori.get(rects.get(i).getId()).setWidth(rects.get(i).getWidth());
             ori.get(rects.get(i).getId()).setHeight(rects.get(i).getHeight());
+            ori.get(rects.get(i).getId()).setPivot(rects.get(i).isPivot());
+            ori.get(rects.get(i).getId()).setLevel(rects.get(i).getLevel());
         }   
     }
      
@@ -997,5 +999,38 @@ public class Util {
         return Math.abs(area/2.0);
     }
     
+    
+    public static double[] extractParameters(double eps, ArrayList<Retangulo> pivots, ArrayList<Retangulo> elements) {
+        double[] parameters = new double[2];
+        int sum = 0;
+        
+        for( int i = 0; i < pivots.size(); ++i ) 
+            sum += Util.elementsInRange(eps, pivots.get(i), elements);        
+        parameters[0] = (double)sum/(double)pivots.size();
+        
+        parameters[1] = 0;
+        for( int i = 0; i < elements.size(); ++i )
+            if( elements.get(i).getHealth() >= 2 )
+                parameters[1]++;
+            
+        
+        return parameters;
+    }
+    
+    private static int elementsInRange(double eps, Retangulo r, ArrayList<Retangulo> elements) {
+        int qtd = 0;
+        
+        for( int i = 0; i < elements.size(); ++i ) {
+            
+            double distancia = Util.distanciaEuclideana(r.getCenterX(), r.getCenterY(), 
+                    elements.get(i).getCenterX(), elements.get(i).getCenterY());
+            if( distancia <= eps ) {
+                qtd++;
+                elements.get(i).increment();
+            }
+            
+        }
+        return qtd;
+    }
     
 }

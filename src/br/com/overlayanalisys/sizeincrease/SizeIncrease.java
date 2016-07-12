@@ -48,7 +48,7 @@ public class SizeIncrease implements Metric {
         }
         
         
-        return (double)Util.polygonArea(polygon1)/(double)Util.polygonArea(polygon2);
+        return (double)Util.polygonArea(polygon2)/(double)Util.polygonArea(polygon1);
     }
 
     public Polygon getPolygon1() {
