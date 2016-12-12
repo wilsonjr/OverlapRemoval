@@ -2,27 +2,42 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package br.com.grafos.ui;
 
 
 import br.com.grafos.desenho.color.RainbowScale;
-import br.com.metodos.overlap.hexboard.HexBoardExecutor;
-import br.com.metodos.overlap.incboard.IncBoardExecutor;
-import br.com.metodos.overlap.incboard.PontoItem;
-import br.com.metodos.overlap.prism.PRISM;
-import br.com.metodos.overlap.projsnippet.ProjSnippet;
-import br.com.metodos.overlap.rwordle.RWordleC;
-import br.com.metodos.overlap.rwordle.RWordleL;
-import br.com.metodos.overlap.vpsc.VPSC;
-import br.com.metodos.pivot.GNAT;
-import br.com.metodos.pivot.MST;
-import br.com.metodos.pivot.OMNI;
-import br.com.metodos.pivot.SSS;
-import br.com.metodos.utils.Retangulo;
-import br.com.metodos.utils.RetanguloVis;
-import br.com.metodos.utils.Util;
+import br.com.methods.overlap.hexboard.HexBoardExecutor;
+import br.com.methods.overlap.incboard.IncBoardExecutor;
+import br.com.methods.overlap.incboard.PointItem;
+import br.com.methods.overlap.prism.PRISM;
+import br.com.methods.overlap.projsnippet.ProjSnippet;
+import br.com.methods.overlap.rwordle.RWordleC;
+import br.com.methods.overlap.rwordle.RWordleL;
+import br.com.methods.overlap.vpsc.VPSC;
+import br.com.methods.pivot.GNAT;
+import br.com.methods.pivot.MST;
+import br.com.methods.pivot.OMNI;
+import br.com.methods.pivot.SSS;
+import br.com.methods.utils.ChangeRetangulo;
+import br.com.methods.utils.KNN;
+import br.com.methods.utils.Pair;
+import br.com.methods.utils.OverlapRect;
+import br.com.methods.utils.RetanguloVis;
+import br.com.methods.utils.Util;
 import br.com.overlayanalisys.definition.Metric;
 import br.com.overlayanalisys.sizeincrease.SizeIncrease;
 import java.awt.Color;
@@ -46,7 +61,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -68,6 +87,11 @@ public class Menu extends javax.swing.JFrame {
     private ArrayList<Point> hexPoints;
     private static final int HEXBOARD_SIZE = 20;
     private Polygon p1, p2;
+    private static final int RECTSIZE = 20;
+    
+    
+    
+    private ArrayList<ChangeRetangulo> cRetangulo = null;
     /**
      * Creates new form Menu
      */
@@ -101,6 +125,7 @@ public class Menu extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         limparJMenuItem = new javax.swing.JMenuItem();
         salvarImagemJMenuItem = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         rwordleCJMenuItem = new javax.swing.JMenuItem();
         rwordleLJMenuItem = new javax.swing.JMenuItem();
@@ -165,6 +190,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu1.add(salvarImagemJMenuItem);
+
+        jMenuItem1.setText("Mover");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
 
         jMenuBar1.add(jMenu1);
 
@@ -319,7 +352,7 @@ public class Menu extends javax.swing.JFrame {
                     double y = Double.parseDouble(linha[2]);
                     int grupo = id;//Integer.parseInt(linha[3]);
 
-                    rectangles.add(new RetanguloVis(x, y, 30, 30, rbS.getColor((grupo*10)%255), id++));                
+                    rectangles.add(new RetanguloVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo*10)%255), id++));                
                 }
 
                 loadedData = true;
@@ -334,9 +367,10 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_loadDataJMenuItemActionPerformed
 
     private void rwordleCJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordleCJMenuItemActionPerformed
-        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         double[] center0 = Util.getCenter(rects);
-        ArrayList<Retangulo> projected = RWordleC.apply(rects);
+        RWordleC rw = new RWordleC();
+        ArrayList<OverlapRect> projected = rw.apply(rects);
         double[] center1 = Util.getCenter(projected);
         
         double ammountX = center0[0]-center1[0];
@@ -357,10 +391,11 @@ public class Menu extends javax.swing.JFrame {
             alpha = 0;
         }
         
-        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         double[] center0 = Util.getCenter(rects);
         //ArrayList<Retangulo> projected  = RWordleL.apply(rects, alpha, recentralizarJCheckBox.isSelected());
-        ArrayList<Retangulo> projected = RWordleL.apply(rects, alpha, false);
+        RWordleL rwl = new RWordleL(alpha, false);
+        ArrayList<OverlapRect> projected = rwl.apply(rects);
         double[] center1 = Util.getCenter(projected);
                 
         double ammountX = center0[0]-center1[0];
@@ -373,17 +408,140 @@ public class Menu extends javax.swing.JFrame {
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_rwordleLJMenuItemActionPerformed
+    
+    private boolean temSobreposicao(double x, double y, ArrayList<ChangeRetangulo> R, int id) {
+        double x1 = x, x2 = x+RECTSIZE;
+        double y1 = y, y2 = y+RECTSIZE;
+        
+        for( int i = 0; i < R.size(); ++i ) {
+            OverlapRect r = R.get(i).third.getUX() == 0.0 && R.get(i).third.getUY() == 0.0
+                          ? R.get(i).second : R.get(i).third;
+            
+            if( r.getId() == id )
+                continue;
+            
+            if( x2 > r.getUX() && x1 < r.getUX()+RECTSIZE && y2 > r.getUY() && y1 < r.getUY()+RECTSIZE )
+                return true;            
+        }
+        return false;
+    }
+    
+    private void findPosition(ArrayList<ChangeRetangulo> R) {
+        Collections.sort(R, new Comparator<ChangeRetangulo>() {
 
+            @Override
+            public int compare(ChangeRetangulo o1, ChangeRetangulo o2) {
+                
+                double d1 = Math.sqrt(Math.pow(o1.first.getUX()-o1.second.getUX(), 2)
+                                        +
+                             Math.pow(o1.first.getUY()-o1.second.getUY(), 2));
+                double d2 = Math.sqrt(Math.pow(o2.first.getUX()-o2.second.getUX(), 2)
+                                        +
+                             Math.pow(o2.first.getUY()-o2.second.getUY(), 2));
+                if( d1 < d2 )
+                    return -1;
+                else if( d1 > d2 )
+                    return 1;
+                
+                return 0;
+            }
+        });
+        
+        for( int j = 0; j < R.size(); ++j ) {
+            ChangeRetangulo r = R.get(j);
+            
+            double FACTOR = 0.0001;
+            double i = 1-FACTOR;
+            double x = 0, y = 0;
+            
+            for( ; i >= 0.0; i -= FACTOR ) {
+                x = (1.0-i)*r.second.getUX() + i*r.first.getUX();
+                y = (1.0-i)*r.second.getUY() + i*r.first.getUY();                
+                if( !temSobreposicao(x, y, R, r.third.getId()) )  
+                    break;
+            }
+            i += FACTOR;
+            x = (1.0-i)*r.second.getUX() + i*r.first.getUX();
+            y = (1.0-i)*r.second.getUY() + i*r.first.getUY();
+            
+           // System.out.println("Position: (x:"+x+", y:"+y+") - (x:"+r.second.getUX()+", y:"+r.second.getUY()+")");
+            r.third.setUX(x);
+            r.third.setUY(y);
+                    
+        }
+    }
+    
+    private void reduceKNN(int id, Pair[][] knn, ArrayList<ChangeRetangulo> R) {
+        
+        
+        if( R.get(id).third.getUX() != 0.0 || R.get(id).third.getUY() != 0.0 )
+            return;
+        
+        double FACTOR = 0.0001;
+        double i = 1-FACTOR;
+        double x = 0, y = 0;
+
+        for( ; i >= 0.0; i -= FACTOR ) {
+            x = (1.0-i)*R.get(id).second.getUX() + i*R.get(id).first.getUX();
+            y = (1.0-i)*R.get(id).second.getUY() + i*R.get(id).first.getUY();                
+            if( !temSobreposicao(x, y, R, R.get(id).third.getId()) )  
+                break;
+        }
+        i += FACTOR;
+       // System.out.println("i: "+i+", distancia: "+d);
+        x = (1.0-i)*R.get(id).second.getUX() + i*R.get(id).first.getUX();
+        y = (1.0-i)*R.get(id).second.getUY() + i*R.get(id).first.getUY();
+
+       // System.out.println("Position: (x:"+x+", y:"+y+") - (x:"+r.second.getUX()+", y:"+r.second.getUY()+")");
+        R.get(id).third.setUX(x);
+        R.get(id).third.setUY(y);
+        
+        // faz para os vizinhos até parar...
+        for( int j = 0; j < knn[id].length; ++j ) 
+            reduceKNN(knn[id][j].index, knn, R);
+    }
+    
+    private void findPosition(ArrayList<ChangeRetangulo> R, Pair[][] knn) {
+        OverlapRect[] rs = new OverlapRect[R.size()];
+        int idMinDist = 0;
+        double dist = Double.MAX_VALUE;
+        for( int i = 0; i < R.size(); ++i ) {
+            double d = Math.sqrt(Math.pow(R.get(i).first.getUX()-R.get(i).second.getUX(), 2)
+                                        +
+                        Math.pow(R.get(i).first.getUY()-R.get(i).second.getUY(), 2));
+            if( d < dist ) {
+                dist = d;
+                idMinDist = i;
+            }
+        }
+        
+        reduceKNN(idMinDist, knn, R);
+        
+        for( int j = 0; j < knn.length; ++j ) {
+            reduceKNN(j, knn, R);
+        }       
+    }
+    
+    
     private void vpscJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vpscJMenuItemActionPerformed
-        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         double[] center0 = Util.getCenter(rects);
-        ArrayList<Retangulo> projected = VPSC.apply(rects);
+        VPSC vpsc = new VPSC();
+        ArrayList<OverlapRect> projected = vpsc.apply(rects);
         double[] center1 = Util.getCenter(projected);
         
+        
+        cRetangulo = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i ) {
             projected.get(i).setId(i);                    
             rects.get(i).setId(i); 
+            cRetangulo.add(new ChangeRetangulo(rects.get(i), projected.get(i)));
+            cRetangulo.get(i).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, i);            
         }
+        
+        findPosition(cRetangulo);
+        
+        
         
         
         double ammountX = center0[0]-center1[0];
@@ -406,20 +564,89 @@ public class Menu extends javax.swing.JFrame {
         int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
         
         
-        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);        
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);        
         double[] center0 = Util.getCenter(rects);
-        ArrayList<Retangulo> projected = PRISM.apply(rects, algo);
+        PRISM prism = new PRISM(algo);
+        ArrayList<OverlapRect> projected = prism.apply(rects);
         double[] center1 = Util.getCenter(projected);
         
-        int i = 0;
-        for( Retangulo r: projected )
-            r.setId(i++);        
+        for( int i = 0; i < rects.size(); ++i ) {
+            projected.get(i).setId(i);                    
+            rects.get(i).setId(i); 
+        }
+        
+//        cRetangulo = new ArrayList<>();
+//        for( int i = 0; i < rects.size(); ++i ) {
+//            cRetangulo.add(new ChangeRetangulo(rects.get(i), projected.get(i)));
+//            cRetangulo.get(i).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, i);            
+//        }        
+//        findPosition(cRetangulo);
+//        
+//        
+//        ArrayList<Retangulo> rects2 = new ArrayList<>();
+//        for( int i = 0; i < cRetangulo.size(); ++i ) {
+//            double x = cRetangulo.get(i).third.getUX();
+//            double y = cRetangulo.get(i).third.getUY();
+//            
+//            rects2.add(new OverlapRect(x, y, RECTSIZE, RECTSIZE, i));
+//            
+//        }
         
         double ammountX = center0[0]-center1[0];
         double ammountY = center0[1]-center1[1];
-        Util.translate(projected, ammountX, ammountY);
-        
+        Util.translate(projected, ammountX, ammountY);        
         Util.normalize(projected);
+        
+//        ammountX = center0[0]-center1[0];
+//        ammountY = center0[1]-center1[1];
+//        Util.translate(rects2, ammountX, ammountY);        
+//        Util.normalize(rects2);
+        
+        
+//    
+//        
+//        for( int i = 0; i < cRetangulo.size(); ++i ) {
+//            cRetangulo.get(i).third.setUX(cRetangulo.get(i).third.getUX()+ammountX);
+//            cRetangulo.get(i).third.setUY(cRetangulo.get(i).third.getUY()+ammountY);
+//            
+//        }
+//        
+//        double minX = Util.getMinX(projected);
+//        double minY = Util.getMinY(projected);
+//        if( minX < 0 || minY < 0 ) {
+//            for( int i = 0; i < cRetangulo.size(); ++i ) {
+//                if( minX < 0 )
+//                    cRetangulo.get(i).third.setUX(cRetangulo.get(i).third.getUX()-minX);
+//                if( minY < 0 )
+//                    cRetangulo.get(i).third.setUY(cRetangulo.get(i).third.getUY()-minY);
+//            }
+//        }
+        
+        KNN knn = new KNN(10);
+        Pair[][] pair = null;
+        try {
+            pair = knn.execute(projected);
+        } catch( IOException e ) {
+            
+        }
+        
+        for( int i = 0; i < pair.length; ++i ) {
+            System.out.print(i+":");
+            for( int j = 0; j < pair[i].length; ++j ) 
+                System.out.print(" ("+pair[i][j].index+","+pair[i][j].value+")");
+            
+            System.out.println();
+        }
+        
+        
+        cRetangulo = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i ) {
+            cRetangulo.add(new ChangeRetangulo(rects.get(i), projected.get(i)));
+            cRetangulo.get(i).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, i);            
+        }        
+        findPosition(cRetangulo);
+        
+        
         Util.toRetanguloVis(rectangles, projected);
         
         view.cleanImage();
@@ -427,10 +654,10 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_prismJMenuItemActionPerformed
 
     private void projSnippetJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projSnippetJMenuItemActionPerformed
-        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         
         int i = 0;
-        for( Retangulo r: rects )
+        for( OverlapRect r: rects )
             r.setId(i++);
         double[] center0 = Util.getCenter(rects);
         //ArrayList<Retangulo> projected = ProjSnippet.e_o(rects, Double.parseDouble(projSnippetAlphaJTextField.getText()));
@@ -438,13 +665,13 @@ public class Menu extends javax.swing.JFrame {
         String alpha_value = JOptionPane.showInputDialog("Por favor, insira o valor para 'alpha':");
         String k_value = JOptionPane.showInputDialog("Por favor, insira o valor de 'k':");
         
-        
-        ArrayList<Retangulo> projected = ProjSnippet.apply(rects, Double.parseDouble(alpha_value), Integer.parseInt(k_value)+1);
+        ProjSnippet ps = new ProjSnippet(Double.parseDouble(alpha_value), Integer.parseInt(k_value)+1);
+        ArrayList<OverlapRect> projected = ps.apply(rects);
         if( projected != null ) {
             
             double[] center1 = Util.getCenter(projected);
             i = 0;
-            for( Retangulo r: projected )
+            for( OverlapRect r: projected )
                 r.setId(i++);        
 
             double ammountX = center0[0]-center1[0];
@@ -452,6 +679,15 @@ public class Menu extends javax.swing.JFrame {
             Util.translate(projected, ammountX, ammountY);
 
             Util.normalize(projected);
+             cRetangulo = new ArrayList<>();
+            for( int j = 0; j < rects.size(); ++j ) {
+                cRetangulo.add(new ChangeRetangulo(rects.get(j), projected.get(j)));
+                cRetangulo.get(j).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, j);            
+            }        
+            findPosition(cRetangulo);
+        
+            
+            
             Util.toRetanguloVis(rectangles, projected);
 
             view.cleanImage();
@@ -470,7 +706,7 @@ public class Menu extends javax.swing.JFrame {
                 File file = jFileChooser.getSelectedFile();
 
                 rectangles.clear();
-                ArrayList<PontoItem> items = new ArrayList<>();
+                ArrayList<PointItem> items = new ArrayList<>();
                 Scanner scn = new Scanner(file);
                 for( int i = 0; i < 4; ++i ) 
                     if( scn.hasNext() )
@@ -483,7 +719,7 @@ public class Menu extends javax.swing.JFrame {
                     double[] dims = new double[linha.length-2];
                     for( int i = 1, j = 0; i < linha.length-1; ++i )
                         dims[j++] = Double.parseDouble(linha[i]);            
-                    items.add(new PontoItem(dims, String.valueOf(id), id, grupo));
+                    items.add(new PointItem(dims, String.valueOf(id), id, grupo));
                     id++;
                 }
 
@@ -494,7 +730,7 @@ public class Menu extends javax.swing.JFrame {
                 int ymin = Math.abs(executor.getMinRow());
                 int xmin = Math.abs(executor.getMinCol());
                 RainbowScale rbS = new RainbowScale();
-                for( PontoItem d: executor.getItems() ) {
+                for( PointItem d: executor.getItems() ) {
                     rectangles.add(new RetanguloVis(30*(d.getCol()+xmin), 30*(d.getRow()+ymin), 
                                                     30, 30, rbS.getColor((d.getGrupo()*10)%255), 
                                                     d.getId()));
@@ -520,7 +756,7 @@ public class Menu extends javax.swing.JFrame {
                 File file = jFileChooser.getSelectedFile();
 
                 rectangles.clear();
-                ArrayList<PontoItem> items = new ArrayList<>();
+                ArrayList<PointItem> items = new ArrayList<>();
                 Scanner scn = new Scanner(file);
                 for( int i = 0; i < 4; ++i ) 
                     if( scn.hasNext() )
@@ -533,7 +769,7 @@ public class Menu extends javax.swing.JFrame {
                     double[] dims = new double[linha.length-2];
                     for( int i = 1, j = 0; i < linha.length-1; ++i )
                         dims[j++] = Double.parseDouble(linha[i]);            
-                    items.add(new PontoItem(dims, String.valueOf(id), id, grupo));
+                    items.add(new PointItem(dims, String.valueOf(id), id, grupo));
                     ++id;
                 }
 
@@ -543,9 +779,9 @@ public class Menu extends javax.swing.JFrame {
                 int zMin = executor.getMinRow()-executor.getMinCol();
                 
                 int minDist = Integer.MAX_VALUE;
-                PontoItem q = null;
+                PointItem q = null;
                 int zMIN = Integer.MAX_VALUE;
-                for( PontoItem d: executor.getItems() ) {
+                for( PointItem d: executor.getItems() ) {
                     int z = d.getRow()-d.getCol();
                     if( z < zMIN )
                         zMIN = z;
@@ -564,7 +800,7 @@ public class Menu extends javax.swing.JFrame {
                 int xmin = HEXBOARD_SIZE;
                 int a  = (int)Math.sqrt( (HEXBOARD_SIZE*HEXBOARD_SIZE) - (Math.pow(HEXBOARD_SIZE/2,2)) );
                 RainbowScale rbS = new RainbowScale();
-                for( PontoItem d: executor.getItems() ) {
+                for( PointItem d: executor.getItems() ) {
                     int z = d.getRow() - d.getCol();
                     int centerHexY = (3*HEXBOARD_SIZE/2)*(z + Math.abs(zMIN))+HEXBOARD_SIZE;
                     int distancia = (Math.abs(q.getRow()-d.getRow())+Math.abs(q.getCol()-d.getCol()))*a + xmin;
@@ -596,9 +832,9 @@ public class Menu extends javax.swing.JFrame {
                 File file = jFileChooser.getSelectedFile();
                 FileWriter fw = new FileWriter(file.getAbsoluteFile());
                 try( BufferedWriter bw = new BufferedWriter(fw) ) {
-                    ArrayList<Retangulo> retangulos = Util.toRetangulo(rectangles);
+                    ArrayList<OverlapRect> retangulos = Util.toRetangulo(rectangles);
                     int i = 0;
-                    for( Retangulo r: retangulos ) {
+                    for( OverlapRect r: retangulos ) {
                         bw.write(i+";"+r.getLX()+";"+r.getLY()+";"+i+"\n");
                         ++i;
                     }
@@ -613,11 +849,11 @@ public class Menu extends javax.swing.JFrame {
         double a = Double.parseDouble(JOptionPane.showInputDialog("Insira o valor de alpha: "));
         
         SSS sss = new SSS();
-        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         
         sss.selectPivots(rects, a, getMaxDistance());
         int i = 0;
-        for( Retangulo r: rects ) {
+        for( OverlapRect r: rects ) {
                 r.setId(i++); 
                 r.setLevel(1);
         }
@@ -631,13 +867,13 @@ public class Menu extends javax.swing.JFrame {
         
         
         GNAT gnat = new GNAT();
-        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         
         int k = 5*rects.size()/100; //Integer.parseInt(JOptionPane.showInputDialog("Insira o número de pivôs: "));
         
         gnat.selectPivots(rects, k);
         int i = 0;
-        for( Retangulo r: rects ) {
+        for( OverlapRect r: rects ) {
             r.setId(i++);
             r.setLevel(1);
         }
@@ -651,11 +887,11 @@ public class Menu extends javax.swing.JFrame {
         int card = Integer.parseInt(JOptionPane.showInputDialog("Insira a número de focos: "));
         
         OMNI omni = new OMNI();
-        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         
         omni.selectPivots(rects, card);
         int i = 0;
-        for( Retangulo r: rects ) {
+        for( OverlapRect r: rects ) {
             r.setId(i++);
             r.setLevel(1);
         }
@@ -669,10 +905,10 @@ public class Menu extends javax.swing.JFrame {
     private void mstJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mstJMenuItemActionPerformed
         
         MST mst = new MST();
-        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         
         int i = 0;
-        for( Retangulo r: rects ) 
+        for( OverlapRect r: rects ) 
             r.setId(i++);
         mst.selectPivots(rects, 20);
         
@@ -683,9 +919,9 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_mstJMenuItemActionPerformed
 
     private void extractParametersJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractParametersJMenuItemActionPerformed
-        ArrayList<Retangulo> rects = Util.toRetangulo(rectangles);
-        ArrayList<Retangulo> pivots = new ArrayList<>();
-        ArrayList<Retangulo> elements = new ArrayList<>();
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> pivots = new ArrayList<>();
+        ArrayList<OverlapRect> elements = new ArrayList<>();
         
         for( int i = 0; i < rects.size(); ++i ) {
             if( rects.get(i).isPivot() )
@@ -716,6 +952,40 @@ public class Menu extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_salvarImagemJMenuItemActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        view.r3 = new RetanguloVis(view.r1.getUX(), view.r1.getUY(), 30, 30, Color.red, 3);
+        
+        double d = Math.sqrt(Math.pow(view.r2.getUX()-view.r1.getUX(), 2)
+                                        +
+                             Math.pow(view.r2.getUY()-view.r1.getUY(), 2));
+        
+        view.cleanImage();
+        view.repaint();
+        
+        
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            private double i = 0.0;
+            @Override
+            public void run() {
+                System.out.println("Ola: "+i);
+                
+                double x = (1.0-i)*view.r1.getUX() + i*view.r2.getUX();
+                double y = (1.0-i)*view.r1.getUY() + i*view.r2.getUY();
+                view.r3.setUX(x);
+                view.r3.setUY(y);
+                view.cleanImage();
+                view.repaint();
+                i += 0.05;
+                if( i >= 1.0 )
+                    cancel();
+            }
+        }, 0, 100);
+        
+        //Timer t = new Timer();
+       // t.schedule(null, WIDTH, WIDTH);
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     
     public double getMaxDistance() {
@@ -767,17 +1037,22 @@ public class Menu extends javax.swing.JFrame {
         rectangles.clear();
        
         if( view != null ) {
+            view.r1 = view.r2 = view.r3 = null;
             view.cleanImage();
             view.repaint();            
         }
+        
+        
     }
+
+    
     
     
     public class ViewPanel extends JPanel {
         private Color color = Color.RED;
         
         private double iniX, iniY, fimX, fimY;
-        
+        public RetanguloVis r1 = null, r2 = null, r3 = null;
         private BufferedImage imageBuffer;
         
         public ViewPanel() {
@@ -791,8 +1066,12 @@ public class Menu extends javax.swing.JFrame {
                     iniX = e.getX();
                     iniY = e.getY();
                     
+                  /* if( r1 == null )
+                        r1 = new RetanguloVis(iniX, iniY, 30, 30, Color.red, 1);
+                    else if( r2 == null )
+                        r2 = new RetanguloVis(iniX, iniY, 30, 30, Color.red, 2);*/
                     RainbowScale rbS = new RainbowScale();
-                    rectangles.add(new RetanguloVis(iniX, iniY, 30, 30, 
+                    rectangles.add(new RetanguloVis(iniX, iniY, RECTSIZE, RECTSIZE, 
                                                 rbS.getColor((globalCounterColor++*10)%255), globalCounter++));                                        
                     cleanImage();
                     repaint();   
@@ -849,25 +1128,41 @@ public class Menu extends javax.swing.JFrame {
                         if( r.isPivot() ) {
                             pivots.add(r);
                         } else {
-                            g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), 30, 30);
+                            g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             g2Buffer.setColor(Color.BLACK);
-                            g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), 30, 30);
+                            g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                         }
                     }
                     
                     
-                    if( p1 != null ) {
+                 /*   if( p1 != null ) {
                         g2Buffer.setColor(Color.GREEN);
                         g2Buffer.drawPolygon(p1);
                         g2Buffer.setColor(Color.RED);
                         g2Buffer.drawPolygon(p2);
-                    }
+                    }*/
                     if( !r.isPivot() ) {
                         g2Buffer.setColor(Color.WHITE);
                         g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
                         g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
                     }
                 }
+                
+                if( r1 != null ) {
+                    g2Buffer.setColor(Color.RED);
+                    g2Buffer.fillRect((int)r1.getUX(), (int)r1.getUY(), 30, 30);
+                }
+                
+                if( r2 != null ) {
+                    g2Buffer.setColor(Color.RED);
+                    g2Buffer.fillRect((int)r2.getUX(), (int)r2.getUY(), 30, 30);
+                }
+                
+                if( r3 != null ) {
+                    g2Buffer.setColor(Color.BLACK);
+                    g2Buffer.fillRect((int)r3.getUX(), (int)r3.getUY(), 20, 20);
+                }
+                
                 
                 for( RetanguloVis r: pivots ) {
                     
@@ -881,7 +1176,26 @@ public class Menu extends javax.swing.JFrame {
                 System.out.println("Numero de itens: "+rectangles.size());
                 System.out.println("Numero de pivos: "+pivots.size());
                 
-                
+                if( cRetangulo != null ) {
+                    for( ChangeRetangulo r: cRetangulo ) {
+                        int x1 = (int) r.second.getUX();
+                        int y1 = (int) r.second.getUY();                    
+                        int x2 = (int) r.third.getUX();
+                        int y2 = (int) r.third.getUY();
+
+                        OverlapRect rr = r.third;
+                        
+                        g2Buffer.fillRect((int)rr.getUX(), (int)rr.getUY(), (int)rr.getWidth(), (int)rr.getHeight());
+                        g2Buffer.setColor(Color.BLACK);
+                        g2Buffer.drawRect((int)rr.getUX(), (int)rr.getUY(), (int)rr.getWidth(), (int)rr.getHeight());
+                        g2Buffer.setColor(Color.WHITE);
+                        g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                        g2Buffer.drawString(String.valueOf(rr.getId()), (int)rr.getUX()+10, (int)rr.getUY()+10);
+                        
+                        g2Buffer.setColor(Color.GRAY);
+                        g2Buffer.drawLine(x1, y1, x2, y2);
+                    }
+                }
                 
                 
                 g2Buffer.dispose();
@@ -949,6 +1263,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator10;
     private javax.swing.JPopupMenu.Separator jSeparator11;

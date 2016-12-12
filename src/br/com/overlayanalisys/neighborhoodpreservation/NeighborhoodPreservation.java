@@ -2,11 +2,15 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package br.com.overlayanalisys.neighborhoodpreservation;
 
-import br.com.metodos.utils.Retangulo;
+import br.com.methods.utils.OverlapRect;
 import br.com.overlayanalisys.definition.Metric;
 import java.util.ArrayList;
 import nu.thiele.mllib.classifiers.NearestNeighbour;
@@ -24,18 +28,18 @@ public class NeighborhoodPreservation implements Metric {
     }
 
     @Override
-    public double execute(ArrayList<Retangulo> pts1, ArrayList<Retangulo> pts2) {
+    public double execute(ArrayList<OverlapRect> pts1, ArrayList<OverlapRect> pts2) {
         if( pts1.size() != pts2.size() )
             throw new RuntimeException("A quantidade de elementos na projeção deve ser a mesma.");
         
         double taxa = 0;
         
         ArrayList<Data.DataEntry> dataPts1 = new ArrayList<>();
-        for( Retangulo r: pts1 )
+        for( OverlapRect r: pts1 )
             dataPts1.add(new Data.DataEntry(new double[]{r.getCenterX(), r.getCenterY()}, (long)r.getId()));
         
         ArrayList<Data.DataEntry> dataPts2 = new ArrayList<>();
-        for( Retangulo r: pts2 )
+        for( OverlapRect r: pts2 )
             dataPts2.add(new Data.DataEntry(new double[]{r.getCenterX(), r.getCenterY()}, (long)r.getId()));
         
         

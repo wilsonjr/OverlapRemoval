@@ -2,11 +2,15 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package br.com.overlayanalisys.definition;
 
-import br.com.metodos.utils.Retangulo;
+import br.com.methods.utils.OverlapRect;
 import java.util.ArrayList;
 
 /**
@@ -15,5 +19,5 @@ import java.util.ArrayList;
  */
 public interface Metric {
 
-    abstract double execute(ArrayList<Retangulo> pts1, ArrayList<Retangulo> pts2);
+    abstract double execute(ArrayList<OverlapRect> pts1, ArrayList<OverlapRect> pts2);
 }

@@ -2,12 +2,16 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package br.com.overlayanalisys.sizeincrease;
 
-import br.com.metodos.utils.Retangulo;
-import br.com.metodos.utils.Util;
+import br.com.methods.utils.OverlapRect;
+import br.com.methods.utils.Util;
 import br.com.overlayanalisys.definition.Metric;
 import java.awt.Polygon;
 import java.awt.geom.Area;
@@ -23,7 +27,7 @@ public class SizeIncrease implements Metric {
     private Polygon polygon2 = new Polygon();
     
     @Override
-    public double execute(ArrayList<Retangulo> pts1, ArrayList<Retangulo> pts2) {
+    public double execute(ArrayList<OverlapRect> pts1, ArrayList<OverlapRect> pts2) {
         
         Point2D[] p1 = new Point2D[pts1.size()];
         for( int i = 0; i < p1.length; ++i )
