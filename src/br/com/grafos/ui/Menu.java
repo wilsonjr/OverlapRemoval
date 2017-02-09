@@ -530,19 +530,10 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> projected = vpsc.apply(rects);
         double[] center1 = Util.getCenter(projected);
         
-        
-        cRetangulo = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i ) {
             projected.get(i).setId(i);                    
             rects.get(i).setId(i); 
-            cRetangulo.add(new ChangeRetangulo(rects.get(i), projected.get(i)));
-            cRetangulo.get(i).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, i);            
         }
-        
-        findPosition(cRetangulo);
-        
-        
-        
         
         double ammountX = center0[0]-center1[0];
         double ammountY = center0[1]-center1[1];
@@ -575,77 +566,10 @@ public class Menu extends javax.swing.JFrame {
             rects.get(i).setId(i); 
         }
         
-//        cRetangulo = new ArrayList<>();
-//        for( int i = 0; i < rects.size(); ++i ) {
-//            cRetangulo.add(new ChangeRetangulo(rects.get(i), projected.get(i)));
-//            cRetangulo.get(i).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, i);            
-//        }        
-//        findPosition(cRetangulo);
-//        
-//        
-//        ArrayList<Retangulo> rects2 = new ArrayList<>();
-//        for( int i = 0; i < cRetangulo.size(); ++i ) {
-//            double x = cRetangulo.get(i).third.getUX();
-//            double y = cRetangulo.get(i).third.getUY();
-//            
-//            rects2.add(new OverlapRect(x, y, RECTSIZE, RECTSIZE, i));
-//            
-//        }
-        
         double ammountX = center0[0]-center1[0];
         double ammountY = center0[1]-center1[1];
         Util.translate(projected, ammountX, ammountY);        
         Util.normalize(projected);
-        
-//        ammountX = center0[0]-center1[0];
-//        ammountY = center0[1]-center1[1];
-//        Util.translate(rects2, ammountX, ammountY);        
-//        Util.normalize(rects2);
-        
-        
-//    
-//        
-//        for( int i = 0; i < cRetangulo.size(); ++i ) {
-//            cRetangulo.get(i).third.setUX(cRetangulo.get(i).third.getUX()+ammountX);
-//            cRetangulo.get(i).third.setUY(cRetangulo.get(i).third.getUY()+ammountY);
-//            
-//        }
-//        
-//        double minX = Util.getMinX(projected);
-//        double minY = Util.getMinY(projected);
-//        if( minX < 0 || minY < 0 ) {
-//            for( int i = 0; i < cRetangulo.size(); ++i ) {
-//                if( minX < 0 )
-//                    cRetangulo.get(i).third.setUX(cRetangulo.get(i).third.getUX()-minX);
-//                if( minY < 0 )
-//                    cRetangulo.get(i).third.setUY(cRetangulo.get(i).third.getUY()-minY);
-//            }
-//        }
-        
-        KNN knn = new KNN(10);
-        Pair[][] pair = null;
-        try {
-            pair = knn.execute(projected);
-        } catch( IOException e ) {
-            
-        }
-        
-        for( int i = 0; i < pair.length; ++i ) {
-            System.out.print(i+":");
-            for( int j = 0; j < pair[i].length; ++j ) 
-                System.out.print(" ("+pair[i][j].index+","+pair[i][j].value+")");
-            
-            System.out.println();
-        }
-        
-        
-        cRetangulo = new ArrayList<>();
-        for( int i = 0; i < rects.size(); ++i ) {
-            cRetangulo.add(new ChangeRetangulo(rects.get(i), projected.get(i)));
-            cRetangulo.get(i).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, i);            
-        }        
-        findPosition(cRetangulo);
-        
         
         Util.toRetanguloVis(rectangles, projected);
         
