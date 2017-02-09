@@ -679,12 +679,12 @@ public class Menu extends javax.swing.JFrame {
             Util.translate(projected, ammountX, ammountY);
 
             Util.normalize(projected);
-             cRetangulo = new ArrayList<>();
-            for( int j = 0; j < rects.size(); ++j ) {
-                cRetangulo.add(new ChangeRetangulo(rects.get(j), projected.get(j)));
-                cRetangulo.get(j).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, j);            
-            }        
-            findPosition(cRetangulo);
+//             cRetangulo = new ArrayList<>();
+//            for( int j = 0; j < rects.size(); ++j ) {
+//                cRetangulo.add(new ChangeRetangulo(rects.get(j), projected.get(j)));
+//                cRetangulo.get(j).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, j);            
+//            }        
+//            findPosition(cRetangulo);
         
             
             
