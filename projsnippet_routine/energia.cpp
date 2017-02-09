@@ -298,7 +298,7 @@ vector<double> read_elems()
 {
     double x = 0.0, y = 0.0, w = 0.0, h = 0.0;
     vector<double> elems;
-    ifstream ifs("points.rect");
+    ifstream ifs("projsnippet_routine/points.rect");
 
     if( ifs ) {
         int qtd = 0;
@@ -329,7 +329,7 @@ vector<vector<double> > read_matrix() {
 
     vector<vector<double> > m;
 
-    ifstream ifs("matrixL.matrix");
+    ifstream ifs("projsnippet_routine/matrixL.matrix");
 
     if( ifs ) {
         int dim;
@@ -376,7 +376,7 @@ int main(int argc, char** argv) {
 
     double minf = 0;
     nlopt::result result = opt.optimize(x, minf);
-    ofstream ofs("point_solve.rect");
+    ofstream ofs("projsnippet_routine/point_solve.rect");
     if( ofs ) {
         ofs << x.size()/2 << endl;
         for( int i = 0; i < x.size()-1; i+=2 ) {
@@ -385,10 +385,6 @@ int main(int argc, char** argv) {
         ofs << x[x.size()-1];
         ofs.close();
     }
-
-
-
-
 
 	return 0;
 }
