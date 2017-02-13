@@ -553,8 +553,7 @@ public class Menu extends javax.swing.JFrame {
 
     private void prismJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJMenuItemActionPerformed
         int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
-        
-        
+                
         ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);        
         double[] center0 = Util.getCenter(rects);
         PRISM prism = new PRISM(algo);
@@ -563,7 +562,7 @@ public class Menu extends javax.swing.JFrame {
         
         for( int i = 0; i < rects.size(); ++i ) {
             projected.get(i).setId(i);                    
-            rects.get(i).setId(i); 
+            rects.get(i).setId(i);  
         }
         
         double ammountX = center0[0]-center1[0];
