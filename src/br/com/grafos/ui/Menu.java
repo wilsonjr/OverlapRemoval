@@ -40,6 +40,7 @@ import br.com.methods.utils.RetanguloVis;
 import br.com.methods.utils.Util;
 import br.com.overlayanalisys.definition.Metric;
 import br.com.overlayanalisys.sizeincrease.SizeIncrease;
+import br.com.projection.spacereduction.seamcarving.SeamCarving;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -53,6 +54,7 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -63,6 +65,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -79,7 +82,7 @@ import javax.swing.JScrollPane;
  */
 public class Menu extends javax.swing.JFrame {
     private ViewPanel view;
-    private ArrayList<RetanguloVis> rectangles;
+    private ArrayList<RetanguloVis> rectangles, afterSeamCarving;
     private double alpha = 0;
     private int globalCounter = 0;
     private int globalCounterColor = 0;
@@ -552,25 +555,46 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_vpscJMenuItemActionPerformed
 
     private void prismJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJMenuItemActionPerformed
-        int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
+//        int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
                 
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);        
-        double[] center0 = Util.getCenter(rects);
-        PRISM prism = new PRISM(algo);
-        ArrayList<OverlapRect> projected = prism.apply(rects);
-        double[] center1 = Util.getCenter(projected);
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         
-        for( int i = 0; i < rects.size(); ++i ) {
-            projected.get(i).setId(i);                    
-            rects.get(i).setId(i);  
+        Rectangle2D.Double[] r2ds = new Rectangle2D.Double[rects.size()];
+        for( int i = 0; i < r2ds.length; ++i )
+            r2ds[i] = new Rectangle2D.Double(rects.get(i).getUX(), rects.get(i).getUY(), rects.get(i).width, rects.get(i).height);
+       
+        SeamCarving sc = new SeamCarving(r2ds);
+        OverlapRect[] array = new OverlapRect[rects.size()];
+        array = rects.toArray(array);
+        Map<Rectangle2D.Double, Rectangle2D.Double> mapSeamCarving = sc.reduceSpace(array);
+
+        afterSeamCarving = new ArrayList<>();
+        for( Map.Entry<Rectangle2D.Double, Rectangle2D.Double> element: mapSeamCarving.entrySet() ) {
+            int idx = ((OverlapRect)element.getKey()).getHealth();
+            
+            afterSeamCarving.add(new RetanguloVis(element.getValue().getMinX(), element.getValue().getMinY(), 
+                    RECTSIZE, RECTSIZE, rectangles.get(idx).cor, rectangles.get(idx).numero));
         }
-        
-        double ammountX = center0[0]-center1[0];
-        double ammountY = center0[1]-center1[1];
-        Util.translate(projected, ammountX, ammountY);        
-        Util.normalize(projected);
-        
-        Util.toRetanguloVis(rectangles, projected);
+//        double[] center0 = Util.getCenter(rects);
+//        PRISM prism = new PRISM(algo);
+//        ArrayList<OverlapRect> projected = prism.apply(rects);
+//        double[] center1 = Util.getCenter(projected);
+//        
+//        for( int i = 0; i < rects.size(); ++i ) {
+//            projected.get(i).setId(i);                    
+//            rects.get(i).setId(i);  
+//        }
+//        
+//        
+//        
+//        
+//        
+//        double ammountX = center0[0]-center1[0];
+//        double ammountY = center0[1]-center1[1];
+//        Util.translate(projected, ammountX, ammountY);        
+//        Util.normalize(projected);
+//        
+//        Util.toRetanguloVis(rectangles, projected);
         
         view.cleanImage();
         view.repaint();
@@ -982,6 +1006,7 @@ public class Menu extends javax.swing.JFrame {
             setBackground(Color.WHITE);
             setLayout(new FlowLayout(FlowLayout.LEFT));
             rectangles = new ArrayList<>();
+            afterSeamCarving = new ArrayList<>();
             
             addMouseListener(new MouseAdapter() {
                 @Override
@@ -1031,45 +1056,52 @@ public class Menu extends javax.swing.JFrame {
 
                 g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 ArrayList<RetanguloVis> pivots = new ArrayList<>();
-                for( RetanguloVis r: rectangles ) {                    
-                    g2Buffer.setColor(r.cor);
-                    
-                    if( r.isHexBoard ) {
-                        int a = (int)Math.sqrt(Math.pow(HEXBOARD_SIZE, 2) - Math.pow(HEXBOARD_SIZE/2, 2));
-                        Point p = r.getP();
-                        Polygon poly = new Polygon();
-                        poly.addPoint(p.x, p.y - HEXBOARD_SIZE);
-                        poly.addPoint(p.x + a, p.y - HEXBOARD_SIZE/2);
-                        poly.addPoint(p.x + a, p.y + HEXBOARD_SIZE/2);
-                        poly.addPoint(p.x, p.y + HEXBOARD_SIZE);
-                        poly.addPoint(p.x - a, p.y + HEXBOARD_SIZE/2);
-                        poly.addPoint(p.x - a, p.y - HEXBOARD_SIZE/2);
-                        g2Buffer.fillPolygon(poly);
-                        g2Buffer.setColor(Color.WHITE);
-                        g2Buffer.drawPolygon(poly);
-                    } else {
-                        if( r.isPivot() ) {
-                            pivots.add(r);
+                if( afterSeamCarving.isEmpty() )
+                {                
+                    for( RetanguloVis r: rectangles ) {                    
+                        g2Buffer.setColor(r.cor);
+
+                        if( r.isHexBoard ) {
+                            int a = (int)Math.sqrt(Math.pow(HEXBOARD_SIZE, 2) - Math.pow(HEXBOARD_SIZE/2, 2));
+                            Point p = r.getP();
+                            Polygon poly = new Polygon();
+                            poly.addPoint(p.x, p.y - HEXBOARD_SIZE);
+                            poly.addPoint(p.x + a, p.y - HEXBOARD_SIZE/2);
+                            poly.addPoint(p.x + a, p.y + HEXBOARD_SIZE/2);
+                            poly.addPoint(p.x, p.y + HEXBOARD_SIZE);
+                            poly.addPoint(p.x - a, p.y + HEXBOARD_SIZE/2);
+                            poly.addPoint(p.x - a, p.y - HEXBOARD_SIZE/2);
+                            g2Buffer.fillPolygon(poly);
+                            g2Buffer.setColor(Color.WHITE);
+                            g2Buffer.drawPolygon(poly);
                         } else {
-                            g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                            g2Buffer.setColor(Color.BLACK);
-                            g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            if( r.isPivot() ) {
+                                pivots.add(r);
+                            } else {
+                                g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                g2Buffer.setColor(Color.BLACK);
+                                g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            }
+                        }
+
+                        if( !r.isPivot() ) {
+                            g2Buffer.setColor(Color.WHITE);
+                            g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                            g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
                         }
                     }
-                    
-                    
-                 /*   if( p1 != null ) {
-                        g2Buffer.setColor(Color.GREEN);
-                        g2Buffer.drawPolygon(p1);
-                        g2Buffer.setColor(Color.RED);
-                        g2Buffer.drawPolygon(p2);
-                    }*/
-                    if( !r.isPivot() ) {
-                        g2Buffer.setColor(Color.WHITE);
-                        g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                        g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
-                    }
                 }
+                
+                afterSeamCarving.stream().forEach(r->{
+                    g2Buffer.setColor(r.cor);
+                    g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                    g2Buffer.setColor(Color.BLACK);
+                    g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                    g2Buffer.setColor(Color.WHITE);
+                    g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                    g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10); 
+                    System.out.print("pintando... "+r);
+                });
                 
                 if( r1 != null ) {
                     g2Buffer.setColor(Color.RED);
