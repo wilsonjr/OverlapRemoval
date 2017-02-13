@@ -16,7 +16,7 @@ import java.awt.geom.Rectangle2D;
  * Classe OverlapRect usada nos métodos de remoção de sobreposição.
  * @author wilson
  */
-public class OverlapRect extends Rectangle2D.Double  implements Pivot {    
+public class OverlapRect extends Rectangle2D.Double implements Pivot {    
     private double lx, ly;    
     private int id;
     private boolean pivot;
@@ -57,8 +57,8 @@ public class OverlapRect extends Rectangle2D.Double  implements Pivot {
         this(minX, minY, width, height, -1);
     }    
 
-    public OverlapRect(double ux, double uy, double width, double height, boolean pivot, int level, int cluster, int health) {
-        this(ux, uy, width, height);
+    public OverlapRect(double ux, double uy, double width, double height, boolean pivot, int level, int cluster, int health, int id) {
+        this(ux, uy, width, height, id);
         this.pivot = pivot;
         this.level = level;
         this.cluster = cluster;

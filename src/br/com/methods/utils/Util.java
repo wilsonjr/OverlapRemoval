@@ -62,7 +62,7 @@ public class Util {
         ArrayList<OverlapRect> rs = new ArrayList<>();
         
         for( RetanguloVis r: rects ) {
-            rs.add(new OverlapRect(r.getUX(), r.getUY(), r.getWidth(), r.getHeight(), r.isPivot(), r.getLevel(), r.getCluster(), r.getHealth()));
+            rs.add(new OverlapRect(r.getUX(), r.getUY(), r.getWidth(), r.getHeight(), r.isPivot(), r.getLevel(), r.getCluster(), r.getHealth(), r.numero));
         }
         return rs;
     }
