@@ -22,41 +22,40 @@ import java.util.stream.IntStream;
  */
 public class SeamCarving {
     
-    private Rectangle2D.Double[] rects;
-    private Rectangle2D.Double[] rectPositions;
+    private Rectangle2D.Double[] _rects;
+    private Rectangle2D.Double[] _rectPositions;
     
-    private final Rectangle2D.Double[] initialPositions;
+    private final Rectangle2D.Double[] _initialPositions;
     
     public SeamCarving(Rectangle2D.Double[] initialPiositions) {
-        this.initialPositions = initialPiositions;
+        _initialPositions = initialPiositions;
     }    
     
     public Map<Rectangle2D.Double, Rectangle2D.Double> reduceSpace(Rectangle2D.Double[] projection) {
         
-        this.rects = projection;
-        this.rectPositions = new Rectangle2D.Double[rects.length];
+        _rects = projection;
+        _rectPositions = new Rectangle2D.Double[_rects.length];
         
         applyAlgorithm();
         
         Map<Rectangle2D.Double, Rectangle2D.Double> positions = new HashMap<>();
         
-        IntStream.range(0, rects.length).forEach(i->positions.put(rects[i], rectPositions[i]));
+        IntStream.range(0, _rects.length).forEach(i->positions.put(_rects[i], _rectPositions[i]));
 
         return positions;
     }
 
     private void applyAlgorithm() {
         
-        if( initialPositions == null )
+        if( _initialPositions == null )
             throw new NullPointerException("The initial positions must be specified!");
-        
-        Zone[][] zones = createZones(initialPositions);
-        
-        rectPositions = initialPositions;
-        rectPositions = removeSeams(zones, initialPositions);
+         
+        Zone[][] zones = createZones(_initialPositions);        
+        _rectPositions = _initialPositions;
+        _rectPositions = removeSeams(zones, _initialPositions);
     }
 
-    private Zone[][] createZones(Rectangle2D.Double[] initialPositions) {
+    private Zone[][] createZones(Rectangle2D.Double[] rectPositions) {
         Set<Double> xValues = new HashSet<>();
         Set<Double> yValues = new HashSet<>();
         
@@ -87,7 +86,7 @@ public class SeamCarving {
         
         for( int i = 0; i < n; ++i ) {
             for( int j = 0; j < m; ++j ) {
-                Rectangle2D.Double r = new Rectangle2D.Double(xx[i], yy[j], xx[i+1]-xx[i], yy[j+1]-yy[j]);
+                Rectangle2D.Double r = new Rectangle2D.Double(xx[i], yy[j], xx[i+1] - xx[i], yy[j+1] - yy[j]);
                 zones[i][j] = new Zone(r, i, j);
             }
         }              
@@ -109,11 +108,11 @@ public class SeamCarving {
         return Math.max(maxX - minX, maxY - minY) / 2;
     }
 
-    private Rectangle2D.Double[] removeSeams(Zone[][] zones, Rectangle2D.Double[] initialPositions) {
+    private Rectangle2D.Double[] removeSeams(Zone[][] zones, Rectangle2D.Double[] rectPositions) {
         Rectangle2D.Double[] returnedPositions = Arrays.copyOf(rectPositions, rectPositions.length);
         
         double maxRectSize = returnedPositions[0].width;
-        double scalingFactor = computeScalingFactor(rectPositions);
+        double scalingFactor = computeScalingFactor(returnedPositions);
         
         int MAX_ITERATIONS = 500;
         double minSeamSize = 10;
@@ -126,8 +125,8 @@ public class SeamCarving {
             List<Zone> horizontalSeam = new ArrayList<>();
             List<Zone> verticalSeam = new ArrayList<>();
             
-            double horizontalSeamCost = findOptimalSeam(true, zones, returnedPositions, E, horizontalSeam, minSeamSize);
-            double verticalSeamCost = findOptimalSeam(false, zones, returnedPositions, E, verticalSeam, minSeamSize);
+            double horizontalSeamCost = findOptimalSeam(true, zones, E, horizontalSeam, minSeamSize);
+            double verticalSeamCost = findOptimalSeam(false, zones, E, verticalSeam, minSeamSize);
             
             if( horizontalSeamCost >= Double.POSITIVE_INFINITY && verticalSeamCost >= Double.POSITIVE_INFINITY ) {
                 if( minSeamSize <= 0.5 )
@@ -135,9 +134,9 @@ public class SeamCarving {
                 minSeamSize /= 3.0;
                 continue;
             } else if( horizontalSeamCost < verticalSeamCost )
-                removeHorizontalSeamByFullReconstruction(zones, returnedPositions, horizontalSeam);
+                removeHorizontalSeamByFullReconstruction(returnedPositions, horizontalSeam);
             else 
-                removeVerticalSeamByFullReconstruction(zones, returnedPositions, verticalSeam);
+                removeVerticalSeamByFullReconstruction(returnedPositions, verticalSeam);
                         
             zones = createZones(returnedPositions);
         }
@@ -145,7 +144,7 @@ public class SeamCarving {
         return returnedPositions;
     }
 
-    private void alignRects(Rectangle2D.Double[] returnedPositions) {
+    private void alignRects(Rectangle2D.Double[] rectPositions) {
         double EPS = 0.1;
         
         List<Double> xValues = new ArrayList<>();
@@ -198,7 +197,7 @@ public class SeamCarving {
         }
     }
 
-    private double[][] energy(Zone[][] zones, Rectangle2D.Double[] returnedPositions, double maxRectSize, double scalingFactor) {
+    private double[][] energy(Zone[][] zones, Rectangle2D.Double[] rectPositions, double maxRectSize, double scalingFactor) {
         int n = zones.length;
         int m = zones[0].length;
         
@@ -218,8 +217,7 @@ public class SeamCarving {
     
     private double energy(Zone zone, Rectangle2D.Double[] rectPositions, double maxRectSize, double scalingFactor) {
         if( zone.isOccupied )
-            return Double.POSITIVE_INFINITY;
-        
+            return Double.POSITIVE_INFINITY;        
         
         double result = 0;
         
@@ -247,8 +245,7 @@ public class SeamCarving {
         return result;
     }
 
-    private double findOptimalSeam(boolean horizontal, Zone[][] zones, Rectangle2D.Double[] rectPositions, double[][] E, 
-            List<Zone> zonePath, double minSeamSize) {
+    private double findOptimalSeam(boolean horizontal, Zone[][] zones, double[][] E, List<Zone> zonePath, double minSeamSize) {
         
         int n = zones.length;
         int m = zones[0].length;
@@ -256,7 +253,7 @@ public class SeamCarving {
         double[][] Ec = new double[n][m];
         int[][] parent = new int[n][m];
         
-        for( int cell = 0; cell < n*m; cell++ ) {
+        for( int cell = 0; cell < n*m; ++cell ) {
             int i, j;
             if( horizontal ) {
                 i = cell/m;
@@ -278,11 +275,12 @@ public class SeamCarving {
             if( horizontal && i-1 >= 0 ) {
                 
                 Ec[i][j] = Double.POSITIVE_INFINITY;
-                for( int t = -dt; i <= dt; ++t ) 
-                    if( Ec[i][j] > Ec[i-1][j+t] ) {
-                        Ec[i][j] = Ec[i-1][j+t];
-                        parent[i][j] = j+t;
-                    }
+                for( int t = -dt; t <= dt; ++t ) 
+                    if( j+t >= 0 && j+t < m )
+                        if( Ec[i][j] > Ec[i-1][j+t] ) {
+                            Ec[i][j] = Ec[i-1][j+t];
+                            parent[i][j] = j+t;
+                        }
                 
             } else if( !horizontal && j-1 >= 0 ) {
                 
@@ -350,7 +348,7 @@ public class SeamCarving {
         return minSum;
     }
 
-    private void removeHorizontalSeamByFullReconstruction(Zone[][] zones, Rectangle2D.Double[] rectPositions, List<Zone> zonePath) {
+    private void removeHorizontalSeamByFullReconstruction(Rectangle2D.Double[] rectPositions, List<Zone> zonePath) {
         
         Map<Double, Double> zoneY = new HashMap<>();
         double minHeight = Double.POSITIVE_INFINITY;
@@ -368,7 +366,7 @@ public class SeamCarving {
         }        
     }
 
-    private void removeVerticalSeamByFullReconstruction(Zone[][] zones, Rectangle2D.Double[] rectPositions, List<Zone> zonePath) {
+    private void removeVerticalSeamByFullReconstruction(Rectangle2D.Double[] rectPositions, List<Zone> zonePath) {
         Map<Double, Double> zoneX = new HashMap<>();
         
         double minWidth = Double.POSITIVE_INFINITY;
