@@ -555,46 +555,44 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_vpscJMenuItemActionPerformed
 
     private void prismJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJMenuItemActionPerformed
-//        int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
+        int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
                 
         ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         
-        Rectangle2D.Double[] r2ds = new Rectangle2D.Double[rects.size()];
+        double[] center0 = Util.getCenter(rects);
+        PRISM prism = new PRISM(algo);
+        ArrayList<OverlapRect> projected = prism.apply(rects);
+        double[] center1 = Util.getCenter(projected);
+        
+        for( int i = 0; i < rects.size(); ++i ) {
+            projected.get(i).setId(i);                    
+            rects.get(i).setId(i);  
+        }
+        
+        double ammountX = center0[0]-center1[0];
+        double ammountY = center0[1]-center1[1];
+        Util.translate(projected, ammountX, ammountY);        
+        Util.normalize(projected);
+        
+        
+        Rectangle2D.Double[] r2ds = new Rectangle2D.Double[projected.size()];
         for( int i = 0; i < r2ds.length; ++i )
-            r2ds[i] = new Rectangle2D.Double(rects.get(i).getUX(), rects.get(i).getUY(), rects.get(i).width, rects.get(i).height);
+            r2ds[i] = new Rectangle2D.Double(projected.get(i).getUX(), projected.get(i).getUY(), projected.get(i).width, projected.get(i).height);
        
         SeamCarving sc = new SeamCarving(r2ds);
-        OverlapRect[] array = new OverlapRect[rects.size()];
-        array = rects.toArray(array);
+        OverlapRect[] array = new OverlapRect[projected.size()];
+        array = projected.toArray(array);
         Map<Rectangle2D.Double, Rectangle2D.Double> mapSeamCarving = sc.reduceSpace(array);
 
         afterSeamCarving = new ArrayList<>();
-        for( Map.Entry<Rectangle2D.Double, Rectangle2D.Double> element: mapSeamCarving.entrySet() ) {
-            int idx = ((OverlapRect)element.getKey()).getHealth();
+        mapSeamCarving.entrySet().forEach((element)->{
+            int idx = ((OverlapRect)element.getKey()).getId();
             
             afterSeamCarving.add(new RetanguloVis(element.getValue().getMinX(), element.getValue().getMinY(), 
                     RECTSIZE, RECTSIZE, rectangles.get(idx).cor, rectangles.get(idx).numero));
-        }
-//        double[] center0 = Util.getCenter(rects);
-//        PRISM prism = new PRISM(algo);
-//        ArrayList<OverlapRect> projected = prism.apply(rects);
-//        double[] center1 = Util.getCenter(projected);
-//        
-//        for( int i = 0; i < rects.size(); ++i ) {
-//            projected.get(i).setId(i);                    
-//            rects.get(i).setId(i);  
-//        }
-//        
-//        
-//        
-//        
-//        
-//        double ammountX = center0[0]-center1[0];
-//        double ammountY = center0[1]-center1[1];
-//        Util.translate(projected, ammountX, ammountY);        
-//        Util.normalize(projected);
-//        
-//        Util.toRetanguloVis(rectangles, projected);
+        });
+        
+        Util.toRetanguloVis(rectangles, projected);
         
         view.cleanImage();
         view.repaint();
