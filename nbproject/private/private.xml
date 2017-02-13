@@ -5,6 +5,10 @@
         <group>
             <file>file:/C:/Users/Windows/Desktop/OverlapRemoval/src/br/com/methods/utils/OverlapRect.java</file>
             <file>file:/C:/Users/Windows/Desktop/OverlapRemoval/src/br/com/grafos/ui/Menu.java</file>
+            <file>file:/C:/Users/Windows/Desktop/OverlapRemoval/src/br/com/projection/spacereduction/seamcarving/SeamCarving.java</file>
+            <file>file:/C:/Users/Windows/Desktop/OverlapRemoval/src/br/com/projection/spacereduction/seamcarving/SeamPair.java</file>
+            <file>file:/C:/Users/Windows/Desktop/OverlapRemoval/src/br/com/projection/spacereduction/seamcarving/RectGraphCache.java</file>
+            <file>file:/C:/Users/Windows/Desktop/OverlapRemoval/src/br/com/projection/spacereduction/seamcarving/RectGraph.java</file>
         </group>
     </open-files>
 </project-private>
