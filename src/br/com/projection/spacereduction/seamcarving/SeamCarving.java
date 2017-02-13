@@ -27,8 +27,8 @@ public class SeamCarving {
     
     private final Rectangle2D.Double[] _initialPositions;
     
-    public SeamCarving(Rectangle2D.Double[] initialPiositions) {
-        _initialPositions = initialPiositions;
+    public SeamCarving(Rectangle2D.Double[] initialPositions) {
+        _initialPositions = initialPositions;
     }    
     
     public Map<Rectangle2D.Double, Rectangle2D.Double> reduceSpace(Rectangle2D.Double[] projection) {
@@ -45,13 +45,11 @@ public class SeamCarving {
         return positions;
     }
 
-    private void applyAlgorithm() {
-        
+    private void applyAlgorithm() {        
         if( _initialPositions == null )
             throw new NullPointerException("The initial positions must be specified!");
          
-        Zone[][] zones = createZones(_initialPositions);        
-        _rectPositions = _initialPositions;
+        Zone[][] zones = createZones(_initialPositions);       
         _rectPositions = removeSeams(zones, _initialPositions);
     }
 
