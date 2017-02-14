@@ -10,18 +10,19 @@
 
 package br.com.methods.utils;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Classe OverlapRect usada nos métodos de remoção de sobreposição.
  * @author wilson
  */
-public class OverlapRect implements Pivot {    
-    private double ux, uy, lx, ly;    
+public class OverlapRect extends Rectangle2D.Double implements Pivot {    
+    private double lx, ly;    
     private int id;
     private boolean pivot;
     private int level;
     private int cluster;
     private int health;
-            
             
     /**
      * Cria um retângulo para aplicação do método.
@@ -32,9 +33,10 @@ public class OverlapRect implements Pivot {
      * @param id Identificação do retângulo
      */
     public OverlapRect(double minX, double minY, double width, double height, int id) {
-        ux = minX;
+        super(minX, minY, width, height);
+        this.x = minX;
         lx = minX+width;
-        uy = minY;
+        this.y = minY;
         ly = minY+height;
         this.id = id;
         
@@ -55,16 +57,15 @@ public class OverlapRect implements Pivot {
         this(minX, minY, width, height, -1);
     }    
 
-    public OverlapRect(double ux, double uy, double width, double height, boolean pivot, int level, int cluster, int health) {
-       this(ux, uy, width, height);
+    public OverlapRect(double ux, double uy, double width, double height, boolean pivot, int level, int cluster, int health, int id) {
+        this(ux, uy, width, height, id);
         this.pivot = pivot;
         this.level = level;
         this.cluster = cluster;
         this.health = 0;
         
     }
-    
-    
+     
     
     /**
      * Retorna a identificação.
@@ -88,8 +89,8 @@ public class OverlapRect implements Pivot {
      */
     public void setUX(double x) {
         double w = getWidth();
-        ux = x;
-        lx = ux+w;
+        this.x = x;
+        lx = this.x+w;
     }
     
     /**
@@ -106,8 +107,8 @@ public class OverlapRect implements Pivot {
      */
     public void setUY(double y) {
         double h = getHeight();
-        uy = y;
-        ly = uy+h;
+        this.y = y;
+        ly = this.y+h;
     }
     
     /**
@@ -115,7 +116,8 @@ public class OverlapRect implements Pivot {
      * @param w Largura do retângulo
      */
     public void setWidth(double w) {
-        setLX(ux+w);
+        setLX(this.x+w);
+        super.width = w;
     }
     
     /**
@@ -123,7 +125,8 @@ public class OverlapRect implements Pivot {
      * @param h Altura do retângulo
      */
     public void setHeight(double h)  {
-        setLY(uy+h);
+        setLY(this.y+h);        
+        super.height = h;
     }
     
     /**
@@ -147,7 +150,7 @@ public class OverlapRect implements Pivot {
      * @return double
      */
     public double getUX() { 
-        return ux; 
+        return this.x; 
     }
     
     /**
@@ -155,40 +158,44 @@ public class OverlapRect implements Pivot {
      * @return double
      */
     public double getUY() { 
-        return uy; 
+        return this.y; 
     }
     
     /**
      * Retorna o centro em relação ao eixo X.
      * @return double
      */
-    public double getCenterX() { 
-        return ux+getWidth()/2.0; 
-    }
+//    @Override
+//    public double getCenterX() { 
+//        return this.x+getWidth()/2.0; 
+//    }
+//    
+//    /**
+//     * Retorna o centro em relação ao eixo Y.
+//     * @return 
+//     */
+//    @Override
+//    public double getCenterY() { 
+//        return this.y+getHeight()/2.0; 
+//    }
     
-    /**
-     * Retorna o centro em relação ao eixo Y.
-     * @return 
-     */
-    public double getCenterY() { 
-        return uy+getHeight()/2.0; 
-    }
-    
-    /**
-     * Retorna a largura.
-     * @return double
-     */
-    public double getWidth()  { 
-        return lx-ux; 
-    }
-    
-    /**
-     * Retorna a altura.
-     * @return double
-     */
-    public double getHeight()  { 
-        return ly-uy; 
-    }
+//    /**
+//     * Retorna a largura.
+//     * @return double
+//     */
+//    @Override
+//    public double getWidth()  { 
+//        return lx-this.x; 
+//    }
+//    
+//    /**
+//     * Retorna a altura.
+//     * @return double
+//     */
+//    @Override
+//    public double getHeight()  { 
+//        return ly-this.y; 
+//    }
     
     /**
      * Move o retângulo no eixo X.
@@ -197,7 +204,7 @@ public class OverlapRect implements Pivot {
     public void moveX(double x) {
         double q = (x-getWidth()/2.);
         lx = q+getWidth();
-        ux = q;        
+        this.x = q;        
     }
     
     /**
@@ -207,7 +214,7 @@ public class OverlapRect implements Pivot {
     public void moveY(double y) {
         double q = (y-getHeight()/2.);
         ly = q+getHeight();
-        uy = q;
+        this.y = q;
     }
     
     /**
@@ -230,7 +237,7 @@ public class OverlapRect implements Pivot {
     
     @Override
     public String toString() {
-        return "<"+ux+", "+lx+", "+uy+", "+ly+">";
+        return "<"+this.x+", "+lx+", "+this.y+", "+ly+">";
     }
 
     @Override
@@ -241,15 +248,18 @@ public class OverlapRect implements Pivot {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 97 * hash + (int) (Double.doubleToLongBits(this.ux) ^ (Double.doubleToLongBits(this.ux) >>> 32));
-        hash = 97 * hash + (int) (Double.doubleToLongBits(this.uy) ^ (Double.doubleToLongBits(this.uy) >>> 32));
-        hash = 97 * hash + (int) (Double.doubleToLongBits(this.lx) ^ (Double.doubleToLongBits(this.lx) >>> 32));
-        hash = 97 * hash + (int) (Double.doubleToLongBits(this.ly) ^ (Double.doubleToLongBits(this.ly) >>> 32));
-        hash = 97 * hash + this.id;
+        int hash = 5;
+        hash = 73 * hash + (int) ((long)(this.x) ^ ((long)(this.x) >>> 32));
+        hash = 73 * hash + (int) ((long)(this.y) ^ ((long)(this.y) >>> 32));
+        hash = 73 * hash + (int) ((long)(this.lx) ^ ((long)(this.lx) >>> 32));
+        hash = 73 * hash + (int) ((long)(this.ly) ^ ((long)(this.ly) >>> 32));
+        hash = 73 * hash + this.id;
         return hash;
     }
+
     
+
+   
     /**
      * 
      * @param id 

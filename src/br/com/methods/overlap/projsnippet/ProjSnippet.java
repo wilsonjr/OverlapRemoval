@@ -14,10 +14,12 @@ import br.com.grafos.ui.Menu;
 import br.com.methods.overlap.OverlapRemoval;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -61,7 +63,7 @@ public class ProjSnippet implements OverlapRemoval {
         ArrayList<OverlapRect> projected = new ArrayList<>();        
         
         try {
-            File file = new File("points.rect");        
+            File file = new File("projsnippet_routine\\points.rect");        
             if( !file.exists() )
                 file.createNewFile();
  
@@ -80,7 +82,7 @@ public class ProjSnippet implements OverlapRemoval {
             /**
              * salva a matriz usada para a energia de vizinhança
              */
-            File fileMat = new File("matrixL.matrix");
+            File fileMat = new File("projsnippet_routine\\matrixL.matrix");
             if( !fileMat.exists() )  
                 fileMat.createNewFile();
             
@@ -95,7 +97,8 @@ public class ProjSnippet implements OverlapRemoval {
             }
             
             try {
-                final Process p = Runtime.getRuntime().exec("cmd /c energia.exe");
+                final Process p = Runtime.getRuntime().exec("cmd /c projsnippet_routine\\energia.exe");
+                
                 System.out.println("Esperando rotina C++");
                 new Runnable() {
 
@@ -103,7 +106,14 @@ public class ProjSnippet implements OverlapRemoval {
                     public void run() {
                         try {  
                             resultado = p.waitFor();
-                        } catch (InterruptedException ex) {
+                            System.out.println(p.getErrorStream().toString());
+                            System.out.println("Resultado: "+resultado);
+                            String line;
+                            BufferedReader input = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                            while ((line = input.readLine()) != null) {
+                              System.out.println(line);
+                            }
+                        } catch (InterruptedException | IOException ex) {
                             Logger.getLogger(ProjSnippet.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
@@ -115,7 +125,7 @@ public class ProjSnippet implements OverlapRemoval {
             
             System.out.println("Recuperando resultados...");
             if( resultado == 0 ) {
-                Scanner scn = new Scanner(new File("point_solve.rect"));
+                Scanner scn = new Scanner(new File("projsnippet_routine\\point_solve.rect"));
                 int idx = 0;
                 
                 if( scn.hasNext() ) {

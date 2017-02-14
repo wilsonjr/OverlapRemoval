@@ -40,6 +40,7 @@ import br.com.methods.utils.RetanguloVis;
 import br.com.methods.utils.Util;
 import br.com.overlayanalisys.definition.Metric;
 import br.com.overlayanalisys.sizeincrease.SizeIncrease;
+import br.com.projection.spacereduction.seamcarving.SeamCarving;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -53,6 +54,7 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -63,6 +65,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -79,7 +82,7 @@ import javax.swing.JScrollPane;
  */
 public class Menu extends javax.swing.JFrame {
     private ViewPanel view;
-    private ArrayList<RetanguloVis> rectangles;
+    private ArrayList<RetanguloVis> rectangles, afterSeamCarving;
     private double alpha = 0;
     private int globalCounter = 0;
     private int globalCounterColor = 0;
@@ -530,25 +533,18 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> projected = vpsc.apply(rects);
         double[] center1 = Util.getCenter(projected);
         
-        
-        cRetangulo = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i ) {
             projected.get(i).setId(i);                    
             rects.get(i).setId(i); 
-            cRetangulo.add(new ChangeRetangulo(rects.get(i), projected.get(i)));
-            cRetangulo.get(i).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, i);            
         }
-        
-        findPosition(cRetangulo);
-        
-        
-        
         
         double ammountX = center0[0]-center1[0];
         double ammountY = center0[1]-center1[1];
-        Util.translate(projected, ammountX, ammountY);
-                
+        Util.translate(projected, ammountX, ammountY);                
         Util.normalize(projected);        
+        
+        
+        
         Util.toRetanguloVis(rectangles, projected);
         
         Metric ls = new SizeIncrease();
@@ -562,9 +558,9 @@ public class Menu extends javax.swing.JFrame {
 
     private void prismJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJMenuItemActionPerformed
         int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
+        boolean applySeamCarving = Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         
-        
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);        
         double[] center0 = Util.getCenter(rects);
         PRISM prism = new PRISM(algo);
         ArrayList<OverlapRect> projected = prism.apply(rects);
@@ -572,86 +568,41 @@ public class Menu extends javax.swing.JFrame {
         
         for( int i = 0; i < rects.size(); ++i ) {
             projected.get(i).setId(i);                    
-            rects.get(i).setId(i); 
+            rects.get(i).setId(i);  
         }
-        
-//        cRetangulo = new ArrayList<>();
-//        for( int i = 0; i < rects.size(); ++i ) {
-//            cRetangulo.add(new ChangeRetangulo(rects.get(i), projected.get(i)));
-//            cRetangulo.get(i).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, i);            
-//        }        
-//        findPosition(cRetangulo);
-//        
-//        
-//        ArrayList<Retangulo> rects2 = new ArrayList<>();
-//        for( int i = 0; i < cRetangulo.size(); ++i ) {
-//            double x = cRetangulo.get(i).third.getUX();
-//            double y = cRetangulo.get(i).third.getUY();
-//            
-//            rects2.add(new OverlapRect(x, y, RECTSIZE, RECTSIZE, i));
-//            
-//        }
         
         double ammountX = center0[0]-center1[0];
         double ammountY = center0[1]-center1[1];
         Util.translate(projected, ammountX, ammountY);        
         Util.normalize(projected);
-        
-//        ammountX = center0[0]-center1[0];
-//        ammountY = center0[1]-center1[1];
-//        Util.translate(rects2, ammountX, ammountY);        
-//        Util.normalize(rects2);
-        
-        
-//    
-//        
-//        for( int i = 0; i < cRetangulo.size(); ++i ) {
-//            cRetangulo.get(i).third.setUX(cRetangulo.get(i).third.getUX()+ammountX);
-//            cRetangulo.get(i).third.setUY(cRetangulo.get(i).third.getUY()+ammountY);
-//            
-//        }
-//        
-//        double minX = Util.getMinX(projected);
-//        double minY = Util.getMinY(projected);
-//        if( minX < 0 || minY < 0 ) {
-//            for( int i = 0; i < cRetangulo.size(); ++i ) {
-//                if( minX < 0 )
-//                    cRetangulo.get(i).third.setUX(cRetangulo.get(i).third.getUX()-minX);
-//                if( minY < 0 )
-//                    cRetangulo.get(i).third.setUY(cRetangulo.get(i).third.getUY()-minY);
-//            }
-//        }
-        
-        KNN knn = new KNN(10);
-        Pair[][] pair = null;
-        try {
-            pair = knn.execute(projected);
-        } catch( IOException e ) {
-            
-        }
-        
-        for( int i = 0; i < pair.length; ++i ) {
-            System.out.print(i+":");
-            for( int j = 0; j < pair[i].length; ++j ) 
-                System.out.print(" ("+pair[i][j].index+","+pair[i][j].value+")");
-            
-            System.out.println();
-        }
-        
-        
-        cRetangulo = new ArrayList<>();
-        for( int i = 0; i < rects.size(); ++i ) {
-            cRetangulo.add(new ChangeRetangulo(rects.get(i), projected.get(i)));
-            cRetangulo.get(i).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, i);            
-        }        
-        findPosition(cRetangulo);
-        
+                
+        if( applySeamCarving )
+            addSeamCarvingResult(projected);
         
         Util.toRetanguloVis(rectangles, projected);
         
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_prismJMenuItemActionPerformed
+
+    private void addSeamCarvingResult(ArrayList<OverlapRect> projected) {
+        Rectangle2D.Double[] r2ds = new Rectangle2D.Double[projected.size()];
+        for( int i = 0; i < r2ds.length; ++i )
+            r2ds[i] = new Rectangle2D.Double(projected.get(i).getUX(), projected.get(i).getUY(), projected.get(i).width, projected.get(i).height);
+        
+        SeamCarving sc = new SeamCarving(r2ds);
+        OverlapRect[] array = new OverlapRect[projected.size()];
+        array = projected.toArray(array);
+        Map<Rectangle2D.Double, Rectangle2D.Double> mapSeamCarving = sc.reduceSpace(array);
+        
+        afterSeamCarving = new ArrayList<>();
+        mapSeamCarving.entrySet().forEach((element)->{
+            int idx = ((OverlapRect)element.getKey()).getId();
+            
+            afterSeamCarving.add(new RetanguloVis(element.getValue().getMinX(), element.getValue().getMinY(),
+                    RECTSIZE, RECTSIZE, rectangles.get(idx).cor, rectangles.get(idx).numero));
+        });
+    }
 
     private void projSnippetJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projSnippetJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
@@ -664,6 +615,7 @@ public class Menu extends javax.swing.JFrame {
         
         String alpha_value = JOptionPane.showInputDialog("Por favor, insira o valor para 'alpha':");
         String k_value = JOptionPane.showInputDialog("Por favor, insira o valor de 'k':");
+        boolean applySeamCarving = Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
         
         ProjSnippet ps = new ProjSnippet(Double.parseDouble(alpha_value), Integer.parseInt(k_value)+1);
         ArrayList<OverlapRect> projected = ps.apply(rects);
@@ -677,16 +629,10 @@ public class Menu extends javax.swing.JFrame {
             double ammountX = center0[0]-center1[0];
             double ammountY = center0[1]-center1[1];
             Util.translate(projected, ammountX, ammountY);
-
             Util.normalize(projected);
-             cRetangulo = new ArrayList<>();
-            for( int j = 0; j < rects.size(); ++j ) {
-                cRetangulo.add(new ChangeRetangulo(rects.get(j), projected.get(j)));
-                cRetangulo.get(j).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, j);            
-            }        
-            findPosition(cRetangulo);
-        
             
+            if( applySeamCarving )
+                addSeamCarvingResult(projected);
             
             Util.toRetanguloVis(rectangles, projected);
 
@@ -1059,6 +1005,7 @@ public class Menu extends javax.swing.JFrame {
             setBackground(Color.WHITE);
             setLayout(new FlowLayout(FlowLayout.LEFT));
             rectangles = new ArrayList<>();
+            afterSeamCarving = new ArrayList<>();
             
             addMouseListener(new MouseAdapter() {
                 @Override
@@ -1108,45 +1055,52 @@ public class Menu extends javax.swing.JFrame {
 
                 g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 ArrayList<RetanguloVis> pivots = new ArrayList<>();
-                for( RetanguloVis r: rectangles ) {                    
-                    g2Buffer.setColor(r.cor);
-                    
-                    if( r.isHexBoard ) {
-                        int a = (int)Math.sqrt(Math.pow(HEXBOARD_SIZE, 2) - Math.pow(HEXBOARD_SIZE/2, 2));
-                        Point p = r.getP();
-                        Polygon poly = new Polygon();
-                        poly.addPoint(p.x, p.y - HEXBOARD_SIZE);
-                        poly.addPoint(p.x + a, p.y - HEXBOARD_SIZE/2);
-                        poly.addPoint(p.x + a, p.y + HEXBOARD_SIZE/2);
-                        poly.addPoint(p.x, p.y + HEXBOARD_SIZE);
-                        poly.addPoint(p.x - a, p.y + HEXBOARD_SIZE/2);
-                        poly.addPoint(p.x - a, p.y - HEXBOARD_SIZE/2);
-                        g2Buffer.fillPolygon(poly);
-                        g2Buffer.setColor(Color.WHITE);
-                        g2Buffer.drawPolygon(poly);
-                    } else {
-                        if( r.isPivot() ) {
-                            pivots.add(r);
+                if( afterSeamCarving.isEmpty() )
+                {                
+                    for( RetanguloVis r: rectangles ) {                    
+                        g2Buffer.setColor(r.cor);
+
+                        if( r.isHexBoard ) {
+                            int a = (int)Math.sqrt(Math.pow(HEXBOARD_SIZE, 2) - Math.pow(HEXBOARD_SIZE/2, 2));
+                            Point p = r.getP();
+                            Polygon poly = new Polygon();
+                            poly.addPoint(p.x, p.y - HEXBOARD_SIZE);
+                            poly.addPoint(p.x + a, p.y - HEXBOARD_SIZE/2);
+                            poly.addPoint(p.x + a, p.y + HEXBOARD_SIZE/2);
+                            poly.addPoint(p.x, p.y + HEXBOARD_SIZE);
+                            poly.addPoint(p.x - a, p.y + HEXBOARD_SIZE/2);
+                            poly.addPoint(p.x - a, p.y - HEXBOARD_SIZE/2);
+                            g2Buffer.fillPolygon(poly);
+                            g2Buffer.setColor(Color.WHITE);
+                            g2Buffer.drawPolygon(poly);
                         } else {
-                            g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                            g2Buffer.setColor(Color.BLACK);
-                            g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            if( r.isPivot() ) {
+                                pivots.add(r);
+                            } else {
+                                g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                g2Buffer.setColor(Color.BLACK);
+                                g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            }
+                        }
+
+                        if( !r.isPivot() ) {
+                            g2Buffer.setColor(Color.WHITE);
+                            g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                            g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
                         }
                     }
-                    
-                    
-                 /*   if( p1 != null ) {
-                        g2Buffer.setColor(Color.GREEN);
-                        g2Buffer.drawPolygon(p1);
-                        g2Buffer.setColor(Color.RED);
-                        g2Buffer.drawPolygon(p2);
-                    }*/
-                    if( !r.isPivot() ) {
-                        g2Buffer.setColor(Color.WHITE);
-                        g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                        g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
-                    }
                 }
+                
+                afterSeamCarving.stream().forEach(r->{
+                    g2Buffer.setColor(r.cor);
+                    g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                    g2Buffer.setColor(Color.BLACK);
+                    g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                    g2Buffer.setColor(Color.WHITE);
+                    g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                    g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10); 
+                    System.out.print("pintando... "+r);
+                });
                 
                 if( r1 != null ) {
                     g2Buffer.setColor(Color.RED);
