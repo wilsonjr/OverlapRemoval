@@ -540,9 +540,11 @@ public class Menu extends javax.swing.JFrame {
         
         double ammountX = center0[0]-center1[0];
         double ammountY = center0[1]-center1[1];
-        Util.translate(projected, ammountX, ammountY);
-                
+        Util.translate(projected, ammountX, ammountY);                
         Util.normalize(projected);        
+        
+        
+        
         Util.toRetanguloVis(rectangles, projected);
         
         Metric ls = new SizeIncrease();
@@ -556,7 +558,7 @@ public class Menu extends javax.swing.JFrame {
 
     private void prismJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJMenuItemActionPerformed
         int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
-                
+        boolean applySeamCarving = Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
         ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         
         double[] center0 = Util.getCenter(rects);
@@ -573,30 +575,34 @@ public class Menu extends javax.swing.JFrame {
         double ammountY = center0[1]-center1[1];
         Util.translate(projected, ammountX, ammountY);        
         Util.normalize(projected);
-        
-        
-        Rectangle2D.Double[] r2ds = new Rectangle2D.Double[projected.size()];
-        for( int i = 0; i < r2ds.length; ++i )
-            r2ds[i] = new Rectangle2D.Double(projected.get(i).getUX(), projected.get(i).getUY(), projected.get(i).width, projected.get(i).height);
-       
-        SeamCarving sc = new SeamCarving(r2ds);
-        OverlapRect[] array = new OverlapRect[projected.size()];
-        array = projected.toArray(array);
-        Map<Rectangle2D.Double, Rectangle2D.Double> mapSeamCarving = sc.reduceSpace(array);
-
-        afterSeamCarving = new ArrayList<>();
-        mapSeamCarving.entrySet().forEach((element)->{
-            int idx = ((OverlapRect)element.getKey()).getId();
-            
-            afterSeamCarving.add(new RetanguloVis(element.getValue().getMinX(), element.getValue().getMinY(), 
-                    RECTSIZE, RECTSIZE, rectangles.get(idx).cor, rectangles.get(idx).numero));
-        });
+                
+        if( applySeamCarving )
+            addSeamCarvingResult(projected);
         
         Util.toRetanguloVis(rectangles, projected);
         
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_prismJMenuItemActionPerformed
+
+    private void addSeamCarvingResult(ArrayList<OverlapRect> projected) {
+        Rectangle2D.Double[] r2ds = new Rectangle2D.Double[projected.size()];
+        for( int i = 0; i < r2ds.length; ++i )
+            r2ds[i] = new Rectangle2D.Double(projected.get(i).getUX(), projected.get(i).getUY(), projected.get(i).width, projected.get(i).height);
+        
+        SeamCarving sc = new SeamCarving(r2ds);
+        OverlapRect[] array = new OverlapRect[projected.size()];
+        array = projected.toArray(array);
+        Map<Rectangle2D.Double, Rectangle2D.Double> mapSeamCarving = sc.reduceSpace(array);
+        
+        afterSeamCarving = new ArrayList<>();
+        mapSeamCarving.entrySet().forEach((element)->{
+            int idx = ((OverlapRect)element.getKey()).getId();
+            
+            afterSeamCarving.add(new RetanguloVis(element.getValue().getMinX(), element.getValue().getMinY(),
+                    RECTSIZE, RECTSIZE, rectangles.get(idx).cor, rectangles.get(idx).numero));
+        });
+    }
 
     private void projSnippetJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projSnippetJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
@@ -609,6 +615,7 @@ public class Menu extends javax.swing.JFrame {
         
         String alpha_value = JOptionPane.showInputDialog("Por favor, insira o valor para 'alpha':");
         String k_value = JOptionPane.showInputDialog("Por favor, insira o valor de 'k':");
+        boolean applySeamCarving = Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
         
         ProjSnippet ps = new ProjSnippet(Double.parseDouble(alpha_value), Integer.parseInt(k_value)+1);
         ArrayList<OverlapRect> projected = ps.apply(rects);
@@ -622,16 +629,10 @@ public class Menu extends javax.swing.JFrame {
             double ammountX = center0[0]-center1[0];
             double ammountY = center0[1]-center1[1];
             Util.translate(projected, ammountX, ammountY);
-
             Util.normalize(projected);
-//             cRetangulo = new ArrayList<>();
-//            for( int j = 0; j < rects.size(); ++j ) {
-//                cRetangulo.add(new ChangeRetangulo(rects.get(j), projected.get(j)));
-//                cRetangulo.get(j).third = new OverlapRect(0, 0, RECTSIZE, RECTSIZE, j);            
-//            }        
-//            findPosition(cRetangulo);
-        
             
+            if( applySeamCarving )
+                addSeamCarvingResult(projected);
             
             Util.toRetanguloVis(rectangles, projected);
 
