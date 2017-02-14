@@ -16,8 +16,8 @@ import java.util.Random;
  */
 public class ForceDirectedOverlapRemoval {
     
-    private static double KR = 0.25;
-    private int LIMIT = 1000;
+    protected static double KR = 0.25;
+    protected int LIMIT = 1000;
     
     public ForceDirectedOverlapRemoval() {}
     
@@ -67,7 +67,7 @@ public class ForceDirectedOverlapRemoval {
         
     }
     
-    private Point2D computeForceIJ(Rectangle2D.Double rectI, Rectangle2D.Double rectJ) {
+    protected Point2D computeForceIJ(Rectangle2D.Double rectI, Rectangle2D.Double rectJ) {
         
         double hix = Math.min(rectI.getMaxX(), rectJ.getMaxX());
         double lox = Math.max(rectI.getMinX(), rectJ.getMinX());
@@ -92,7 +92,7 @@ public class ForceDirectedOverlapRemoval {
         return dir;       
     }
     
-    public boolean thereAreOverlaps(Rectangle2D.Double[] elems) {
+    protected boolean thereAreOverlaps(Rectangle2D.Double[] elems) {
         for( int i = 0; i < elems.length; ++i )
             for( int j = 0; j < elems.length; ++j )
                 if( elems[i].intersects(elems[j]) )

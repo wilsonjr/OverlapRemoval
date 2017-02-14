@@ -52,8 +52,8 @@ public class SeamCarving {
         Zone[][] zones = createZones(_initialPositions);       
         _rectPositions = removeSeams(zones, _initialPositions);
         
-       // new ForceDirectedOverlapRemoval().run(_rectPositions);
-       // new ForceDirectedUniformity().run(_rectPositions);
+        new ForceDirectedOverlapRemoval().run(_rectPositions);
+        new ForceDirectedUniformity().run(_rectPositions);
     }
 
     private Zone[][] createZones(Rectangle2D.Double[] rectPositions) {
