@@ -40,7 +40,7 @@ import br.com.methods.utils.RetanguloVis;
 import br.com.methods.utils.Util;
 import br.com.overlayanalisys.definition.Metric;
 import br.com.overlayanalisys.sizeincrease.SizeIncrease;
-import br.com.projection.spacereduction.seamcarving.SeamCarving;
+import br.com.projection.spacereduction.SeamCarving;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
