@@ -29,7 +29,6 @@ public class ContextPreserving {
     
     private final Rectangle2D.Double[] _initialPositions;
     private Rectangle2D.Double[] _rects;
-    private Rectangle2D.Double[] _rectPositions;
     
     private int[][] delaunayEdges;
             
@@ -39,7 +38,6 @@ public class ContextPreserving {
     
     public Map<Rectangle2D.Double, Rectangle2D.Double> reduceSpace(Rectangle2D.Double[] projection) {
         _rects = projection;
-        _rectPositions = new Rectangle2D.Double[_rects.length];
         
         applyAlgorithm();
         
@@ -49,7 +47,6 @@ public class ContextPreserving {
         return positions;
         
     }
-    
     
     public void applyAlgorithm() {
         
@@ -76,11 +73,7 @@ public class ContextPreserving {
         Point2D.Double[] points2D = new Point2D.Double[_rects.length];
         List<List<Integer>> edges = new ArrayList<>();
         Util.computeDelaunayTriangulation(_rects, _initialPositions, points2D, edges);
-        
-        Point2D.Double[] points = new Point2D.Double[_rects.length];
-        for( int i = 0; i < _rects.length; ++i )
-            points[i] = new Point2D.Double(points2D[i].x, points2D[i].y);
-        
+                
         int res[][] = new int[_rects.length][];
         for( int i = 0; i < _rects.length; ++i ) {
             
@@ -129,19 +122,19 @@ public class ContextPreserving {
             
             if( !overlap(i) ) {
                 // attractive force (compact principle)
-                Point2D.Double p = computeAttractiveForce(bb, i, rect, maxWeight);
+                Point2D.Double p = computeAttractiveForce(i, rect, maxWeight);
                 dxy.setLocation(dxy.x+p.x, dxy.y+p.y);
                 
                 // resulsion force (planar principle)
-                p = computePlanarForce(bb, i, rect);
+                p = computePlanarForce(i);
                 dxy.setLocation(dxy.x+p.x, dxy.y+p.y);
             } else {
                 // repulsion force (removing overlaps)
-                Point2D.Double p = computeRepulsiveForce(bb, i, rect);
+                Point2D.Double p = computeRepulsiveForce(i, rect);
                 dxy.setLocation(dxy.x+p.x, dxy.y+p.y);
                 
                 // repulsion force (planar principle)
-                p = computePlanarForce(bb, i, rect);
+                p = computePlanarForce(i);
                 dxy.setLocation(dxy.x+p.x, dxy.y+p.y);
             }
             
@@ -190,7 +183,7 @@ public class ContextPreserving {
         return false;
     }
 
-    private Point2D.Double computeAttractiveForce(Rectangle2D.Double bb, int i, Rectangle2D.Double recti, double maxWeight) {
+    private Point2D.Double computeAttractiveForce(int i, Rectangle2D.Double recti, double maxWeight) {
             
         Point2D.Double dxy = new Point2D.Double(0, 0);
         
@@ -213,15 +206,15 @@ public class ContextPreserving {
                 Point2D.Double dir = new Point2D.Double(rectj.getCenterX()-recti.getCenterX(), rectj.getCenterY()-recti.getCenterY());
                         
                 double len = Util.distanciaEuclideana(dir.x, dir.y, 0, 0);
-                if( len < EPS )
-                    continue;
-                
-                // normalize
-                dir.setLocation(dir.x/len, dir.y/len);
-                dir.setLocation(dir.x*force, dir.y*force);
-                
-                dxy.setLocation(dxy.x+dir.x, dxy.y+dir.y);
-                cnt++;
+                if( len >= EPS ) {
+                    
+                    // normalize
+                    dir.setLocation(dir.x/len, dir.y/len);
+                    dir.setLocation(dir.x*force, dir.y*force);
+
+                    dxy.setLocation(dxy.x+dir.x, dxy.y+dir.y);
+                    cnt++;
+                }
             }
         }
         
@@ -232,7 +225,7 @@ public class ContextPreserving {
         return dxy;
     }
 
-    private Point2D.Double computeRepulsiveForce(Rectangle2D.Double bb, int i, Rectangle2D.Double recti) {
+    private Point2D.Double computeRepulsiveForce(int i, Rectangle2D.Double recti) {
         Point2D.Double dxy = new Point2D.Double(0, 0);
         
         double cnt = 0.0;
@@ -256,14 +249,14 @@ public class ContextPreserving {
                             rectj.getCenterY()-recti.getCenterY());
                     
                     double len = Util.distanciaEuclideana(dir.x, dir.y, 0, 0);
-                    if( len < EPS )
-                        continue;
+                    if( len >= EPS ) {
                     
-                    dir.setLocation(dir.x/len, dir.y/len);
-                    dir.setLocation(dir.x*force, dir.y*force);
-                    
-                    dxy.setLocation(dxy.x-dir.x, dxy.y-dir.y);
-                    cnt++;                    
+                        dir.setLocation(dir.x/len, dir.y/len);
+                        dir.setLocation(dir.x*force, dir.y*force);
+
+                        dxy.setLocation(dxy.x-dir.x, dxy.y-dir.y);
+                        cnt++;                    
+                    }
                 }
             }    
         }
@@ -274,7 +267,7 @@ public class ContextPreserving {
         return dxy;       
     }
 
-    private Point2D.Double computePlanarForce(Rectangle2D.Double bb, int i, Rectangle2D.Double recti) {
+    private Point2D.Double computePlanarForce(int i) {
         Point2D.Double dxy = new Point2D.Double(0, 0);
         
         double cnt = 0.0;

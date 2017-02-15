@@ -1057,10 +1057,8 @@ public class Util {
     }
 
     public static double pointToLineDistance(Point2D.Double u, Point2D.Double v, Point2D.Double p) {
-        Point2D.Double bc = new Point2D.Double(v.x, v.y);
-        bc.setLocation(v.x-u.x, v.y-u.y);
-        Point2D.Double ba = new Point2D.Double(p.x, p.y);
-        ba.setLocation(ba.x-u.x, ba.y-u.y);
+        Point2D.Double bc = new Point2D.Double(v.x-u.x, v.y-u.y);
+        Point2D.Double ba = new Point2D.Double(p.x-u.x, p.y-u.y);
         
         double c1 = bc.x*ba.x + bc.y*ba.y;
         double c2 = bc.x*bc.x + bc.y*bc.y;
@@ -1089,15 +1087,9 @@ public class Util {
                 for( int k = j+1; k < rects.length; ++k ) {
                     
                     boolean isTriangle = true;
-                    for( int p = 0; p < rects.length; ++p ) {
-                        if( p == i || p == j || p == k )
-                            continue;
-                        
-                        if( Util.pointInsideCircle(points[p], points[i], points[j], points[k]) ) {
-                            isTriangle = false;
-                            break;
-                        }                        
-                    }
+                    for( int p = 0; isTriangle && p < rects.length; ++p ) 
+                        if( p != i && p != j && p != k && Util.pointInsideCircle(points[p], points[i], points[j], points[k]) ) 
+                            isTriangle = false;                                            
                     
                     if( isTriangle ) {
                         if (!edges.get(i).contains(j))
@@ -1124,7 +1116,7 @@ public class Util {
         Point2D.Double jj = new Point2D.Double(j.x-i.x, j.y-i.y);
         Point2D.Double kk = new Point2D.Double(k.x-i.x, k.y-i.y);
         
-        double delta = 2.* (jj.x*kk.y - jj.y*kk.x);
+        double delta = 2. * (jj.x*kk.y - jj.y*kk.x);
         if( Math.abs(delta) < 1e-6 )
             return false;
         
