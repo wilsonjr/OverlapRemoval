@@ -1062,7 +1062,7 @@ public class Util {
         Point2D.Double ba = new Point2D.Double(p.x, p.y);
         ba.setLocation(ba.x-u.x, ba.y-u.y);
         
-        double c1 = bc.x*ba.x + bc.y*bc.y;
+        double c1 = bc.x*ba.x + bc.y*ba.y;
         double c2 = bc.x*bc.x + bc.y*bc.y;
         double parameter = c1/c2;
         
@@ -1112,8 +1112,7 @@ public class Util {
                             edges.get(k).add(i);
                         if (!edges.get(k).contains(j))
                             edges.get(k).add(j);
-                    }
-                    
+                    }                    
                 }
         
         

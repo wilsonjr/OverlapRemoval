@@ -44,7 +44,7 @@ public class ContextPreserving {
         applyAlgorithm();
         
         Map<Rectangle2D.Double, Rectangle2D.Double> positions = new HashMap<>();        
-        IntStream.range(0, _rects.length).forEach(i->positions.put(_rects[i], _rectPositions[i]));
+        IntStream.range(0, _rects.length).forEach(i->positions.put(_rects[i], _initialPositions[i]));
 
         return positions;
         
@@ -176,7 +176,8 @@ public class ContextPreserving {
         double maxWeight = 0.;
         
         for( int i = 0; i < _rects.length; ++i )
-            maxWeight = Math.max(maxWeight, _rects[i].getWeight());
+            maxWeight = Math.max(maxWeight, 1);  // rectangles don't have weight 
+            ///maxWeight = Math.max(maxWeight, _rects[i].getWeight());
         
         return maxWeight;
     }
@@ -199,8 +200,11 @@ public class ContextPreserving {
                 
                 Rectangle2D.Double rectj = _initialPositions[j];
                 
-                double wi = Math.max(_rects[i].getWeight(), maxWeight/5.);
-                double wj = Math.max(_rects[j].getWeight(), maxWeight/5.);
+                // rectangles don't have weight
+                //double wi = Math.max(_rects[i].getWeight(), maxWeight/5.);
+                //double wj = Math.max(_rects[j].getWeight(), maxWeight/5.);
+                double wi = Math.max(1.0, maxWeight/5.);
+                double wj = Math.max(1.0, maxWeight/5.);
                 double dist = Util.rectToRectDistance(recti, rectj);
                 double force = wi * wj * dist / (maxWeight*maxWeight);                
                 if( T < 0.5 )
@@ -249,7 +253,7 @@ public class ContextPreserving {
                     double force = KR * Math.min(dx, dy);
                     
                     Point2D.Double dir = new Point2D.Double(rectj.getCenterX()-recti.getCenterX(), 
-                            rectj.getCenterX()-recti.getCenterX());
+                            rectj.getCenterY()-recti.getCenterY());
                     
                     double len = Util.distanciaEuclideana(dir.x, dir.y, 0, 0);
                     if( len < EPS )
@@ -320,7 +324,7 @@ public class ContextPreserving {
 
     private Point2D.Double normalize(Point2D.Double force, Rectangle2D.Double bb) {
         
-        double mx = Math.min(bb.getWidth(), bb.getHeight());
+        double mx = Math.min(bb.width, bb.height);
         double len = Util.distanciaEuclideana(force.x, force.y, 0, 0);
         if( len < 1e-3 )
             return force;
