@@ -15,8 +15,11 @@ import br.com.methods.overlap.prism.PRISMPoint;
 import br.com.methods.overlap.prism.SetPoint;
 import br.com.methods.overlap.vpsc.Event;
 import java.awt.Polygon;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.TreeSet;
 
 /**
@@ -1035,6 +1038,105 @@ public class Util {
             
         }
         return qtd;
+    }
+
+    public static double rectToRectDistance(Rectangle2D.Double recti, Rectangle2D.Double rectj) {
+        
+        double dx = diff(recti.getMinX(), recti.getMaxX(), rectj.getMinX(), rectj.getMaxX());
+        double dy = diff(recti.getMinY(), recti.getMaxY(), rectj.getMinY(), rectj.getMaxY());
+        
+        return Math.sqrt(dx*dx + dy*dy);        
+    }
+    
+    private static double diff(double m1, double M1, double m2, double M2) {
+        if( M1 <= m2 )
+            return m2-M1;
+        if( M2 <= m1 )
+            return m1-M2;
+        return 0;
+    }
+
+    public static double pointToLineDistance(Point2D.Double u, Point2D.Double v, Point2D.Double p) {
+        Point2D.Double bc = new Point2D.Double(v.x, v.y);
+        bc.setLocation(v.x-u.x, v.y-u.y);
+        Point2D.Double ba = new Point2D.Double(p.x, p.y);
+        ba.setLocation(ba.x-u.x, ba.y-u.y);
+        
+        double c1 = bc.x*ba.x + bc.y*bc.y;
+        double c2 = bc.x*bc.x + bc.y*bc.y;
+        double parameter = c1/c2;
+        
+        Point2D.Double res = new Point2D.Double(ba.x, ba.y);
+        bc.setLocation(bc.x*parameter, bc.y*parameter);
+        res.setLocation(res.x-bc.x, res.y-bc.y);
+        
+        return Util.distanciaEuclideana(res.x, res.y, 0, 0);
+    }
+
+    public static void computeDelaunayTriangulation(Rectangle2D.Double[] rects, Rectangle2D.Double[] initialPositions, 
+            Point2D.Double[] points, List<List<Integer>> edges) {
+        
+        for( int i = 0; i < rects.length; ++i ) {
+            edges.add(i, new ArrayList<>());
+            
+            Rectangle2D.Double temp = initialPositions[i];
+            points[i] = new Point2D.Double(temp.getCenterX(), temp.getCenterY());
+        }
+        
+        // is ijk a circle with no interior points?
+        for( int i = 0; i < rects.length; ++i )
+            for( int j = i+1; j < rects.length; ++j )
+                for( int k = j+1; k < rects.length; ++k ) {
+                    
+                    boolean isTriangle = true;
+                    for( int p = 0; p < rects.length; ++p ) {
+                        if( p == i || p == j || p == k )
+                            continue;
+                        
+                        if( Util.pointInsideCircle(points[p], points[i], points[j], points[k]) ) {
+                            isTriangle = false;
+                            break;
+                        }                        
+                    }
+                    
+                    if( isTriangle ) {
+                        if (!edges.get(i).contains(j))
+                            edges.get(i).add(j);
+                        if (!edges.get(i).contains(k))
+                            edges.get(i).add(k);
+                        if (!edges.get(j).contains(i))
+                            edges.get(j).add(i);
+                        if (!edges.get(j).contains(k))
+                            edges.get(j).add(k);
+                        if (!edges.get(k).contains(i))
+                            edges.get(k).add(i);
+                        if (!edges.get(k).contains(j))
+                            edges.get(k).add(j);
+                    }
+                    
+                }
+        
+        
+        
+    }
+
+    private static boolean pointInsideCircle(Point2D.Double p, Point2D.Double i, Point2D.Double j, Point2D.Double k) {
+        // Center
+        Point2D.Double jj = new Point2D.Double(j.x-i.x, j.y-i.y);
+        Point2D.Double kk = new Point2D.Double(k.x-i.x, k.y-i.y);
+        
+        double delta = 2.* (jj.x*kk.y - jj.y*kk.x);
+        if( Math.abs(delta) < 1e-6 )
+            return false;
+        
+        double jdot = jj.x*jj.x + jj.y*jj.y;
+        double kdot = kk.x*kk.x + kk.y*kk.y;
+        double delta1 = kk.y*jdot - jj.y*kdot;
+        double delta2 = jj.x*kdot - kk.x*jdot;
+        
+        Point2D.Double centralPoint = new Point2D.Double(i.x + delta1/delta, i.y + delta2/delta);
+        
+        return Util.distanciaEuclideana(centralPoint.x, centralPoint.y, p.x, p.y) <= Util.distanciaEuclideana(centralPoint.x, centralPoint.y, i.x, i.y);        
     }
     
 }

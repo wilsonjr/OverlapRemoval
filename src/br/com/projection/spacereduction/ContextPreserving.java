@@ -9,7 +9,9 @@ package br.com.projection.spacereduction;
 import br.com.methods.utils.Util;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -52,7 +54,7 @@ public class ContextPreserving {
     public void applyAlgorithm() {
         
         delaunayEdges = computeDelaunay();
-        
+                
         applyForceAlgorithm();
     }
 
@@ -71,7 +73,48 @@ public class ContextPreserving {
     }
 
     private int[][] computeDelaunay() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Point2D.Double[] points2D = new Point2D.Double[_rects.length];
+        List<List<Integer>> edges = new ArrayList<>();
+        Util.computeDelaunayTriangulation(_rects, _initialPositions, points2D, edges);
+        
+        Point2D.Double[] points = new Point2D.Double[_rects.length];
+        for( int i = 0; i < _rects.length; ++i )
+            points[i] = new Point2D.Double(points2D[i].x, points2D[i].y);
+        
+        int res[][] = new int[_rects.length][];
+        for( int i = 0; i < _rects.length; ++i ) {
+            
+            List<Integer> arr = new ArrayList<>();
+            List<Integer> neighborsi = edges.get(i);
+            
+            for( int j = 0; j < neighborsi.size(); ++j ) {
+                
+                List<Integer> neighborsj = edges.get(neighborsi.get(j));
+                List<Integer> commonNeighbors = new ArrayList<>(neighborsi);
+                commonNeighbors.retainAll(neighborsj);
+                
+                Point2D.Double pi = points2D[i];
+                Point2D.Double pj = points2D[neighborsi.get(j)];
+                
+                for( int k = 0; k < commonNeighbors.size(); ++k ) {
+                 
+                    Point2D.Double pk = points2D[commonNeighbors.get(k)];
+                    if( orientation(pi, pj, pk) >= 0 ) {
+                        arr.add(neighborsi.get(j));
+                        arr.add(commonNeighbors.get(k));
+                    } else {
+                        arr.add(commonNeighbors.get(k));
+                        arr.add(neighborsi.get(j));
+                    }                    
+                }                
+            }
+            
+            res[i] = new int[arr.size()];
+            for( int j = 0; j < arr.size(); ++j )
+                res[i][j] = arr.get(j);
+        }
+        
+        return res;
     }
 
     private boolean doIteration() {
@@ -273,6 +316,18 @@ public class ContextPreserving {
         norm.setLocation(norm.x*dist, norm.y*dist);
         
         return norm;
+    }
+
+    private Point2D.Double normalize(Point2D.Double force, Rectangle2D.Double bb) {
+        
+        double mx = Math.min(bb.getWidth(), bb.getHeight());
+        double len = Util.distanciaEuclideana(force.x, force.y, 0, 0);
+        if( len < 1e-3 )
+            return force;
+        
+        double maxLen = Math.min(len, T*mx/50.0);
+        force.setLocation(force.x*(maxLen/len), force.y*(maxLen/len));
+        return force;
     }
     
     
