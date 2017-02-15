@@ -40,6 +40,7 @@ import br.com.methods.utils.RetanguloVis;
 import br.com.methods.utils.Util;
 import br.com.overlayanalisys.definition.Metric;
 import br.com.overlayanalisys.sizeincrease.SizeIncrease;
+import br.com.projection.spacereduction.ContextPreserving;
 import br.com.projection.spacereduction.SeamCarving;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -590,18 +591,38 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < r2ds.length; ++i )
             r2ds[i] = new Rectangle2D.Double(projected.get(i).getUX(), projected.get(i).getUY(), projected.get(i).width, projected.get(i).height);
         
-        SeamCarving sc = new SeamCarving(r2ds);
+        //SeamCarving sc = new SeamCarving(r2ds);
         OverlapRect[] array = new OverlapRect[projected.size()];
         array = projected.toArray(array);
-        Map<Rectangle2D.Double, Rectangle2D.Double> mapSeamCarving = sc.reduceSpace(array);
+        //Map<Rectangle2D.Double, Rectangle2D.Double> mapSeamCarving = sc.reduceSpace(array);
+        ContextPreserving cp = new ContextPreserving(r2ds);
+        Map<Rectangle2D.Double, Rectangle2D.Double> mapContextPreserving = cp.reduceSpace(array);
         
         afterSeamCarving = new ArrayList<>();
-        mapSeamCarving.entrySet().forEach((element)->{
+//        mapSeamCarving.entrySet().forEach((element)->{
+//            int idx = ((OverlapRect)element.getKey()).getId();
+//            
+//            afterSeamCarving.add(new RetanguloVis(element.getValue().getMinX(), element.getValue().getMinY(),
+//                    RECTSIZE, RECTSIZE, rectangles.get(idx).cor, rectangles.get(idx).numero));
+//        });
+        mapContextPreserving.entrySet().forEach((element)->{
             int idx = ((OverlapRect)element.getKey()).getId();
             
-            afterSeamCarving.add(new RetanguloVis(element.getValue().getMinX(), element.getValue().getMinY(),
-                    RECTSIZE, RECTSIZE, rectangles.get(idx).cor, rectangles.get(idx).numero));
+            afterSeamCarving.add(new RetanguloVis(element.getValue().getMinX(), element.getValue().getMinY(), 
+                RECTSIZE, RECTSIZE, rectangles.get(idx).cor, rectangles.get(idx).numero));
+        
         });
+        
+
+
+         
+        
+        
+        
+        
+        
+        
+        
     }
 
     private void projSnippetJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projSnippetJMenuItemActionPerformed
