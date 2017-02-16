@@ -19,12 +19,15 @@
 package br.com.grafos.ui;
 
 
+import br.com.grafos.desenho.color.GrayScale;
 import br.com.grafos.desenho.color.RainbowScale;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
 import br.com.methods.overlap.incboard.IncBoardExecutor;
 import br.com.methods.overlap.incboard.PointItem;
 import br.com.methods.overlap.prism.PRISM;
+import br.com.methods.overlap.projsnippet.Edge;
 import br.com.methods.overlap.projsnippet.ProjSnippet;
+import br.com.methods.overlap.projsnippet.Vertex;
 import br.com.methods.overlap.rwordle.RWordleC;
 import br.com.methods.overlap.rwordle.RWordleL;
 import br.com.methods.overlap.vpsc.VPSC;
@@ -33,7 +36,6 @@ import br.com.methods.pivot.MST;
 import br.com.methods.pivot.OMNI;
 import br.com.methods.pivot.SSS;
 import br.com.methods.utils.ChangeRetangulo;
-import br.com.methods.utils.KNN;
 import br.com.methods.utils.Pair;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.RetanguloVis;
@@ -41,7 +43,7 @@ import br.com.methods.utils.Util;
 import br.com.overlayanalisys.definition.Metric;
 import br.com.overlayanalisys.sizeincrease.SizeIncrease;
 import br.com.projection.spacereduction.ContextPreserving;
-import br.com.projection.spacereduction.SeamCarving;
+import br.com.representative.Dijsktra;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -92,6 +94,7 @@ public class Menu extends javax.swing.JFrame {
     private static final int HEXBOARD_SIZE = 20;
     private Polygon p1, p2;
     private static final int RECTSIZE = 20;
+    private int maior, menor;
     
     
     
@@ -149,6 +152,8 @@ public class Menu extends javax.swing.JFrame {
         mstJMenuItem = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         extractParametersJMenuItem = new javax.swing.JMenuItem();
+        jMenu5 = new javax.swing.JMenu();
+        dijsktraRepresentativeJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -317,6 +322,18 @@ public class Menu extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu4);
 
+        jMenu5.setText("Representativos");
+
+        dijsktraRepresentativeJMenuItem.setText("Dijsktra");
+        dijsktraRepresentativeJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dijsktraRepresentativeJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu5.add(dijsktraRepresentativeJMenuItem);
+
+        jMenuBar1.add(jMenu5);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -346,8 +363,8 @@ public class Menu extends javax.swing.JFrame {
                 File file = jFileChooser.getSelectedFile();
                 Scanner scn = new Scanner(file);
                 rectangles.clear();
-                RainbowScale rbS = new RainbowScale();
-                //GrayScale rbS = new GrayScale();
+                //RainbowScale rbS = new RainbowScale();
+                GrayScale rbS = new GrayScale();
                 
                 int id = 0;
                 while( scn.hasNext() ) {
@@ -954,6 +971,41 @@ public class Menu extends javax.swing.JFrame {
        // t.schedule(null, WIDTH, WIDTH);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
+    private void dijsktraRepresentativeJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dijsktraRepresentativeJMenuItemActionPerformed
+        Vertex[] grafo = new Vertex[rectangles.size()];
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        OverlapRect[] rectsV = new OverlapRect[rects.size()];
+        rectsV = rects.toArray(rectsV);
+
+        for( int i = 0; i < grafo.length; ++i )
+            grafo[i] = new Vertex(i);
+        for( int i = 0; i < grafo.length; ++i ) 
+            for( int j = i+1; j < grafo.length; ++j )  {
+                double d = Util.distanciaEuclideana(rectsV[i].getCenterX(), rectsV[i].getCenterY(), rectsV[j].getCenterX(), rectsV[j].getCenterY());
+                System.out.println("Distance: "+d);
+                
+                grafo[i].add(new Edge(i, j, d));
+                grafo[j].add(new Edge(j, i, d));
+            }
+        
+        Dijsktra d = new Dijsktra(grafo);
+        for( int i = 0; i < grafo.length; ++i )
+            for( int j = i+1; j < grafo.length; ++j )
+                d.exec(i, j, rectsV);
+        
+        maior = Integer.MIN_VALUE;
+        menor = Integer.MAX_VALUE;
+        for( int i = 0; i < rectsV.length; ++i ) {
+            System.out.println("Health: "+rectsV[i].getHealth());
+            maior = Math.max(maior, rectsV[i].getHealth());
+            menor = Math.min(menor, rectsV[i].getHealth());
+        }
+        Util.toRetanguloVis(rectangles, rects);
+        view.cleanImage();
+        view.repaint();
+        
+    }//GEN-LAST:event_dijsktraRepresentativeJMenuItemActionPerformed
+
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1038,9 +1090,11 @@ public class Menu extends javax.swing.JFrame {
                         r1 = new RetanguloVis(iniX, iniY, 30, 30, Color.red, 1);
                     else if( r2 == null )
                         r2 = new RetanguloVis(iniX, iniY, 30, 30, Color.red, 2);*/
-                    RainbowScale rbS = new RainbowScale();
+                    //RainbowScale rbS = new RainbowScale();
+                    GrayScale gS = new GrayScale();
                     rectangles.add(new RetanguloVis(iniX, iniY, RECTSIZE, RECTSIZE, 
-                                                rbS.getColor((globalCounterColor++*10)%255), globalCounter++));                                        
+                                                //gS.getColor((globalCounterColor++*10)%255), globalCounter++));   
+                                                gS.getColor(0), globalCounter++));
                     cleanImage();
                     repaint();   
                 }                   
@@ -1079,7 +1133,9 @@ public class Menu extends javax.swing.JFrame {
                 if( afterSeamCarving.isEmpty() )
                 {                
                     for( RetanguloVis r: rectangles ) {                    
-                        g2Buffer.setColor(r.cor);
+                        ///g2Buffer.setColor(r.cor);
+                        int cinza = (int) (((double)(r.getHealth()-menor)/(double)(maior-menor))*255.0);
+                        g2Buffer.setColor(new GrayScale().getColor(cinza));;
 
                         if( r.isHexBoard ) {
                             int a = (int)Math.sqrt(Math.pow(HEXBOARD_SIZE, 2) - Math.pow(HEXBOARD_SIZE/2, 2));
@@ -1105,7 +1161,7 @@ public class Menu extends javax.swing.JFrame {
                         }
 
                         if( !r.isPivot() ) {
-                            g2Buffer.setColor(Color.WHITE);
+                            g2Buffer.setColor(Color.RED);
                             g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
                             g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
                         }
@@ -1229,6 +1285,7 @@ public class Menu extends javax.swing.JFrame {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem dijsktraRepresentativeJMenuItem;
     private javax.swing.JMenuItem extractParametersJMenuItem;
     private javax.swing.JMenuItem gnatJMenuItem;
     private javax.swing.JMenuItem hexBoardJMenuItem;
@@ -1237,6 +1294,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
