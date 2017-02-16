@@ -64,9 +64,9 @@ public class Util {
     public static ArrayList<OverlapRect> toRetangulo(ArrayList<RetanguloVis> rects) {
         ArrayList<OverlapRect> rs = new ArrayList<>();
         
-        for( RetanguloVis r: rects ) {
+        rects.forEach(r-> {
             rs.add(new OverlapRect(r.getUX(), r.getUY(), r.getWidth(), r.getHeight(), r.isPivot(), r.getLevel(), r.getCluster(), r.getHealth(), r.numero));
-        }
+        });
         return rs;
     }
         
@@ -84,6 +84,8 @@ public class Util {
             ori.get(rects.get(i).getId()).setHeight(rects.get(i).getHeight());
             ori.get(rects.get(i).getId()).setPivot(rects.get(i).isPivot());
             ori.get(rects.get(i).getId()).setLevel(rects.get(i).getLevel());
+            ori.get(rects.get(i).getId()).numero = rects.get(i).getId();
+            ori.get(rects.get(i).getId()).setHealth(rects.get(i).getHealth());
         }   
     }
      

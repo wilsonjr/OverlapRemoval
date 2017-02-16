@@ -242,6 +242,8 @@ public class OverlapRect extends Rectangle2D.Double implements Pivot {
 
     @Override
     public boolean equals(Object obj) {
+        if( !(obj instanceof OverlapRect) )
+            return false;
         OverlapRect robj = (OverlapRect) obj;
         return getCenterX() == robj.getCenterX() && getCenterY() == robj.getCenterY();
     }
@@ -303,5 +305,13 @@ public class OverlapRect extends Rectangle2D.Double implements Pivot {
     
     public int getHealth() {
         return health;
+    }
+    
+    public void addHealth() {
+        health++;
+    }
+    
+    public void setHealth(int health) {
+        this.health = health;
     }
 }
