@@ -12,6 +12,8 @@ package br.com.methods.overlap;
 
 import br.com.methods.utils.OverlapRect;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -19,4 +21,14 @@ import java.util.ArrayList;
  */
 public interface OverlapRemoval {
     public ArrayList<OverlapRect> apply(ArrayList<OverlapRect> rects);
+    
+    default public ArrayList<OverlapRect> applyAndGetTime(ArrayList<OverlapRect> rects) {
+        
+        long startTime = System.currentTimeMillis();
+        ArrayList<OverlapRect> returned = apply(rects);
+        long endTime = System.currentTimeMillis();
+        Logger.getLogger(OverlapRemoval.class.getName()).log(Level.INFO, "Execution time: {0}", ((endTime-startTime)/1000));
+        
+        return returned;                
+    }
 }
