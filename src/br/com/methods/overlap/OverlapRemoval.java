@@ -22,12 +22,12 @@ import java.util.logging.Logger;
 public interface OverlapRemoval {
     public ArrayList<OverlapRect> apply(ArrayList<OverlapRect> rects);
     
-    default public ArrayList<OverlapRect> applyAndGetTime(ArrayList<OverlapRect> rects) {
+    default public ArrayList<OverlapRect> applyAndShowTime(ArrayList<OverlapRect> rects) {
         
         long startTime = System.currentTimeMillis();
         ArrayList<OverlapRect> returned = apply(rects);
         long endTime = System.currentTimeMillis();
-        Logger.getLogger(OverlapRemoval.class.getName()).log(Level.INFO, "Execution time: {0}", ((endTime-startTime)/1000));
+        Logger.getLogger(OverlapRemoval.class.getName()).log(Level.INFO, "Execution time "+toString()+": {0}", ((endTime-startTime)/1000));
         
         return returned;                
     }

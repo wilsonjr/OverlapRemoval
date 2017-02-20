@@ -581,7 +581,7 @@ public class Menu extends javax.swing.JFrame {
         
         double[] center0 = Util.getCenter(rects);
         PRISM prism = new PRISM(algo);
-        ArrayList<OverlapRect> projected = prism.apply(rects);
+        ArrayList<OverlapRect> projected = prism.applyAndShowTime(rects);
         double[] center1 = Util.getCenter(projected);
         
         for( int i = 0; i < rects.size(); ++i ) {
@@ -1204,9 +1204,6 @@ public class Menu extends javax.swing.JFrame {
                     g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
                 }
                 
-                System.out.println("Numero de itens: "+rectangles.size());
-                System.out.println("Numero de pivos: "+pivots.size());
-                
                 if( cRetangulo != null ) {
                     for( ChangeRetangulo r: cRetangulo ) {
                         int x1 = (int) r.second.getUX();
@@ -1273,7 +1270,6 @@ public class Menu extends javax.swing.JFrame {
             Dimension d = this.getSize();
             d.width = (int) max_x + zero;
             d.height = (int) max_y + zero;
-            System.out.println("Dimension- width: "+d.width+", height:"+d.height);
             this.setSize(d);
             this.setPreferredSize(d);
         }

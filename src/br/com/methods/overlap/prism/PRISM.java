@@ -275,4 +275,9 @@ public class PRISM implements OverlapRemoval {
         return secondPass;
     }
     
+    
+    @Override
+    public String toString() {
+        return "PRISM";
+    }
 }
