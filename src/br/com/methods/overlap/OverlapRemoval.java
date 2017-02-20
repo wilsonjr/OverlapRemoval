@@ -27,7 +27,7 @@ public interface OverlapRemoval {
         long startTime = System.currentTimeMillis();
         ArrayList<OverlapRect> returned = apply(rects);
         long endTime = System.currentTimeMillis();
-        Logger.getLogger(OverlapRemoval.class.getName()).log(Level.INFO, "Execution time "+toString()+": {0}", ((endTime-startTime)/1000));
+        Logger.getLogger(OverlapRemoval.class.getName()).log(Level.INFO, "Execution time "+toString()+": {0}", ((endTime-startTime)/1000.0));
         
         return returned;                
     }

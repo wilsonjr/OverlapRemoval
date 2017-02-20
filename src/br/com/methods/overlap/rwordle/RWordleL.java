@@ -187,4 +187,8 @@ public class RWordleL implements OverlapRemoval {
                 
     }
     
+    @Override
+    public String toString() {
+        return "RWordleL";
+    }
 }

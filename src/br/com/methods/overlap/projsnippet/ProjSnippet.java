@@ -288,4 +288,9 @@ public class ProjSnippet implements OverlapRemoval {
                  comp++;
              }         
      }
+     
+     @Override
+     public String toString() {
+         return "ProjSnippet";
+     }
 }

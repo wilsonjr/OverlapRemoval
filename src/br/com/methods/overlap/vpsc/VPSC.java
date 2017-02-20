@@ -516,4 +516,9 @@ public class VPSC implements OverlapRemoval {
         
         return true;
     }
+    
+    @Override
+    public String toString() {
+        return "VPSC";
+    }
 }

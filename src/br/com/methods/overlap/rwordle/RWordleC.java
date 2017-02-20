@@ -128,4 +128,9 @@ public class RWordleC implements OverlapRemoval {
         return projected;
     }
     
+    @Override
+    public String toString() {
+        return "RWordleC";
+    }
+    
 }
