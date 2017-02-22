@@ -38,8 +38,11 @@ import br.com.methods.overlap.OverlapRemoval;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TreeSet;
+import java.util.stream.IntStream;
 
 /**
  *
@@ -53,14 +56,16 @@ public class VPSC implements OverlapRemoval {
      * @return Projeção sem sobreposição
      */
     @Override
-    public ArrayList<OverlapRect> apply(ArrayList<OverlapRect> rectangles) {
+    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rectangles) {
         /**
          * copy rectangles 
          */         
         ArrayList<OverlapRect> projected = new ArrayList<>();
-        for( OverlapRect r: rectangles )  
-            projected.add(new OverlapRect(r.getUX(), r.getUY(), r.getWidth(), r.getHeight()));
-        
+        System.out.println("toApply()");
+        rectangles.stream().forEach(r->{
+            projected.add(new OverlapRect(r.getUX(), r.getUY(), r.width, r.height));
+        });       
+        System.out.println("----------------------");
         /**
          *  init all variables
          */         
@@ -94,7 +99,13 @@ public class VPSC implements OverlapRemoval {
         for( int i = 0; i < projected.size(); ++i )  
             projected.get(i).moveY(vars.get(i).getPosition());           
         
-        return projected;      
+        
+        Map<OverlapRect, OverlapRect> projectedToReprojected = new HashMap<>();
+        IntStream.range(0, projected.size()).forEach(
+            i->projectedToReprojected.put(rectangles.get(i), projected.get(i))
+        );
+        
+        return projectedToReprojected;
            
     }
     
