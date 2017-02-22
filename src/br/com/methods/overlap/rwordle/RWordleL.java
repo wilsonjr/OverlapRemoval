@@ -19,7 +19,9 @@ import java.awt.Shape;
 import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 /**
  * Classe de implementação do método RWordleL
@@ -42,7 +44,7 @@ public class RWordleL implements OverlapRemoval {
      * @return Retângulos sem sobreposição.
      */
     @Override
-    public ArrayList<OverlapRect> apply(ArrayList<OverlapRect> rectangles) {
+    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rectangles) {
         
         /**
          * Finds the min and max x and y coordinates in rectangles
@@ -76,7 +78,7 @@ public class RWordleL implements OverlapRemoval {
             double distance = Util.distanciaEuclideana(0, 0, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
                         
             novos.add(new OverlapRect((rectangles.get(i).getUX()-distance), (rectangles.get(i).getUY()-distance), 
-                                    rectangles.get(i).getWidth(), rectangles.get(i).getHeight(), i));            
+                                    rectangles.get(i).getWidth(), rectangles.get(i).getHeight(), rectangles.get(i).getId()));            
         }
         
         /**
@@ -102,12 +104,7 @@ public class RWordleL implements OverlapRemoval {
         /**
          * Now, we sort the elements according with a scanline defined by angle alpha
          */        
-        Collections.sort(novos, new Comparator<OverlapRect>() {
-            @Override
-            public int compare(OverlapRect o1, OverlapRect o2) {
-                return new Double(o1.getUX()).compareTo(o2.getUX());
-            }            
-        });
+        Collections.sort(novos, (OverlapRect o1, OverlapRect o2)->new Double(o1.getUX()).compareTo(o2.getUX()));
         
         
         Rectangle.Double r = new Rectangle.Double();        
@@ -179,12 +176,15 @@ public class RWordleL implements OverlapRemoval {
                     xlinha = initialCenterX - r.getCenterX();
                     ylinha = initialCenterY - r.getCenterY();
                 }
-            }   
-            
+            }               
         }
         
-        return projected;
-                
+        Map<OverlapRect, OverlapRect> projectedToReprojected = new HashMap<>();
+        IntStream.range(0, rectangles.size()).forEach(
+            i->projectedToReprojected.put(rectangles.get(projected.get(i).getId()), projected.get(i))
+        );
+        
+        return projectedToReprojected;                
     }
     
     @Override
