@@ -21,9 +21,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import nu.thiele.mllib.classifiers.NearestNeighbour;
 import nu.thiele.mllib.data.Data;
 
@@ -56,7 +59,8 @@ public class ProjSnippet implements OverlapRemoval {
       
       * @return 
       */
-     public ArrayList<OverlapRect> apply(ArrayList<OverlapRect> retangulos) {
+     @Override
+     public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> retangulos) {
         resultado = -1;
         
         double[][] l = formGraph(retangulos);
@@ -106,14 +110,7 @@ public class ProjSnippet implements OverlapRemoval {
                     public void run() {
                         try {  
                             resultado = p.waitFor();
-                            System.out.println(p.getErrorStream().toString());
-                            System.out.println("Resultado: "+resultado);
-                            String line;
-                            BufferedReader input = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                            while ((line = input.readLine()) != null) {
-                              System.out.println(line);
-                            }
-                        } catch (InterruptedException | IOException ex) {
+                        } catch (InterruptedException ex) {
                             Logger.getLogger(ProjSnippet.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
@@ -142,7 +139,13 @@ public class ProjSnippet implements OverlapRemoval {
                         }
                     }                    
                 }
-                return projected;
+                
+                Map<OverlapRect, OverlapRect> projectedToReprojected = new HashMap<>();
+                IntStream.range(0, retangulos.size()).forEach(
+                    i->projectedToReprojected.put(retangulos.get(i), projected.get(i))
+                );                
+                
+                return projectedToReprojected;
             } 
             
         } catch( IOException e ) {
