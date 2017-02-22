@@ -391,15 +391,16 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         double[] center0 = Util.getCenter(rects);
         RWordleC rw = new RWordleC();
-        ArrayList<OverlapRect> projected = rw.apply(rects);
-        double[] center1 = Util.getCenter(projected);
+        Map<OverlapRect, OverlapRect> projected = rw.apply(rects);
+        ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
+        double[] center1 = Util.getCenter(projectedValues);
         
         double ammountX = center0[0]-center1[0];
         double ammountY = center0[1]-center1[1];
-        Util.translate(projected, ammountX, ammountY);
+        Util.translate(projectedValues, ammountX, ammountY);
         
-        Util.normalize(projected);
-        Util.toRetanguloVis(rectangles, projected);
+        Util.normalize(projectedValues);
+        Util.toRetanguloVis(rectangles, projectedValues);
 
         view.cleanImage();
         view.repaint();
@@ -414,17 +415,18 @@ public class Menu extends javax.swing.JFrame {
         
         ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         double[] center0 = Util.getCenter(rects);
-        //ArrayList<Retangulo> projected  = RWordleL.apply(rects, alpha, recentralizarJCheckBox.isSelected());
+        
         RWordleL rwl = new RWordleL(alpha, false);
-        ArrayList<OverlapRect> projected = rwl.apply(rects);
-        double[] center1 = Util.getCenter(projected);
+        Map<OverlapRect, OverlapRect> projected = rwl.apply(rects);
+        ArrayList<OverlapRect> projectedValues =  Util.getProjectedValues(projected);
+        double[] center1 = Util.getCenter(projectedValues);
                 
         double ammountX = center0[0]-center1[0];
         double ammountY = center0[1]-center1[1];
-        Util.translate(projected, ammountX, ammountY);
+        Util.translate(projectedValues, ammountX, ammountY);
         
-        Util.normalize(projected);
-        Util.toRetanguloVis(rectangles, projected);
+        Util.normalize(projectedValues);
+        Util.toRetanguloVis(rectangles, projectedValues);
 
         view.cleanImage();
         view.repaint();
@@ -548,31 +550,29 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         double[] center0 = Util.getCenter(rects);
         VPSC vpsc = new VPSC();
-        ArrayList<OverlapRect> projected = vpsc.apply(rects);
-        double[] center1 = Util.getCenter(projected);
         
-        for( int i = 0; i < rects.size(); ++i ) {
-            projected.get(i).setId(i);                    
-            rects.get(i).setId(i); 
-        }
+        Map<OverlapRect, OverlapRect> projected = vpsc.applyAndShowTime(rects);        
+        ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);        
         
+        double[] center1 = Util.getCenter(projectedValues);
+//        
+//        for( int i = 0; i < rects.size(); ++i ) {
+//            projectedValues.get(i).setId(i);                    
+//            rects.get(i).setId(i); 
+//        }
+//        
         double ammountX = center0[0]-center1[0];
         double ammountY = center0[1]-center1[1];
-        Util.translate(projected, ammountX, ammountY);                
-        Util.normalize(projected);        
+        Util.translate(projectedValues, ammountX, ammountY);                
+        Util.normalize(projectedValues);          
         
-        
-        
-        Util.toRetanguloVis(rectangles, projected);
-        
-        Metric ls = new SizeIncrease();
-        System.out.println("Resultado: "+ls.execute(rects, projected));
-        p1 = ((SizeIncrease)ls).getPolygon1();
-        p2 = ((SizeIncrease)ls).getPolygon2();
+        Util.toRetanguloVis(rectangles, projectedValues);
         
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_vpscJMenuItemActionPerformed
+
+    
 
     private void prismJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJMenuItemActionPerformed
         int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
@@ -581,23 +581,19 @@ public class Menu extends javax.swing.JFrame {
         
         double[] center0 = Util.getCenter(rects);
         PRISM prism = new PRISM(algo);
-        ArrayList<OverlapRect> projected = prism.applyAndShowTime(rects);
-        double[] center1 = Util.getCenter(projected);
-        
-        for( int i = 0; i < rects.size(); ++i ) {
-            projected.get(i).setId(i);                    
-            rects.get(i).setId(i);  
-        }
+        Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
+        ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
+        double[] center1 = Util.getCenter(projectedValues);
         
         double ammountX = center0[0]-center1[0];
         double ammountY = center0[1]-center1[1];
-        Util.translate(projected, ammountX, ammountY);        
-        Util.normalize(projected);
+        Util.translate(projectedValues, ammountX, ammountY);        
+        Util.normalize(projectedValues);
                 
         if( applySeamCarving )
-            addSeamCarvingResult(projected);
+            addSeamCarvingResult(projectedValues);
         
-        Util.toRetanguloVis(rectangles, projected);
+        Util.toRetanguloVis(rectangles, projectedValues);
         
         view.cleanImage();
         view.repaint();
@@ -656,23 +652,21 @@ public class Menu extends javax.swing.JFrame {
         boolean applySeamCarving = Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
         
         ProjSnippet ps = new ProjSnippet(Double.parseDouble(alpha_value), Integer.parseInt(k_value)+1);
-        ArrayList<OverlapRect> projected = ps.apply(rects);
+        Map<OverlapRect, OverlapRect> projected = ps.apply(rects);
+        ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
         if( projected != null ) {
             
-            double[] center1 = Util.getCenter(projected);
-            i = 0;
-            for( OverlapRect r: projected )
-                r.setId(i++);        
+            double[] center1 = Util.getCenter(projectedValues);
 
             double ammountX = center0[0]-center1[0];
             double ammountY = center0[1]-center1[1];
-            Util.translate(projected, ammountX, ammountY);
-            Util.normalize(projected);
+            Util.translate(projectedValues, ammountX, ammountY);
+            Util.normalize(projectedValues);
             
             if( applySeamCarving )
-                addSeamCarvingResult(projected);
+                addSeamCarvingResult(projectedValues);
             
-            Util.toRetanguloVis(rectangles, projected);
+            Util.toRetanguloVis(rectangles, projectedValues);
 
             view.cleanImage();
             view.repaint();
