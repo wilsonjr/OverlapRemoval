@@ -20,6 +20,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 /**
@@ -63,7 +64,6 @@ public class Util {
      */
     public static ArrayList<OverlapRect> toRetangulo(ArrayList<RetanguloVis> rects) {
         ArrayList<OverlapRect> rs = new ArrayList<>();
-        
         rects.forEach(r-> {
             rs.add(new OverlapRect(r.getUX(), r.getUY(), r.getWidth(), r.getHeight(), r.isPivot(), r.getLevel(), r.getCluster(), r.getHealth(), r.numero));
         });
@@ -77,7 +77,7 @@ public class Util {
      */
     public static void toRetanguloVis(ArrayList<RetanguloVis> ori, ArrayList<OverlapRect> rects) {
         
-        for( int i = 0; i < rects.size(); ++i ) {            
+        for( int i = 0; i < rects.size(); ++i ) {    
             ori.get(rects.get(i).getId()).setUX(rects.get(i).getUX());
             ori.get(rects.get(i).getId()).setUY(rects.get(i).getUY());
             ori.get(rects.get(i).getId()).setWidth(rects.get(i).getWidth());
@@ -1130,6 +1130,16 @@ public class Util {
         Point2D.Double centralPoint = new Point2D.Double(i.x + delta1/delta, i.y + delta2/delta);
         
         return Util.distanciaEuclideana(centralPoint.x, centralPoint.y, p.x, p.y) <= Util.distanciaEuclideana(centralPoint.x, centralPoint.y, i.x, i.y);        
+    }
+    
+    public static ArrayList<OverlapRect> getProjectedValues(Map<OverlapRect, OverlapRect> projected) {
+        ArrayList<OverlapRect> projectedValues = new ArrayList<>();
+        projected.entrySet().forEach((element)->{
+            
+            projectedValues.add(element.getValue());
+            projectedValues.get(projectedValues.size()-1).setId(element.getKey().getId());
+        });
+        return projectedValues;
     }
     
 }
