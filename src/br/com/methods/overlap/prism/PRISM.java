@@ -43,7 +43,10 @@ import br.com.methods.utils.Util;
 import delaunay_triangulation.Delaunay_Triangulation;
 import delaunay_triangulation.Triangle_dt;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 
 /**
@@ -240,14 +243,19 @@ public class PRISM implements OverlapRemoval {
      */
     private static ArrayList<OverlapRect> naivePRISM(ArrayList<OverlapRect> rects) {
         
-        double x = Math.abs(olapx(rects.get(0), rects.get(1)));
-        double y = Math.abs(olapy(rects.get(0), rects.get(1)));        
+         ArrayList<OverlapRect> projected = new ArrayList<>();
+        
+        for( int i = 0; i < rects.size(); ++i )
+            projected.add(new OverlapRect(rects.get(i).getUX(), rects.get(i).getUY(), rects.get(i).getWidth(), rects.get(i).getHeight()));
+        
+        double x = Math.abs(olapx(projected.get(0), projected.get(1)));
+        double y = Math.abs(olapy(projected.get(0), projected.get(1)));        
         
         if( x < y )
-            rects.get(0).setUX(rects.get(0).getUX()-x);
+            projected.get(0).setUX(projected.get(0).getUX()-x);
         else
-            rects.get(0).setUY(rects.get(0).getUY()-y);
-        return rects;
+            projected.get(0).setUY(projected.get(0).getUY()-y);
+        return projected;
     }
     
     /**
@@ -257,22 +265,31 @@ public class PRISM implements OverlapRemoval {
      * @return Retângulos sem sobreposição.
      */
     @Override
-    public ArrayList<OverlapRect> apply(ArrayList<OverlapRect> rects) {
-        
+    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rects) {
+        Map<OverlapRect, OverlapRect> projectedToReprojected = new HashMap<>();
+
         // para um nó apenas não há o que fazer
-        if( rects.size() <= 1 ) 
-            return rects;
-        
+        if( rects.size() <= 1 ) {
+            IntStream.range(0, rects.size()).forEach(i->projectedToReprojected.put(rects.get(i), rects.get(i)));
+            return projectedToReprojected;
+        }
         // para dois nós a remoção é trivial
-        if( rects.size() == 2 )
-            return naivePRISM(rects);
-        
+        if( rects.size() == 2 ) {
+            ArrayList<OverlapRect> naiveReprojected = naivePRISM(rects);
+            IntStream.range(0, rects.size()).forEach(
+                i->projectedToReprojected.put(rects.get(i), naiveReprojected.get(i))
+            );
+            return projectedToReprojected;
+        }
         // remove a sobreposição por meio de uma visão local
         ArrayList<OverlapRect> firstPass = apply(rects, false, structure);
         
         // remove o restante da sobreposição por meio de uma visão global
         ArrayList<OverlapRect> secondPass = apply(firstPass, true, structure);
-        return secondPass;
+        
+        IntStream.range(0, rects.size()).forEach(i->projectedToReprojected.put(rects.get(i), secondPass.get(i)));
+        
+        return projectedToReprojected;
     }
     
     
