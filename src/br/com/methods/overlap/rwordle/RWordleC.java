@@ -19,6 +19,9 @@ import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 /**
  * Classe de implementação do método RWordleC
@@ -32,7 +35,7 @@ public class RWordleC implements OverlapRemoval {
      * @return Projeção sem sobreposição.
      */
     @Override
-    public ArrayList<OverlapRect> apply(ArrayList<OverlapRect> rectangles) {
+    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rectangles) {
         
         /**
          * Finds the min and max x and y coordinates in rectangles
@@ -62,20 +65,14 @@ public class RWordleC implements OverlapRemoval {
             shapes.add(new IDShape(rectangles.get(i),
                                                  Util.distanciaEuclideana(centerX, centerY, 
                                                      rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY()), 
-                                                    i) );            
+                                                    rectangles.get(i).getId()) );            
         }        
         
         /**
          * arranges the elements according to the mass center
          */
-        Collections.sort(shapes, new Comparator<IDShape>() {
-            @Override
-            public int compare(IDShape o1, IDShape o2) {
-                return new Double(o1.getDistance()).compareTo(o2.getDistance());
-            }            
-        });
-            
-        
+        Collections.sort(shapes, (IDShape o1, IDShape o2)->new Double(o1.getDistance()).compareTo(o2.getDistance()));
+           
         ArrayList<OverlapRect> projected = new ArrayList<>();
         for( int i = 0; i < shapes.size(); ++i ) {
             /* this is a assumption */
@@ -125,7 +122,11 @@ public class RWordleC implements OverlapRemoval {
         }
         
         
-        return projected;
+        Map<OverlapRect, OverlapRect> projectedToReprojected = new HashMap<>();
+        IntStream.range(0, rectangles.size()).forEach(i->projectedToReprojected.put(
+                rectangles.get(projected.get(i).getId()), projected.get(i)));
+        
+        return projectedToReprojected;
     }
     
     @Override
