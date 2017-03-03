@@ -24,7 +24,8 @@ public interface OverlapRemoval {
     public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rects);
     
     default public Map<OverlapRect, OverlapRect> applyAndShowTime(ArrayList<OverlapRect> rects) {
-        
+        for( int i = 0; i < rects.size(); ++i )
+            rects.get(i).setId(i);
         long startTime = System.currentTimeMillis();
         Map<OverlapRect, OverlapRect> returned = apply(rects);
         long endTime = System.currentTimeMillis();
