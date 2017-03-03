@@ -10,7 +10,7 @@
 
 package br.com.methods.overlap.projsnippet;
 
-import br.com.grafos.ui.Menu;
+import br.com.test.ui.Menu;
 import br.com.methods.overlap.OverlapRemoval;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;

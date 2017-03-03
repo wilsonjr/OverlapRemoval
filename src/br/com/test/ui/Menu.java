@@ -16,11 +16,11 @@
  * and open the template in the editor.
  */
 
-package br.com.grafos.ui;
+package br.com.test.ui;
 
 
-import br.com.grafos.desenho.color.GrayScale;
-import br.com.grafos.desenho.color.RainbowScale;
+import br.com.test.draw.color.GrayScale;
+import br.com.test.draw.color.RainbowScale;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
 import br.com.methods.overlap.incboard.IncBoardExecutor;
 import br.com.methods.overlap.incboard.PointItem;

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package br.com.grafos.desenho.color;
+package br.com.test.draw.color;
 
 /**
  *
