@@ -554,13 +554,12 @@ public class Menu extends javax.swing.JFrame {
         Map<OverlapRect, OverlapRect> projected = vpsc.applyAndShowTime(rects);        
         ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);        
         
+        for( OverlapRect r: projectedValues ) {
+            System.out.println(r.getId()+": "+r.x+"; "+r.y);
+        }
+        
+        
         double[] center1 = Util.getCenter(projectedValues);
-//        
-//        for( int i = 0; i < rects.size(); ++i ) {
-//            projectedValues.get(i).setId(i);                    
-//            rects.get(i).setId(i); 
-//        }
-//        
         double ammountX = center0[0]-center1[0];
         double ammountY = center0[1]-center1[1];
         Util.translate(projectedValues, ammountX, ammountY);                
