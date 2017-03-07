@@ -79,7 +79,6 @@ public class Util {
     public static void toRetanguloVis(ArrayList<RetanguloVis> ori, ArrayList<OverlapRect> rects) {
         
         for( int i = 0; i < rects.size(); ++i ) {    
-            System.out.println(i+ " --> "+rects.get(i).getId());
             ori.get(i).setUX(rects.get(i).getUX());
             ori.get(i).setUY(rects.get(i).getUY());
             ori.get(i).setWidth(rects.get(i).getWidth());
