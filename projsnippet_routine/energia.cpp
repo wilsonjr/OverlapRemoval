@@ -10,9 +10,12 @@
 #include <iomanip>
 #include <fstream>
 #include <nlopt.hpp>
+#include <chrono>
 
 using namespace std;
 
+#define DEBUG
+#define DEBUG_TIME
 
 typedef struct point {
     double dist;
@@ -198,8 +201,9 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
         for( int i = 0; i < grad.size(); ++i ) {
             grad[i] = 0;
         }
-
+/*
         double w = x[N];
+
         vector<double> pontos_o_x;
         vector<double> pontos_o_y;
         for( int i = 0; i < N; i += 2 ) {
@@ -226,12 +230,13 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
             for( int j = 0; j < Y.size(); ++j )
                 grad[i+1] += alpha*first*(2.0*L[j][i/2]*Y[j]);
         }
+
         for( int i = 0; i < X.size(); ++i )
             grad[N] += alpha*first*(-2.0*deltax[i]*X[i]);
         for( int i = 0; i < Y.size(); ++i )
             grad[N] += alpha*first*(-2.0*deltay[i]*Y[i]);
 
-
+*/
 
         //cout << "-----------------------------------------------" << endl;
         for( int i = 0; i < N; i += 2 )
@@ -264,7 +269,7 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
                     grad[j] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[i/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
                 }
 
-              //  grad[j+1] += d_O_dx(x[i+1], height[i/2], x[j+1], height[j/2], 1) * O(x[i], width[i/2], x[j], width[j/2]);
+                grad[j+1] += d_O_dx(x[i+1], height[i/2], x[j+1], height[j/2], 1) * O(x[i], width[i/2], x[j], width[j/2]);
                 if( x[i+1] >= x[j+1] ) {
                     q = pow(height[j/2], 2.) - pow(x[i+1]-x[j+1], 2.);
                     grad[j+1] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[j/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
@@ -273,11 +278,6 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
                     grad[j+1] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[i/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
                 }
             }
-
-
-
-
-
     }
 
     double energia_o = 0.0;
@@ -289,16 +289,27 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
     energia_o = (2.0/(n*(n-1.0)))*energia_o;
 
     double energia_n = e_n(x);
-    //cout << "energia_o: " << energia_o << ", energia_n: " << energia_n << endl;
-    //cout << "energia total: " << (1.-alpha)*energia_o + alpha*energia_n << endl;
-    return (1.-alpha)*energia_o + alpha*energia_n;
+
+    #ifdef DEBUG
+        cout << "O-energy: " << energia_o << ", N-energy: " << energia_n << endl;
+    #endif // DEBUG
+
+
+    return energia_o;
+    //return energia_n;
+    //return (1.-alpha)*energia_o + alpha*energia_n;
 }
 
 vector<double> read_elems()
 {
     double x = 0.0, y = 0.0, w = 0.0, h = 0.0;
     vector<double> elems;
-    ifstream ifs("projsnippet_routine/points.rect");
+
+    #ifdef DEBUG
+        ifstream ifs("points.rect");
+    #else
+        ifstream ifs("projsnippet_routine/points.rect");
+    #endif // DEBUG
 
     if( ifs ) {
         int qtd = 0;
@@ -314,14 +325,14 @@ vector<double> read_elems()
             orig_y.push_back(y);
         }
         ifs >> x;
-        x = qtd/5;
+        x = 1;//td/5;
         elems.push_back(x);
         ifs >> alpha;
 
         originais = vector<double>(elems.begin(), elems.end());
         ifs.close();
     }
-
+  //  alpha = 0.8;
     return elems;
 }
 
@@ -329,7 +340,11 @@ vector<vector<double> > read_matrix() {
 
     vector<vector<double> > m;
 
-    ifstream ifs("projsnippet_routine/matrixL.matrix");
+    #ifdef DEBUG
+        ifstream ifs("matrixL.matrix");
+    #else
+        ifstream ifs("projsnippet_routine/matrixL.matrix");
+    #endif // DEBUG
 
     if( ifs ) {
         int dim;
@@ -361,21 +376,25 @@ int main(int argc, char** argv) {
 
     nlopt::opt opt(nlopt::LD_MMA, n);
     vector<double> lb(n, 0);
-    //cout << media*(n/2)+(menor+30) << endl;
-    //cout << media << endl;
-    //cout << media*(n/2) << endl;
-    //cout << (menor+30) << endl;
 
-    vector<double> up(n, media*(n/2)+(menor+30));
+    vector<double> up(n, width[0]*height[0]*n);//media*(n/2)+(menor+30));
     opt.set_lower_bounds(lb);
     opt.set_upper_bounds(up);
-    opt.set_stopval(0.0001);
-    opt.set_maxeval(5000);
-    opt.set_maxtime(900);
+    opt.set_stopval(0.00001);
+  //  opt.set_maxeval(5000);
+   // opt.set_maxtime(900);
     opt.set_min_objective(objective_function, NULL);
 
     double minf = 0;
+    std::chrono::steady_clock::time_point begin_time = std::chrono::steady_clock::now();
     nlopt::result result = opt.optimize(x, minf);
+    std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
+
+    #ifdef DEBUG_TIME
+        std::cout << "Time: " << std::chrono::duration_cast<std::chrono::microseconds>(end_time-begin_time).count()/1000000.0 << std::endl;
+    #endif
+
+
     ofstream ofs("projsnippet_routine/point_solve.rect");
     if( ofs ) {
         ofs << x.size()/2 << endl;
