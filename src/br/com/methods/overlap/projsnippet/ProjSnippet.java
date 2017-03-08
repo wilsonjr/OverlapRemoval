@@ -78,7 +78,7 @@ public class ProjSnippet implements OverlapRemoval {
             try( BufferedWriter bw = new BufferedWriter(fw) ) {
                 bw.write(retangulos.size()+"\n");
                 for( OverlapRect r: retangulos )
-                    bw.write(r.getUX()+" "+r.getLY()+" "+r.getWidth()+" "+r.getHeight()+"\n");
+                    bw.write(r.x+" "+(r.y+r.height)+" "+r.getWidth()+" "+r.getHeight()+"\n");
                 bw.write("1\n"); // w inicial
                 bw.write(String.valueOf(alpha));
             }
