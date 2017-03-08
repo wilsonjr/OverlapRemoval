@@ -338,6 +338,27 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
         update_gradient(grad, grad_eo_x, grad_eo_y);
         update_gradient(grad, grad_en_x, grad_en_y);
 
+        // ----------------------------------------------------------------------------------------
+
+        // gradient for 'w'
+        double soma = 0;
+        for( int i = 0; i < n; ++i ) {
+            double valuey = 0, valuey0 = 0, valuex = 0, valuex0 = 0;
+            for( int j = 0; j < n; ++j ) {
+                valuex += L[j][i]*X[j];
+                valuex0 += L[j][i]*X0[j];
+                valuey += L[j][i]*Y[j];
+                valuey0 += L[j][i]*Y[j];
+            }
+
+            double rx = fabs(valuex - w*valuex0);
+            double rx_sign = sign(valuex-w*valuex0);
+            double ry = fabs(valuey - w*valuey0);
+            double ry_sign = sign(valuey-w*valuey0);
+
+            soma += ((2*rx*rx_sign*valuex0) + (2*ry*ry_sign*valuey0));
+        }
+        w = -(alpha*n2*soma)/divisor;
 
     }
 
@@ -346,21 +367,16 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
     for( int i = 0; i < X.size(); ++i )
         for( int j = i+1; j < X.size(); ++j )
             energia_o += O(X[i], h, X[j], h) * O(Y[i], v, Y[j], v);
-    /*for( int i = 0; i < N; i += 2 )
-        for( int j = i+2; j < N; j += 2 ) {
-            energia_o += O(x[i], h, x[j], h) * O(x[i+1], v, x[j+1], v);
-        }*/
-
     energia_o = (2.0/(n*(n-1.0)))*energia_o;
 
     //double energia_n = e_n(x);
     double energia_n = 0;
     #ifdef DEBUG
-        cout << "O-energy: " << energia_o << ", N-energy: " << energia_n << endl;
+        cout << "O-energy: " << (1-alpha)*energia_o << ", N-energy: " << energia_n << endl;
     #endif // DEBUG
 
 
-    return energia_o;
+    return (1-alpha)*energia_o;
     //return energia_n;
     //return (1.-alpha)*energia_o + alpha*energia_n;
 }
