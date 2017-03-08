@@ -197,15 +197,22 @@ void transfer_elements(const std::vector<double> &x, std::vector<double>& X, std
     }
 }
 
-void update_gradient_on(std::vector<double> &grad, std::vector<double>& grad_on_x, std::vector<double>& grad_on_y)
+void update_gradient(std::vector<double> &grad, std::vector<double>& grad_x, std::vector<double>& grad_y)
 {
     int N = grad.size()-1;
     for( int i = 0, j = 0; i < N; i += 2, j++ ) {
-        grad[i] += grad_on_x[j];
-        grad[i+1] += grad_on_y[j];
+        grad[i] += grad_x[j];
+        grad[i+1] += grad_y[j];
     }
 
 
+}
+
+double sign(double element)
+{
+    if( element == 0.0 ) return 0;
+    if( element > 0.0 ) return 1;
+    return -1;
 }
 
 double objective_function(const std::vector<double> &x, std::vector<double> &grad, void *my_func_data)
@@ -294,18 +301,42 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
 
         // gradient for EN component (x)
         for( int i = 0; i < n; ++i ) {
+            double soma = 0;
             for( int j = 0; j < n; ++j ) {
                 double valuex = 0, valuex0 = 0;
                 for( int k = 0; k < n; ++k ) {
-
+                    valuex += L[k][j]*X[k];
+                    valuex0 += L[k][j]*X0[k];
                 }
+
+                double value = fabs(valuex - w*valuex0);
+                double value_sign = sign(valuex - w*valuex0);
+
+                soma += (2.*L[i][j]*value*value_sign);
             }
+            grad_en_x[i] = ((n2*alpha*soma)/divisor);
         }
 
+        // gradient for EN component (y)
+        for( int i = 0; i < n; ++i ) {
+            double soma = 0;
+            for( int j = 0; j < n; ++j ) {
+                double valuey = 0, valuey0 = 0;
+                for( int k = 0; k < n; ++k ) {
+                    valuey += L[k][j]*Y[k];
+                    valuey0 += L[k][j]*Y0[k];
+                }
 
+                double value = fabs(valuey - w*valuey0);
+                double value_sign = sign(valuey - w*valuey0);
 
+                soma += (2.*L[i][j]*value*value_sign);
+            }
+            grad_en_y[i] = ((n2*alpha*soma)/divisor);
+        }
 
-        update_gradient_on(grad, grad_eo_x, grad_eo_y);
+        update_gradient(grad, grad_eo_x, grad_eo_y);
+        update_gradient(grad, grad_en_x, grad_en_y);
 
 
     }
