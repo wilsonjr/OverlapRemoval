@@ -14,6 +14,8 @@
 
 using namespace std;
 
+//#define REALISE
+#define DEBUG_ENERGY
 #define DEBUG
 #define DEBUG_TIME
 
@@ -101,8 +103,8 @@ inline double norma(const vector<double>& c)
 {
     double soma = 0.0;
     for( int i = 0; i < c.size(); ++i )
-        soma += (c[i]*c[i]);
-    return sqrt(soma);
+        soma += (c[i]);
+    return fabs(soma);
 }
 
 vector<double> delta_x()
@@ -164,28 +166,11 @@ double x_plus(double x)
 	return x;
 }
 
-double d_xplus_dx(double x)
-{
-    if( x < 0.0 )
-        return 0;
-    return 1;
-}
-
 double O(double ai, double bi, double aj, double bj)
 {
 	if( ai >= aj )
 		return (1.0 / pow(bj, 4.0)) * pow(x_plus(pow(bj, 2.0) - pow(ai-aj, 2.0)), 2.0);
 	return (1.0 / pow(bi, 4.0)) * pow(x_plus(pow(bi, 2.0) - pow(ai-aj, 2.0)), 2.0);
-}
-
-double d_O_dx(double ai, double bi, double aj, double bj, double signal)
-{
-    if( ai >= aj ) {
-        double q = (bj, 2.) - pow(ai-aj, 2.);
-        return (signal*4. * (ai-aj) * x_plus(q) * d_xplus_dx(q) ) / pow(bj, 4.);
-    }
-    double q = (bi, 2.) - pow(ai-aj, 2.);
-    return (signal*4. * (ai-aj) * x_plus(q) * d_xplus_dx(q) ) / pow(bi, 4.);
 }
 
 void transfer_elements(const std::vector<double> &x, std::vector<double>& X, std::vector<double>& Y)
@@ -204,8 +189,6 @@ void update_gradient(std::vector<double> &grad, std::vector<double>& grad_x, std
         grad[i] += grad_x[j];
         grad[i+1] += grad_y[j];
     }
-
-
 }
 
 double sign(double element)
@@ -280,20 +263,20 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
                     double num = 2. * (2.*Y[i] - 2.*Y[j]) * (pow(Y[i] - Y[j], 2.) - v*v) * pow(pow(X[i] - X[j], 2.) - h*h, 2.);
                     soma += (num/h4v4);
                 } else {
-                    double num = - 2. * (2.*Y[j] - 2.*Y[i]) * (pow(Y[j] - Y[i], 2.) - v*v) * pow(pow(Y[j] - Y[i], 2.) - h*h, 2.);
+                    double num = - 2. * (2.*Y[j] - 2.*Y[i]) * (pow(Y[j] - Y[i], 2.) - v*v) * pow(pow(X[j] - X[i], 2.) - h*h, 2.);
                     soma += (num/h4v4);
                 }
             }
             grad_eo_y[i] = soma*fator_on*(1-alpha);
         }
-
+         update_gradient(grad, grad_eo_x, grad_eo_y);
         // -----------------------------------------------------------------------------------------------------------------------
         double divisor = 0;
         for( int i = 0; i < n; ++i ) {
             double somax = 0, somay = 0;
             for( int j = 0; j < n; ++j ) {
-                somax += L[j][i]*X0[j];
-                somay += L[j][i]*Y0[j];
+                somax += L[i][j]*X0[j];
+                somay += L[i][j]*Y0[j];
             }
             divisor += (2.*pow(fabs(somax), 2.) + 2.*pow(fabs(somay), 2.));
         }
@@ -305,14 +288,14 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
             for( int j = 0; j < n; ++j ) {
                 double valuex = 0, valuex0 = 0;
                 for( int k = 0; k < n; ++k ) {
-                    valuex += L[k][j]*X[k];
-                    valuex0 += L[k][j]*X0[k];
+                    valuex += L[j][k]*X[k];
+                    valuex0 += L[j][k]*X0[k];
                 }
 
                 double value = fabs(valuex - w*valuex0);
                 double value_sign = sign(valuex - w*valuex0);
 
-                soma += (2.*L[i][j]*value*value_sign);
+                soma += (2.*L[j][i]*value*value_sign);
             }
             grad_en_x[i] = ((n2*alpha*soma)/divisor);
         }
@@ -323,19 +306,18 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
             for( int j = 0; j < n; ++j ) {
                 double valuey = 0, valuey0 = 0;
                 for( int k = 0; k < n; ++k ) {
-                    valuey += L[k][j]*Y[k];
-                    valuey0 += L[k][j]*Y0[k];
+                    valuey += L[j][k]*Y[k];
+                    valuey0 += L[j][k]*Y0[k];
                 }
 
                 double value = fabs(valuey - w*valuey0);
                 double value_sign = sign(valuey - w*valuey0);
 
-                soma += (2.*L[i][j]*value*value_sign);
+                soma += (2.*L[j][i]*value*value_sign);
             }
             grad_en_y[i] = ((n2*alpha*soma)/divisor);
         }
 
-        update_gradient(grad, grad_eo_x, grad_eo_y);
         update_gradient(grad, grad_en_x, grad_en_y);
 
         // ----------------------------------------------------------------------------------------
@@ -345,10 +327,10 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
         for( int i = 0; i < n; ++i ) {
             double valuey = 0, valuey0 = 0, valuex = 0, valuex0 = 0;
             for( int j = 0; j < n; ++j ) {
-                valuex += L[j][i]*X[j];
-                valuex0 += L[j][i]*X0[j];
-                valuey += L[j][i]*Y[j];
-                valuey0 += L[j][i]*Y[j];
+                valuex += L[i][j]*X[j];
+                valuex0 += L[i][j]*X0[j];
+                valuey += L[i][j]*Y[j];
+                valuey0 += L[i][j]*Y0[j];
             }
 
             double rx = fabs(valuex - w*valuex0);
@@ -359,7 +341,7 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
             soma += ((2*rx*rx_sign*valuex0) + (2*ry*ry_sign*valuey0));
         }
         w = -(alpha*n2*soma)/divisor;
-
+        grad[N] = w;
     }
 
     double energia_o = 0.0;
@@ -368,17 +350,11 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
         for( int j = i+1; j < X.size(); ++j )
             energia_o += O(X[i], h, X[j], h) * O(Y[i], v, Y[j], v);
     energia_o = (2.0/(n*(n-1.0)))*energia_o;
-
-    //double energia_n = e_n(x);
-    double energia_n = 0;
-    #ifdef DEBUG
-        cout << "O-energy: " << (1-alpha)*energia_o << ", N-energy: " << energia_n << endl;
+    double energia_n = e_n(x);
+    #ifdef DEBUG_ENERGY
+        cout << "O-energy: " << (1-alpha)*energia_o << ", N-energy: " << alpha*energia_n << endl;
     #endif // DEBUG
-
-
-    return (1-alpha)*energia_o;
-    //return energia_n;
-    //return (1.-alpha)*energia_o + alpha*energia_n;
+    return (1.-alpha)*energia_o + alpha*energia_n;
 }
 
 vector<double> read_elems()
@@ -388,7 +364,8 @@ vector<double> read_elems()
 
     #ifdef DEBUG
         ifstream ifs("points.rect");
-    #else
+    #endif
+    #ifdef REALISE
         ifstream ifs("projsnippet_routine/points.rect");
     #endif // DEBUG
 
@@ -403,24 +380,24 @@ vector<double> read_elems()
             width.push_back(ww);
             height.push_back(hh);
 
-            orig_x.push_back(x);
-            orig_y.push_back(y);
-            X0.push_back(x);
-            Y0.push_back(y);
+            orig_x.push_back(x+(ww/2));
+            orig_y.push_back(y-(hh/2));
+            X0.push_back(x+(ww/2));
+            Y0.push_back(y-(hh/2));
 
         }
         h = width[0];
         v = width[0];
 
         ifs >> x;
-        x = 1;//td/5;
+      //  x = 0;//td/5;
         elems.push_back(x);
         ifs >> alpha;
 
         originais = vector<double>(elems.begin(), elems.end());
         ifs.close();
     }
-  //  alpha = 0.8;
+    //alpha = 0.3;
     return elems;
 }
 
@@ -430,7 +407,8 @@ vector<vector<double> > read_matrix() {
 
     #ifdef DEBUG
         ifstream ifs("matrixL.matrix");
-    #else
+    #endif
+    #ifdef REALISE
         ifstream ifs("projsnippet_routine/matrixL.matrix");
     #endif // DEBUG
 
@@ -465,14 +443,15 @@ int main(int argc, char** argv) {
     nlopt::opt opt(nlopt::LD_MMA, n);
     vector<double> lb(n, 0);
 
-    vector<double> up(n, h*((n-1)/2));
+    vector<double> up(n, media*(n/2)+(menor+30));
     opt.set_lower_bounds(lb);
     opt.set_upper_bounds(up);
     opt.set_stopval(0.00001);
-  //  opt.set_maxeval(5000);
+    //opt.set_maxeval(200);
+
+    opt.set_ftol_abs(0.001);
    // opt.set_maxtime(900);
     opt.set_min_objective(objective_function, NULL);
-
     double minf = 0;
     std::chrono::steady_clock::time_point begin_time = std::chrono::steady_clock::now();
     nlopt::result result = opt.optimize(x, minf);
