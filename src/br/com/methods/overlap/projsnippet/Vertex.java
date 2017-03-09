@@ -52,6 +52,10 @@ public class Vertex implements HeapElement {
     }
     
     public void add(Edge v) {
+        for( Edge e: adj )
+            if( e.getV() == v.getV() )
+                return;
+        
         adj.add(v);
     }
     
