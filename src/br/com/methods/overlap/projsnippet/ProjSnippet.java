@@ -14,14 +14,13 @@ import br.com.test.ui.Menu;
 import br.com.methods.overlap.OverlapRemoval;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -169,26 +168,53 @@ public class ProjSnippet implements OverlapRemoval {
          
          // Para cada vértice, encontra seus vizinhos mais próximos
          Vertex[] grafo = new Vertex[retangulos.size()];
+         for( int i = 0; i < grafo.length; ++i ) {
+             grafo[i] = new Vertex(i);
+         }
          for (int i = 0; i < data.size(); ++i) {
             Data.DataEntry[] e = NearestNeighbour.getKNearestNeighbours(data, data.get(i).getX(), 
                     kNeighbours > retangulos.size() ? retangulos.size() : kNeighbours);
             
             // forma o grafo de acordo com os vizinhos mais próximos
-            Vertex v = new Vertex(i);
-            for( int j = 0; j < e.length; ++j ) {
-                if( v.getId() != (long)e[j].getY() )
+            Vertex v = grafo[i];
+            System.out.print(v.getId()+": ");
+            for( int j = 0; j < e.length; ++j ) {                
+                if( v.getId() != (long)e[j].getY() ) {
                     v.add(new Edge(i, (Long)e[j].getY(), Util.distanciaEuclideana(data.get(i).getX()[0], 
                                                                                   data.get(i).getX()[1], 
                                                                                   e[j].getX()[0],
                                                                                   e[j].getX()[1])));
+                    grafo[((Long)e[j].getY()).intValue()].add(new Edge((Long)e[j].getY(), i, 
+                                                    Util.distanciaEuclideana(data.get(i).getX()[0], 
+                                                                                  data.get(i).getX()[1], 
+                                                                                  e[j].getX()[0],
+                                                                                  e[j].getX()[1])));
+                    System.out.print(e[j].getY()+" ");
+                }
+                
             }
-            grafo[i] = v;
+            System.out.println();
          }         
          
          // encontra as componentes resultante do kNN
          findComponents(grafo);
          
+         System.out.println("Componentes:");
+         for( int i = 0; i < grafo.length; ++i ) 
+             System.out.println(grafo[i].getId()+": "+grafo[i].getComponente());
+         
+         
          // "aumenta" o número de arestas ligando possíveis componentes desconectadas
+         System.out.println("ARESTAS 1");
+         for( int i = 0; i < grafo.length; ++i ) {
+             Vertex v = grafo[i];
+             LinkedList<Edge> adj = v.getAdj();             
+             System.out.print(v.getId()+": ");
+             for( int j = 0; j < adj.size(); ++j ) {
+                 System.out.print(adj.get(j).getV()+" ");
+             }
+             System.out.println();
+         }
          Vertex[] c = completedGraph(retangulos);
          
          // encontra a árvore geradora mínima
@@ -214,6 +240,16 @@ public class ProjSnippet implements OverlapRemoval {
                      grafo[(int)e.getV()].add(new Edge(e.getV(), e.getU(), e.getPeso()));
              }
          }
+         System.out.println("ARESTAS 2");
+         for( int i = 0; i < grafo.length; ++i ) {
+             Vertex v = grafo[i];
+             LinkedList<Edge> adj = v.getAdj();             
+             System.out.print(v.getId()+": ");
+             for( int j = 0; j < adj.size(); ++j ) {
+                 System.out.print(adj.get(j).getV()+" ");
+             }
+             System.out.println();
+         }
                   
          /** cria a matriz L, definida da seguinte forma:
           * L_ii = 1
@@ -224,13 +260,13 @@ public class ProjSnippet implements OverlapRemoval {
          double[][] l = new double[grafo.length][grafo.length];
          for( Vertex v: grafo ) {
              for( Edge e: v.getAdj() ) 
-                 l[(int)e.getU()][(int)e.getV()] = -1.0/((double)v.getAdj().size()+2);             
+                 l[(int)e.getU()][(int)e.getV()] = -1.0/((double)v.getAdj().size());             
          }                  
          for( int i = 0; i < l.length; ++i ) 
              l[i][i] = 1.0;
          
          return l;         
-     }
+     }     
      
      /**
       * Cria um grafo completo
