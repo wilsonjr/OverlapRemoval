@@ -78,6 +78,7 @@ double e_n(const vector<double>& pontos_o)
     vector<double> y = Lxy(L, pontos_o_y);
     vector<double> deltax = delta_x();//Lxy(L, orig_x);
     vector<double> deltay = delta_y();// = Lxy(L, orig_y);
+
     for( int i = 0; i < x.size(); ++i ) {
         x[i] = x[i] - w*deltax[i];
         y[i] = y[i] - w*deltay[i];
@@ -90,11 +91,6 @@ double e_n(const vector<double>& pontos_o)
 
     return (pow((double)n, 2.0)* (ddx + ddy)) /
                     (2.0 * (dx + dy));
-}
-
-inline double distancia(double x1, double y1, double x2, double y2)
-{
-    return sqrt(pow(x1-x2, 2.) + pow(y1-y2, 2.));
 }
 
 double x_plus(double x)
@@ -125,8 +121,8 @@ void update_gradient(std::vector<double> &grad, std::vector<double>& grad_x, std
 {
     int N = grad.size()-1;
     for( int i = 0, j = 0; i < N; i += 2, j++ ) {
-        grad[i] += grad_x[j];
-        grad[i+1] += grad_y[j];
+        grad[i] = grad_x[j];
+        grad[i+1] = grad_y[j];
     }
 }
 
@@ -154,7 +150,7 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
             grad[i] = 0;
         }
         vector<double> grad_en_x(X.size(), 0), grad_en_y(Y.size(), 0), grad_eo_x(X.size(), 0), grad_eo_y(Y.size(), 0);
-
+        vector<double> updatex(X.size(), 0), updatey(Y.size(), 0);
         double h4v4 = pow(h, 4.)*pow(v, 4.);
         double fator_on = 2.0/(n*(n-1.));
         double n2 = n*n;
@@ -208,7 +204,7 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
             }
             grad_eo_y[i] = soma*fator_on*(1-alpha);
         }
-         update_gradient(grad, grad_eo_x, grad_eo_y);
+         //update_gradient(grad, grad_eo_x, grad_eo_y);
         // -----------------------------------------------------------------------------------------------------------------------
         double divisor = 0;
         for( int i = 0; i < n; ++i ) {
@@ -257,7 +253,13 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
             grad_en_y[i] = ((n2*alpha*soma)/divisor);
         }
 
-        update_gradient(grad, grad_en_x, grad_en_y);
+        //update_gradient(grad, grad_en_x, grad_en_y);
+        for( int i = 0; i < X.size(); ++i ) {
+
+            updatex[i] = grad_eo_x[i]+grad_en_x[i];
+            updatey[i] = grad_eo_y[i]+grad_en_y[i];
+        }
+        update_gradient(grad, updatex, updatey);
 
         // ----------------------------------------------------------------------------------------
 
@@ -330,7 +332,7 @@ vector<double> read_elems()
         v = width[0];
 
         ifs >> x;
-        x = 2;
+        x = 1;
         elems.push_back(x);
         ifs >> alpha;
 
@@ -380,14 +382,14 @@ int main(int argc, char** argv) {
         media += (width[i]+height[i]);
     media /= (2.0*width.size());
     nlopt::opt opt(nlopt::LD_MMA, n);
-    vector<double> lb(n, 0);
-    vector<double> up(n, media*(n/2)+(menor+30));
-    opt.set_lower_bounds(lb);
-    opt.set_upper_bounds(up);
-    opt.set_stopval(0.009);
+   // vector<double> lb(n, 0);
+   // vector<double> up(n, media*(n/2)+(menor+30));
+//    opt.set_lower_bounds(lb);
+//    opt.set_upper_bounds(up);
+    opt.set_stopval(0.00001);
     //opt.set_maxeval(200);
-    opt.set_ftol_abs(0.009);
-    //opt.set_ftol_rel(0.0001);
+  //  opt.set_ftol_abs(0.0001);
+    opt.set_ftol_rel(0.0001);
    // opt.set_maxtime(900);
     opt.set_min_objective(objective_function, NULL);
 
