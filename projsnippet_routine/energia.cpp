@@ -14,34 +14,11 @@
 
 using namespace std;
 
-//#define REALISE
-#define DEBUG_ENERGY
-#define DEBUG
-#define DEBUG_TIME
+#define REALISE
+//#define DEBUG_ENERGY
+//#define DEBUG
+//#define DEBUG_TIME
 
-typedef struct point {
-    double dist;
-    int id;
-    point() {}
-    point(int i, double d):id(i), dist(d) {}
-    bool operator<(const point& b) const {
-        return dist < b.dist;
-    }
-} point;
-
-
-typedef struct vertice {
-    long id;
-    bool visitado;
-    double x, y;
-    list<long> adj;
-    set<point> elems;
-} vertice;
-
-
-typedef struct {
-    int idx;
-} my_constraint_data;
 int counter = 0;
 
 vector<double> height;
@@ -52,39 +29,6 @@ vector<double> orig_x, X0;
 vector<double> orig_y, Y0;
 double alpha;
 double h, v;
-
-int idx_maior;
-
-int findMultiplier(const vector<double>& c, double w)
-{
-    for( int i = 1; i <= c.size(); ++i ) {
-        int z = i;
-        if( z <= 2 )
-            z = 2;
-
-        bool menorIgual = false;
-        bool var = true;
-        for( int j = 1, k = 1; j <= c.size(); ++j ) {
-
-            if( i == j )
-                menorIgual = true;
-            if( menorIgual )
-                var = var && (w*c[k] - w*c[z] <= 0);
-            else
-                var = var && (w*c[k] - w*c[z] > 0);
-
-            if( k < i && k <= j )
-                k++;
-            if( z <= j+1 )
-                z++;
-
-        }
-        if( var )
-            return i-1;
-    }
-
-    return c.size()-1;
-}
 
 vector<double> Lxy(vector<vector<double> >& l, vector<double>& xy)
 {
@@ -103,8 +47,8 @@ inline double norma(const vector<double>& c)
 {
     double soma = 0.0;
     for( int i = 0; i < c.size(); ++i )
-        soma += (c[i]);
-    return fabs(soma);
+        soma += (c[i]*c[i]);
+    return sqrt(soma);
 }
 
 vector<double> delta_x()
@@ -151,11 +95,6 @@ double e_n(const vector<double>& pontos_o)
 inline double distancia(double x1, double y1, double x2, double y2)
 {
     return sqrt(pow(x1-x2, 2.) + pow(y1-y2, 2.));
-}
-
-bool comp_distancia(const point& a, const point& b)
-{
-    return a.dist < b.dist;
 }
 
 double x_plus(double x)
@@ -210,7 +149,7 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
     transfer_elements(x, X, Y);
 
     if (!grad.empty()) {
-      //  cout << "counter: " << counter << endl;
+        cout << "counter: " << counter << endl;
         for( int i = 0; i < grad.size(); ++i ) {
             grad[i] = 0;
         }
@@ -231,7 +170,7 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
                 double valuex = x_plus(pow(h, 2.) - pow(X[i] - X[j], 2.));
                 double valuey = x_plus(pow(v, 2.) - pow(Y[i] - Y[j], 2.));
 
-                if( !valuex || !valuey )
+                if( valuex == 0.0 || valuey == 0.0 )
                     continue;
 
                 if( i < j ) {
@@ -343,17 +282,18 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
         w = -(alpha*n2*soma)/divisor;
         grad[N] = w;
     }
-
     double energia_o = 0.0;
-
     for( int i = 0; i < X.size(); ++i )
         for( int j = i+1; j < X.size(); ++j )
             energia_o += O(X[i], h, X[j], h) * O(Y[i], v, Y[j], v);
     energia_o = (2.0/(n*(n-1.0)))*energia_o;
     double energia_n = e_n(x);
+
     #ifdef DEBUG_ENERGY
-        cout << "O-energy: " << (1-alpha)*energia_o << ", N-energy: " << alpha*energia_n << endl;
+        //cout << "O-energy: " << energia_o << endl;
+        cout << "O-energy: " << (1-alpha)*energia_o << ", N-energy: " << alpha*energia_n << ", w: " << x[N] << endl;
     #endif // DEBUG
+    //return energia_o;
     return (1.-alpha)*energia_o + alpha*energia_n;
 }
 
@@ -380,17 +320,17 @@ vector<double> read_elems()
             width.push_back(ww);
             height.push_back(hh);
 
-            orig_x.push_back(x+(ww/2));
-            orig_y.push_back(y-(hh/2));
-            X0.push_back(x+(ww/2));
-            Y0.push_back(y-(hh/2));
+            orig_x.push_back(x);
+            orig_y.push_back(y);
+            X0.push_back(x);
+            Y0.push_back(y);
 
         }
         h = width[0];
         v = width[0];
 
         ifs >> x;
-      //  x = 0;//td/5;
+        x = 2;
         elems.push_back(x);
         ifs >> alpha;
 
@@ -439,19 +379,18 @@ int main(int argc, char** argv) {
     for( int i = 0; i < width.size(); ++i )
         media += (width[i]+height[i]);
     media /= (2.0*width.size());
-
     nlopt::opt opt(nlopt::LD_MMA, n);
     vector<double> lb(n, 0);
-
     vector<double> up(n, media*(n/2)+(menor+30));
     opt.set_lower_bounds(lb);
     opt.set_upper_bounds(up);
-    opt.set_stopval(0.00001);
+    opt.set_stopval(0.009);
     //opt.set_maxeval(200);
-
-    opt.set_ftol_abs(0.001);
+    opt.set_ftol_abs(0.009);
+    //opt.set_ftol_rel(0.0001);
    // opt.set_maxtime(900);
     opt.set_min_objective(objective_function, NULL);
+
     double minf = 0;
     std::chrono::steady_clock::time_point begin_time = std::chrono::steady_clock::now();
     nlopt::result result = opt.optimize(x, minf);
