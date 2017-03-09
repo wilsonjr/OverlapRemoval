@@ -10,14 +10,8 @@
 #include <iomanip>
 #include <fstream>
 #include <nlopt.hpp>
-#include <chrono>
 
 using namespace std;
-
-#define REALISE
-//#define DEBUG_ENERGY
-//#define DEBUG
-//#define DEBUG_TIME
 
 int counter = 0;
 
@@ -25,10 +19,9 @@ vector<double> height;
 vector<double> width;
 vector<vector<double> > L;
 vector<double> originais;
-vector<double> orig_x, X0;
-vector<double> orig_y, Y0;
+vector<double> orig_x;
+vector<double> orig_y;
 double alpha;
-double h, v;
 
 vector<double> Lxy(vector<vector<double> >& l, vector<double>& xy)
 {
@@ -78,7 +71,6 @@ double e_n(const vector<double>& pontos_o)
     vector<double> y = Lxy(L, pontos_o_y);
     vector<double> deltax = delta_x();//Lxy(L, orig_x);
     vector<double> deltay = delta_y();// = Lxy(L, orig_y);
-
     for( int i = 0; i < x.size(); ++i ) {
         x[i] = x[i] - w*deltax[i];
         y[i] = y[i] - w*deltay[i];
@@ -93,12 +85,20 @@ double e_n(const vector<double>& pontos_o)
                     (2.0 * (dx + dy));
 }
 
+
 double x_plus(double x)
 {
 	if( x < 0.0 )
 		return 0.0;
 
 	return x;
+}
+
+double d_xplus_dx(double x)
+{
+    if( x < 0.0 )
+        return 0;
+    return 1;
 }
 
 double O(double ai, double bi, double aj, double bj)
@@ -108,29 +108,14 @@ double O(double ai, double bi, double aj, double bj)
 	return (1.0 / pow(bi, 4.0)) * pow(x_plus(pow(bi, 2.0) - pow(ai-aj, 2.0)), 2.0);
 }
 
-void transfer_elements(const std::vector<double> &x, std::vector<double>& X, std::vector<double>& Y)
+double d_O_dx(double ai, double bi, double aj, double bj, double signal)
 {
-    int N = x.size()-1;
-    for( int i = 0; i < N; i += 2 ) {
-        X.push_back(x[i]);
-        Y.push_back(x[i+1]);
+    if( ai >= aj ) {
+        double q = (bj, 2.) - pow(ai-aj, 2.);
+        return (signal*4. * (ai-aj) * x_plus(q) * d_xplus_dx(q) ) / pow(bj, 4.);
     }
-}
-
-void update_gradient(std::vector<double> &grad, std::vector<double>& grad_x, std::vector<double>& grad_y)
-{
-    int N = grad.size()-1;
-    for( int i = 0, j = 0; i < N; i += 2, j++ ) {
-        grad[i] = grad_x[j];
-        grad[i+1] = grad_y[j];
-    }
-}
-
-double sign(double element)
-{
-    if( element == 0.0 ) return 0;
-    if( element > 0.0 ) return 1;
-    return -1;
+    double q = (bi, 2.) - pow(ai-aj, 2.);
+    return (signal*4. * (ai-aj) * x_plus(q) * d_xplus_dx(q) ) / pow(bi, 4.);
 }
 
 double objective_function(const std::vector<double> &x, std::vector<double> &grad, void *my_func_data)
@@ -140,206 +125,132 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
     int N = x.size()-1;
     int n = N/2;
 
-    vector<double> X, Y;
-    double w = x[N];
-    transfer_elements(x, X, Y);
 
     if (!grad.empty()) {
-        cout << "counter: " << counter << endl;
+      //  cout << "counter: " << counter << endl;
+        double q = 0;
         for( int i = 0; i < grad.size(); ++i ) {
             grad[i] = 0;
         }
-        vector<double> grad_en_x(X.size(), 0), grad_en_y(Y.size(), 0), grad_eo_x(X.size(), 0), grad_eo_y(Y.size(), 0);
-        vector<double> updatex(X.size(), 0), updatey(Y.size(), 0);
-        double h4v4 = pow(h, 4.)*pow(v, 4.);
-        double fator_on = 2.0/(n*(n-1.));
-        double n2 = n*n;
+        //cout << "-----------------------------------------------" << endl;
+        for( int i = 0; i < N; i += 2 )
+            for( int j = i+2; j < N; j += 2 ) {
 
-        // gradient for EO component (x)
-        for( int i = 0; i < X.size(); ++i ) {
-            double soma = 0;
-
-            for( int j = 0; j < X.size(); ++j ) {
-                if( i == j )
-                    continue;
-
-                double valuex = x_plus(pow(h, 2.) - pow(X[i] - X[j], 2.));
-                double valuey = x_plus(pow(v, 2.) - pow(Y[i] - Y[j], 2.));
-
-                if( valuex == 0.0 || valuey == 0.0 )
-                    continue;
-
-                if( i < j ) {
-                    double num = 2. * (2.*X[i] - 2.*X[j]) * (pow(X[i] - X[j], 2.) - h*h) * pow(pow(Y[i] - Y[j], 2.) - v*v, 2.);
-                    soma += (num/h4v4);
+               // grad[i] += d_O_dx(x[i], width[i/2], x[j], width[j/2], -1) * O(x[i+1], height[i/2], x[j+1], height[j/2]);
+                if( x[i] >= x[j] ) {
+                    q = pow(width[j/2], 2.) - pow(x[i]-x[j], 2.);
+                    grad[i] += (1.-alpha)*(2./(n*(n-1.)))*((-4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[j/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
                 } else {
-                    double num = - 2. * (2.*X[j] - 2.*X[i]) * (pow(X[j] - X[i], 2.) - h*h) * pow(pow(Y[j] - Y[i], 2.) - v*v, 2.);
-                    soma += (num/h4v4);
+                    q = pow(width[i/2], 2.) - pow(x[i]-x[j], 2.);
+                    grad[i] += (1.-alpha)*(2./(n*(n-1.)))*((-4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[i/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
                 }
-            }
-            grad_eo_x[i] = soma*fator_on*(1-alpha);
-        }
 
-        // gradient for EO component (y)
-        for( int i = 0; i < Y.size(); ++i ) {
-            double soma = 0;
-
-            for( int j = 0; j < Y.size(); ++j ) {
-                if( i == j )
-                    continue;
-
-                double valuex = x_plus(pow(h, 2.) - pow(X[i] - X[j], 2.));
-                double valuey = x_plus(pow(v, 2.) - pow(Y[i] - Y[j], 2.));
-
-                if( valuex == 0.0 || valuey == 0.0 )
-                    continue;
-
-                if( i < j ) {
-                    double num = 2. * (2.*Y[i] - 2.*Y[j]) * (pow(Y[i] - Y[j], 2.) - v*v) * pow(pow(X[i] - X[j], 2.) - h*h, 2.);
-                    soma += (num/h4v4);
+               // grad[i+1] += d_O_dx(x[i+1], height[i/2], x[j+1], height[j/2], -1) * O(x[i], width[i/2], x[j], width[j/2]);
+                if( x[i+1] >= x[j+1] ) {
+                    q = pow(height[j/2], 2.) - pow(x[i+1]-x[j+1], 2.);
+                    grad[i+1] += (1.-alpha)*(2./(n*(n-1.)))*((-4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[j/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
                 } else {
-                    double num = - 2. * (2.*Y[j] - 2.*Y[i]) * (pow(Y[j] - Y[i], 2.) - v*v) * pow(pow(X[j] - X[i], 2.) - h*h, 2.);
-                    soma += (num/h4v4);
-                }
-            }
-            grad_eo_y[i] = soma*fator_on*(1-alpha);
-        }
-         //update_gradient(grad, grad_eo_x, grad_eo_y);
-        // -----------------------------------------------------------------------------------------------------------------------
-        double divisor = 0;
-        for( int i = 0; i < n; ++i ) {
-            double somax = 0, somay = 0;
-            for( int j = 0; j < n; ++j ) {
-                somax += L[i][j]*X0[j];
-                somay += L[i][j]*Y0[j];
-            }
-            divisor += (2.*pow(fabs(somax), 2.) + 2.*pow(fabs(somay), 2.));
-        }
-
-
-        // gradient for EN component (x)
-        for( int i = 0; i < n; ++i ) {
-            double soma = 0;
-            for( int j = 0; j < n; ++j ) {
-                double valuex = 0, valuex0 = 0;
-                for( int k = 0; k < n; ++k ) {
-                    valuex += L[j][k]*X[k];
-                    valuex0 += L[j][k]*X0[k];
+                    q = pow(height[i/2], 2.) - pow(x[i+1]-x[j+1], 2.);
+                    grad[i+1] += (1.-alpha)*(2./(n*(n-1.)))*((-4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[i/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
                 }
 
-                double value = fabs(valuex - w*valuex0);
-                double value_sign = sign(valuex - w*valuex0);
-
-                soma += (2.*L[j][i]*value*value_sign);
-            }
-            grad_en_x[i] = ((n2*alpha*soma)/divisor);
-        }
-
-        // gradient for EN component (y)
-        for( int i = 0; i < n; ++i ) {
-            double soma = 0;
-            for( int j = 0; j < n; ++j ) {
-                double valuey = 0, valuey0 = 0;
-                for( int k = 0; k < n; ++k ) {
-                    valuey += L[j][k]*Y[k];
-                    valuey0 += L[j][k]*Y0[k];
+               // grad[j] += d_O_dx(x[i], width[i/2], x[j], width[j/2], 1) * O(x[i+1], height[i/2], x[j+1], height[j/2]);
+                if( x[i] >= x[j] ) {
+                    q = pow(width[j/2], 2.) - pow(x[i]-x[j], 2.);
+                    grad[j] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[j/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
+                } else {
+                    q = pow(width[i/2], 2.) - pow(x[i]-x[j], 2.);
+                    grad[j] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[i/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
                 }
 
-                double value = fabs(valuey - w*valuey0);
-                double value_sign = sign(valuey - w*valuey0);
-
-                soma += (2.*L[j][i]*value*value_sign);
+              //  grad[j+1] += d_O_dx(x[i+1], height[i/2], x[j+1], height[j/2], 1) * O(x[i], width[i/2], x[j], width[j/2]);
+                if( x[i+1] >= x[j+1] ) {
+                    q = pow(height[j/2], 2.) - pow(x[i+1]-x[j+1], 2.);
+                    grad[j+1] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[j/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
+                } else {
+                    q = pow(height[i/2], 2.) - pow(x[i+1]-x[j+1], 2.);
+                    grad[j+1] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[i/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
+                }
             }
-            grad_en_y[i] = ((n2*alpha*soma)/divisor);
+
+
+        double w = x[N];
+        vector<double> pontos_o_x;
+        vector<double> pontos_o_y;
+        for( int i = 0; i < N; i += 2 ) {
+            pontos_o_x.push_back(x[i]);
+            pontos_o_y.push_back(x[i+1]);
         }
 
-        //update_gradient(grad, grad_en_x, grad_en_y);
+        vector<double> X = Lxy(L, pontos_o_x);
+        vector<double> Y = Lxy(L, pontos_o_y);
+        vector<double> deltax = delta_x();//Lxy(L, orig_x);
+        vector<double> deltay = delta_y();// = Lxy(L, orig_y);
         for( int i = 0; i < X.size(); ++i ) {
-
-            updatex[i] = grad_eo_x[i]+grad_en_x[i];
-            updatey[i] = grad_eo_y[i]+grad_en_y[i];
+            X[i] = X[i] - w*deltax[i];
+            Y[i] = Y[i] - w*deltay[i];
         }
-        update_gradient(grad, updatex, updatey);
 
-        // ----------------------------------------------------------------------------------------
+        double dx = norma(deltax);
+        double dy = norma(deltay);
 
-        // gradient for 'w'
-        double soma = 0;
-        for( int i = 0; i < n; ++i ) {
-            double valuey = 0, valuey0 = 0, valuex = 0, valuex0 = 0;
-            for( int j = 0; j < n; ++j ) {
-                valuex += L[i][j]*X[j];
-                valuex0 += L[i][j]*X0[j];
-                valuey += L[i][j]*Y[j];
-                valuey0 += L[i][j]*Y0[j];
-            }
-
-            double rx = fabs(valuex - w*valuex0);
-            double rx_sign = sign(valuex-w*valuex0);
-            double ry = fabs(valuey - w*valuey0);
-            double ry_sign = sign(valuey-w*valuey0);
-
-            soma += ((2*rx*rx_sign*valuex0) + (2*ry*ry_sign*valuey0));
+        double first = pow((double)n, 2.0) / (2.0*(pow(dx, 2.0)+pow(dy, 2.0)));
+        for( int i = 0; i < N; i += 2 ) {
+            for( int j = 0; j < X.size(); ++j )
+                grad[i] += alpha*first*(2.0*L[j][i/2]*X[j]);
+            for( int j = 0; j < Y.size(); ++j )
+                grad[i+1] += alpha*first*(2.0*L[j][i/2]*Y[j]);
         }
-        w = -(alpha*n2*soma)/divisor;
-        grad[N] = w;
+        for( int i = 0; i < X.size(); ++i )
+            grad[N] += alpha*first*(-2.0*deltax[i]*X[i]);
+        for( int i = 0; i < Y.size(); ++i )
+            grad[N] += alpha*first*(-2.0*deltay[i]*Y[i]);
+
+
     }
-    double energia_o = 0.0;
-    for( int i = 0; i < X.size(); ++i )
-        for( int j = i+1; j < X.size(); ++j )
-            energia_o += O(X[i], h, X[j], h) * O(Y[i], v, Y[j], v);
-    energia_o = (2.0/(n*(n-1.0)))*energia_o;
-    double energia_n = e_n(x);
 
-    #ifdef DEBUG_ENERGY
-        //cout << "O-energy: " << energia_o << endl;
-        cout << "O-energy: " << (1-alpha)*energia_o << ", N-energy: " << alpha*energia_n << ", w: " << x[N] << endl;
-    #endif // DEBUG
-    //return energia_o;
+    double energia_o = 0.0;
+    for( int i = 0; i < N; i += 2 )
+        for( int j = i+2; j < N; j += 2 ) {
+            energia_o += O(x[i], width[i/2], x[j], width[j/2]) * O(x[i+1], height[i/2], x[j+1], height[j/2]);
+        }
+
+    energia_o = (2.0/(n*(n-1.0)))*energia_o;
+
+    double energia_n = e_n(x);
+    //cout << "energia_o: " << energia_o << ", energia_n: " << energia_n << endl;
+    //cout << "energia total: " << (1.-alpha)*energia_o + alpha*energia_n << endl;
     return (1.-alpha)*energia_o + alpha*energia_n;
 }
 
 vector<double> read_elems()
 {
-    double x = 0.0, y = 0.0, ww = 0.0, hh = 0.0;
+    double x = 0.0, y = 0.0, w = 0.0, h = 0.0;
     vector<double> elems;
-
-    #ifdef DEBUG
-        ifstream ifs("points.rect");
-    #endif
-    #ifdef REALISE
-        ifstream ifs("projsnippet_routine/points.rect");
-    #endif // DEBUG
+    ifstream ifs("projsnippet_routine/points.rect");
 
     if( ifs ) {
         int qtd = 0;
         ifs >> qtd;
         for( int i = 0; i < qtd; ++i ) {
-            ifs >> x >> y >> ww >> hh;
+            ifs >> x >> y >> w >> h;
             elems.push_back(x);
             elems.push_back(y);
-
-            width.push_back(ww);
-            height.push_back(hh);
+            width.push_back(w);
+            height.push_back(h);
 
             orig_x.push_back(x);
             orig_y.push_back(y);
-            X0.push_back(x);
-            Y0.push_back(y);
-
         }
-        h = width[0];
-        v = width[0];
-
         ifs >> x;
-        x = 1;
+        x = qtd/5;
         elems.push_back(x);
         ifs >> alpha;
 
         originais = vector<double>(elems.begin(), elems.end());
         ifs.close();
     }
-    //alpha = 0.3;
+
     return elems;
 }
 
@@ -347,12 +258,7 @@ vector<vector<double> > read_matrix() {
 
     vector<vector<double> > m;
 
-    #ifdef DEBUG
-        ifstream ifs("matrixL.matrix");
-    #endif
-    #ifdef REALISE
-        ifstream ifs("projsnippet_routine/matrixL.matrix");
-    #endif // DEBUG
+    ifstream ifs("projsnippet_routine/matrixL.matrix");
 
     if( ifs ) {
         int dim;
@@ -381,28 +287,24 @@ int main(int argc, char** argv) {
     for( int i = 0; i < width.size(); ++i )
         media += (width[i]+height[i]);
     media /= (2.0*width.size());
+
     nlopt::opt opt(nlopt::LD_MMA, n);
-   // vector<double> lb(n, 0);
-   // vector<double> up(n, media*(n/2)+(menor+30));
-//    opt.set_lower_bounds(lb);
-//    opt.set_upper_bounds(up);
-    opt.set_stopval(0.00001);
-    //opt.set_maxeval(200);
-  //  opt.set_ftol_abs(0.0001);
-    opt.set_ftol_rel(0.0001);
-   // opt.set_maxtime(900);
+    vector<double> lb(n, 0);
+    //cout << media*(n/2)+(menor+30) << endl;
+    //cout << media << endl;
+    //cout << media*(n/2) << endl;
+    //cout << (menor+30) << endl;
+
+    vector<double> up(n, media*(n/2)+(menor+30));
+    opt.set_lower_bounds(lb);
+    opt.set_upper_bounds(up);
+    opt.set_stopval(0.0009);
+    opt.set_maxeval(5000);
+    opt.set_maxtime(900);
     opt.set_min_objective(objective_function, NULL);
 
     double minf = 0;
-    std::chrono::steady_clock::time_point begin_time = std::chrono::steady_clock::now();
     nlopt::result result = opt.optimize(x, minf);
-    std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
-
-    #ifdef DEBUG_TIME
-        std::cout << "Time: " << std::chrono::duration_cast<std::chrono::microseconds>(end_time-begin_time).count()/1000000.0 << std::endl;
-    #endif
-
-
     ofstream ofs("projsnippet_routine/point_solve.rect");
     if( ofs ) {
         ofs << x.size()/2 << endl;
@@ -412,6 +314,10 @@ int main(int argc, char** argv) {
         ofs << x[x.size()-1];
         ofs.close();
     }
+
+
+
+
 
 	return 0;
 }
