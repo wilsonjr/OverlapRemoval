@@ -317,9 +317,7 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
         for( int j = i+2; j < N; j += 2 ) {
             energia_o += O(x[i], width[i/2], x[j], width[j/2]) * O(x[i+1], height[i/2], x[j+1], height[j/2]);
         }
-
     energia_o = (2.0/(n*(n-1.0)))*energia_o;
-
     double energia_n = e_n(x);
     #ifdef DEBUG
         cout << "energia_o: " << (1-alpha)*energia_o << ", energia_n: " << alpha*energia_n << endl;
@@ -437,5 +435,4 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-
 
