@@ -10,6 +10,10 @@
 #include <iomanip>
 #include <fstream>
 #include <nlopt.hpp>
+#include <chrono>
+
+//#define DEBUG
+
 
 using namespace std;
 
@@ -23,7 +27,7 @@ vector<double> orig_x;
 vector<double> orig_y;
 double alpha;
 
-vector<double> Lxy(vector<vector<double> >& l, vector<double>& xy)
+vector<double> Lxy(const vector<vector<double> >& l, const vector<double>& xy)
 {
     vector<double> delta_xy = vector<double>(xy.size(), 0);
 
@@ -53,38 +57,6 @@ vector<double> delta_y()
 {
     return Lxy(L, orig_y);
 }
-
-double e_n(const vector<double>& pontos_o)
-{
-    int N = pontos_o.size()-1;
-    int n = N/2;
-    double w = pontos_o[N];
-    vector<double> pontos_o_x;
-    vector<double> pontos_o_y;
-
-    for( int i = 0; i < N; i += 2 ) {
-        pontos_o_x.push_back(pontos_o[i]);
-        pontos_o_y.push_back(pontos_o[i+1]);
-    }
-
-    vector<double> x = Lxy(L, pontos_o_x);
-    vector<double> y = Lxy(L, pontos_o_y);
-    vector<double> deltax = delta_x();//Lxy(L, orig_x);
-    vector<double> deltay = delta_y();// = Lxy(L, orig_y);
-    for( int i = 0; i < x.size(); ++i ) {
-        x[i] = x[i] - w*deltax[i];
-        y[i] = y[i] - w*deltay[i];
-    }
-
-    double dx = pow(norma(deltax), 2.0);
-    double dy = pow(norma(deltay), 2.0);
-    double ddx = pow(norma(x), 2.0);
-    double ddy = pow(norma(y), 2.0);
-
-    return (pow((double)n, 2.0)* (ddx + ddy)) /
-                    (2.0 * (dx + dy));
-}
-
 
 double x_plus(double x)
 {
@@ -118,6 +90,128 @@ double d_O_dx(double ai, double bi, double aj, double bj, double signal)
     return (signal*4. * (ai-aj) * x_plus(q) * d_xplus_dx(q) ) / pow(bi, 4.);
 }
 
+
+void get_elements(const vector<double>& elems, vector<double>& xx, vector<double>& yy, double& w)
+{
+    int n = elems.size()-1;
+
+    for( int i = 0; i < n; i += 2 ) {
+        xx.push_back(elems[i]);
+        yy.push_back(elems[i+1]);
+    }
+
+    w = elems[n];
+}
+
+double fn(const vector<double>& X, const vector<double>& Y, const double& w)
+{
+    int n = X.size();
+    double soma_eo = 0, soma_en = 0;
+
+    /***** Calculate Eo **********/
+
+    for( int i = 0; i < n; ++i )
+        for( int j = i+1; j < n; ++j )
+            soma_eo += O(X[i], width[i], X[j], width[j])*O(Y[i], height[i], Y[j], height[j]);
+    soma_eo = (2./(n*(n-1.)))*soma_eo;
+
+
+    /***** Calculate En **********/
+    vector<double> dx = delta_x();
+    vector<double> dy = delta_y();
+
+    vector<double> Lx = Lxy(L, X);
+    vector<double> Ly = Lxy(L, Y);
+
+    vector<double> Lxwdx(n, 0);
+    vector<double> Lywdy(n, 0);
+
+    for( int i = 0; i < n; ++i ) {
+        Lxwdx[i] = Lx[i] - w*dx[i];
+        Lywdy[i] = Ly[i] - w*dy[i];
+    }
+
+    double norma_Lxwdx = pow(norma(Lxwdx), 2);
+    double norma_Lywdy = pow(norma(Lywdy), 2);
+    double soma_diff = norma_Lxwdx+norma_Lywdy;
+
+    soma_en = ((n*n)/(2.*(pow(norma(dx), 2) + pow(norma(dy), 2))))  * soma_diff;
+
+    return (1.-alpha)*soma_eo + alpha*soma_en;
+}
+
+
+vector<double> gradient(vector<double> x0)
+{
+
+    vector<double> g;
+
+    vector<double> delta(x0.begin(), x0.end());
+    for( int i = 0; i < delta.size(); ++i )
+        delta[i] /= 1000.0;
+
+    for( int i = 0; i < x0.size(); ++i ) {
+
+        if( x0[i] == 0 ) {
+            delta[i] = 1e-12;
+        }
+
+        vector<double> u(x0.begin(), x0.end());
+
+        vector<double> cx1, cy1;
+        double w1;
+        u[i] = x0[i]+delta[i];
+        get_elements(u, cx1, cy1, w1);
+        double f1 = fn(cx1, cy1, w1);
+
+        vector<double> cx2, cy2;
+        double w2;
+        u[i] = x0[i] - delta[i];
+        get_elements(u, cx2, cy2, w2);
+        double f2 = fn(cx2, cy2, w2);
+
+        g.push_back((f1-f2)/(2.0*delta[i]));
+    }
+
+    return g;
+}
+
+
+
+double e_n(const vector<double>& pontos_o)
+{
+    int N = pontos_o.size()-1;
+    int n = N/2;
+    double w = pontos_o[N];
+    vector<double> pontos_o_x;
+    vector<double> pontos_o_y;
+
+    for( int i = 0; i < N; i += 2 ) {
+        pontos_o_x.push_back(pontos_o[i]);
+        pontos_o_y.push_back(pontos_o[i+1]);
+    }
+
+    vector<double> x = Lxy(L, pontos_o_x);
+    vector<double> y = Lxy(L, pontos_o_y);
+    vector<double> deltax = delta_x();//Lxy(L, orig_x);
+    vector<double> deltay = delta_y();// = Lxy(L, orig_y);
+    for( int i = 0; i < x.size(); ++i ) {
+        x[i] = x[i] - w*deltax[i];
+        y[i] = y[i] - w*deltay[i];
+    }
+
+    double dx = pow(norma(deltax), 2.0);
+    double dy = pow(norma(deltay), 2.0);
+    double ddx = pow(norma(x), 2.0);
+    double ddy = pow(norma(y), 2.0);
+
+    return (pow((double)n, 2.0)* (ddx + ddy)) /
+                    (2.0 * (dx + dy));
+}
+
+
+
+
 double objective_function(const std::vector<double> &x, std::vector<double> &grad, void *my_func_data)
 {
     counter++;
@@ -127,7 +221,6 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
 
 
     if (!grad.empty()) {
-      //  cout << "counter: " << counter << endl;
         double q = 0;
         for( int i = 0; i < grad.size(); ++i ) {
             grad[i] = 0;
@@ -209,6 +302,16 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
 
     }
 
+    vector<double> X, Y;
+    double W;
+    get_elements(x, X, Y, W);
+    double r = fn(X, Y, W);
+    #ifdef DEBUG
+        cout << "energia: " << r << endl;
+    #endif // DEBUG
+    return fn(X, Y, W);
+
+/*
     double energia_o = 0.0;
     for( int i = 0; i < N; i += 2 )
         for( int j = i+2; j < N; j += 2 ) {
@@ -218,16 +321,24 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
     energia_o = (2.0/(n*(n-1.0)))*energia_o;
 
     double energia_n = e_n(x);
-    //cout << "energia_o: " << energia_o << ", energia_n: " << energia_n << endl;
-    //cout << "energia total: " << (1.-alpha)*energia_o + alpha*energia_n << endl;
-    return (1.-alpha)*energia_o + alpha*energia_n;
+    #ifdef DEBUG
+        cout << "energia_o: " << (1-alpha)*energia_o << ", energia_n: " << alpha*energia_n << endl;
+    #endif
+    return (1.-alpha)*energia_o + alpha*energia_n;*/
 }
 
 vector<double> read_elems()
 {
     double x = 0.0, y = 0.0, w = 0.0, h = 0.0;
     vector<double> elems;
-    ifstream ifs("projsnippet_routine/points.rect");
+    #ifdef DEBUG
+        ifstream ifs("points.rect");
+    #endif // DEBUG
+
+    #ifndef DEBUG
+        ifstream ifs("projsnippet_routine/points.rect");
+    #endif // DEBUG
+
 
     if( ifs ) {
         int qtd = 0;
@@ -258,7 +369,13 @@ vector<vector<double> > read_matrix() {
 
     vector<vector<double> > m;
 
-    ifstream ifs("projsnippet_routine/matrixL.matrix");
+    #ifdef DEBUG
+        ifstream ifs("matrixL.matrix");
+    #endif // DEBUG
+
+    #ifndef DEBUG
+        ifstream ifs("projsnippet_routine/matrixL.matrix");
+    #endif // DEBUG
 
     if( ifs ) {
         int dim;
@@ -305,21 +422,20 @@ int main(int argc, char** argv) {
 
     double minf = 0;
     nlopt::result result = opt.optimize(x, minf);
-    ofstream ofs("projsnippet_routine/point_solve.rect");
-    if( ofs ) {
-        ofs << x.size()/2 << endl;
-        for( int i = 0; i < x.size()-1; i+=2 ) {
-            ofs << x[i] << " " << x[i+1] << " " << height[i/2] << " " << width[i/2] << endl;
+
+    #ifndef DEBUG
+        ofstream ofs("projsnippet_routine/point_solve.rect");
+        if( ofs ) {
+            ofs << x.size()/2 << endl;
+            for( int i = 0; i < x.size()-1; i+=2 ) {
+                ofs << x[i] << " " << x[i+1] << " " << height[i/2] << " " << width[i/2] << endl;
+            }
+            ofs << x[x.size()-1];
+            ofs.close();
         }
-        ofs << x[x.size()-1];
-        ofs.close();
-    }
+    #endif // DEBUG
 
-
-
-
-
-	return 0;
+    return 0;
 }
 
 
