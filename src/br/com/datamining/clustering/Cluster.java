@@ -14,23 +14,32 @@ import java.util.ArrayList;
  * @author wilson
  */
 public class Cluster {
-    private int id;
+    private String id;
     private ArrayList<Rectangle2D.Double> points;
     
-    public Cluster(Rectangle2D.Double r) {
+    public Cluster(Rectangle2D.Double r, int id) {
         points = new ArrayList<>();
         points.add(r);
+        this.id = String.valueOf(id);
     }
     
-    public Cluster(int id) {
+    public Cluster() {
+        points = new ArrayList<>();
+    }
+    
+    public void addPoint(Rectangle2D.Double p) {
+        points.add(p);
+    }
+    
+    public Cluster(String id) {
         this.id = id;
     }
     
-    public int getId() {
+    public String getId() {
         return id;
     }
     
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

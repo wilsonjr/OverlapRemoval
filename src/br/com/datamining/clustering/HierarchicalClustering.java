@@ -8,6 +8,7 @@ package br.com.datamining.clustering;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.PriorityQueue;
 
 /**
@@ -19,6 +20,7 @@ public class HierarchicalClustering {
     private ArrayList<Cluster> clusters;
     private ArrayList<Rectangle2D.Double> items;
     private PriorityQueue<Linkage> linkages;
+    
     
     public HierarchicalClustering(ArrayList<Rectangle2D.Double> items) {                
         if( items == null )
@@ -34,15 +36,47 @@ public class HierarchicalClustering {
         // 2. compute distance between each par of elements
         computeDistances();
         
-        
-        
+        // 3. extract a pair of clusters with the smallest distance
+        while( clusters.size() > 1 ) {
+            
+            Linkage top = linkages.poll();
+            
+            Cluster u = top.getU();
+            Cluster v = top.getV();            
+            Cluster uv = new Cluster();
+            
+            clusters.remove(u);
+            clusters.remove(v);
+            
+            clusters.stream().map((c) -> {
+                Linkage firstLink = findLink(c, u);
+                Linkage secondLink = findLink(c, v);
+                List<Double> distances = new ArrayList<>();
+                if( firstLink != null ) {
+                    distances.add(firstLink.getDistance());
+                    linkages.remove(firstLink);
+                }
+                if( secondLink != null ) {
+                    distances.add(secondLink.getDistance());
+                    linkages.remove(secondLink);
+                }
+                double linkageDistance = new SingleLinkStrategy().distance(distances);
+                Linkage uvC = new Linkage(uv, c, linkageDistance);
+                return uvC;
+            }).forEach((uvC) -> {
+                linkages.add(uvC);
+            });
+            
+            clusters.add(uv);
+        }
     }
     
     private void createClusters(ArrayList<Rectangle2D.Double> items) {
-        clusters = new ArrayList<>();        
-        items.stream().forEach((e)-> {
-            clusters.add(new Cluster(e));
-        });
+        clusters = new ArrayList<>();      
+        
+        for( int i = 0; i < items.size(); ++i ) {
+            clusters.add(new Cluster(items.get(i), i));
+        }
     }
 
     private void computeDistances() {        
@@ -52,6 +86,18 @@ public class HierarchicalClustering {
                 Linkage linkage = new Linkage(clusters.get(i), clusters.get(j), distance);
                 linkages.add(linkage);
             }
+    }
+
+    private Linkage findLink(Cluster c, Cluster u) {
+        
+        for( Linkage l: linkages ) 
+        {
+            if( l.getU().equals(c) && l.getV().equals(u) ||
+                l.getU().equals(u) && l.getV().equals(c))
+                return l;
+        }
+        
+        return null;
     }
     
     
