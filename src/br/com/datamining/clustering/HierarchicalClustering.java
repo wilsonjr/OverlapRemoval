@@ -49,7 +49,9 @@ public class HierarchicalClustering {
             
             uv.addPoints(u.getPoints());
             uv.addPoints(v.getPoints());
-            uv.setId(u.getId()+"."+v.getId());            
+            uv.setId(u.getId()+"."+v.getId());  
+            uv.addSons(u.getId());
+            uv.addSons(v.getId());
             
             clusters.remove(u);
             clusters.remove(v);
