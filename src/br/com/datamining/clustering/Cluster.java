@@ -6,12 +6,21 @@
 
 package br.com.datamining.clustering;
 
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+
 /**
  *
  * @author wilson
  */
 public class Cluster {
     private int id;
+    private ArrayList<Rectangle2D.Double> points;
+    
+    public Cluster(Rectangle2D.Double r) {
+        points = new ArrayList<>();
+        points.add(r);
+    }
     
     public Cluster(int id) {
         this.id = id;
