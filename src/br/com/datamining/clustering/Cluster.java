@@ -8,6 +8,7 @@ package br.com.datamining.clustering;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -15,20 +16,26 @@ import java.util.ArrayList;
  */
 public class Cluster {
     private String id;
-    private ArrayList<Rectangle2D.Double> points;
+    private ArrayList<Rectangle2D.Double> points = new ArrayList<>();
+    private ArrayList<String> sons = new ArrayList<>();
     
     public Cluster(Rectangle2D.Double r, int id) {
-        points = new ArrayList<>();
         points.add(r);
         this.id = String.valueOf(id);
     }
     
-    public Cluster() {
-        points = new ArrayList<>();
+    public Cluster() { }
+    
+    public void addSons(String sonId) {
+        sons.add(sonId);
     }
     
-    public void addPoint(Rectangle2D.Double p) {
-        points.add(p);
+    public void addPoints(List<Rectangle2D.Double> p) {        
+        points.addAll(p);
+    }
+    
+    public List<Rectangle2D.Double> getPoints() {
+        return points;
     }
     
     public Cluster(String id) {

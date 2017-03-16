@@ -8,7 +8,9 @@ package br.com.datamining.clustering;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 /**
@@ -20,7 +22,7 @@ public class HierarchicalClustering {
     private ArrayList<Cluster> clusters;
     private ArrayList<Rectangle2D.Double> items;
     private PriorityQueue<Linkage> linkages;
-    
+    private Map<String, Linkage> linkageMap;
     
     public HierarchicalClustering(ArrayList<Rectangle2D.Double> items) {                
         if( items == null )
@@ -41,9 +43,13 @@ public class HierarchicalClustering {
             
             Linkage top = linkages.poll();
             
+            Cluster uv = new Cluster();
             Cluster u = top.getU();
             Cluster v = top.getV();            
-            Cluster uv = new Cluster();
+            
+            uv.addPoints(u.getPoints());
+            uv.addPoints(v.getPoints());
+            uv.setId(u.getId()+"."+v.getId());            
             
             clusters.remove(u);
             clusters.remove(v);
@@ -79,25 +85,27 @@ public class HierarchicalClustering {
         }
     }
 
-    private void computeDistances() {        
+    private void computeDistances() {     
+        linkageMap = new HashMap<>();
         for( int i = 0; i < clusters.size(); ++i ) 
             for( int j = i+1; j < clusters.size(); ++j ) {                
                 double distance = clusters.get(i).distanceTo(clusters.get(j));                
                 Linkage linkage = new Linkage(clusters.get(i), clusters.get(j), distance);
                 linkages.add(linkage);
+                linkageMap.put(createKey(linkage.getU(), linkage.getV()), linkage);
             }
     }
 
     private Linkage findLink(Cluster c, Cluster u) {
         
-        for( Linkage l: linkages ) 
-        {
-            if( l.getU().equals(c) && l.getV().equals(u) ||
-                l.getU().equals(u) && l.getV().equals(c))
-                return l;
-        }
-        
-        return null;
+        Linkage link = linkageMap.get(createKey(c, u));
+        if( link == null ) 
+            link = linkageMap.get(createKey(u, c));
+        return link;
+    }
+
+    private String createKey(Cluster u, Cluster v) {        
+        return u.getId()+"<->"+v.getId();
     }
     
     
