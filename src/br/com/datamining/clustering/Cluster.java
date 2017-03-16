@@ -33,5 +33,9 @@ public class Cluster {
     public void setId(int id) {
         this.id = id;
     }
+
+    public double distanceTo(Cluster get) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

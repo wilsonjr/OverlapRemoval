@@ -16,7 +16,7 @@ public class Linkage implements Comparable<Linkage> {
     private Cluster v;
     private double distance;
         
-    private Linkage(Cluster u, Cluster v, double distance) {
+    public Linkage(Cluster u, Cluster v, double distance) {
         this.u = u;
         this.v = v;
         this.distance = distance;
