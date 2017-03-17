@@ -72,7 +72,7 @@ public class HierarchicalClustering {
                     linkages.remove(secondLink);
                 }
            
-                double linkageDistance = new SingleLinkStrategy().distance(distances);
+                double linkageDistance = new SingleLinkageStrategy().distance(distances);
                 Linkage uvC = new Linkage(uv, c, linkageDistance);
                 linkages.add(uvC);
                 linkageMap.put(createKey(uv, c), uvC);

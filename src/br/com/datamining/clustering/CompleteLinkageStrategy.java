@@ -3,20 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.com.datamining.clustering;
 
 import java.util.List;
 
 /**
  *
- * @author wilson
+ * @author Windows
  */
-public class SingleLinkStrategy {
+public class CompleteLinkageStrategy implements LinkageStrategy {
     
-    public double distance(List<Double> d) {        
-        return d.stream().min(Double::compareTo).get();       
+    @Override
+    public double distance(List<Double> d) {
+        return d.stream().max(Double::compareTo).get();
     }
-    
     
 }
