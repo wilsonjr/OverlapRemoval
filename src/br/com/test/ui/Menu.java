@@ -19,6 +19,8 @@
 package br.com.test.ui;
 
 
+import br.com.datamining.clustering.Cluster;
+import br.com.datamining.clustering.HierarchicalClustering;
 import br.com.test.draw.color.GrayScale;
 import br.com.test.draw.color.RainbowScale;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
@@ -40,8 +42,6 @@ import br.com.methods.utils.Pair;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.RetanguloVis;
 import br.com.methods.utils.Util;
-import br.com.overlayanalisys.definition.Metric;
-import br.com.overlayanalisys.sizeincrease.SizeIncrease;
 import br.com.projection.spacereduction.ContextPreserving;
 import br.com.representative.Dijsktra;
 import java.awt.Color;
@@ -154,6 +154,8 @@ public class Menu extends javax.swing.JFrame {
         extractParametersJMenuItem = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         dijsktraRepresentativeJMenuItem = new javax.swing.JMenuItem();
+        jMenu6 = new javax.swing.JMenu();
+        hierarchicalClusteringJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -333,6 +335,18 @@ public class Menu extends javax.swing.JFrame {
         jMenu5.add(dijsktraRepresentativeJMenuItem);
 
         jMenuBar1.add(jMenu5);
+
+        jMenu6.setText("Clustering");
+
+        hierarchicalClusteringJMenuItem.setText("Hierarchical Clustering");
+        hierarchicalClusteringJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hierarchicalClusteringJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu6.add(hierarchicalClusteringJMenuItem);
+
+        jMenuBar1.add(jMenu6);
 
         setJMenuBar(jMenuBar1);
 
@@ -999,6 +1013,12 @@ public class Menu extends javax.swing.JFrame {
         
     }//GEN-LAST:event_dijsktraRepresentativeJMenuItemActionPerformed
 
+    private void hierarchicalClusteringJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hierarchicalClusteringJMenuItemActionPerformed
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        HierarchicalClustering hc = new HierarchicalClustering(rects);        
+        hc.execute();
+    }//GEN-LAST:event_hierarchicalClusteringJMenuItemActionPerformed
+
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1278,12 +1298,14 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem extractParametersJMenuItem;
     private javax.swing.JMenuItem gnatJMenuItem;
     private javax.swing.JMenuItem hexBoardJMenuItem;
+    private javax.swing.JMenuItem hierarchicalClusteringJMenuItem;
     private javax.swing.JMenuItem incBoardJMenuItem;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
+    private javax.swing.JMenu jMenu6;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPopupMenu.Separator jSeparator1;

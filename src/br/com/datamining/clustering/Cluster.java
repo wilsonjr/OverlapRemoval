@@ -6,6 +6,7 @@
 
 package br.com.datamining.clustering;
 
+import br.com.methods.utils.Util;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
 public class Cluster {
     private String id;
     private ArrayList<Rectangle2D.Double> points = new ArrayList<>();
-    private ArrayList<String> sons = new ArrayList<>();
+    private ArrayList<Cluster> sons = new ArrayList<>();
     
     public Cluster(Rectangle2D.Double r, int id) {
         points.add(r);
@@ -26,8 +27,12 @@ public class Cluster {
     
     public Cluster() { }
     
-    public void addSons(String sonId) {
-        sons.add(sonId);
+    public void addSons(Cluster son) {
+        sons.add(son);
+    }
+    
+    public ArrayList<Cluster> getSons() {
+        return sons;
     }
     
     public void addPoints(List<Rectangle2D.Double> p) {        
@@ -50,8 +55,13 @@ public class Cluster {
         this.id = id;
     }
 
-    public double distanceTo(Cluster get) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public double distanceTo(Cluster c) {
+        return Util.distanciaEuclideana(points.get(0).x, points.get(0).y, c.getPoints().get(0).x, c.getPoints().get(0).y);
+    }
+    
+    @Override
+    public String toString() {
+        return id;
     }
     
 }

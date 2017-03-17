@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 
 /**
@@ -20,11 +21,11 @@ import java.util.PriorityQueue;
 public class HierarchicalClustering {
     
     private ArrayList<Cluster> clusters;
-    private ArrayList<Rectangle2D.Double> items;
+    private ArrayList<? extends Rectangle2D.Double> items;
     private PriorityQueue<Linkage> linkages;
     private Map<String, Linkage> linkageMap;
     
-    public HierarchicalClustering(ArrayList<Rectangle2D.Double> items) {                
+    public HierarchicalClustering(ArrayList<? extends Rectangle2D.Double> items) {                
         if( items == null )
             throw new NullPointerException("Data cannot be null");
         
@@ -50,13 +51,15 @@ public class HierarchicalClustering {
             uv.addPoints(u.getPoints());
             uv.addPoints(v.getPoints());
             uv.setId(u.getId()+"."+v.getId());  
-            uv.addSons(u.getId());
-            uv.addSons(v.getId());
+            uv.addSons(u);
+            uv.addSons(v);
+            
+            System.out.println("Unindo clusters: "+u.getId()+" <-> "+v.getId());
             
             clusters.remove(u);
             clusters.remove(v);
             
-            clusters.stream().map((c) -> {
+            for( Cluster c: clusters ) {
                 Linkage firstLink = findLink(c, u);
                 Linkage secondLink = findLink(c, v);
                 List<Double> distances = new ArrayList<>();
@@ -68,18 +71,18 @@ public class HierarchicalClustering {
                     distances.add(secondLink.getDistance());
                     linkages.remove(secondLink);
                 }
+           
                 double linkageDistance = new SingleLinkStrategy().distance(distances);
                 Linkage uvC = new Linkage(uv, c, linkageDistance);
-                return uvC;
-            }).forEach((uvC) -> {
                 linkages.add(uvC);
-            });
+                linkageMap.put(createKey(uv, c), uvC);
+            } 
             
             clusters.add(uv);
         }
     }
     
-    private void createClusters(ArrayList<Rectangle2D.Double> items) {
+    private void createClusters(ArrayList<? extends Rectangle2D.Double> items) {
         clusters = new ArrayList<>();      
         
         for( int i = 0; i < items.size(); ++i ) {
@@ -87,7 +90,8 @@ public class HierarchicalClustering {
         }
     }
 
-    private void computeDistances() {     
+    private void computeDistances() {  
+        linkages = new PriorityQueue<>();
         linkageMap = new HashMap<>();
         for( int i = 0; i < clusters.size(); ++i ) 
             for( int j = i+1; j < clusters.size(); ++j ) {                
@@ -99,7 +103,12 @@ public class HierarchicalClustering {
     }
 
     private Linkage findLink(Cluster c, Cluster u) {
-        
+//        System.out.println("Procurando por: "+createKey(c, u)+" ou "+createKey(u, c));
+//        System.out.println("tem: ");
+//        for( Entry<String, Linkage> e: linkageMap.entrySet() ) {
+//            System.out.println(e.getKey());
+//        }
+//        System.out.println();
         Linkage link = linkageMap.get(createKey(c, u));
         if( link == null ) 
             link = linkageMap.get(createKey(u, c));
@@ -110,7 +119,9 @@ public class HierarchicalClustering {
         return u.getId()+"<->"+v.getId();
     }
     
-    
+    public ArrayList<Cluster> getClusters() {
+        return clusters;
+    }
     
     
     
