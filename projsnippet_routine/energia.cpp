@@ -26,6 +26,7 @@ vector<double> originais;
 vector<double> orig_x;
 vector<double> orig_y;
 double alpha;
+double test_w = 5;
 
 vector<double> Lxy(const vector<vector<double> >& l, const vector<double>& xy)
 {
@@ -343,8 +344,8 @@ vector<double> read_elems()
         ifs >> qtd;
         for( int i = 0; i < qtd; ++i ) {
             ifs >> x >> y >> w >> h;
-            elems.push_back(x);
-            elems.push_back(y);
+            elems.push_back(test_w*x);
+            elems.push_back(test_w*y);
             width.push_back(w);
             height.push_back(h);
 
@@ -352,7 +353,7 @@ vector<double> read_elems()
             orig_y.push_back(y);
         }
         ifs >> x;
-        x = qtd/5;
+        x = test_w;
         elems.push_back(x);
         ifs >> alpha;
 
@@ -410,16 +411,28 @@ int main(int argc, char** argv) {
     //cout << media*(n/2) << endl;
     //cout << (menor+30) << endl;
 
-    vector<double> up(n, media*(n/2)+(menor+30));
+    vector<double> up(n, test_w*(media*(n/2)+(menor+30)));
     opt.set_lower_bounds(lb);
     opt.set_upper_bounds(up);
-    opt.set_stopval(0.0009);
+    opt.set_stopval(0.00001);
     opt.set_maxeval(5000);
     opt.set_maxtime(900);
     opt.set_min_objective(objective_function, NULL);
 
     double minf = 0;
     nlopt::result result = opt.optimize(x, minf);
+
+    #ifdef DEBUG
+        ofstream ofs("point_solve.rect");
+        if( ofs ) {
+            ofs << x.size()/2 << endl;
+            for( int i = 0; i < x.size()-1; i+=2 ) {
+                ofs << x[i] << " " << x[i+1] << " " << height[i/2] << " " << width[i/2] << endl;
+            }
+            ofs << x[x.size()-1];
+            ofs.close();
+        }
+    #endif // DEBUG
 
     #ifndef DEBUG
         ofstream ofs("projsnippet_routine/point_solve.rect");

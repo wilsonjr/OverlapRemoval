@@ -109,6 +109,7 @@ public class ProjSnippet implements OverlapRemoval {
                     public void run() {
                         try {  
                             resultado = p.waitFor();
+                            
                         } catch (InterruptedException ex) {
                             Logger.getLogger(ProjSnippet.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -184,11 +185,11 @@ public class ProjSnippet implements OverlapRemoval {
                                                                                   data.get(i).getX()[1], 
                                                                                   e[j].getX()[0],
                                                                                   e[j].getX()[1])));
-                    /*grafo[((Long)e[j].getY()).intValue()].add(new Edge((Long)e[j].getY(), i, 
+                    grafo[((Long)e[j].getY()).intValue()].add(new Edge((Long)e[j].getY(), i, 
                                                     Util.distanciaEuclideana(data.get(i).getX()[0], 
                                                                                   data.get(i).getX()[1], 
                                                                                   e[j].getX()[0],
-                                                                                  e[j].getX()[1])));*/
+                                                                                  e[j].getX()[1])));
                     System.out.print(e[j].getY()+" ");
                 }
                 
@@ -260,7 +261,7 @@ public class ProjSnippet implements OverlapRemoval {
          double[][] l = new double[grafo.length][grafo.length];
          for( Vertex v: grafo ) {
              for( Edge e: v.getAdj() ) 
-                 l[(int)e.getU()][(int)e.getV()] = -1.0/((double)v.getAdj().size()+2);             
+                 l[(int)e.getU()][(int)e.getV()] = -1.0/((double)v.getAdj().size());             
          }                  
          for( int i = 0; i < l.length; ++i ) 
              l[i][i] = 1.0;
