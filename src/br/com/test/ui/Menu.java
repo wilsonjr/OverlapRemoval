@@ -21,6 +21,7 @@ package br.com.test.ui;
 
 import br.com.datamining.clustering.Cluster;
 import br.com.datamining.clustering.HierarchicalClustering;
+import br.com.datamining.clustering.SingleLinkageStrategy;
 import br.com.test.draw.color.GrayScale;
 import br.com.test.draw.color.RainbowScale;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
@@ -1015,7 +1016,7 @@ public class Menu extends javax.swing.JFrame {
 
     private void hierarchicalClusteringJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hierarchicalClusteringJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
-        HierarchicalClustering hc = new HierarchicalClustering(rects);        
+        HierarchicalClustering hc = new HierarchicalClustering(rects, new SingleLinkageStrategy());        
         hc.execute();
     }//GEN-LAST:event_hierarchicalClusteringJMenuItemActionPerformed
 

@@ -24,12 +24,14 @@ public class HierarchicalClustering {
     private ArrayList<? extends Rectangle2D.Double> items;
     private PriorityQueue<Linkage> linkages;
     private Map<String, Linkage> linkageMap;
+    private LinkageStrategy linkageStrategy;
     
-    public HierarchicalClustering(ArrayList<? extends Rectangle2D.Double> items) {                
+    public HierarchicalClustering(ArrayList<? extends Rectangle2D.Double> items, LinkageStrategy linkageStrategy) {                
         if( items == null )
             throw new NullPointerException("Data cannot be null");
         
         this.items = items;
+        this.linkageStrategy = linkageStrategy;
     }
     
     public void execute() {
@@ -72,7 +74,7 @@ public class HierarchicalClustering {
                     linkages.remove(secondLink);
                 }
            
-                double linkageDistance = new SingleLinkageStrategy().distance(distances);
+                double linkageDistance = linkageStrategy.distance(distances);
                 Linkage uvC = new Linkage(uv, c, linkageDistance);
                 linkages.add(uvC);
                 linkageMap.put(createKey(uv, c), uvC);
@@ -103,12 +105,6 @@ public class HierarchicalClustering {
     }
 
     private Linkage findLink(Cluster c, Cluster u) {
-//        System.out.println("Procurando por: "+createKey(c, u)+" ou "+createKey(u, c));
-//        System.out.println("tem: ");
-//        for( Entry<String, Linkage> e: linkageMap.entrySet() ) {
-//            System.out.println(e.getKey());
-//        }
-//        System.out.println();
         Linkage link = linkageMap.get(createKey(c, u));
         if( link == null ) 
             link = linkageMap.get(createKey(u, c));
