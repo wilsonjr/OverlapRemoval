@@ -70,10 +70,10 @@ public class Cluster {
         return id;
     }
     
-    public void printHierarchy(String space) {
+    public void print(String space) {
         System.out.println(space+this+" has "+sons.size()+" children");        
         for( int i = 0; i < sons.size(); ++i ) {
-            sons.get(i).printHierarchy(space+"\t");
+            sons.get(i).print(space+"\t");
         }
     }
     

@@ -1018,7 +1018,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         HierarchicalClustering hc = new HierarchicalClustering(rects, new SingleLinkageStrategy());        
         hc.execute();
-        hc.getClusters().get(0).printHierarchy("");
+        hc.printHierarchy();
     }//GEN-LAST:event_hierarchicalClusteringJMenuItemActionPerformed
 
     

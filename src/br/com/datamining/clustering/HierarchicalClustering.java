@@ -119,6 +119,8 @@ public class HierarchicalClustering {
         return clusters;
     }
     
-    
+    public void printHierarchy() {
+        clusters.get(0).print("");
+    }
     
 }
