@@ -88,7 +88,7 @@ public class HierarchicalClustering {
         clusters = new ArrayList<>();      
         
         for( int i = 0; i < items.size(); ++i ) {
-            clusters.add(new Cluster(items.get(i), i));
+            clusters.add(new Cluster(items.get(i), i, this));
         }
     }
 

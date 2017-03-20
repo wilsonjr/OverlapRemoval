@@ -19,10 +19,16 @@ public class Cluster {
     private String id;
     private ArrayList<Rectangle2D.Double> points = new ArrayList<>();
     private ArrayList<Cluster> sons = new ArrayList<>();
+    private HierarchicalClustering hc;
     
     public Cluster(Rectangle2D.Double r, int id) {
         points.add(r);
         this.id = String.valueOf(id);
+    }
+    
+    public Cluster(Rectangle2D.Double r, int id, HierarchicalClustering hc) {
+        this(r, id);
+        this.hc = hc;
     }
     
     public Cluster() { }
@@ -62,6 +68,13 @@ public class Cluster {
     @Override
     public String toString() {
         return id;
+    }
+    
+    public void printHierarchy(String space) {
+        System.out.println(space+this+" has "+sons.size()+" children");        
+        for( int i = 0; i < sons.size(); ++i ) {
+            sons.get(i).printHierarchy(space+"\t");
+        }
     }
     
 }
