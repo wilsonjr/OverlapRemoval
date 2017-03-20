@@ -96,6 +96,8 @@ public class Menu extends javax.swing.JFrame {
     private Polygon p1, p2;
     private static final int RECTSIZE = 20;
     private int maior, menor;
+    private ArrayList<ArrayList<ArrayList<Integer>>> clusters = null;
+    private int nivelDendrogram = 0;
     
     
     
@@ -157,6 +159,9 @@ public class Menu extends javax.swing.JFrame {
         dijsktraRepresentativeJMenuItem = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         hierarchicalClusteringJMenuItem = new javax.swing.JMenuItem();
+        jMenu7 = new javax.swing.JMenu();
+        incrementJMenuItem = new javax.swing.JMenuItem();
+        decrementJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -348,6 +353,26 @@ public class Menu extends javax.swing.JFrame {
         jMenu6.add(hierarchicalClusteringJMenuItem);
 
         jMenuBar1.add(jMenu6);
+
+        jMenu7.setText("Dendogram Controller");
+
+        incrementJMenuItem.setText("Increment");
+        incrementJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                incrementJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu7.add(incrementJMenuItem);
+
+        decrementJMenuItem.setText("Decrement");
+        decrementJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                decrementJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu7.add(decrementJMenuItem);
+
+        jMenuBar1.add(jMenu7);
 
         setJMenuBar(jMenuBar1);
 
@@ -1019,7 +1044,36 @@ public class Menu extends javax.swing.JFrame {
         HierarchicalClustering hc = new HierarchicalClustering(rects, new SingleLinkageStrategy());        
         hc.execute();
         hc.printHierarchy();
+        
+        clusters = hc.getClusterHierarchy();
+//        for( int i = 0; i < clusters.size(); ++i ) {
+//            System.out.println("Nivel "+(clusters.size()-i)+": ");
+//            for( int j = 0; j < clusters.get(i).size(); ++j ) {
+//                for( int item: clusters.get(i).get(j) )
+//                    System.out.print(item+" ");
+//                System.out.println();
+//            }
+//        }
+        
+        view.cleanImage();
+        view.repaint();
     }//GEN-LAST:event_hierarchicalClusteringJMenuItemActionPerformed
+
+    private void incrementJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_incrementJMenuItemActionPerformed
+        if( nivelDendrogram < clusters.size()-1 )
+            nivelDendrogram++;
+        
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_incrementJMenuItemActionPerformed
+
+    private void decrementJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decrementJMenuItemActionPerformed
+        if( nivelDendrogram > 0 )
+            nivelDendrogram--;
+        
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_decrementJMenuItemActionPerformed
 
     
     public double getMaxDistance() {
@@ -1075,8 +1129,6 @@ public class Menu extends javax.swing.JFrame {
             view.cleanImage();
             view.repaint();            
         }
-        
-        
     }
 
     
@@ -1147,10 +1199,30 @@ public class Menu extends javax.swing.JFrame {
                 ArrayList<RetanguloVis> pivots = new ArrayList<>();
                 if( afterSeamCarving.isEmpty() )
                 {                
+                    if( clusters != null ) {
+                        RainbowScale rbS = new RainbowScale();
+                        int passo = 30;                        
+                        ArrayList<ArrayList<Integer>> indexes = clusters.get(nivelDendrogram);
+                        System.out.println("Painting "+nivelDendrogram+"th level");
+                        for( int i = 0; i < indexes.size(); ++i ) {
+                            Color cor = rbS.getColor((i)*passo);                            
+                            for( int j = 0; j < indexes.get(i).size(); ++j ) {
+                                int index = indexes.get(i).get(j);
+                                System.out.print(index+" ");
+                                rectangles.get(index).cor = cor;
+                            }                            
+                            System.out.println();
+                        }
+                        
+                    }
+                    
+                    
+                    
+                    
                     for( RetanguloVis r: rectangles ) {                    
                         ///g2Buffer.setColor(r.cor);
                         int cinza = (int) (((double)(r.getHealth()-menor)/(double)(maior-menor))*255.0);
-                        g2Buffer.setColor(new GrayScale().getColor(cinza));;
+                        g2Buffer.setColor(r.cor);
 
                         if( r.isHexBoard ) {
                             int a = (int)Math.sqrt(Math.pow(HEXBOARD_SIZE, 2) - Math.pow(HEXBOARD_SIZE/2, 2));
@@ -1296,18 +1368,21 @@ public class Menu extends javax.swing.JFrame {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem decrementJMenuItem;
     private javax.swing.JMenuItem dijsktraRepresentativeJMenuItem;
     private javax.swing.JMenuItem extractParametersJMenuItem;
     private javax.swing.JMenuItem gnatJMenuItem;
     private javax.swing.JMenuItem hexBoardJMenuItem;
     private javax.swing.JMenuItem hierarchicalClusteringJMenuItem;
     private javax.swing.JMenuItem incBoardJMenuItem;
+    private javax.swing.JMenuItem incrementJMenuItem;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenu6;
+    private javax.swing.JMenu jMenu7;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
