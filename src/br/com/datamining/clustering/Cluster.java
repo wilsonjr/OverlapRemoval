@@ -19,9 +19,11 @@ public class Cluster {
     private String id;
     private ArrayList<Rectangle2D.Double> points = new ArrayList<>();
     private ArrayList<Cluster> sons = new ArrayList<>();
+    private Cluster parent;
     private HierarchicalClustering hc;
     
     public Cluster(Rectangle2D.Double r, int id) {
+        parent = null;
         points.add(r);
         this.id = String.valueOf(id);
     }
@@ -32,6 +34,14 @@ public class Cluster {
     }
     
     public Cluster() { }
+    
+    public Cluster getParent() {
+        return parent;
+    }
+    
+    public void setParent(Cluster parent) {
+        this.parent = parent;
+    }
     
     public void addSons(Cluster son) {
         sons.add(son);
@@ -76,5 +86,6 @@ public class Cluster {
             sons.get(i).print(space+"\t");
         }
     }
+    
     
 }

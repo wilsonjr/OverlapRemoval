@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.PriorityQueue;
 
 /**
@@ -20,11 +19,13 @@ import java.util.PriorityQueue;
  */
 public class HierarchicalClustering {
     
-    private ArrayList<Cluster> clusters;
+    private ArrayList<Cluster> clusters, backup;
     private ArrayList<? extends Rectangle2D.Double> items;
     private PriorityQueue<Linkage> linkages;
     private Map<String, Linkage> linkageMap;
     private LinkageStrategy linkageStrategy;
+    private ArrayList<ArrayList<Integer>>[] clusterHierarchy;
+            
     
     public HierarchicalClustering(ArrayList<? extends Rectangle2D.Double> items, LinkageStrategy linkageStrategy) {                
         if( items == null )
@@ -55,6 +56,8 @@ public class HierarchicalClustering {
             uv.setId(u.getId()+"."+v.getId());  
             uv.addSons(u);
             uv.addSons(v);
+            u.setParent(uv);
+            v.setParent(uv);
             
             System.out.println("Unindo clusters: "+u.getId()+" <-> "+v.getId());
             
@@ -82,13 +85,23 @@ public class HierarchicalClustering {
             
             clusters.add(uv);
         }
+        
+        // find the dendogram height
+        int height = findHeight();        
+        clusterHierarchy = new ArrayList[height+1];
+        for( int i = 0; i < clusterHierarchy.length; ++i ) {
+            clusterHierarchy[i] = new ArrayList<>();
+        }
+        
+        constructClusterHierarchy(clusters.get(0), 0);
     }
     
     private void createClusters(ArrayList<? extends Rectangle2D.Double> items) {
         clusters = new ArrayList<>();      
-        
+        backup = new ArrayList<>();
         for( int i = 0; i < items.size(); ++i ) {
             clusters.add(new Cluster(items.get(i), i, this));
+            backup.add(clusters.get(i));
         }
     }
 
@@ -121,6 +134,40 @@ public class HierarchicalClustering {
     
     public void printHierarchy() {
         clusters.get(0).print("");
+    }
+    
+    private void constructClusterHierarchy(Cluster c, int index) {
+        ArrayList<Cluster> sons = c.getSons();        
+       
+        System.out.println("Adding "+c.getId()+" to level "+index);
+
+        for( int i = 0; i < sons.size(); ++i ) {            
+            constructClusterHierarchy(sons.get(i), index+1);                        
+        }
+
+        clusterHierarchy[index].add(new ArrayList<>());
+        String[] indexes = c.getId().split("\\.");           
+        for( int i = 0; i < indexes.length; ++i )
+            clusterHierarchy[index].get(clusterHierarchy[index].size()-1).add(Integer.parseInt(indexes[i]));
+        
+        
+    }
+    
+    private int findHeight() {
+        int height = Integer.MIN_VALUE;
+        
+        for( int i = 0; i < backup.size(); ++i ) {
+            int iHeight = 0;
+            Cluster c = backup.get(i);
+            while( c.getParent() != null ) {
+                iHeight++;
+                c = c.getParent();
+            }
+            
+            height = Math.max(height, iHeight);
+        }
+        
+        return height;
     }
     
 }
