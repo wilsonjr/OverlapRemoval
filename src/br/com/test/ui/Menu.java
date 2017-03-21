@@ -1062,7 +1062,6 @@ public class Menu extends javax.swing.JFrame {
     private void incrementJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_incrementJMenuItemActionPerformed
         if( nivelDendrogram < clusters.size()-1 )
             nivelDendrogram++;
-        
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_incrementJMenuItemActionPerformed
@@ -1070,7 +1069,6 @@ public class Menu extends javax.swing.JFrame {
     private void decrementJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decrementJMenuItemActionPerformed
         if( nivelDendrogram > 0 )
             nivelDendrogram--;
-        
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_decrementJMenuItemActionPerformed
