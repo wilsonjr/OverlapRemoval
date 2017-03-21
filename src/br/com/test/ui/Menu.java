@@ -19,9 +19,9 @@
 package br.com.test.ui;
 
 
-import br.com.datamining.clustering.Cluster;
-import br.com.datamining.clustering.HierarchicalClustering;
-import br.com.datamining.clustering.SingleLinkageStrategy;
+import br.com.datamining.clustering.Hierarchical.Cluster;
+import br.com.datamining.clustering.Hierarchical.HierarchicalClustering;
+import br.com.datamining.clustering.Hierarchical.SingleLinkageStrategy;
 import br.com.test.draw.color.GrayScale;
 import br.com.test.draw.color.RainbowScale;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
@@ -1046,14 +1046,14 @@ public class Menu extends javax.swing.JFrame {
         hc.printHierarchy();
         
         clusters = hc.getClusterHierarchy();
-//        for( int i = 0; i < clusters.size(); ++i ) {
-//            System.out.println("Nivel "+(clusters.size()-i)+": ");
-//            for( int j = 0; j < clusters.get(i).size(); ++j ) {
-//                for( int item: clusters.get(i).get(j) )
-//                    System.out.print(item+" ");
-//                System.out.println();
-//            }
-//        }
+        for( int i = 0; i < clusters.size(); ++i ) {
+            System.out.println("Nivel "+(clusters.size()-i)+": ");
+            for( int j = 0; j < clusters.get(i).size(); ++j ) {
+                for( int item: clusters.get(i).get(j) )
+                    System.out.print(item+" ");
+                System.out.println();
+            }
+        }
         
         view.cleanImage();
         view.repaint();
