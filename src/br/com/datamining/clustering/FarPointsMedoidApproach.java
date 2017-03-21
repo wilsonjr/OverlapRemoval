@@ -24,7 +24,7 @@ public class FarPointsMedoidApproach implements InitialMedoidApproach {
         double d = Double.MIN_VALUE;
         for( int i = 0; i < items.size(); ++i ) {
             double di = Util.distanciaEuclideana(first.x, first.y, items.get(i).x, items.get(i).y);
-            if( d > di ) {
+            if( d < di ) {
                 d = di;
                 index = i;
             }
