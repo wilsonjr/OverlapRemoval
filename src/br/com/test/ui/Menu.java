@@ -850,6 +850,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_hexBoardJMenuItemActionPerformed
 
     private void limparJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limparJMenuItemActionPerformed
+        currentCluster = null;
         embaralha();
     }//GEN-LAST:event_limparJMenuItemActionPerformed
 
@@ -1085,7 +1086,7 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
                 
-        KMeans kmeans = new KMeans(points, new FirstPointsMedoidApproach(), 3);
+        KMeans kmeans = new KMeans(points, new FirstPointsMedoidApproach(), 2);
         kmeans.execute();
         currentCluster = kmeans.getClusters();        
         
@@ -1140,6 +1141,7 @@ public class Menu extends javax.swing.JFrame {
     
     private void embaralha() {
         globalCounterColor = globalCounter = 0;
+        
         rectangles.clear();
        
         if( view != null ) {
@@ -1217,7 +1219,7 @@ public class Menu extends javax.swing.JFrame {
                 ArrayList<RetanguloVis> pivots = new ArrayList<>();
                 if( afterSeamCarving.isEmpty() )
                 {                
-                    if( currentCluster != null ) {
+                    if( currentCluster != null && !rectangles.isEmpty() ) {
                         RainbowScale rbS = new RainbowScale();
                         int passo = 30;                        
                         ArrayList<ArrayList<Integer>> indexes = currentCluster;
