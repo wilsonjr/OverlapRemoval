@@ -26,6 +26,7 @@ public class KMedoid {
         if( items == null )
             throw new NullPointerException("Data cannot be null");
         
+        this.items = items;
         this.initialGuessApproach = initialGuessApproach;
         this.K = k;
     }
@@ -86,6 +87,10 @@ public class KMedoid {
             
             
         } while( !Arrays.equals(oldGuess, newGuess) && iter++ < maxIterations );
+    }
+    
+    public ArrayList<ArrayList<Integer>> getClusters() {
+        return clusters;
     }
     
 }
