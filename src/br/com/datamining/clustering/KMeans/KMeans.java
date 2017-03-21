@@ -62,8 +62,6 @@ public class KMeans {
                  clusters.get(centroid).add(i);
              }
              
-             
-             
              // compute de new centroids
              for( int i = 0; i < clusters.size(); ++i ) {
                  ArrayList<Integer> cluster = clusters.get(i);
@@ -82,7 +80,7 @@ public class KMeans {
              }
              
             
-        } while( Arrays.equals(oldGuess, newGuess) && iter++ < maxIterations );
+        } while( !Arrays.equals(oldGuess, newGuess) && iter++ < maxIterations );
         
         
     }

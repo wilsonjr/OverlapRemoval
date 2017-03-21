@@ -1087,7 +1087,7 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
                 
-        KMeans kmeans = new KMeans(points, new FarPointsMedoidApproach(), 2);
+        KMeans kmeans = new KMeans(points, new FarPointsMedoidApproach(), 3);
         kmeans.execute();
         currentCluster = kmeans.getClusters();        
         

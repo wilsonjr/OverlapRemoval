@@ -30,7 +30,6 @@ public class FarPointsMedoidApproach implements InitialMedoidApproach {
             }
         }
         
-        System.out.println(">> "+index);
         medoids[count++] = items.get(index);
         
         while( count < k ) {
@@ -51,7 +50,6 @@ public class FarPointsMedoidApproach implements InitialMedoidApproach {
                 }
             }
             
-            System.out.println(">> "+index);
             medoids[count++] = items.get(index);
         }
         
