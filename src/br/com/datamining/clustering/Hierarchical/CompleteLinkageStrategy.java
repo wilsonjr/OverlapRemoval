@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.datamining.clustering;
+package br.com.datamining.clustering.Hierarchical;
 
 import java.util.List;
 
@@ -11,8 +11,11 @@ import java.util.List;
  *
  * @author Windows
  */
-public interface LinkageStrategy {
+public class CompleteLinkageStrategy implements LinkageStrategy {
     
-    double distance(List<Double> d);
+    @Override
+    public double distance(List<Double> d) {
+        return d.stream().max(Double::compareTo).get();
+    }
     
 }

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package br.com.datamining.clustering;
+package br.com.datamining.clustering.Hierarchical;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -65,8 +65,6 @@ public class HierarchicalClustering {
             uv.addSons(v);
             u.setParent(uv);
             v.setParent(uv);
-            
-            
             
             System.out.println("Unindo clusters: "+u.getId()+" <-> "+v.getId());
             

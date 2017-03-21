@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package br.com.datamining.clustering;
+package br.com.datamining.clustering.Hierarchical;
 
 import br.com.methods.utils.Util;
 import java.awt.geom.Rectangle2D;
