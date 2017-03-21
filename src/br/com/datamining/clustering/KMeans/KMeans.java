@@ -45,6 +45,7 @@ public class KMeans {
                  clusters.add(new ArrayList<>());
              }
              
+             // compute nearest cluster for each point
              for( int i = 0; i < items.size(); ++i ) {
                  double distance = Double.MAX_VALUE;
                  int centroid = -1;
@@ -61,7 +62,7 @@ public class KMeans {
                  clusters.get(centroid).add(i);
              }
              
-             
+             // compute de new centroids
              for( int i = 0; i < clusters.size(); ++i ) {
                  ArrayList<Integer> cluster = clusters.get(i);
                  double x = 0, y = 0;

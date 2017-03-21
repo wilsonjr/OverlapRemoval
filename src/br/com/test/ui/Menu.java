@@ -97,6 +97,7 @@ public class Menu extends javax.swing.JFrame {
     private static final int RECTSIZE = 20;
     private int maior, menor;
     private ArrayList<ArrayList<ArrayList<Integer>>> clusters = null;
+    private ArrayList<ArrayList<Integer>> currentCluster = null;
     private int nivelDendrogram = 0;
     
     
@@ -1043,18 +1044,9 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
         HierarchicalClustering hc = new HierarchicalClustering(rects, new SingleLinkageStrategy());        
         hc.execute();
-        hc.printHierarchy();
         
         clusters = hc.getClusterHierarchy();
-        for( int i = 0; i < clusters.size(); ++i ) {
-            System.out.println("Nivel "+(clusters.size()-i)+": ");
-            for( int j = 0; j < clusters.get(i).size(); ++j ) {
-                for( int item: clusters.get(i).get(j) )
-                    System.out.print(item+" ");
-                System.out.println();
-            }
-        }
-        
+        currentCluster = clusters.get(0);
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_hierarchicalClusteringJMenuItemActionPerformed
@@ -1062,6 +1054,7 @@ public class Menu extends javax.swing.JFrame {
     private void incrementJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_incrementJMenuItemActionPerformed
         if( nivelDendrogram < clusters.size()-1 )
             nivelDendrogram++;
+        currentCluster = clusters.get(nivelDendrogram);
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_incrementJMenuItemActionPerformed
@@ -1069,6 +1062,7 @@ public class Menu extends javax.swing.JFrame {
     private void decrementJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decrementJMenuItemActionPerformed
         if( nivelDendrogram > 0 )
             nivelDendrogram--;
+        currentCluster = clusters.get(nivelDendrogram);
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_decrementJMenuItemActionPerformed
@@ -1197,10 +1191,10 @@ public class Menu extends javax.swing.JFrame {
                 ArrayList<RetanguloVis> pivots = new ArrayList<>();
                 if( afterSeamCarving.isEmpty() )
                 {                
-                    if( clusters != null ) {
+                    if( currentCluster != null ) {
                         RainbowScale rbS = new RainbowScale();
                         int passo = 30;                        
-                        ArrayList<ArrayList<Integer>> indexes = clusters.get(nivelDendrogram);
+                        ArrayList<ArrayList<Integer>> indexes = currentCluster;
                         System.out.println("Painting "+nivelDendrogram+"th level");
                         for( int i = 0; i < indexes.size(); ++i ) {
                             Color cor = rbS.getColor((i)*passo);                            
