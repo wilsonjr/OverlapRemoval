@@ -7,7 +7,6 @@ package br.com.datamining.clustering;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  *
@@ -17,16 +16,18 @@ public class RandomMedoidApproach implements InitialMedoidApproach {
 
     @Override
     public Point2D.Double[] getInitialGuess(ArrayList<Point2D.Double> items, int k) {
-        Random rnd = new Random();
         
         ArrayList<Integer> selected = new ArrayList<>();
         Point2D.Double[] medoids = new Point2D.Double[k];
         int count = 0;
         
         while( count < k ) {
-            int i = rnd.nextInt(items.size());
-            if( !selected.contains(i) ) 
+            int i = (int) (Math.random() * (items.size() - 1));
+            if( !selected.contains(i) ) {
+                System.out.println("Medoid: "+i);
                 medoids[count++] = items.get(i);
+                selected.add(i);
+            }
         }
         
         return medoids;

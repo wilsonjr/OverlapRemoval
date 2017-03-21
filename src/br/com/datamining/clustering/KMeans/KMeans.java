@@ -37,7 +37,7 @@ public class KMeans {
         Point.Double[] newGuess = initialGuessApproach.getInitialGuess(items, K);
         Point.Double[] oldGuess = null;
         
-        int maxIterations = 10, iter = 0;
+        int maxIterations = 30, iter = 0;
         do {
              oldGuess = Arrays.copyOf(newGuess, newGuess.length);
              clusters = new ArrayList<>();
@@ -62,11 +62,17 @@ public class KMeans {
                  clusters.get(centroid).add(i);
              }
              
+             
+             
              // compute de new centroids
              for( int i = 0; i < clusters.size(); ++i ) {
                  ArrayList<Integer> cluster = clusters.get(i);
-                 double x = 0, y = 0;
                  
+                 if( cluster.isEmpty() ) {
+                     cluster.add((int) (Math.random() * (items.size() - 1)));
+                 }
+                 
+                 double x = 0, y = 0;                 
                  for( int j = 0; j < cluster.size(); ++j ) {
                      x += items.get(cluster.get(j)).x;
                      y += items.get(cluster.get(j)).y;

@@ -19,9 +19,12 @@
 package br.com.test.ui;
 
 
+import br.com.datamining.clustering.FirstPointsMedoidApproach;
 import br.com.datamining.clustering.Hierarchical.Cluster;
 import br.com.datamining.clustering.Hierarchical.HierarchicalClustering;
 import br.com.datamining.clustering.Hierarchical.SingleLinkageStrategy;
+import br.com.datamining.clustering.KMeans.KMeans;
+import br.com.datamining.clustering.RandomMedoidApproach;
 import br.com.test.draw.color.GrayScale;
 import br.com.test.draw.color.RainbowScale;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
@@ -160,6 +163,7 @@ public class Menu extends javax.swing.JFrame {
         dijsktraRepresentativeJMenuItem = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         hierarchicalClusteringJMenuItem = new javax.swing.JMenuItem();
+        kMeansJMenuItem = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         incrementJMenuItem = new javax.swing.JMenuItem();
         decrementJMenuItem = new javax.swing.JMenuItem();
@@ -352,6 +356,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu6.add(hierarchicalClusteringJMenuItem);
+
+        kMeansJMenuItem.setText("k-means");
+        kMeansJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                kMeansJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu6.add(kMeansJMenuItem);
 
         jMenuBar1.add(jMenu6);
 
@@ -1067,6 +1079,20 @@ public class Menu extends javax.swing.JFrame {
         view.repaint();
     }//GEN-LAST:event_decrementJMenuItemActionPerformed
 
+    private void kMeansJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kMeansJMenuItemActionPerformed
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<Point.Double> points = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i )
+            points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+                
+        KMeans kmeans = new KMeans(points, new FirstPointsMedoidApproach(), 3);
+        kmeans.execute();
+        currentCluster = kmeans.getClusters();        
+        
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_kMeansJMenuItemActionPerformed
+
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1382,6 +1408,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator11;
     private javax.swing.JPopupMenu.Separator jSeparator8;
     private javax.swing.JPopupMenu.Separator jSeparator9;
+    private javax.swing.JMenuItem kMeansJMenuItem;
     private javax.swing.JMenuItem limparJMenuItem;
     private javax.swing.JMenuItem loadDataJMenuItem;
     private javax.swing.JMenuItem mstJMenuItem;
