@@ -22,6 +22,7 @@ public class KMeans {
     private final int K;
     private ArrayList<ArrayList<Integer>> clusters;
     private Point.Double[] centroids;
+    private int maxIterations;
     
     public KMeans(ArrayList<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
         if( items == null )
@@ -30,6 +31,7 @@ public class KMeans {
         this.items = items;
         this.initialGuessApproach = initialGuessApproach;
         this.K = k;
+        this.maxIterations = 30;
     }
     
     
@@ -37,7 +39,7 @@ public class KMeans {
         Point.Double[] newGuess = initialGuessApproach.getInitialGuess(items, K);
         Point.Double[] oldGuess = null;
         
-        int maxIterations = 30, iter = 0;
+        int iter = 0;
         do {
              oldGuess = Arrays.copyOf(newGuess, newGuess.length);
              clusters = new ArrayList<>();
@@ -91,6 +93,10 @@ public class KMeans {
     
     public Point.Double[] getCentroids() {
         return centroids;
+    }
+    
+    public void setMaxIterations(int max) {
+        this.maxIterations = max;
     }
     
 }

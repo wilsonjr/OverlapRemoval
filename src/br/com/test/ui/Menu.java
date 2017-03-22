@@ -19,11 +19,13 @@
 package br.com.test.ui;
 
 
+import br.com.dataming.clustering.BisectingKMeans.BisectingKMeans;
 import br.com.datamining.clustering.FarPointsMedoidApproach;
 import br.com.datamining.clustering.Hierarchical.HierarchicalClustering;
 import br.com.datamining.clustering.Hierarchical.SingleLinkageStrategy;
 import br.com.datamining.clustering.KMeans.KMeans;
 import br.com.datamining.clustering.KMedoid.KMedoid;
+import br.com.datamining.clustering.RandomMedoidApproach;
 import br.com.test.draw.color.GrayScale;
 import br.com.test.draw.color.RainbowScale;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
@@ -164,6 +166,7 @@ public class Menu extends javax.swing.JFrame {
         hierarchicalClusteringJMenuItem = new javax.swing.JMenuItem();
         kMeansJMenuItem = new javax.swing.JMenuItem();
         kMedoidJMenuItem = new javax.swing.JMenuItem();
+        bisectingKMeansJMenuItem = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         incrementJMenuItem = new javax.swing.JMenuItem();
         decrementJMenuItem = new javax.swing.JMenuItem();
@@ -372,6 +375,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu6.add(kMedoidJMenuItem);
+
+        bisectingKMeansJMenuItem.setText("Bisecting k-means");
+        bisectingKMeansJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bisectingKMeansJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu6.add(bisectingKMeansJMenuItem);
 
         jMenuBar1.add(jMenu6);
 
@@ -1116,6 +1127,20 @@ public class Menu extends javax.swing.JFrame {
         view.repaint();
     }//GEN-LAST:event_kMedoidJMenuItemActionPerformed
 
+    private void bisectingKMeansJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bisectingKMeansJMenuItemActionPerformed
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<Point.Double> points = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i )
+            points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+        
+        BisectingKMeans bkmeans = new BisectingKMeans(points, new RandomMedoidApproach(), 2);
+        bkmeans.execute();
+        currentCluster = bkmeans.getCluster();
+        
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_bisectingKMeansJMenuItemActionPerformed
+
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1410,6 +1435,7 @@ public class Menu extends javax.swing.JFrame {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem bisectingKMeansJMenuItem;
     private javax.swing.JMenuItem decrementJMenuItem;
     private javax.swing.JMenuItem dijsktraRepresentativeJMenuItem;
     private javax.swing.JMenuItem extractParametersJMenuItem;

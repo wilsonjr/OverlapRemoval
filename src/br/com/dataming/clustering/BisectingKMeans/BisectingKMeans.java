@@ -8,9 +8,13 @@ package br.com.dataming.clustering.BisectingKMeans;
 
 import br.com.datamining.clustering.InitialMedoidApproach;
 import br.com.datamining.clustering.KMeans.KMeans;
+import br.com.methods.utils.Util;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -23,6 +27,7 @@ public class BisectingKMeans {
     private ArrayList<ArrayList<Integer>> clusters;
     private int K;
     private Point.Double[] centroids;
+    private int ITER = 10;
     
     
     public BisectingKMeans(ArrayList<Point.Double> items, InitialMedoidApproach initialGuess, int k) {
@@ -42,8 +47,6 @@ public class BisectingKMeans {
             clusters.get(0).add(i);
         }
         
-        Point.Double[] centers = null;//initialGuess.getInitialGuess(items, 1);
-        
         for( int i = 0; i < K-1; ++i ) { // K-1 is equal the number of times we have to split to create K clusters
             
             // get the greatest cluster
@@ -56,26 +59,62 @@ public class BisectingKMeans {
             
             ArrayList<Integer> cluster = clusters.get(index);
             
-            ArrayList<Point.Double> clusterItems = new ArrayList<>();
-            for( int j = 0; j < cluster.size(); ++j )
-                clusterItems.add(items.get(cluster.get(j)));
-            
-            KMeans kmeans = new KMeans(clusterItems, initialGuess, 2);
-            kmeans.execute();
-            centers = kmeans.getCentroids();
-            ArrayList<ArrayList<Integer>> splitCluster = kmeans.getClusters();
+            // choose the best split 
+            ArrayList<ArrayList<Integer>> chosenSplit = chooseSplit(cluster);
+                        
             
             clusters.remove(index);            
-            clusters.add(splitCluster.get(0));
-            clusters.add(splitCluster.get(1));
+            clusters.add(chosenSplit.get(0));
+            clusters.add(chosenSplit.get(1));
             
         }
-        
-        centroids = Arrays.copyOf(centers, centers.length);        
     }
     
     public Point.Double[] getCentroids() {
         return centroids;
-  }
+    }
+    
+    public ArrayList<ArrayList<Integer>> getCluster() {
+        return clusters;
+    }
+
+    private ArrayList<ArrayList<Integer>> chooseSplit(ArrayList<Integer> cluster) {
+        ArrayList<Point.Double> clusterItems = new ArrayList<>();
+        Map<Integer, Integer> mapIndex = new HashMap<>();
+        for( int j = 0; j < cluster.size(); ++j ) {
+            clusterItems.add(items.get(cluster.get(j)));
+            mapIndex.put(j, cluster.get(j));
+        }
+        
+        ArrayList<ArrayList<Integer>> chosenSplit = null;
+        double minEc = Double.MAX_VALUE;
+            
+        for( int x = 0; x < ITER; ++x ) {            
+            KMeans kmeans = new KMeans(clusterItems, initialGuess, 2);
+            kmeans.setMaxIterations(1);
+            kmeans.execute();
+            centroids = kmeans.getCentroids();
+            ArrayList<ArrayList<Integer>> splitCluster = kmeans.getClusters();
+            for( int j = 0; j < splitCluster.size(); ++j ) {
+                for( int k = 0; k < splitCluster.get(j).size(); ++k ) 
+                    splitCluster.get(j).set(k, mapIndex.get(splitCluster.get(j).get(k)));
+            }
+
+            double ec = 0;
+
+            for( int j = 0; j < centroids.length; ++j ) {
+                for( int k = 0; k < splitCluster.get(j).size(); ++k ) 
+                    ec += Util.distanciaEuclideana(centroids[j].x, centroids[j].y, 
+                            items.get(splitCluster.get(j).get(k)).x, items.get(splitCluster.get(j).get(k)).y);
+            }
+
+            if( ec < minEc ) {
+                chosenSplit = splitCluster;
+                minEc = ec;
+            }
+        }
+        
+        return chosenSplit;
+    }
     
 }
