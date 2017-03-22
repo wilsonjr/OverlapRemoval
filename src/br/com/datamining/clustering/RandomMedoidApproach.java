@@ -24,7 +24,6 @@ public class RandomMedoidApproach implements InitialMedoidApproach {
         while( count < k ) {
             int i = (int) (Math.random() * (items.size() - 1));
             if( !selected.contains(i) ) {
-                System.out.println("Medoid: "+i);
                 medoids[count++] = items.get(i);
                 selected.add(i);
             }

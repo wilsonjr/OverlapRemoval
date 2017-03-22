@@ -1272,7 +1272,7 @@ public class Menu extends javax.swing.JFrame {
                         ArrayList<ArrayList<Integer>> indexes = currentCluster;
                         System.out.println("Painting "+nivelDendrogram+"th level");
                         for( int i = 0; i < indexes.size(); ++i ) {
-                            Color cor = rbS.getColor((i)*passo);                            
+                            Color cor = rbS.getColor((i+1)*passo);                            
                             for( int j = 0; j < indexes.get(i).size(); ++j ) {
                                 int index = indexes.get(i).get(j);
                                 System.out.print(index+" ");
