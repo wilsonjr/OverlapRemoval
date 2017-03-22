@@ -21,7 +21,7 @@ public class KMeans {
     private InitialMedoidApproach initialGuessApproach;
     private final int K;
     private ArrayList<ArrayList<Integer>> clusters;
-    
+    private Point.Double[] centroids;
     
     public KMeans(ArrayList<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
         if( items == null )
@@ -82,13 +82,15 @@ public class KMeans {
             
         } while( !Arrays.equals(oldGuess, newGuess) && iter++ < maxIterations );
         
-        
+        centroids = Arrays.copyOf(newGuess, newGuess.length);
     }
     
     public ArrayList<ArrayList<Integer>> getClusters() {
         return clusters;
     }
     
-    
+    public Point.Double[] getCentroids() {
+        return centroids;
+    }
     
 }
