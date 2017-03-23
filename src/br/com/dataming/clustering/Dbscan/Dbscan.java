@@ -34,24 +34,33 @@ public class Dbscan {
         this.currentCluster = 0;
     }
     
+    public void setEpsilon(double epsilon) {
+        this.epsilon = epsilon;
+    }
+    
+    public void setMinPts(int minPts) {
+        this.minPts = minPts;
+    }
+    
     public void execute() {
        
-       for( int i = 0; i < points.size(); ++i ) {
-           
-           DbscanPoint p = points.get(i);
-           
-           if( !p.processed() ) {
-               tryExpand(p);
-           }
-       }
+        for( int i = 0; i < points.size(); ++i ) {
+
+            DbscanPoint p = points.get(i);
+
+            if( !p.processed() ) {
+                tryExpand(p);
+            }
+        }
+
+        clusters = new ArrayList<>();
+        for( int i = 0; i < currentCluster; ++i ) {
+            clusters.add(new ArrayList<>());
+        }
        
-       clusters = new ArrayList<>();
-       for( int i = 0; i < currentCluster; ++i ) {
-           clusters.add(new ArrayList<>());
-       }
-       
-       for( int i = 0; i < points.size(); ++i )
-           clusters.get(points.get(i).cluster).add(i);       
+        for( int i = 0; i < points.size(); ++i )
+            if( points.get(i).processed() )
+                clusters.get(points.get(i).cluster).add(i);       
     }
 
     private void tryExpand(DbscanPoint p) {
@@ -64,29 +73,31 @@ public class Dbscan {
         }
         
         if( seeds.size() >= minPts ) {
-            
-            for( int i = 0; i < seeds.size(); ++i ) 
-                seeds.get(i).cluster = currentCluster;                            
+            p.cluster = currentCluster;
             seeds.remove(p);
             
             while( !seeds.isEmpty() ) {
                 DbscanPoint first = seeds.get(0);
-                
+                ArrayList<DbscanPoint> nseeds = new ArrayList<>();
                 for( int i = 0; i < points.size(); ++i ) {
-                    
-                    double d = Util.distanciaEuclideana(first.point.x, first.point.y, 
-                            points.get(i).point.x, points.get(i).point.y);                    
-                    if( d < epsilon ) {                        
-                        if( points.get(i).cluster != currentCluster )
-                            points.get(i).cluster = currentCluster;                                                    
-                    }
+                    double d = Util.distanciaEuclideana(first.point.x, first.point.y, points.get(i).point.x, points.get(i).point.y);
+                    if( d < epsilon ) 
+                        nseeds.add(points.get(i));
                 }
                 
+                if( nseeds.size() >= minPts ) {                    
+                    for( int i = 0; i < nseeds.size(); ++i ) {                        
+                        if( !nseeds.get(i).processed() ) {
+                            seeds.add(nseeds.get(i));
+                        }                        
+                        nseeds.get(i).cluster = currentCluster;
+                    }
+                }
                 seeds.remove(first);
             }
             
             currentCluster++;
-        }
+        } 
     }
     
     public ArrayList<ArrayList<Integer>> getClusters() {

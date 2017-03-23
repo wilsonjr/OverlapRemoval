@@ -20,6 +20,7 @@ package br.com.test.ui;
 
 
 import br.com.dataming.clustering.BisectingKMeans.BisectingKMeans;
+import br.com.dataming.clustering.Dbscan.Dbscan;
 import br.com.datamining.clustering.FarPointsMedoidApproach;
 import br.com.datamining.clustering.Hierarchical.HierarchicalClustering;
 import br.com.datamining.clustering.Hierarchical.SingleLinkageStrategy;
@@ -167,6 +168,7 @@ public class Menu extends javax.swing.JFrame {
         kMeansJMenuItem = new javax.swing.JMenuItem();
         kMedoidJMenuItem = new javax.swing.JMenuItem();
         bisectingKMeansJMenuItem = new javax.swing.JMenuItem();
+        dbscanJMenuItem = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         incrementJMenuItem = new javax.swing.JMenuItem();
         decrementJMenuItem = new javax.swing.JMenuItem();
@@ -383,6 +385,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu6.add(bisectingKMeansJMenuItem);
+
+        dbscanJMenuItem.setText("DBSCAN");
+        dbscanJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dbscanJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu6.add(dbscanJMenuItem);
 
         jMenuBar1.add(jMenu6);
 
@@ -1135,11 +1145,34 @@ public class Menu extends javax.swing.JFrame {
         
         BisectingKMeans bkmeans = new BisectingKMeans(points, new RandomMedoidApproach(), 2);
         bkmeans.execute();
-        currentCluster = bkmeans.getCluster();
+        currentCluster = bkmeans.getClusters();
         
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_bisectingKMeansJMenuItemActionPerformed
+
+    private void dbscanJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbscanJMenuItemActionPerformed
+        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<Point.Double> points = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i )
+            points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+        
+        for( int i = 0; i < rects.size(); ++i ) {
+            for( int j = 0; j < rects.size(); ++j )
+                System.out.printf("%.2f ",Util.distanciaEuclideana(points.get(i).x, points.get(i).y, 
+                        points.get(j).x, points.get(j).y));
+            System.out.println();
+        }
+        
+        Dbscan dbscan = new Dbscan(points);
+        dbscan.setEpsilon(100);
+        dbscan.setMinPts(2);
+        dbscan.execute();
+        currentCluster = dbscan.getClusters();
+        
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_dbscanJMenuItemActionPerformed
 
     
     public double getMaxDistance() {
@@ -1436,6 +1469,7 @@ public class Menu extends javax.swing.JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem bisectingKMeansJMenuItem;
+    private javax.swing.JMenuItem dbscanJMenuItem;
     private javax.swing.JMenuItem decrementJMenuItem;
     private javax.swing.JMenuItem dijsktraRepresentativeJMenuItem;
     private javax.swing.JMenuItem extractParametersJMenuItem;

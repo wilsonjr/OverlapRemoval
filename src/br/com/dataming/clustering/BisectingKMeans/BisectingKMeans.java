@@ -74,7 +74,7 @@ public class BisectingKMeans {
         return centroids;
     }
     
-    public ArrayList<ArrayList<Integer>> getCluster() {
+    public ArrayList<ArrayList<Integer>> getClusters() {
         return clusters;
     }
 
