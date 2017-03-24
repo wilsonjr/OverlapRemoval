@@ -10,9 +10,7 @@ import br.com.datamining.clustering.InitialMedoidApproach;
 import br.com.datamining.clustering.KMeans.KMeans;
 import br.com.methods.utils.Util;
 import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 

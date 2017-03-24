@@ -11,18 +11,18 @@
 #include <fstream>
 #include <nlopt.hpp>
 #include <chrono>
+#include <numeric>
 
 //#define DEBUG
 
+#define X_PLUS(x) (x < 0.0 ? 0 : x)
+#define D_XPLUS_DX(x) (x < 0.0 ? 0 : 1)
 
 using namespace std;
-
-int counter = 0;
 
 vector<double> height;
 vector<double> width;
 vector<vector<double> > L;
-vector<double> originais;
 vector<double> orig_x, deltx;
 vector<double> orig_y, delty;
 double alpha;
@@ -41,54 +41,36 @@ vector<double> Lxy(const vector<vector<double> >& l, const vector<double>& xy)
 
 }
 
-inline double norma(const vector<double>& c)
+inline double norm(const vector<double>& vet)
 {
-    double soma = 0.0;
-    for( int i = 0; i < c.size(); ++i )
-        soma += (c[i]*c[i]);
-    return sqrt(soma);
+    return sqrt(std::inner_product(vet.begin(), vet.end(), vet.begin(), 0.0));
 }
 
-vector<double> delta_x()
+inline vector<double> delta_x()
 {
     return deltx;
 }
 
-vector<double> delta_y()
+inline vector<double> delta_y()
 {
     return delty;
-}
-
-double x_plus(double x)
-{
-	if( x < 0.0 )
-		return 0.0;
-
-	return x;
-}
-
-double d_xplus_dx(double x)
-{
-    if( x < 0.0 )
-        return 0;
-    return 1;
 }
 
 double O(double ai, double bi, double aj, double bj)
 {
 	if( ai >= aj )
-		return (1.0 / pow(bj, 4.0)) * pow(x_plus(pow(bj, 2.0) - pow(ai-aj, 2.0)), 2.0);
-	return (1.0 / pow(bi, 4.0)) * pow(x_plus(pow(bi, 2.0) - pow(ai-aj, 2.0)), 2.0);
+		return (1.0 / pow(bj, 4.0)) * pow(X_PLUS(pow(bj, 2.0) - pow(ai-aj, 2.0)), 2.0);
+	return (1.0 / pow(bi, 4.0)) * pow(X_PLUS(pow(bi, 2.0) - pow(ai-aj, 2.0)), 2.0);
 }
 
 double d_O_dx(double ai, double bi, double aj, double bj, double signal)
 {
     if( ai >= aj ) {
         double q = (bj, 2.) - pow(ai-aj, 2.);
-        return (signal*4. * (ai-aj) * x_plus(q) * d_xplus_dx(q) ) / pow(bj, 4.);
+        return (signal*4. * (ai-aj) * X_PLUS(q) * D_XPLUS_DX(q) ) / pow(bj, 4.);
     }
     double q = (bi, 2.) - pow(ai-aj, 2.);
-    return (signal*4. * (ai-aj) * x_plus(q) * d_xplus_dx(q) ) / pow(bi, 4.);
+    return (signal*4. * (ai-aj) * X_PLUS(q) * D_XPLUS_DX(q) ) / pow(bi, 4.);
 }
 
 
@@ -124,74 +106,62 @@ double fn(const vector<double>& X, const vector<double>& Y, const double& w)
     vector<double> Lx = Lxy(L, X);
     vector<double> Ly = Lxy(L, Y);
 
-    vector<double> Lxwdx(n, 0);
-    vector<double> Lywdy(n, 0);
-
     for( int i = 0; i < n; ++i ) {
-        Lxwdx[i] = Lx[i] - w*dx[i];
-        Lywdy[i] = Ly[i] - w*dy[i];
+        Lx[i] = Lx[i] - w*dx[i];
+        Ly[i] = Ly[i] - w*dy[i];
     }
 
-    double norma_Lxwdx = pow(norma(Lxwdx), 2);
-    double norma_Lywdy = pow(norma(Lywdy), 2);
-    double soma_diff = norma_Lxwdx+norma_Lywdy;
+    double norm_Lxwdx = pow(norm(Lx), 2);
+    double norm_Lywdy = pow(norm(Ly), 2);
+    double soma_diff = norm_Lxwdx+norm_Lywdy;
 
-    soma_en = ((n*n)/(2.*(pow(norma(dx), 2) + pow(norma(dy), 2))))  * soma_diff;
+    soma_en = ((n*n)/(2.*(pow(norm(dx), 2) + pow(norm(dy), 2))))  * soma_diff;
 
     return (1.-alpha)*soma_eo + alpha*soma_en;
 }
 
 double objective_function(const std::vector<double> &x, std::vector<double> &grad, void *my_func_data)
 {
-    counter++;
-   // cout << "counter: " << counter << endl;
     int N = x.size()-1;
     int n = N/2;
 
-
     if (!grad.empty()) {
-        double q = 0;
-        for( int i = 0; i < grad.size(); ++i ) {
-            grad[i] = 0;
-        }
-        //cout << "-----------------------------------------------" << endl;
+        double q = 0, multiplier = (1.-alpha)*(2./(n*(n-1.)));
+        grad.assign(grad.size(), 0.0);
+
         for( int i = 0; i < N; i += 2 )
             for( int j = i+2; j < N; j += 2 ) {
 
-               // grad[i] += d_O_dx(x[i], width[i/2], x[j], width[j/2], -1) * O(x[i+1], height[i/2], x[j+1], height[j/2]);
                 if( x[i] >= x[j] ) {
                     q = pow(width[j/2], 2.) - pow(x[i]-x[j], 2.);
-                    grad[i] += (1.-alpha)*(2./(n*(n-1.)))*((-4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[j/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
+                    grad[i] += multiplier*((-4. * (x[i]-x[j]) * X_PLUS(q) * D_XPLUS_DX(q)) / pow(width[j/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
                 } else {
                     q = pow(width[i/2], 2.) - pow(x[i]-x[j], 2.);
-                    grad[i] += (1.-alpha)*(2./(n*(n-1.)))*((-4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[i/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
+                    grad[i] += multiplier*((-4. * (x[i]-x[j]) * X_PLUS(q) * D_XPLUS_DX(q)) / pow(width[i/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
                 }
 
-               // grad[i+1] += d_O_dx(x[i+1], height[i/2], x[j+1], height[j/2], -1) * O(x[i], width[i/2], x[j], width[j/2]);
                 if( x[i+1] >= x[j+1] ) {
                     q = pow(height[j/2], 2.) - pow(x[i+1]-x[j+1], 2.);
-                    grad[i+1] += (1.-alpha)*(2./(n*(n-1.)))*((-4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[j/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
+                    grad[i+1] += multiplier*((-4. * (x[i+1]-x[j+1]) * X_PLUS(q) * D_XPLUS_DX(q)) / pow(height[j/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
                 } else {
                     q = pow(height[i/2], 2.) - pow(x[i+1]-x[j+1], 2.);
-                    grad[i+1] += (1.-alpha)*(2./(n*(n-1.)))*((-4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[i/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
+                    grad[i+1] += multiplier*((-4. * (x[i+1]-x[j+1]) * X_PLUS(q) * D_XPLUS_DX(q)) / pow(height[i/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
                 }
 
-               // grad[j] += d_O_dx(x[i], width[i/2], x[j], width[j/2], 1) * O(x[i+1], height[i/2], x[j+1], height[j/2]);
                 if( x[i] >= x[j] ) {
                     q = pow(width[j/2], 2.) - pow(x[i]-x[j], 2.);
-                    grad[j] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[j/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
+                    grad[j] += multiplier*((4. * (x[i]-x[j]) * X_PLUS(q) * D_XPLUS_DX(q)) / pow(width[j/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
                 } else {
                     q = pow(width[i/2], 2.) - pow(x[i]-x[j], 2.);
-                    grad[j] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i]-x[j]) * x_plus(q) * d_xplus_dx(q)) / pow(width[i/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
+                    grad[j] += multiplier*((4. * (x[i]-x[j]) * X_PLUS(q) * D_XPLUS_DX(q)) / pow(width[i/2], 4.) * O(x[i+1], height[i/2], x[j+1], height[j/2]));
                 }
 
-              //  grad[j+1] += d_O_dx(x[i+1], height[i/2], x[j+1], height[j/2], 1) * O(x[i], width[i/2], x[j], width[j/2]);
                 if( x[i+1] >= x[j+1] ) {
                     q = pow(height[j/2], 2.) - pow(x[i+1]-x[j+1], 2.);
-                    grad[j+1] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[j/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
+                    grad[j+1] += multiplier*((4. * (x[i+1]-x[j+1]) * X_PLUS(q) * D_XPLUS_DX(q)) / pow(height[j/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
                 } else {
                     q = pow(height[i/2], 2.) - pow(x[i+1]-x[j+1], 2.);
-                    grad[j+1] += (1.-alpha)*(2./(n*(n-1.)))*((4. * (x[i+1]-x[j+1]) * x_plus(q) * d_xplus_dx(q)) / pow(height[i/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
+                    grad[j+1] += multiplier*((4. * (x[i+1]-x[j+1]) * X_PLUS(q) * D_XPLUS_DX(q)) / pow(height[i/2], 4.) * O(x[i], width[i/2], x[j], width[j/2]));
                 }
             }
 
@@ -204,29 +174,29 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
             pontos_o_y.push_back(x[i+1]);
         }
 
-        vector<double> X = Lxy(L, pontos_o_x);
-        vector<double> Y = Lxy(L, pontos_o_y);
-        vector<double> deltax = delta_x();//Lxy(L, orig_x);
-        vector<double> deltay = delta_y();// = Lxy(L, orig_y);
-        for( int i = 0; i < X.size(); ++i ) {
-            X[i] = X[i] - w*deltax[i];
-            Y[i] = Y[i] - w*deltay[i];
+        vector<double> dx = delta_x();
+        vector<double> dy = delta_y();
+
+        vector<double> Lx = Lxy(L, pontos_o_x);
+        vector<double> Ly = Lxy(L, pontos_o_y);
+
+        for( int i = 0; i < n; ++i ) {
+            Lx[i] = Lx[i] - w*dx[i];
+            Ly[i] = Ly[i] - w*dy[i];
         }
 
-        double dx = norma(deltax);
-        double dy = norma(deltay);
 
-        double first = pow((double)n, 2.0) / (2.0*(pow(dx, 2.0)+pow(dy, 2.0)));
+        multiplier = alpha*pow((double)n, 2.0) / (2.0*(pow(norm(dx), 2.0)+pow(norm(dy), 2.0)));
         for( int i = 0; i < N; i += 2 ) {
-            for( int j = 0; j < X.size(); ++j )
-                grad[i] += alpha*first*(2.0*L[j][i/2]*X[j]);
-            for( int j = 0; j < Y.size(); ++j )
-                grad[i+1] += alpha*first*(2.0*L[j][i/2]*Y[j]);
+            for( int j = 0; j < Lx.size(); ++j )
+                grad[i] += multiplier*(2.0*L[j][i/2]*Lx[j]);
+            for( int j = 0; j < Ly.size(); ++j )
+                grad[i+1] += multiplier*(2.0*L[j][i/2]*Ly[j]);
         }
-        for( int i = 0; i < X.size(); ++i )
-            grad[N] += alpha*first*(-2.0*deltax[i]*X[i]);
-        for( int i = 0; i < Y.size(); ++i )
-            grad[N] += alpha*first*(-2.0*deltay[i]*Y[i]);
+        for( int i = 0; i < Lx.size(); ++i )
+            grad[N] += multiplier*(-2.0*dx[i]*Lx[i]);
+        for( int i = 0; i < Ly.size(); ++i )
+            grad[N] += multiplier*(-2.0*dy[i]*Ly[i]);
 
 
     }
@@ -272,7 +242,6 @@ vector<double> read_elems()
         elems.push_back(x);
         ifs >> alpha;
 
-        originais = vector<double>(elems.begin(), elems.end());
         ifs.close();
     }
 
@@ -325,11 +294,6 @@ int main(int argc, char** argv) {
 
     nlopt::opt opt(nlopt::LD_MMA, n);
     vector<double> lb(n, 0);
-    //cout << media*(n/2)+(menor+30) << endl;
-    //cout << media << endl;
-    //cout << media*(n/2) << endl;
-    //cout << (menor+30) << endl;
-
     vector<double> up(n, test_w*(media*(n/2)+(menor+30)));
     opt.set_lower_bounds(lb);
     opt.set_upper_bounds(up);
@@ -341,9 +305,13 @@ int main(int argc, char** argv) {
     opt.set_min_objective(objective_function, NULL);
 
     double minf = 0;
-    nlopt::result result = opt.optimize(x, minf);
 
     #ifdef DEBUG
+        std::chrono::steady_clock::time_point begin_time = std::chrono::steady_clock::now();
+        nlopt::result result = opt.optimize(x, minf);
+        std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
+        std::cout << "Time (s):" << std::chrono::duration_cast<std::chrono::nanoseconds>(end_time-begin_time).count()/1.0e9 << std::endl;
+
         ofstream ofs("point_solve.rect");
         if( ofs ) {
             ofs << x.size()/2 << endl;
@@ -356,6 +324,8 @@ int main(int argc, char** argv) {
     #endif // DEBUG
 
     #ifndef DEBUG
+        nlopt::result result = opt.optimize(x, minf);
+
         ofstream ofs("projsnippet_routine/point_solve.rect");
         if( ofs ) {
             ofs << x.size()/2 << endl;
