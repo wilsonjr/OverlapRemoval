@@ -23,8 +23,8 @@ vector<double> height;
 vector<double> width;
 vector<vector<double> > L;
 vector<double> originais;
-vector<double> orig_x;
-vector<double> orig_y;
+vector<double> orig_x, deltx;
+vector<double> orig_y, delty;
 double alpha;
 double test_w = 5;
 
@@ -51,12 +51,12 @@ inline double norma(const vector<double>& c)
 
 vector<double> delta_x()
 {
-    return Lxy(L, orig_x);
+    return deltx;
 }
 
 vector<double> delta_y()
 {
-    return Lxy(L, orig_y);
+    return delty;
 }
 
 double x_plus(double x)
@@ -140,78 +140,6 @@ double fn(const vector<double>& X, const vector<double>& Y, const double& w)
 
     return (1.-alpha)*soma_eo + alpha*soma_en;
 }
-
-
-vector<double> gradient(vector<double> x0)
-{
-
-    vector<double> g;
-
-    vector<double> delta(x0.begin(), x0.end());
-    for( int i = 0; i < delta.size(); ++i )
-        delta[i] /= 1000.0;
-
-    for( int i = 0; i < x0.size(); ++i ) {
-
-        if( x0[i] == 0 ) {
-            delta[i] = 1e-12;
-        }
-
-        vector<double> u(x0.begin(), x0.end());
-
-        vector<double> cx1, cy1;
-        double w1;
-        u[i] = x0[i]+delta[i];
-        get_elements(u, cx1, cy1, w1);
-        double f1 = fn(cx1, cy1, w1);
-
-        vector<double> cx2, cy2;
-        double w2;
-        u[i] = x0[i] - delta[i];
-        get_elements(u, cx2, cy2, w2);
-        double f2 = fn(cx2, cy2, w2);
-
-        g.push_back((f1-f2)/(2.0*delta[i]));
-    }
-
-    return g;
-}
-
-
-
-double e_n(const vector<double>& pontos_o)
-{
-    int N = pontos_o.size()-1;
-    int n = N/2;
-    double w = pontos_o[N];
-    vector<double> pontos_o_x;
-    vector<double> pontos_o_y;
-
-    for( int i = 0; i < N; i += 2 ) {
-        pontos_o_x.push_back(pontos_o[i]);
-        pontos_o_y.push_back(pontos_o[i+1]);
-    }
-
-    vector<double> x = Lxy(L, pontos_o_x);
-    vector<double> y = Lxy(L, pontos_o_y);
-    vector<double> deltax = delta_x();//Lxy(L, orig_x);
-    vector<double> deltay = delta_y();// = Lxy(L, orig_y);
-    for( int i = 0; i < x.size(); ++i ) {
-        x[i] = x[i] - w*deltax[i];
-        y[i] = y[i] - w*deltay[i];
-    }
-
-    double dx = pow(norma(deltax), 2.0);
-    double dy = pow(norma(deltay), 2.0);
-    double ddx = pow(norma(x), 2.0);
-    double ddy = pow(norma(y), 2.0);
-
-    return (pow((double)n, 2.0)* (ddx + ddy)) /
-                    (2.0 * (dx + dy));
-}
-
-
-
 
 double objective_function(const std::vector<double> &x, std::vector<double> &grad, void *my_func_data)
 {
@@ -372,6 +300,10 @@ vector<vector<double> > read_matrix() {
             for( int j = 0; j < dim; ++j )
                 ifs >> m[i][j];
     }
+
+    deltx = Lxy(m, orig_x);
+    delty = Lxy(m, orig_y);
+
 
     return m;
 }
