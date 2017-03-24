@@ -306,24 +306,11 @@ double objective_function(const std::vector<double> &x, std::vector<double> &gra
     vector<double> X, Y;
     double W;
     get_elements(x, X, Y, W);
-    double r = fn(X, Y, W);
     #ifdef DEBUG
+        double r = fn(X, Y, W);
         cout << "energia: " << r << endl;
     #endif // DEBUG
     return fn(X, Y, W);
-
-/*
-    double energia_o = 0.0;
-    for( int i = 0; i < N; i += 2 )
-        for( int j = i+2; j < N; j += 2 ) {
-            energia_o += O(x[i], width[i/2], x[j], width[j/2]) * O(x[i+1], height[i/2], x[j+1], height[j/2]);
-        }
-    energia_o = (2.0/(n*(n-1.0)))*energia_o;
-    double energia_n = e_n(x);
-    #ifdef DEBUG
-        cout << "energia_o: " << (1-alpha)*energia_o << ", energia_n: " << alpha*energia_n << endl;
-    #endif
-    return (1.-alpha)*energia_o + alpha*energia_n;*/
 }
 
 vector<double> read_elems()
@@ -417,6 +404,8 @@ int main(int argc, char** argv) {
     opt.set_stopval(0.00001);
     opt.set_maxeval(5000);
     opt.set_maxtime(900);
+    opt.set_ftol_abs(0.00001);
+    opt.set_ftol_rel(0.00001);
     opt.set_min_objective(objective_function, NULL);
 
     double minf = 0;
