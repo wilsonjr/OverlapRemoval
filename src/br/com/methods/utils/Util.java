@@ -14,6 +14,7 @@ import br.com.methods.overlap.prism.PRISMEdge;
 import br.com.methods.overlap.prism.PRISMPoint;
 import br.com.methods.overlap.prism.SetPoint;
 import br.com.methods.overlap.vpsc.Event;
+import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -1140,6 +1141,23 @@ public class Util {
             projectedValues.get(projectedValues.size()-1).setId(element.getKey().getId());
         });
         return projectedValues;
+    }
+    
+    /**
+     * Creata a matrix with elements corresponding to the columns and the dimensions corresponding to the rows
+     * @param points
+     * @return 
+     */
+    public static double[][] elementMatrix(ArrayList<ArrayList<Double>> points) {
+        double[][] elements = new double[points.get(0).size()][points.size()];
+       
+        for( int i = 0; i < points.size(); ++i ) {
+            for( int j = 0; j < points.get(0).size(); ++j ) {
+                elements[j][i] = points.get(i).get(j);
+            }
+        } 
+            
+        return elements;
     }
     
 }

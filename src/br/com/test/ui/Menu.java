@@ -50,6 +50,7 @@ import br.com.methods.utils.RetanguloVis;
 import br.com.methods.utils.Util;
 import br.com.projection.spacereduction.ContextPreserving;
 import br.com.representative.Dijsktra;
+import br.com.representative.csm.CSM;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -103,7 +104,8 @@ public class Menu extends javax.swing.JFrame {
     private int maior, menor;
     private ArrayList<ArrayList<ArrayList<Integer>>> clusters = null;
     private ArrayList<ArrayList<Integer>> currentCluster = null;
-    private int nivelDendrogram = 0;
+    private int nivelDendrogram = 0, indexRepresentatives = -1;
+    private int[] selectedRepresentatives = null;
     
     
     
@@ -172,6 +174,9 @@ public class Menu extends javax.swing.JFrame {
         jMenu7 = new javax.swing.JMenu();
         incrementJMenuItem = new javax.swing.JMenuItem();
         decrementJMenuItem = new javax.swing.JMenuItem();
+        jMenu8 = new javax.swing.JMenu();
+        viewSelectedJMenuItem = new javax.swing.JMenuItem();
+        csmJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -415,6 +420,26 @@ public class Menu extends javax.swing.JFrame {
         jMenu7.add(decrementJMenuItem);
 
         jMenuBar1.add(jMenu7);
+
+        jMenu8.setText("Representativo");
+
+        viewSelectedJMenuItem.setText("View Representative");
+        viewSelectedJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewSelectedJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(viewSelectedJMenuItem);
+
+        csmJMenuItem.setText("CSM");
+        csmJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                csmJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(csmJMenuItem);
+
+        jMenuBar1.add(jMenu8);
 
         setJMenuBar(jMenuBar1);
 
@@ -1174,6 +1199,51 @@ public class Menu extends javax.swing.JFrame {
         view.repaint();
     }//GEN-LAST:event_dbscanJMenuItemActionPerformed
 
+    private void csmJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_csmJMenuItemActionPerformed
+        
+        JFileChooser jFileChooser = new JFileChooser();
+        int result = jFileChooser.showOpenDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            try {                 
+                File file = jFileChooser.getSelectedFile();
+                Scanner scn = new Scanner(file);
+                scn.nextLine();
+                scn.nextLine();
+                scn.nextLine();
+                scn.nextLine();
+                ArrayList<ArrayList<Double>> attrs = new ArrayList<>();
+                while( scn.hasNext() ) {
+                    
+                    attrs.add(new ArrayList<>());
+                    String[] linhas = scn.nextLine().split(";");
+                    for( int i = 1; i < linhas.length-1; ++i ) 
+                        attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                        
+                    
+                }
+                
+                CSM csm = new CSM(attrs, (int) ((int) attrs.size()*0.5));
+                csm.execute();
+
+                selectedRepresentatives = csm.getRepresentatives();
+                
+                if( view != null ) {
+                    view.cleanImage();
+                    view.repaint();            
+                }
+            } catch( FileNotFoundException e ) {
+
+            }
+        }
+    }//GEN-LAST:event_csmJMenuItemActionPerformed
+
+    private void viewSelectedJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewSelectedJMenuItemActionPerformed
+        
+        indexRepresentatives = (indexRepresentatives+1) % selectedRepresentatives.length;
+        
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_viewSelectedJMenuItemActionPerformed
+
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1353,6 +1423,23 @@ public class Menu extends javax.swing.JFrame {
                             g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
                         }
                     }
+                    if( selectedRepresentatives != null ) {
+                        
+                        
+                        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+                            RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
+                            g2Buffer.setColor(Color.RED);
+                            g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            g2Buffer.setColor(Color.BLACK);
+                            g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            g2Buffer.setColor(Color.GREEN);
+                            g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                            g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
+                        }
+                        
+                        
+                        
+                    }
                 }
                 
                 afterSeamCarving.stream().forEach(r->{
@@ -1469,6 +1556,7 @@ public class Menu extends javax.swing.JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem bisectingKMeansJMenuItem;
+    private javax.swing.JMenuItem csmJMenuItem;
     private javax.swing.JMenuItem dbscanJMenuItem;
     private javax.swing.JMenuItem decrementJMenuItem;
     private javax.swing.JMenuItem dijsktraRepresentativeJMenuItem;
@@ -1485,6 +1573,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenu6;
     private javax.swing.JMenu jMenu7;
+    private javax.swing.JMenu jMenu8;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
@@ -1507,6 +1596,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem saveDataCoordJMenuItem;
     private javax.swing.JMenuItem sssJMenuItem;
     private javax.swing.JScrollPane telaJScrollPane;
+    private javax.swing.JMenuItem viewSelectedJMenuItem;
     private javax.swing.JMenuItem vpscJMenuItem;
     // End of variables declaration//GEN-END:variables
 }
