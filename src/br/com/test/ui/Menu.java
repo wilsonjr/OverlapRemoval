@@ -905,6 +905,7 @@ public class Menu extends javax.swing.JFrame {
 
     private void limparJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limparJMenuItemActionPerformed
         currentCluster = null;
+        selectedRepresentatives = null;
         embaralha();
     }//GEN-LAST:event_limparJMenuItemActionPerformed
 
@@ -1221,7 +1222,7 @@ public class Menu extends javax.swing.JFrame {
                     
                 }
                 
-                CSM csm = new CSM(attrs, (int) ((int) attrs.size()*0.5));
+                CSM csm = new CSM(attrs, (int) ((int) attrs.size()*0.2));
                 csm.execute();
 
                 selectedRepresentatives = csm.getRepresentatives();
