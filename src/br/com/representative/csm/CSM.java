@@ -38,12 +38,17 @@ public class CSM {
     public CSM(double[][] d, int c) {
         this.d = d;
         this.c = c;    
-        this.k = d.length;//Math.min(items.size(), items.get(0).size())/2 +1;
+        this.k = 3;//d.length;//Math.min(items.size(), items.get(0).size())/2 +1;
     }
     
     public void execute() {
+     
+        double[][] distanceMatrix = null;
         
-        double[][] distanceMatrix = Util.elementMatrix(items);   
+        if( items == null )
+            distanceMatrix = d;
+        else
+            distanceMatrix = Util.elementMatrix(items);   
         //getTruncatedSVD(distanceMatrix, k);
 //        columns = new IndexPI[truncatedVT[0].length];
 //        System.out.println("Columns: "+truncatedVT[0].length);

@@ -1222,7 +1222,18 @@ public class Menu extends javax.swing.JFrame {
                     
                 }
                 
-                CSM csm = new CSM(attrs, (int) ((int) attrs.size()*0.2));
+                ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+                ArrayList<Point.Double> points = new ArrayList<>();
+                for( int i = 0; i < rects.size(); ++i )
+                    points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+                
+                double[][] distance = new double[points.size()][points.size()];
+                for( int i = 0; i < distance.length; ++i )
+                    for( int j = 0; j < distance.length; ++j )
+                        distance[i][j] = Util.distanciaEuclideana(points.get(i).x, points.get(i).y, 
+                                points.get(j).x, points.get(j).y);
+                
+                CSM csm = new CSM(attrs, (int) ((int) attrs.size()*0.5));
                 csm.execute();
 
                 selectedRepresentatives = csm.getRepresentatives();
