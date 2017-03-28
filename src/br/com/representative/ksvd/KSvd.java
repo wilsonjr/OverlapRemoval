@@ -125,8 +125,10 @@ public class KSvd {
         }
     }
 
-    private boolean topCondition(int m, double eps, List<Integer> idx, double[] residual) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private boolean topCondition(int m, double eps, List<Integer> idx, double[] residual) {        
+        if( eps > 0 ) 
+            return idx.size() == m;
+        return Util.innerProduct(residual, residual) <= eps;        
     }
     
     private double[] prod(double[][] a, double[] b) {
