@@ -232,7 +232,7 @@ public class Util {
         }    
     }
     
-    private static double innerProduct(double[] r1, double[] r2) {
+    public static double innerProduct(double[] r1, double[] r2) {
         double prod = 0;
         for( int i = 0; i < r1.length; ++i )
             prod += (r1[i]*r2[i]);
