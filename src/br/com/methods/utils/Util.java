@@ -1148,7 +1148,7 @@ public class Util {
      * @param points
      * @return 
      */
-    public static double[][] elementMatrix(ArrayList<ArrayList<Double>> points) {
+    public static double[][] elementMatrix(List<? extends List<Double>> points) {
         double[][] elements = new double[points.get(0).size()][points.size()];
        
         for( int i = 0; i < points.size(); ++i ) {
