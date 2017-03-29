@@ -12,7 +12,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.Matrix;
+import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.LinearSolverFactory;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition;
 import org.ejml.interfaces.linsol.LinearSolver;
 
 /**
@@ -123,9 +126,22 @@ public class KSvd {
                     for( int j = 0; j < EkR[0].length; ++j )
                         EkR[i][j] = items_temp[i][j] - EkR[i][j];
                 
+                // Apply SVD decomposition EkR = USVT. Choose the updated dictionary column d'k to be the dist column of U. Update the coefficient
+                // vector xkr (the selected rows according to wk) to be the first column of V mulitiplied by S(1,1), the greatest singular value
+                
+                DenseMatrix64F A = new DenseMatrix64F(EkR);
+                SingularValueDecomposition svd =  DecompositionFactory.svd(EkR.length, EkR[0].length, true, true, false);
+                svd.decompose(A);
+                double S11 = ((DenseMatrix64F)svd.getW(null)).get(0, 0);
+                
+                for( int i = 0; i < dict.length; ++i ) 
+                    dict[i][k] = ((DenseMatrix64F)svd.getU(null, false)).get(i, 0);
+        
+                for( int i = 0; i < gammaiT[k].length; ++i )
+                    gammaiT[k][i] = ((DenseMatrix64F)svd.getV(null, true)).get(i, 0)*S11;
                 
                 
-            
+                // the question is: Do I have to update gamma for the next iterations? I think so...
             }
             
             
