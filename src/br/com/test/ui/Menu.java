@@ -51,6 +51,7 @@ import br.com.methods.utils.Util;
 import br.com.projection.spacereduction.ContextPreserving;
 import br.com.representative.Dijsktra;
 import br.com.representative.csm.CSM;
+import br.com.representative.ksvd.KSvd;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -177,6 +178,7 @@ public class Menu extends javax.swing.JFrame {
         jMenu8 = new javax.swing.JMenu();
         viewSelectedJMenuItem = new javax.swing.JMenuItem();
         csmJMenuItem = new javax.swing.JMenuItem();
+        ksvdJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -438,6 +440,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu8.add(csmJMenuItem);
+
+        ksvdJMenuItem.setText("K-SVD");
+        ksvdJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ksvdJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(ksvdJMenuItem);
 
         jMenuBar1.add(jMenu8);
 
@@ -1245,6 +1255,45 @@ public class Menu extends javax.swing.JFrame {
         view.repaint();
     }//GEN-LAST:event_viewSelectedJMenuItemActionPerformed
 
+    private void ksvdJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ksvdJMenuItemActionPerformed
+        JFileChooser jFileChooser = new JFileChooser();
+        int result = jFileChooser.showOpenDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            try {                 
+                File file = jFileChooser.getSelectedFile();
+                Scanner scn = new Scanner(file);
+                scn.nextLine();
+                scn.nextLine();
+                scn.nextLine();
+                scn.nextLine();
+                ArrayList<ArrayList<Double>> attrs = new ArrayList<>();
+                while( scn.hasNext() ) {
+                    
+                    attrs.add(new ArrayList<>());
+                    String[] linhas = scn.nextLine().split(";");
+                    for( int i = 1; i < linhas.length-1; ++i ) 
+                        attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                        
+                    
+                }
+                
+                KSvd ksvd = new KSvd(attrs, (int) ((int) attrs.size()*0.2));
+                ksvd.execute();
+                
+                
+
+                
+                if( view != null ) {
+                    view.cleanImage();
+                    view.repaint();            
+                }
+            } catch( FileNotFoundException e ) {
+
+            }
+        }
+        
+        
+    }//GEN-LAST:event_ksvdJMenuItemActionPerformed
+
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1584,6 +1633,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator9;
     private javax.swing.JMenuItem kMeansJMenuItem;
     private javax.swing.JMenuItem kMedoidJMenuItem;
+    private javax.swing.JMenuItem ksvdJMenuItem;
     private javax.swing.JMenuItem limparJMenuItem;
     private javax.swing.JMenuItem loadDataJMenuItem;
     private javax.swing.JMenuItem mstJMenuItem;

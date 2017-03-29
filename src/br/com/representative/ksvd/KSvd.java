@@ -6,13 +6,13 @@
 
 package br.com.representative.ksvd;
 
+import Jama.Matrix;
 import br.com.methods.utils.Util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.data.Matrix;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.LinearSolverFactory;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
@@ -27,50 +27,16 @@ public class KSvd {
     private int dictsize;
     private double[] ans;
     
-    public KSvd(List<List<Double>> items, int dictsize) {
+    public KSvd(List<? extends List<Double>> items, int dictsize) {
         this.items = Util.elementMatrix(items);
+        this.dictsize = dictsize;
     }
     
     public void execute() {
         
-        double D[][] = initialDict();
-        int j = 0;
-        
-        
-        
-    }
-    
-    
-    
-    
-    private double[][] initialDict() {
-        int n = items.length;        
-        double[][] dict = new double[n][dictsize];
-        
+        double D[][] = initialDict();        
+        int maxiter = 1, n = D.length;
         List<Integer> ids = new ArrayList<>();
-        for( int i = 0; i < n; ++i )
-            ids.add(i);
-        
-        Collections.shuffle(ids);
-                
-        for( int i = 0; i < n; ++i )            
-            for( int j = 0; j < dictsize; ++j ) {
-                dict[i][j] = items[i][ids.get(j)];                              
-            }
-        
-        // normalize columns in l^2
-        for( int j = 0; j < dictsize; ++j ) {
-            double norm = 0;
-            for( int i = 0; i < n; ++i )
-                norm += dict[i][j]*dict[i][j];
-            
-            norm = 1.0/Math.sqrt(norm);
-            for( int i = 0; i < n; ++i )
-                dict[i][j] = dict[i][j]*norm;
-        }
-        
-        int maxiter = 1;
-        
         
         double[] gamma = new double[n];
         double[] y = new double[n];
@@ -82,18 +48,19 @@ public class KSvd {
                 for( int k = 0; k < n; ++k )
                     y[k] = items[k][i];
                 
-                omp(dict, y, 1e-6, 0, gamma, ids);
+                // notice that 'm' must be <= number of features
+                omp(D, y, -1, n/2, gamma, ids);
                 
                 for( int k = 0; k < n; ++k )
                     gammai[k][i] = gamma[k];
                 
             }
             
-            /** codebook update stage **/
             
+            /** codebook update stage **/            
             // for each column k = 1, 2, ..., k, in D^(j-1)
             // note that D^(j-1) is the current dictionary
-            for( int k = 0; k < dict[0].length; ++k ) {
+            /*for( int k = 0; k < D[0].length; ++k ) {
                 
                 // define the group of examples that use this atom
                 List<Integer> wk = new ArrayList<>();
@@ -103,10 +70,10 @@ public class KSvd {
                 }
                 
                 // compute the overall representation error matrix, Ek = Y - sum(j!=k) d_jx^j_T
-                double[][] dict_temp = new double[dict.length][dict[0].length];                
-                for( int i = 0; i < dict.length; ++i )
-                    for( int j = 0; j < dict[0].length; ++j )
-                        dict_temp[i][j] = (j == k ? 0 : dict[i][j]); // "remove" column k
+                double[][] dict_temp = new double[D.length][D[0].length];                
+                for( int i = 0; i < D.length; ++i )
+                    for( int j = 0; j < D[0].length; ++j )
+                        dict_temp[i][j] = (j == k ? 0 : D[i][j]); // "remove" column k
                                 
                 double[][] items_temp = new double[items.length][wk.size()];
                 for( int i = 0; i < items_temp.length; ++i )
@@ -134,24 +101,54 @@ public class KSvd {
                 svd.decompose(A);
                 double S11 = ((DenseMatrix64F)svd.getW(null)).get(0, 0);
                 
-                for( int i = 0; i < dict.length; ++i ) 
-                    dict[i][k] = ((DenseMatrix64F)svd.getU(null, false)).get(i, 0);
+                for( int i = 0; i < D.length; ++i ) 
+                    D[i][k] = ((DenseMatrix64F)svd.getU(null, false)).get(i, 0);
         
                 for( int i = 0; i < gammaiT[k].length; ++i )
                     gammaiT[k][i] = ((DenseMatrix64F)svd.getV(null, true)).get(i, 0)*S11;
                 
                 
+                // add modifications to the other iterations
+                for( int i = 0; i < gammaiT[k].length; ++i ) 
+                    gammai[i][k] = gammaiT[k][i];
+                
+                
+                
                 // the question is: Do I have to update gamma for the next iterations? I think so...
-            }
-            
-            
-            
-            
-            
-            
-            
+            }*/
         }
         
+    }
+    
+    
+    
+    
+    private double[][] initialDict() {
+        
+        int n = items.length;        
+        double[][] dict = new double[n][dictsize];
+        
+        List<Integer> ids = new ArrayList<>();
+        for( int i = 0; i < items[0].length; ++i )
+            ids.add(i);
+        
+        Collections.shuffle(ids);
+                
+        for( int i = 0; i < n; ++i )            
+            for( int j = 0; j < dictsize; ++j ) {
+                dict[i][j] = items[i][ids.get(j)];                              
+            }
+        
+        // normalize columns in l^2
+        for( int j = 0; j < dictsize; ++j ) {
+            double norm = 0;
+            for( int i = 0; i < n; ++i )
+                norm += dict[i][j]*dict[i][j];
+            
+            norm = 1.0/Math.sqrt(norm);
+            for( int i = 0; i < n; ++i )
+                dict[i][j] = dict[i][j]*norm;
+        }
         
         return dict;
     }
@@ -160,8 +157,8 @@ public class KSvd {
     private void omp(double[][] D, double[] y, double eps, int m, double[] gamma, List<Integer> idx ) {
         /*  Orthogonal matching pursuit (OMP)
     
-            Solves [1] min || D * gamma - x ||_2 subject to || gamma ||_0 <= m
-            or     [2] min || gamma ||_0         subject to || D * gamma - x || <= eps
+            Solves [1] min || D * gamma - y ||_2 subject to || gamma ||_0 <= m
+            or     [2] min || gamma ||_0         subject to || D * gamma - y || <= eps
 
             Parameters
             ----------
@@ -170,13 +167,9 @@ public class KSvd {
                 m, integer <= n_features
                 eps, float (supersedes m)
 
-        */
-        
-        int n = items.length;
-        
+        */        
         
         double[] residual = Arrays.copyOf(y, y.length);
-        
         while( !topCondition(m, eps, idx, residual) ) {
             
             ans = new double[residual.length];
@@ -186,33 +179,38 @@ public class KSvd {
             int index = getMaxIndex(elements);
             idx.add(index);
             
-            LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.leastSquares(n, dictsize);
             
-            double[] Dindex = new double[y.length];
-            gamma = new double[y.length];
-            DenseMatrix64F Dden = new DenseMatrix64F(y.length, 1);
-            DenseMatrix64F Yden = new DenseMatrix64F(y.length, 1);
-            DenseMatrix64F gammaDen = new DenseMatrix64F(y.length, 1);
-            for( int i = 0; i < Dden.numCols; ++i ) {
-                Dindex[i] = D[i][index];
-                Dden.set(i, 0, D[i][index]);
-                Yden.set(i, 0, y[i]);
+            double[][] Dindex = new double[y.length][idx.size()];
+            double[][] yToSolve = new double[y.length][1];
+            for( int i = 0; i < Dindex.length; ++i ) {
+                for( int j = 0; j < idx.size(); ++j ) {
+                    Dindex[i][j] = D[i][idx.get(j)];
+                }
+                yToSolve[i][0] = y[i];
             }
-                            
-            solver.solve(Yden, gammaDen);
-            for( int i = 0; i < gammaDen.numCols; ++i )
-                gamma[i] = gammaDen.get(i, 0);
+            Matrix DindexM = new Matrix(Dindex);
+            Matrix yToSolveM = new Matrix(yToSolve);
+            Matrix gammaM = DindexM.solve(yToSolveM);
             
             
-            double innerprod = Util.innerProduct(Dindex, gamma);
+            System.out.println("Dimensions of GammaM: "+gammaM.getRowDimension()+", "+gammaM.getColumnDimension());
+            
+            double[][] g = new double[gammaM.getRowDimension()][gammaM.getColumnDimension()];
+            gamma = new double[gammaM.getRowDimension()];
+            for( int i = 0; i < gamma.length; ++i ) {
+                gamma[i] = gammaM.get(i, 0);
+                g[i][0] = gammaM.get(i, 0);
+            }
+            
+            double[][] DbyGamma = mult(Dindex, g);
             for( int i = 0; i < residual.length; ++i ) {
-                residual[i] = y[i] - innerprod;
+                residual[i] = y[i] - DbyGamma[i][0];
             }
         }
     }
 
     private boolean topCondition(int m, double eps, List<Integer> idx, double[] residual) {        
-        if( eps > 0 ) 
+        if( eps < 0 ) 
             return idx.size() == m;
         return Util.innerProduct(residual, residual) <= eps;        
     }
@@ -238,7 +236,7 @@ public class KSvd {
     }
     
     private double[][] mult(double[][] a, double[][] b) {
-        double[][] r = new double[a[0].length][b.length];
+        double[][] r = new double[a.length][b[0].length];
         for(int i = 0;i < a.length;i++){
             for(int j = 0;j < b[0].length;j++){
                for(int k = 0;k < b.length;k++){
