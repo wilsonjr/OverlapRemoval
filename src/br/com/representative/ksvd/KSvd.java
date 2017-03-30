@@ -88,18 +88,17 @@ public class KSvd {
                         for( int j = 0; j < wk.size(); ++j )
                             items_temp[i][j] = items[i][wk.get(j)];
 
-
-                    double[][] gT = transposta(gammai);
-                    double[][] gammaiT = new double[gT.length][wk.size()];
-                    for( int i = 0; i < gammaiT.length; ++i )
+                    double[][] gammaiIndex = new double[gammai.length][wk.size()];
+                    for( int i = 0; i < gammaiIndex.length; ++i )
                         for( int j = 0; j < wk.size(); ++j )
-                            gammaiT[i][j] = gT[i][wk.get(j)];
-
-
-                    double[][] EkR = mult(dict_temp, gammaiT);
+                            gammaiIndex[i][j] = gammai[i][wk.get(j)];
+                    
+                    double[][] EkR = new double[D.length][wk.size()];
+                    double[][] DGammaiIndex = mult(D, gammaiIndex);
+                 
                     for( int i = 0; i < EkR.length; ++i )
                         for( int j = 0; j < EkR[0].length; ++j )
-                            EkR[i][j] = items_temp[i][j] - EkR[i][j];
+                            EkR[i][j] = items_temp[i][j] - DGammaiIndex[i][j];
 
                     System.out.println("Finished step 2");
 
@@ -117,18 +116,15 @@ public class KSvd {
                         for( int i = 0; i < D.length; ++i ) 
                             D[i][k] = ((DenseMatrix64F)svd.getU(null, false)).get(i, 0);
 
-                        for( int i = 0; i < gammaiT[k].length; ++i )
-                            gammaiT[k][i] = ((DenseMatrix64F)svd.getV(null, true)).get(i, 0)*S11;
-
                         System.out.println("Finished step 3");
 
                         // the question is: Do I have to update gamma for the next iterations? I think so...
                         // well, he it is:
                         // add modifications to the other iterations
-                        for( int i = 0; i < gammaiT[k].length; ++i ) 
-                            gammai[i][k] = gammaiT[k][i];
+                        for( int i = 0; i < wk.size(); ++i )
+                            gammai[k][wk.get(i)] = ((DenseMatrix64F)svd.getV(null, false)).get(i, 0)*S11;
                         
-                        
+                        System.out.println("Finished step 4");
                         
                     } else {
                         System.out.println("NAO PASSOU PELA SVD");
@@ -139,6 +135,9 @@ public class KSvd {
                 
             }
         }
+        
+        
+        System.out.println("K-SVD execution finished");
         
     }
     
