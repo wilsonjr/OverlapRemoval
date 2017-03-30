@@ -56,19 +56,15 @@ public class KSvd {
                     gammai[k][i] = k < gamma.length ? gamma[k] : 0;
                 
             }
+            
             System.out.println("dictsize: "+dictsize);
             System.out.println("Dimensions gammai: "+gammai.length+", "+gammai[0].length);
             
-            for( int i = 0; i < gammai.length; ++i ) {
-                for( int j = 0; j < gammai[0].length; ++j )
-                    System.out.printf("%.2f ", gammai[i][j]);
-                System.out.println();
-            }
             
             /** codebook update stage **/            
             // for each column k = 1, 2, ..., k, in D^(j-1)
             // note that D^(j-1) is the current dictionary
-            /*for( int k = 0; k < D[0].length; ++k ) {
+            for( int k = 0; k < D[0].length; ++k ) {
                 
                 // define the group of examples that use this atom
                 List<Integer> wk = new ArrayList<>();
@@ -126,29 +122,30 @@ public class KSvd {
 
                         System.out.println("Finished step 3");
 
+                        // the question is: Do I have to update gamma for the next iterations? I think so...
+                        // well, he it is:
                         // add modifications to the other iterations
                         for( int i = 0; i < gammaiT[k].length; ++i ) 
                             gammai[i][k] = gammaiT[k][i];
+                        
+                        
+                        
                     } else {
                         System.out.println("NAO PASSOU PELA SVD");
                         return;
                     }
                     System.out.println("Finished step 4");
                 }
-                // the question is: Do I have to update gamma for the next iterations? I think so...
-            }*/
+                
+            }
         }
         
     }
-    
-    
-    
     
     private double[][] initialDict() {
         
         int n = items.length;        
         double[][] dict = new double[n][dictsize];
-        
         
         List<Integer> ids = new ArrayList<>();
         for( int i = 0; i < items[0].length; ++i )
@@ -171,7 +168,7 @@ public class KSvd {
             for( int i = 0; i < n; ++i )
                 dict[i][j] = dict[i][j]*norm;
         }
-        System.out.println("dict: "+dict.length+", "+dict[0].length);
+        
         return dict;
     }
     
@@ -229,95 +226,6 @@ public class KSvd {
         
         return gamma;
     }
-            
-    
-    
-    private double[] omp(double[][] D, double[] y, double eps, int m, List<Integer> idx ) {
-        /*  Orthogonal matching pursuit (OMP)
-    
-            Solves [1] min || D * gamma - y ||_2 subject to || gamma ||_0 <= m
-            or     [2] min || gamma ||_0         subject to || D * gamma - y || <= eps
-
-            Parameters
-            ----------
-                D, array of shape n_features x n_components
-                y, vector of length n_features
-                m, integer <= n_features
-                eps, float (supersedes m)
-
-        */        
-        double[] gamma = null;
-        Matrix gammaM = null;
-        
-        double[] residual = Arrays.copyOf(y, y.length);
-        while( !topCondition(m, eps, idx, residual) && idx.size() < m ) {
-            
-            ans = new double[D[0].length];
-            double[] elements = prod(transposta(D), residual);
-            for( int i = 0; i < elements.length; ++i )
-                elements[i] = Math.abs(elements[i]);
-            int index = getMaxIndex(elements);
-            idx.add(index);
-            //System.out.println("index: "+index);            
-            
-            double[][] Dindex = new double[y.length][idx.size()];
-            System.out.println("Dindex: "+Dindex.length+", "+idx.size());
-            //System.out.println("D: "+D.length+", "+D[0].length);
-            double[][] yToSolve = new double[y.length][1];
-            for( int i = 0; i < Dindex.length; ++i ) {
-                for( int j = 0; j < idx.size(); ++j ) {
-                    Dindex[i][j] = D[i][idx.get(j)];
-                }
-                yToSolve[i][0] = y[i];
-            }
-            Matrix DindexM = new Matrix(Dindex);
-            Matrix yToSolveM = new Matrix(yToSolve);
-            gammaM = DindexM.solve(yToSolveM);
-            
-            
-            System.out.println("Dimensions of GammaM: "+gammaM.getRowDimension()+", "+gammaM.getColumnDimension());
-            
-            double[][] g = new double[gammaM.getRowDimension()][gammaM.getColumnDimension()];
-            gamma = new double[gammaM.getRowDimension()];
-            for( int i = 0; i < gamma.length; ++i ) {
-                gamma[i] = gammaM.get(i, 0);
-                g[i][0] = gammaM.get(i, 0);
-            }
-            
-            double[][] DbyGamma = mult(Dindex, g);
-            for( int i = 0; i < residual.length; ++i ) {
-                residual[i] = y[i] - DbyGamma[i][0];
-            }
-        }
-        
-        
-        gamma = new double[D[0].length];
-        Arrays.fill(gamma, 0);
-        for( int i = 0; i < idx.size(); ++i ) {
-            gamma[idx.get(i)] = gammaM.get(i, 0);
-            
-        }
-        
-        return gamma;
-    }
-
-    private boolean topCondition(int m, double eps, List<Integer> idx, double[] residual) {        
-        return false;
-        //if( eps < 0 ) 
-       //     return idx.size() == m;
-       // return Util.innerProduct(residual, residual) <= eps;        
-    }
-    
-    private double[] prod(double[] b, double[][] a) {
-        System.out.println("b(1, "+b.length+") x a("+a.length+", "+a[0].length+")");
-        for( int i = 0; i < a[0].length; ++i ) {
-            ans[i] = 0;
-            for( int j = 0; j < a.length; ++j )
-                ans[i] += b[j]*a[j][i];
-        }
-        
-        return ans;
-    }
     
     private double[] prod(double[][] a, double[] b) {
         ans = new double[a.length];
@@ -329,8 +237,6 @@ public class KSvd {
         
         return ans;
     }
-    
-    
     
     private int getMaxIndex(double[] elements) {
         int index = 0;
