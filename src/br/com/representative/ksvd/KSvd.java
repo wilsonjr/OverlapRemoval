@@ -14,9 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
-import org.ejml.factory.LinearSolverFactory;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition;
-import org.ejml.interfaces.linsol.LinearSolver;
 
 /**
  *
@@ -94,7 +92,7 @@ public class KSvd {
                             gammaiIndex[i][j] = gammai[i][wk.get(j)];
                     
                     double[][] EkR = new double[D.length][wk.size()];
-                    double[][] DGammaiIndex = mult(D, gammaiIndex);
+                    double[][] DGammaiIndex = Util.multiply(D, gammaiIndex);
                  
                     for( int i = 0; i < EkR.length; ++i )
                         for( int j = 0; j < EkR[0].length; ++j )
@@ -187,11 +185,11 @@ public class KSvd {
         double[] stemp = null;
         while( normr2 > normtol2 && k <= D[0].length ) {
             
-            double[][] dictT = transposta(D);            
-            double[] projections = prod(dictT, residual);
+            double[][] dictT = Util.transposed(D);            
+            double[] projections = Util.multiply(dictT, residual);
             for( int i = 0; i < projections.length; ++i )
                 projections[i] = Math.pow(projections[i], 2.0);
-            int index = getMaxIndex(projections);
+            int index = Util.maxIndex(projections);
             
             indexes.add(index);
             
@@ -208,7 +206,7 @@ public class KSvd {
                 stemp[i] = stempM.get(i, 0);
             
             
-            double[] Hstemp = prod(H, stemp);
+            double[] Hstemp = Util.multiply(H, stemp);
             for( int i = 0; i < residual.length; ++i )
                 residual[i] = x[i]-Hstemp[i];
             
@@ -226,53 +224,5 @@ public class KSvd {
         return gamma;
     }
     
-    private double[] prod(double[][] a, double[] b) {
-        ans = new double[a.length];
-        for( int i = 0; i < a.length; ++i ) {
-            ans[i] = 0;
-            for( int j = 0; j < a[0].length; ++j )
-                ans[i] += a[i][j]*b[j];
-        }
-        
-        return ans;
-    }
-    
-    private int getMaxIndex(double[] elements) {
-        int index = 0;
-        double maior = elements[0];
-        for( int i = 0; i < elements.length; ++i )
-            if( elements[i] > maior ) {
-                index = i;         
-                maior = elements[i];
-            }
-        
-        return index;
-    }
-    
-    private double[][] mult(double[][] a, double[][] b) {
-        double[][] r = new double[a.length][b[0].length];
-        for(int i = 0;i < a.length;i++){
-            for(int j = 0;j < b[0].length;j++){
-               for(int k = 0;k < b.length;k++){
-                  r[i][j] += a[i][k] * b[k][j];
-               }
-            }
-            
-        
-        }
-        
-        return r;
-    }
-    
-    private double[][] transposta(double[][] m) {
-        
-        double[][] mt = new double[m[0].length][m.length];
-        
-        for( int i = 0; i < m.length; ++i )
-            for( int j =0; j < m[0].length; ++j )
-                mt[j][i] = m[i][j];
-        
-        return mt;
-    }
-    
+         
 }

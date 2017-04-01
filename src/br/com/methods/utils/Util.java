@@ -1160,4 +1160,49 @@ public class Util {
         return elements;
     }
     
+    public static int maxIndex(double[] v) {
+        int index = 0;
+        double maior = v[0];
+        for( int i = 0; i < v.length; ++i )
+            if( v[i] > maior ) {
+                index = i;         
+                maior = v[i];
+            }
+        
+        return index;
+    }
+    
+    public static double[][] multiply(double[][] a, double[][] b) {
+        double[][] r = new double[a.length][b[0].length];
+        for(int i = 0;i < a.length;i++)
+            for(int j = 0;j < b[0].length;j++)
+               for(int k = 0;k < b.length;k++)
+                  r[i][j] += a[i][k] * b[k][j];
+        
+        return r;
+    }
+    
+    public static double[] multiply(double[][] a, double[] b) {
+        double[] ans = new double[a.length];
+        for( int i = 0; i < a.length; ++i ) {
+            ans[i] = 0;
+            for( int j = 0; j < a[0].length; ++j )
+                ans[i] += a[i][j]*b[j];
+        }
+        
+        return ans;
+    }
+    
+    public static double[][] transposed(double[][] m) {
+        double[][] mt = new double[m[0].length][m.length];
+        
+        for( int i = 0; i < m.length; ++i )
+            for( int j =0; j < m[0].length; ++j )
+                mt[j][i] = m[i][j];
+        
+        return mt;
+    }
+    
+    
+    
 }
