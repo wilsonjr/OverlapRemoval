@@ -50,7 +50,7 @@ public class KSvd {
                 
                 // notice that 'm' must be <= number of features, here we use m = n/2
                 ids = new ArrayList<>();
-                gamma = omp2(D, y, 1e-5, 2, ids);
+                gamma = omp(D, y, 1e-5, 2);
                 
                 for( int k = 0; k < dictsize; ++k )
                     gammai[k][i] = k < gamma.length ? gamma[k] : 0;
@@ -171,7 +171,7 @@ public class KSvd {
         return dict;
     }
     
-    private double[] omp2(double[][] D, double[] y, double eps, int m, List<Integer> idx) {
+    private double[] omp(double[][] D, double[] y, double eps, int m) {
         
         double x[] = Arrays.copyOf(y, y.length);
         
