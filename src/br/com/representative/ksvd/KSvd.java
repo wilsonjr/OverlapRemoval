@@ -34,7 +34,6 @@ public class KSvd {
         
         double D[][] = initialDict();        
         int maxiter = 1, n = D.length;
-        List<Integer> ids = null;//new ArrayList<>();
         
         double[] gamma = null;
         double[] y = new double[n];
@@ -47,17 +46,11 @@ public class KSvd {
                     y[k] = items[k][i];
                 
                 // notice that 'm' must be <= number of features, here we use m = n/2
-                ids = new ArrayList<>();
-                gamma = omp(D, y, 1e-5, 2);
+                gamma = omp(D, y, 1e-5, D[0].length);
                 
                 for( int k = 0; k < dictsize; ++k )
-                    gammai[k][i] = k < gamma.length ? gamma[k] : 0;
-                
+                    gammai[k][i] = gamma[k];                
             }
-            
-            System.out.println("dictsize: "+dictsize);
-            System.out.println("Dimensions gammai: "+gammai.length+", "+gammai[0].length);
-            
             
             /** codebook update stage **/            
             // for each column k = 1, 2, ..., k, in D^(j-1)
@@ -74,58 +67,39 @@ public class KSvd {
                 System.out.println("Finished step 1");
                 
                 if( !wk.isEmpty() ) {
-                    System.out.println("Not empty");
                     // compute the overall representation error matrix, Ek = Y - sum(j!=k) d_jx^j_T
                     double[][] dict_temp = new double[D.length][D[0].length];                
-                    for( int i = 0; i < D.length; ++i )
-                        for( int j = 0; j < D[0].length; ++j )
-                            dict_temp[i][j] = (j == k ? 0 : D[i][j]); // "remove" column k
-
-                    double[][] items_temp = new double[items.length][wk.size()];
-                    for( int i = 0; i < items_temp.length; ++i )
-                        for( int j = 0; j < wk.size(); ++j )
-                            items_temp[i][j] = items[i][wk.get(j)];
-
-                    double[][] gammaiIndex = new double[gammai.length][wk.size()];
-                    for( int i = 0; i < gammaiIndex.length; ++i )
-                        for( int j = 0; j < wk.size(); ++j )
-                            gammaiIndex[i][j] = gammai[i][wk.get(j)];
+                    removeColumn(dict_temp, k, D);
+                   
+                    double[][] items_temp = copyFromIndex(items, wk);                    
+                    double[][] gammaiIndex = copyFromIndex(gammai, wk);
+                                        
+                    double[][] DGammaiIndex = Util.multiply(dict_temp, gammaiIndex);
                     
-                    double[][] EkR = new double[D.length][wk.size()];
-                    double[][] DGammaiIndex = Util.multiply(D, gammaiIndex);
-                 
-                    for( int i = 0; i < EkR.length; ++i )
-                        for( int j = 0; j < EkR[0].length; ++j )
-                            EkR[i][j] = items_temp[i][j] - DGammaiIndex[i][j];
+                    double[][] EkR = Util.minus(items_temp, DGammaiIndex);
 
                     System.out.println("Finished step 2");
-
-                    System.out.println("EkR dimensions: "+EkR.length+", "+EkR[0].length);
 
                     // Apply SVD decomposition EkR = USVT. Choose the updated dictionary column d'k to be the dist column of U. Update the coefficient
                     // vector xkr (the selected rows according to wk) to be the first column of V mulitiplied by S(1,1), the greatest singular value
 
                     DenseMatrix64F A = new DenseMatrix64F(EkR);
-                    SingularValueDecomposition svd =  DecompositionFactory.svd(EkR.length, EkR[0].length, true, true, false);
+                    SingularValueDecomposition svd =  DecompositionFactory.svd(EkR.length, EkR[0].length, 
+                                                                               true, true, false);
                     if( svd.decompose(A) ) {
-                        System.out.println("FOi...");
-                        double S11 = ((DenseMatrix64F)svd.getW(null)).get(0, 0);
+                        double delta = ((DenseMatrix64F)svd.getW(null)).get(0, 0);
 
                         for( int i = 0; i < D.length; ++i ) 
                             D[i][k] = ((DenseMatrix64F)svd.getU(null, false)).get(i, 0);
 
-                        System.out.println("Finished step 3");
-
-                        // the question is: Do I have to update gamma for the next iterations? I think so...
-                        // well, he it is:
-                        // add modifications to the other iterations
+                        //update gamma for the next iterations
                         for( int i = 0; i < wk.size(); ++i )
-                            gammai[k][wk.get(i)] = ((DenseMatrix64F)svd.getV(null, false)).get(i, 0)*S11;
+                            gammai[k][wk.get(i)] = ((DenseMatrix64F)svd.getV(null, false)).get(i, 0)*delta;
                         
                         System.out.println("Finished step 4");
                         
                     } else {
-                        System.out.println("NAO PASSOU PELA SVD");
+                        System.out.println("It doesn't perform SVD.");
                         return;
                     }
                     System.out.println("Finished step 4");
@@ -137,6 +111,12 @@ public class KSvd {
         
         System.out.println("K-SVD execution finished");
         
+    }
+
+    private void removeColumn(double[][] dict_temp, int k, double[][] D) {
+        for( int i = 0; i < dict_temp.length; ++i )
+            for( int j = 0; j < dict_temp[0].length; ++j )
+                dict_temp[i][j] = (j == k ? 0 : D[i][j]); // "remove" column k
     }
     
     private double[][] initialDict() {
@@ -175,7 +155,7 @@ public class KSvd {
         
         double normx2 = Util.innerProduct(x, x);
         double normr2 = normx2;
-        int natoms = D[0].length;
+        int natoms = m;
         double normtol2 = eps*normx2;
         
         double[] residual = Arrays.copyOf(x, x.length);
@@ -183,7 +163,7 @@ public class KSvd {
         
         int k = 1;
         double[] stemp = null;
-        while( normr2 > normtol2 && k <= D[0].length ) {
+        while( normr2 > normtol2 && k++ <= natoms ) {
             
             double[][] dictT = Util.transposed(D);            
             double[] projections = Util.multiply(dictT, residual);
@@ -192,11 +172,7 @@ public class KSvd {
             int index = Util.maxIndex(projections);
             
             indexes.add(index);
-            
-            double[][] H = new double[D.length][indexes.size()];
-            for( int i = 0; i < H.length; ++i )
-                for( int j = 0; j < H[0].length; ++j )
-                    H[i][j] = D[i][indexes.get(j)];
+            double[][] H = copyFromIndex(D, indexes);
             
             Matrix HM = new Matrix(H);
             Matrix xM = new Matrix(x, x.length);
@@ -205,14 +181,11 @@ public class KSvd {
             for( int i = 0; i < stemp.length; ++i )
                 stemp[i] = stempM.get(i, 0);
             
-            
             double[] Hstemp = Util.multiply(H, stemp);
             for( int i = 0; i < residual.length; ++i )
                 residual[i] = x[i]-Hstemp[i];
             
-            normr2 = Util.innerProduct(residual, residual);
-            
-            k++;
+            normr2 = Util.innerProduct(residual, residual);            
         }
         
         double[] gamma = new double[natoms];
@@ -222,6 +195,15 @@ public class KSvd {
         
         
         return gamma;
+    }
+
+    private double[][] copyFromIndex(double[][] matrix, List<Integer> indexes) {
+        double[][] copy = new double[matrix.length][indexes.size()];
+        for( int i = 0; i < matrix.length; ++i )
+            for( int j = 0; j < indexes.size(); ++j )
+                copy[i][j] = matrix[i][indexes.get(j)];
+        
+        return copy;
     }
     
          

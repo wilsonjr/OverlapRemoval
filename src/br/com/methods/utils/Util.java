@@ -1193,6 +1193,14 @@ public class Util {
         return ans;
     }
     
+    public static double[][] minus(double[][] a, double[][] b) {
+        double[][] r = new double[a.length][a[0].length];
+        for( int i = 0; i < r.length; ++i )
+            for( int j = 0; j < r[0].length; ++j )
+                r[i][j] = a[i][j] - b[i][j];
+        return r;
+    }
+    
     public static double[][] transposed(double[][] m) {
         double[][] mt = new double[m[0].length][m.length];
         
