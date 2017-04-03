@@ -25,6 +25,7 @@ public class KSvd {
     private int dictsize;
     private double[] ans;
     private double[] usedNorms;
+    private double[][]  D;
     
     public KSvd(List<? extends List<Double>> items, int dictsize) {
         this.items = Util.elementMatrix(items);
@@ -33,7 +34,7 @@ public class KSvd {
     
     public void execute() {
         
-        double D[][] = initialDict();        
+        D = initialDict();        
         int maxiter = 1, n = D.length;
         
         double[] gamma = null;
@@ -217,8 +218,32 @@ public class KSvd {
     }
     
     public int[] getRepresentatives() {
+        
+        int count = 0;
+        int[] reps = new int[D[0].length];
+        
+        for( int j = 0; j < D[0].length; ++j ) {
+            double minDist = Double.MAX_VALUE;
+            int index = 0;
+            for( int k = 0; k < items.length; ++k ) {
+                double dist = 0;
+                for( int i = 0; i < D.length; ++i ) {
+                    dist += Math.pow(items[i][k]-D[j][k], 2.0);
+                }                
+                dist = Math.sqrt(dist);                
+                
+                if( dist < minDist ) {
+                    minDist = dist;
+                    index = k;
+                }
+            }
+            
+            reps[count++] = index;            
+        }
+       
+        
     
-        return null;
+        return reps;
     }
     
          
