@@ -35,7 +35,7 @@ public class KSvd {
     public void execute() {
         
         D = initialDict();        
-        int maxiter = 1, n = D.length;
+        int maxiter = 1000, n = D.length;
         
         double[] gamma = null;
         double[] y = new double[n];
@@ -218,6 +218,8 @@ public class KSvd {
     }
     
     public int[] getRepresentatives() {
+        System.out.println("items dimension: "+items.length+", "+items[0].length);
+        System.out.println("items dimension: "+D.length+", "+D[0].length);
         
         int count = 0;
         int[] reps = new int[D[0].length];
@@ -225,10 +227,10 @@ public class KSvd {
         for( int j = 0; j < D[0].length; ++j ) {
             double minDist = Double.MAX_VALUE;
             int index = 0;
-            for( int k = 0; k < items.length; ++k ) {
+            for( int k = 0; k < items[0].length; ++k ) {
                 double dist = 0;
                 for( int i = 0; i < D.length; ++i ) {
-                    dist += Math.pow(items[i][k]-D[j][k], 2.0);
+                    dist += Math.pow(items[i][k]-(D[i][j]/usedNorms[j]), 2.0);
                 }                
                 dist = Math.sqrt(dist);                
                 
@@ -238,6 +240,7 @@ public class KSvd {
                 }
             }
             
+            System.out.println(">> "+index);
             reps[count++] = index;            
         }
        

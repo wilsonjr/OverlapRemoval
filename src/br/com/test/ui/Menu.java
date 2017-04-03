@@ -1279,13 +1279,13 @@ public class Menu extends javax.swing.JFrame {
                 KSvd ksvd = new KSvd(attrs, (int) ((int) attrs.size()*0.2));
                 ksvd.execute();
                 
-                
-
+                selectedRepresentatives = ksvd.getRepresentatives();
                 
                 if( view != null ) {
                     view.cleanImage();
                     view.repaint();            
                 }
+                
             } catch( FileNotFoundException e ) {
 
             }
