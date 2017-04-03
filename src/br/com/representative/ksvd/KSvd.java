@@ -24,22 +24,26 @@ public class KSvd {
     private double[][] items;
     private int dictsize;
     private double[] ans;
-    private double[] usedNorms;
-    private double[][]  D;
+    private double[][] D;
+    private double[][] itemsc;
+    private int[] representatives;
     
     public KSvd(List<? extends List<Double>> items, int dictsize) {
         this.items = Util.elementMatrix(items);
+        this.itemsc = new double[this.items.length][this.items[0].length];
         this.dictsize = dictsize;
     }
     
     public void execute() {
         
         D = initialDict();        
-        int maxiter = 1000, n = D.length;
+        int maxiter = 30, n = D.length;
         
         double[] gamma = null;
         double[] y = new double[n];
-        for( int count = 0; count < maxiter; ++count ) {
+        double previousError = 0, error = 0;
+        int count;
+        for( count = 0; count < maxiter; ++count ) {
             
             // sparse coding stage
             double[][] gammai = new double[dictsize][items[0].length];
@@ -57,6 +61,7 @@ public class KSvd {
             /** codebook update stage **/            
             // for each column k = 1, 2, ..., k, in D^(j-1)
             // note that D^(j-1) is the current dictionary
+           
             for( int k = 0; k < D[0].length; ++k ) {
                 
                 // define the group of examples that use this atom
@@ -66,12 +71,14 @@ public class KSvd {
                         wk.add(i);
                 }
                 
-                System.out.println("Finished step 1");
+              //  System.out.println("Finished step 1");
                 
                 if( !wk.isEmpty() ) {
                     // compute the overall representation error matrix, Ek = Y - sum(j!=k) d_jx^j_T
                     double[][] dict_temp = new double[D.length][D[0].length];                
                     removeColumn(dict_temp, k, D);
+                    
+                    error = computeError(Util.minus(items, Util.multiply(D, gammai)));
                    
                     double[][] items_temp = copyFromIndex(items, wk);                    
                     double[][] gammaiIndex = copyFromIndex(gammai, wk);
@@ -80,7 +87,7 @@ public class KSvd {
                     
                     double[][] EkR = Util.minus(items_temp, DGammaiIndex);
 
-                    System.out.println("Finished step 2");
+                   // System.out.println("Finished step 2");
 
                     // Apply SVD decomposition EkR = USVT. Choose the updated dictionary column d'k to be the dist column of U. Update the coefficient
                     // vector xkr (the selected rows according to wk) to be the first column of V mulitiplied by S(1,1), the greatest singular value
@@ -98,27 +105,28 @@ public class KSvd {
                         for( int i = 0; i < wk.size(); ++i )
                             gammai[k][wk.get(i)] = ((DenseMatrix64F)svd.getV(null, false)).get(i, 0)*delta;
                         
-                        System.out.println("Finished step 4");
+                      //  System.out.println("Finished step 4");
                         
                     } else {
                         System.out.println("It doesn't perform SVD.");
                         return;
                     }
-                    System.out.println("Finished step 4");
+                 //   System.out.println("Finished step 4");
                 }
                 
             }
+            
+            if( Math.abs(error-previousError) <= 0.0000001 )
+                break;
+            previousError = error;
+            
         }
+               
         
-        
-        System.out.println("K-SVD execution finished");
-        
-        for( int i = 0; i < D.length; ++i ) {
-            for( int j = 0; j < D[i].length; ++j )
-                System.out.printf("%.2f ", D[i][j]/usedNorms[j]);
-            System.out.println();
-        }
-        
+        System.out.println("K-SVD execution finished with "+count+" iteration(s)");
+        System.out.println("Forming representatives...");
+        formRepresentatives();
+        System.out.println("Done.");
         
     }
 
@@ -144,7 +152,6 @@ public class KSvd {
                 dict[i][j] = items[i][ids.get(j)];                              
             }
         
-        usedNorms = new double[dictsize];
         // normalize columns in l^2
         for( int j = 0; j < dictsize; ++j ) {
             double norm = 0;
@@ -152,9 +159,18 @@ public class KSvd {
                 norm += dict[i][j]*dict[i][j];
             
             norm = 1.0/Math.sqrt(norm);
-            usedNorms[j] = norm;
             for( int i = 0; i < n; ++i )
                 dict[i][j] = dict[i][j]*norm;
+        }
+        
+        for( int j = 0; j < itemsc[0].length; ++j ) {
+            double norm = 0;
+            for( int i = 0; i < items.length; ++i )
+                norm += items[i][j]*items[i][j];
+            
+            norm = 1.0/Math.sqrt(norm);
+            for( int i = 0; i < n; ++i )
+                itemsc[i][j] = items[i][j]*norm;
         }
         
         return dict;
@@ -218,20 +234,21 @@ public class KSvd {
     }
     
     public int[] getRepresentatives() {
-        System.out.println("items dimension: "+items.length+", "+items[0].length);
-        System.out.println("items dimension: "+D.length+", "+D[0].length);
-        
+        return representatives;
+    }
+
+    private void formRepresentatives() {
         int count = 0;
-        int[] reps = new int[D[0].length];
+        representatives = new int[D[0].length];
         
         for( int j = 0; j < D[0].length; ++j ) {
             double minDist = Double.MAX_VALUE;
             int index = 0;
-            for( int k = 0; k < items[0].length; ++k ) {
+            for( int k = 0; k < itemsc[0].length; ++k ) {
                 double dist = 0;
                 for( int i = 0; i < D.length; ++i ) {
-                    dist += Math.pow(items[i][k]-(D[i][j]/usedNorms[j]), 2.0);
-                }                
+                    dist += Math.pow(itemsc[i][k]-D[i][j], 2.0);
+                }
                 dist = Math.sqrt(dist);                
                 
                 if( dist < minDist ) {
@@ -241,12 +258,17 @@ public class KSvd {
             }
             
             System.out.println(">> "+index);
-            reps[count++] = index;            
+            representatives[count++] = index;            
         }
-       
+    }
+
+    private double computeError(double[][] m) {
         
-    
-        return reps;
+        double error = 0;
+        for( int i = 0; i < m.length; ++i )
+            for( int j = 0; j < m[0].length; ++j )
+                error += m[i][j]*m[i][j];
+        return Math.sqrt(error);
     }
     
          
