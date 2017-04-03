@@ -24,6 +24,7 @@ public class KSvd {
     private double[][] items;
     private int dictsize;
     private double[] ans;
+    private double[] usedNorms;
     
     public KSvd(List<? extends List<Double>> items, int dictsize) {
         this.items = Util.elementMatrix(items);
@@ -111,6 +112,13 @@ public class KSvd {
         
         System.out.println("K-SVD execution finished");
         
+        for( int i = 0; i < D.length; ++i ) {
+            for( int j = 0; j < D[i].length; ++j )
+                System.out.printf("%.2f ", D[i][j]/usedNorms[j]);
+            System.out.println();
+        }
+        
+        
     }
 
     private void removeColumn(double[][] dict_temp, int k, double[][] D) {
@@ -135,6 +143,7 @@ public class KSvd {
                 dict[i][j] = items[i][ids.get(j)];                              
             }
         
+        usedNorms = new double[dictsize];
         // normalize columns in l^2
         for( int j = 0; j < dictsize; ++j ) {
             double norm = 0;
@@ -142,6 +151,7 @@ public class KSvd {
                 norm += dict[i][j]*dict[i][j];
             
             norm = 1.0/Math.sqrt(norm);
+            usedNorms[j] = norm;
             for( int i = 0; i < n; ++i )
                 dict[i][j] = dict[i][j]*norm;
         }
@@ -204,6 +214,11 @@ public class KSvd {
                 copy[i][j] = matrix[i][indexes.get(j)];
         
         return copy;
+    }
+    
+    public int[] getRepresentatives() {
+    
+        return null;
     }
     
          
