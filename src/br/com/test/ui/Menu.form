@@ -6,12 +6,12 @@
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="jMenu1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Arquivo"/>
+            <Property name="text" type="java.lang.String" value="File"/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="sairJMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Sair"/>
+                <Property name="text" type="java.lang.String" value="Exit"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sairJMenuItemActionPerformed"/>
@@ -19,7 +19,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="loadDataJMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Carregar Dados"/>
+                <Property name="text" type="java.lang.String" value="Load Data"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadDataJMenuItemActionPerformed"/>
@@ -27,7 +27,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="saveDataCoordJMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Salvar Dados (Coordenadas)"/>
+                <Property name="text" type="java.lang.String" value="Save Data (Coords)"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="saveDataCoordJMenuItemActionPerformed"/>
@@ -37,7 +37,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="limparJMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Limpar"/>
+                <Property name="text" type="java.lang.String" value="Clean"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="limparJMenuItemActionPerformed"/>
@@ -45,7 +45,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="salvarImagemJMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Salvar Imagem"/>
+                <Property name="text" type="java.lang.String" value="Save Image"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="salvarImagemJMenuItemActionPerformed"/>
@@ -53,7 +53,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Mover"/>
+                <Property name="text" type="java.lang.String" value="Move"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem1ActionPerformed"/>
@@ -71,7 +71,7 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Algoritmos"/>
+            <Property name="text" type="java.lang.String" value="Algorithm"/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="rwordleCJMenuItem">
@@ -142,7 +142,7 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu3">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Piv&#xf4;s"/>
+            <Property name="text" type="java.lang.String" value="Pivot"/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="sssJMenuItem">
@@ -181,30 +181,15 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu4">
           <Properties>
-            <Property name="text" type="java.lang.String" value="An&#xe1;lise"/>
+            <Property name="text" type="java.lang.String" value="Analysis"/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="extractParametersJMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Extrair Par&#xe2;metros"/>
+                <Property name="text" type="java.lang.String" value="Extract Parameters"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="extractParametersJMenuItemActionPerformed"/>
-              </Events>
-            </MenuItem>
-          </SubComponents>
-        </Menu>
-        <Menu class="javax.swing.JMenu" name="jMenu5">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Representativos"/>
-          </Properties>
-          <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="dijsktraRepresentativeJMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Dijsktra"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dijsktraRepresentativeJMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
@@ -281,7 +266,7 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu8">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Representativo"/>
+            <Property name="text" type="java.lang.String" value="Representative"/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="viewSelectedJMenuItem">
@@ -290,6 +275,14 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="viewSelectedJMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="dijsktraRepresentativeJMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Dijsktra"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dijsktraRepresentativeJMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="csmJMenuItem">

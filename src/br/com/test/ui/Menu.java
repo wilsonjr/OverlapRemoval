@@ -164,8 +164,6 @@ public class Menu extends javax.swing.JFrame {
         mstJMenuItem = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         extractParametersJMenuItem = new javax.swing.JMenuItem();
-        jMenu5 = new javax.swing.JMenu();
-        dijsktraRepresentativeJMenuItem = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         hierarchicalClusteringJMenuItem = new javax.swing.JMenuItem();
         kMeansJMenuItem = new javax.swing.JMenuItem();
@@ -177,14 +175,15 @@ public class Menu extends javax.swing.JFrame {
         decrementJMenuItem = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
         viewSelectedJMenuItem = new javax.swing.JMenuItem();
+        dijsktraRepresentativeJMenuItem = new javax.swing.JMenuItem();
         csmJMenuItem = new javax.swing.JMenuItem();
         ksvdJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jMenu1.setText("Arquivo");
+        jMenu1.setText("File");
 
-        sairJMenuItem.setText("Sair");
+        sairJMenuItem.setText("Exit");
         sairJMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 sairJMenuItemActionPerformed(evt);
@@ -192,7 +191,7 @@ public class Menu extends javax.swing.JFrame {
         });
         jMenu1.add(sairJMenuItem);
 
-        loadDataJMenuItem.setText("Carregar Dados");
+        loadDataJMenuItem.setText("Load Data");
         loadDataJMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loadDataJMenuItemActionPerformed(evt);
@@ -200,7 +199,7 @@ public class Menu extends javax.swing.JFrame {
         });
         jMenu1.add(loadDataJMenuItem);
 
-        saveDataCoordJMenuItem.setText("Salvar Dados (Coordenadas)");
+        saveDataCoordJMenuItem.setText("Save Data (Coords)");
         saveDataCoordJMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveDataCoordJMenuItemActionPerformed(evt);
@@ -209,7 +208,7 @@ public class Menu extends javax.swing.JFrame {
         jMenu1.add(saveDataCoordJMenuItem);
         jMenu1.add(jSeparator1);
 
-        limparJMenuItem.setText("Limpar");
+        limparJMenuItem.setText("Clean");
         limparJMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 limparJMenuItemActionPerformed(evt);
@@ -217,7 +216,7 @@ public class Menu extends javax.swing.JFrame {
         });
         jMenu1.add(limparJMenuItem);
 
-        salvarImagemJMenuItem.setText("Salvar Imagem");
+        salvarImagemJMenuItem.setText("Save Image");
         salvarImagemJMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 salvarImagemJMenuItemActionPerformed(evt);
@@ -225,7 +224,7 @@ public class Menu extends javax.swing.JFrame {
         });
         jMenu1.add(salvarImagemJMenuItem);
 
-        jMenuItem1.setText("Mover");
+        jMenuItem1.setText("Move");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem1ActionPerformed(evt);
@@ -243,7 +242,7 @@ public class Menu extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Algoritmos");
+        jMenu2.setText("Algorithm");
 
         rwordleCJMenuItem.setText("RWordle-C");
         rwordleCJMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -307,7 +306,7 @@ public class Menu extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
-        jMenu3.setText("Pivôs");
+        jMenu3.setText("Pivot");
 
         sssJMenuItem.setText("SSS");
         sssJMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -343,9 +342,9 @@ public class Menu extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu3);
 
-        jMenu4.setText("Análise");
+        jMenu4.setText("Analysis");
 
-        extractParametersJMenuItem.setText("Extrair Parâmetros");
+        extractParametersJMenuItem.setText("Extract Parameters");
         extractParametersJMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 extractParametersJMenuItemActionPerformed(evt);
@@ -354,18 +353,6 @@ public class Menu extends javax.swing.JFrame {
         jMenu4.add(extractParametersJMenuItem);
 
         jMenuBar1.add(jMenu4);
-
-        jMenu5.setText("Representativos");
-
-        dijsktraRepresentativeJMenuItem.setText("Dijsktra");
-        dijsktraRepresentativeJMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dijsktraRepresentativeJMenuItemActionPerformed(evt);
-            }
-        });
-        jMenu5.add(dijsktraRepresentativeJMenuItem);
-
-        jMenuBar1.add(jMenu5);
 
         jMenu6.setText("Clustering");
 
@@ -431,7 +418,7 @@ public class Menu extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu7);
 
-        jMenu8.setText("Representativo");
+        jMenu8.setText("Representative");
 
         viewSelectedJMenuItem.setText("View Representative");
         viewSelectedJMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -440,6 +427,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu8.add(viewSelectedJMenuItem);
+
+        dijsktraRepresentativeJMenuItem.setText("Dijsktra");
+        dijsktraRepresentativeJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dijsktraRepresentativeJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(dijsktraRepresentativeJMenuItem);
 
         csmJMenuItem.setText("CSM");
         csmJMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1640,7 +1635,6 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
-    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenu6;
     private javax.swing.JMenu jMenu7;
     private javax.swing.JMenu jMenu8;
