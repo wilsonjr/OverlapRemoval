@@ -107,8 +107,7 @@ public class Menu extends javax.swing.JFrame {
     private ArrayList<ArrayList<Integer>> currentCluster = null;
     private int nivelDendrogram = 0, indexRepresentatives = -1;
     private int[] selectedRepresentatives = null;
-    
-    
+    private boolean hideShowNumbers = false;
     
     private ArrayList<ChangeRetangulo> cRetangulo = null;
     /**
@@ -145,6 +144,7 @@ public class Menu extends javax.swing.JFrame {
         limparJMenuItem = new javax.swing.JMenuItem();
         salvarImagemJMenuItem = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
+        showHideJMenuItem = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         rwordleCJMenuItem = new javax.swing.JMenuItem();
         rwordleLJMenuItem = new javax.swing.JMenuItem();
@@ -232,6 +232,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu1.add(jMenuItem1);
+
+        showHideJMenuItem.setText("Show/Hide Numbers");
+        showHideJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showHideJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(showHideJMenuItem);
 
         jMenuBar1.add(jMenu1);
 
@@ -1294,6 +1302,14 @@ public class Menu extends javax.swing.JFrame {
         
     }//GEN-LAST:event_ksvdJMenuItemActionPerformed
 
+    private void showHideJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showHideJMenuItemActionPerformed
+        hideShowNumbers = !hideShowNumbers;
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
+    }//GEN-LAST:event_showHideJMenuItemActionPerformed
+
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1469,7 +1485,7 @@ public class Menu extends javax.swing.JFrame {
                             }
                         }
 
-                        if( !r.isPivot() ) {
+                        if( !r.isPivot() && hideShowNumbers ) {
                             g2Buffer.setColor(Color.RED);
                             g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
                             g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
@@ -1484,9 +1500,11 @@ public class Menu extends javax.swing.JFrame {
                             g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             g2Buffer.setColor(Color.BLACK);
                             g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                            g2Buffer.setColor(Color.GREEN);
-                            g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                            g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
+                            if( hideShowNumbers ) {
+                                g2Buffer.setColor(Color.GREEN);
+                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                                g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
+                            }
                         }
                         
                         
@@ -1647,6 +1665,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem sairJMenuItem;
     private javax.swing.JMenuItem salvarImagemJMenuItem;
     private javax.swing.JMenuItem saveDataCoordJMenuItem;
+    private javax.swing.JMenuItem showHideJMenuItem;
     private javax.swing.JMenuItem sssJMenuItem;
     private javax.swing.JScrollPane telaJScrollPane;
     private javax.swing.JMenuItem viewSelectedJMenuItem;
