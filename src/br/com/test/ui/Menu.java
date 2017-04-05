@@ -1461,9 +1461,11 @@ public class Menu extends javax.swing.JFrame {
                             if( r.isPivot() ) {
                                 pivots.add(r);
                             } else {
-                                g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                                g2Buffer.setColor(Color.BLACK);
-                                g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                //g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                //g2Buffer.setColor(Color.BLACK);
+                               // g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                g2Buffer.setColor(Color.BLUE);
+                                g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             }
                         }
 
@@ -1479,9 +1481,9 @@ public class Menu extends javax.swing.JFrame {
                         for( int i = 0; i < selectedRepresentatives.length; ++i ) {
                             RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
                             g2Buffer.setColor(Color.RED);
-                            g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             g2Buffer.setColor(Color.BLACK);
-                            g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             g2Buffer.setColor(Color.GREEN);
                             g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
                             g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
