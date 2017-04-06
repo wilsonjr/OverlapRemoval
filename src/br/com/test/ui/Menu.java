@@ -1198,7 +1198,7 @@ public class Menu extends javax.swing.JFrame {
         
         for( int i = 0; i < rects.size(); ++i ) {
             for( int j = 0; j < rects.size(); ++j )
-                System.out.printf("%.2f ",Util.dieuclideanDistanceoints.get(i).x, points.get(i).y, 
+                System.out.printf("%.2f ",Util.euclideanDistance(points.get(i).x, points.get(i).y, 
                         points.get(j).x, points.get(j).y));
             System.out.println();
         }
@@ -1311,7 +1311,7 @@ public class Menu extends javax.swing.JFrame {
         
         for( int i = 0; i < rectangles.size(); ++i )
             for( int j = 0; j <= i-1; ++j ) {
-                double dd = Util.disteuclideanDistancetangles.get(i).getCenterX(), rectangles.get(i).getCenterY(), 
+                double dd = Util.euclideanDistance(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY(), 
                                                      rectangles.get(j).getCenterX(), rectangles.get(j).getCenterY());
                 d = Math.max(d, dd);
             }
