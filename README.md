@@ -21,7 +21,7 @@ Framework to remove overlap of markers in multidimensional projection.
 
 ## Dependencies
 
-You need to use the following dependencies, although we provide you with the project.
+You need to use the following dependencies although we provide you with the project.
 
 **DT1.2**: [Delaunay Triangulation](http://doc.jzy3d.org/javadoc/0.8.4/org/jzy3d/plot3d/builder/delaunay/jdt/Delaunay_Triangulation.html)
 
@@ -30,3 +30,7 @@ You need to use the following dependencies, although we provide you with the pro
 **HexBoard**: [HexBoard/IncBoard](https://github.com/robertodepinho/HexBoard-API)
 
 **commons-math3-3.6.jar**: [Commons Math](http://commons.apache.org/proper/commons-math/)
+
+**Jama**: [Jama](http://math.nist.gov/javanumerics/jama/)
+
+**EJML**: [EJML](https://ejml.org/wiki/index.php?title=Main_Page)
