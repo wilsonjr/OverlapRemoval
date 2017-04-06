@@ -60,7 +60,7 @@ public class GNAT {
             
             double menor = Double.MAX_VALUE;
             for( int j = 0; j < pivots.size(); ++j ) {
-                double d = Util.distanciaEuclideana(conjunto.get(i).getCenterX(), conjunto.get(i).getCenterY(), 
+                double d = Util.euclideanDistance(conjunto.get(i).getCenterX(), conjunto.get(i).getCenterY(), 
                                                     pivots.get(j).getCenterX(), pivots.get(j).getCenterY());
                 menor = Math.min(d, menor);
             }

@@ -54,7 +54,7 @@ public class KMeans {
                  
                  
                  for( int j = 0; j < newGuess.length; ++j ) {
-                     double dj = Util.distanciaEuclideana(items.get(i).x, items.get(i).y, newGuess[j].x, newGuess[j].y);
+                     double dj = Util.euclideanDistance(items.get(i).x, items.get(i).y, newGuess[j].x, newGuess[j].y);
                      if( dj < distance ) {
                          distance = dj;
                          centroid = j;

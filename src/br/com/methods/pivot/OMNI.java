@@ -32,7 +32,7 @@ public class OMNI {
             if( i == s1 )
                 continue;
             
-            double d = Util.distanciaEuclideana(conjunto.get(i).getCenterX(), conjunto.get(i).getCenterY(), 
+            double d = Util.euclideanDistance(conjunto.get(i).getCenterX(), conjunto.get(i).getCenterY(), 
                                                 conjunto.get(s1).getCenterX(), conjunto.get(s1).getCenterY());
             if( d > dist ) {
                 dist = d;
@@ -45,7 +45,7 @@ public class OMNI {
             if( i == f1 )
                 continue;
             
-            double d = Util.distanciaEuclideana(conjunto.get(i).getCenterX(), conjunto.get(i).getCenterY(), 
+            double d = Util.euclideanDistance(conjunto.get(i).getCenterX(), conjunto.get(i).getCenterY(), 
                                                 conjunto.get(f1).getCenterX(), conjunto.get(f1).getCenterY());
             if( d > dist ) {
                 dist = d;
@@ -53,7 +53,7 @@ public class OMNI {
             }
         }
         
-        double edge = Util.distanciaEuclideana(conjunto.get(f1).getCenterX(), conjunto.get(f1).getCenterY(), 
+        double edge = Util.euclideanDistance(conjunto.get(f1).getCenterX(), conjunto.get(f1).getCenterY(), 
                                                conjunto.get(f2).getCenterX(), conjunto.get(f2).getCenterY());
         
         cardinalidade -= 2;
@@ -79,7 +79,7 @@ public class OMNI {
                 double sum = 0.0;
                 
                 for( int k = 0; k < pivots.size(); ++k ) {
-                    double d = Util.distanciaEuclideana(pivots.get(k).getCenterX(), pivots.get(k).getCenterY(), 
+                    double d = Util.euclideanDistance(pivots.get(k).getCenterX(), pivots.get(k).getCenterY(), 
                                                         conjunto.get(i).getCenterX(), conjunto.get(i).getCenterY());
                     sum += Math.abs(edge-d);
                 }

@@ -49,7 +49,7 @@ public class KMedoid {
                 int centroid = -1;
                 
                 for( int j = 0; j < newGuess.length; ++j ) {
-                    double dij = Util.distanciaEuclideana(items.get(i).x, items.get(i).y, newGuess[j].x, newGuess[j].y);
+                    double dij = Util.euclideanDistance(items.get(i).x, items.get(i).y, newGuess[j].x, newGuess[j].y);
                     if( distance > dij ) {
                         distance = dij;
                         centroid = j;
@@ -73,7 +73,7 @@ public class KMedoid {
                     
                     for( int k = 0; k < cluster.size(); ++k ) {
                         if( k == j ) continue;                        
-                        cost += Util.distanciaEuclideana(centroid.x, centroid.y, items.get(cluster.get(k)).x, items.get(cluster.get(k)).y);
+                        cost += Util.euclideanDistance(centroid.x, centroid.y, items.get(cluster.get(k)).x, items.get(cluster.get(k)).y);
                     }
                     
                     if( cost < minCost ) {

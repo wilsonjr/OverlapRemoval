@@ -102,7 +102,7 @@ public class BisectingKMeans {
 
             for( int j = 0; j < centroids.length; ++j ) {
                 for( int k = 0; k < splitCluster.get(j).size(); ++k ) 
-                    ec += Util.distanciaEuclideana(centroids[j].x, centroids[j].y, 
+                    ec += Util.euclideanDistance(centroids[j].x, centroids[j].y, 
                             items.get(splitCluster.get(j).get(k)).x, items.get(splitCluster.get(j).get(k)).y);
             }
 

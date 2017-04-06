@@ -34,7 +34,7 @@ public class SSS {
             boolean pivot = true;
             
             for( OverlapRect r: pivots ) {
-                double d = Util.distanciaEuclideana(r.getCenterX(), r.getCenterY(), 
+                double d = Util.euclideanDistance(r.getCenterX(), r.getCenterY(), 
                                                     conjunto.get(i).getCenterX(), conjunto.get(i).getCenterY());
                 if( d < maxDistance*alpha ) {
                     pivot = false;

@@ -26,7 +26,7 @@ public class EuclideanDistance implements Metric {
         double sum = 0.0;
         
         for( int i = 0; i < pts1.size(); ++i )        
-            sum += Util.distanciaEuclideana(pts1.get(i).getCenterX(), pts1.get(i).getCenterY(), 
+            sum += Util.euclideanDistance(pts1.get(i).getCenterX(), pts1.get(i).getCenterY(), 
                                             pts2.get(i).getCenterX(), pts2.get(i).getCenterY());
         
         return sum/(double)pts1.size();
@@ -36,7 +36,7 @@ public class EuclideanDistance implements Metric {
         double[] distances = new double[pts1.size()];
         
         for( int i = 0; i < pts1.size(); ++i )
-            distances[i] = Util.distanciaEuclideana(pts1.get(i).getCenterX(), pts1.get(i).getCenterY(), 
+            distances[i] = Util.euclideanDistance(pts1.get(i).getCenterX(), pts1.get(i).getCenterY(), 
                                             pts2.get(i).getCenterX(), pts2.get(i).getCenterY());
         
         return distances;

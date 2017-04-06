@@ -508,7 +508,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_loadDataJMenuItemActionPerformed
 
     private void rwordleCJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordleCJMenuItemActionPerformed
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         double[] center0 = Util.getCenter(rects);
         RWordleC rw = new RWordleC();
         Map<OverlapRect, OverlapRect> projected = rw.apply(rects);
@@ -520,7 +520,7 @@ public class Menu extends javax.swing.JFrame {
         Util.translate(projectedValues, ammountX, ammountY);
         
         Util.normalize(projectedValues);
-        Util.toRetanguloVis(rectangles, projectedValues);
+        Util.toRectangleVis(rectangles, projectedValues);
 
         view.cleanImage();
         view.repaint();
@@ -533,7 +533,7 @@ public class Menu extends javax.swing.JFrame {
             alpha = 0;
         }
         
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         double[] center0 = Util.getCenter(rects);
         
         RWordleL rwl = new RWordleL(alpha, false);
@@ -546,7 +546,7 @@ public class Menu extends javax.swing.JFrame {
         Util.translate(projectedValues, ammountX, ammountY);
         
         Util.normalize(projectedValues);
-        Util.toRetanguloVis(rectangles, projectedValues);
+        Util.toRectangleVis(rectangles, projectedValues);
 
         view.cleanImage();
         view.repaint();
@@ -667,7 +667,7 @@ public class Menu extends javax.swing.JFrame {
     
     
     private void vpscJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vpscJMenuItemActionPerformed
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         double[] center0 = Util.getCenter(rects);
         VPSC vpsc = new VPSC();
         
@@ -685,7 +685,7 @@ public class Menu extends javax.swing.JFrame {
         Util.translate(projectedValues, ammountX, ammountY);                
         Util.normalize(projectedValues);          
         
-        Util.toRetanguloVis(rectangles, projectedValues);
+        Util.toRectangleVis(rectangles, projectedValues);
         
         view.cleanImage();
         view.repaint();
@@ -696,7 +696,7 @@ public class Menu extends javax.swing.JFrame {
     private void prismJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJMenuItemActionPerformed
         int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
         boolean applySeamCarving = Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         
         double[] center0 = Util.getCenter(rects);
         PRISM prism = new PRISM(algo);
@@ -712,7 +712,7 @@ public class Menu extends javax.swing.JFrame {
         if( applySeamCarving )
             addSeamCarvingResult(projectedValues);
         
-        Util.toRetanguloVis(rectangles, projectedValues);
+        Util.toRectangleVis(rectangles, projectedValues);
         
         view.cleanImage();
         view.repaint();
@@ -758,7 +758,7 @@ public class Menu extends javax.swing.JFrame {
     }
 
     private void projSnippetJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projSnippetJMenuItemActionPerformed
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         
         int i = 0;
         for( OverlapRect r: rects )
@@ -785,7 +785,7 @@ public class Menu extends javax.swing.JFrame {
             if( applySeamCarving )
                 addSeamCarvingResult(projectedValues);
             
-            Util.toRetanguloVis(rectangles, projectedValues);
+            Util.toRectangleVis(rectangles, projectedValues);
 
             view.cleanImage();
             view.repaint();
@@ -931,7 +931,7 @@ public class Menu extends javax.swing.JFrame {
                 File file = jFileChooser.getSelectedFile();
                 FileWriter fw = new FileWriter(file.getAbsoluteFile());
                 try( BufferedWriter bw = new BufferedWriter(fw) ) {
-                    ArrayList<OverlapRect> retangulos = Util.toRetangulo(rectangles);
+                    ArrayList<OverlapRect> retangulos = Util.toRectangle(rectangles);
                     int i = 0;
                     for( OverlapRect r: retangulos ) {
                         bw.write(i+";"+r.getLX()+";"+r.getLY()+";"+i+"\n");
@@ -948,7 +948,7 @@ public class Menu extends javax.swing.JFrame {
         double a = Double.parseDouble(JOptionPane.showInputDialog("Insira o valor de alpha: "));
         
         SSS sss = new SSS();
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         
         sss.selectPivots(rects, a, getMaxDistance());
         int i = 0;
@@ -956,7 +956,7 @@ public class Menu extends javax.swing.JFrame {
                 r.setId(i++); 
                 r.setLevel(1);
         }
-        Util.toRetanguloVis(rectangles, rects);
+        Util.toRectangleVis(rectangles, rects);
         System.out.println("OK SSS!");
         view.cleanImage();
         view.repaint();
@@ -966,7 +966,7 @@ public class Menu extends javax.swing.JFrame {
         
         
         GNAT gnat = new GNAT();
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         
         int k = 5*rects.size()/100; //Integer.parseInt(JOptionPane.showInputDialog("Insira o número de pivôs: "));
         
@@ -976,7 +976,7 @@ public class Menu extends javax.swing.JFrame {
             r.setId(i++);
             r.setLevel(1);
         }
-        Util.toRetanguloVis(rectangles, rects);
+        Util.toRectangleVis(rectangles, rects);
         System.out.println("OK GNAT!");
         view.cleanImage();
         view.repaint();
@@ -986,7 +986,7 @@ public class Menu extends javax.swing.JFrame {
         int card = Integer.parseInt(JOptionPane.showInputDialog("Insira a número de focos: "));
         
         OMNI omni = new OMNI();
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         
         omni.selectPivots(rects, card);
         int i = 0;
@@ -995,7 +995,7 @@ public class Menu extends javax.swing.JFrame {
             r.setLevel(1);
         }
         
-        Util.toRetanguloVis(rectangles, rects);
+        Util.toRectangleVis(rectangles, rects);
         System.out.println("OK OMNI!");
         view.cleanImage();
         view.repaint();
@@ -1004,21 +1004,21 @@ public class Menu extends javax.swing.JFrame {
     private void mstJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mstJMenuItemActionPerformed
         
         MST mst = new MST();
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         
         int i = 0;
         for( OverlapRect r: rects ) 
             r.setId(i++);
         mst.selectPivots(rects, 20);
         
-        Util.toRetanguloVis(rectangles, rects);
+        Util.toRectangleVis(rectangles, rects);
         System.out.println("OK MST!");
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_mstJMenuItemActionPerformed
 
     private void extractParametersJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractParametersJMenuItemActionPerformed
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<OverlapRect> pivots = new ArrayList<>();
         ArrayList<OverlapRect> elements = new ArrayList<>();
         
@@ -1088,7 +1088,7 @@ public class Menu extends javax.swing.JFrame {
 
     private void dijsktraRepresentativeJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dijsktraRepresentativeJMenuItemActionPerformed
         Vertex[] grafo = new Vertex[rectangles.size()];
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         OverlapRect[] rectsV = new OverlapRect[rects.size()];
         rectsV = rects.toArray(rectsV);
 
@@ -1096,7 +1096,7 @@ public class Menu extends javax.swing.JFrame {
             grafo[i] = new Vertex(i);
         for( int i = 0; i < grafo.length; ++i ) 
             for( int j = i+1; j < grafo.length; ++j )  {
-                double d = Util.distanciaEuclideana(rectsV[i].getCenterX(), rectsV[i].getCenterY(), rectsV[j].getCenterX(), rectsV[j].getCenterY());
+                double d = Util.euclideanDistance(rectsV[i].getCenterX(), rectsV[i].getCenterY(), rectsV[j].getCenterX(), rectsV[j].getCenterY());
                 System.out.println("Distance: "+d);
                 
                 grafo[i].add(new Edge(i, j, d));
@@ -1115,14 +1115,14 @@ public class Menu extends javax.swing.JFrame {
             maior = Math.max(maior, rectsV[i].getHealth());
             menor = Math.min(menor, rectsV[i].getHealth());
         }
-        Util.toRetanguloVis(rectangles, rects);
+        Util.toRectangleVis(rectangles, rects);
         view.cleanImage();
         view.repaint();
         
     }//GEN-LAST:event_dijsktraRepresentativeJMenuItemActionPerformed
 
     private void hierarchicalClusteringJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hierarchicalClusteringJMenuItemActionPerformed
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         HierarchicalClustering hc = new HierarchicalClustering(rects, new SingleLinkageStrategy());        
         hc.execute();
         
@@ -1149,7 +1149,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_decrementJMenuItemActionPerformed
 
     private void kMeansJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kMeansJMenuItemActionPerformed
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Point.Double> points = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
             points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
@@ -1163,7 +1163,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_kMeansJMenuItemActionPerformed
 
     private void kMedoidJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kMedoidJMenuItemActionPerformed
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Point.Double> points = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
             points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
@@ -1177,7 +1177,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_kMedoidJMenuItemActionPerformed
 
     private void bisectingKMeansJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bisectingKMeansJMenuItemActionPerformed
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Point.Double> points = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
             points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
@@ -1191,14 +1191,14 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_bisectingKMeansJMenuItemActionPerformed
 
     private void dbscanJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbscanJMenuItemActionPerformed
-        ArrayList<OverlapRect> rects = Util.toRetangulo(rectangles);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Point.Double> points = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
             points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
         
         for( int i = 0; i < rects.size(); ++i ) {
             for( int j = 0; j < rects.size(); ++j )
-                System.out.printf("%.2f ",Util.distanciaEuclideana(points.get(i).x, points.get(i).y, 
+                System.out.printf("%.2f ",Util.dieuclideanDistanceoints.get(i).x, points.get(i).y, 
                         points.get(j).x, points.get(j).y));
             System.out.println();
         }
@@ -1311,7 +1311,7 @@ public class Menu extends javax.swing.JFrame {
         
         for( int i = 0; i < rectangles.size(); ++i )
             for( int j = 0; j <= i-1; ++j ) {
-                double dd = Util.distanciaEuclideana(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY(), 
+                double dd = Util.disteuclideanDistancetangles.get(i).getCenterX(), rectangles.get(i).getCenterY(), 
                                                      rectangles.get(j).getCenterX(), rectangles.get(j).getCenterY());
                 d = Math.max(d, dd);
             }

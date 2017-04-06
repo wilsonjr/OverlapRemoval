@@ -142,7 +142,7 @@ public class ContextPreserving {
             dxy = normalize(dxy, bb);
             rect.setRect(rect.x + dxy.x, rect.y + dxy.y, rect.width, rect.height);
             
-            avgStep += Util.distanciaEuclideana(dxy.x, dxy.y, 0, 0);
+            avgStep += Util.euclideanDistance(dxy.x, dxy.y, 0, 0);
         }
         
         avgStep /= _rects.length;
@@ -205,7 +205,7 @@ public class ContextPreserving {
                 
                 Point2D.Double dir = new Point2D.Double(rectj.getCenterX()-recti.getCenterX(), rectj.getCenterY()-recti.getCenterY());
                         
-                double len = Util.distanciaEuclideana(dir.x, dir.y, 0, 0);
+                double len = Util.euclideanDistance(dir.x, dir.y, 0, 0);
                 if( len >= EPS ) {
                     
                     // normalize
@@ -248,7 +248,7 @@ public class ContextPreserving {
                     Point2D.Double dir = new Point2D.Double(rectj.getCenterX()-recti.getCenterX(), 
                             rectj.getCenterY()-recti.getCenterY());
                     
-                    double len = Util.distanciaEuclideana(dir.x, dir.y, 0, 0);
+                    double len = Util.euclideanDistance(dir.x, dir.y, 0, 0);
                     if( len >= EPS ) {
                     
                         dir.setLocation(dir.x/len, dir.y/len);
@@ -318,7 +318,7 @@ public class ContextPreserving {
     private Point2D.Double normalize(Point2D.Double force, Rectangle2D.Double bb) {
         
         double mx = Math.min(bb.width, bb.height);
-        double len = Util.distanciaEuclideana(force.x, force.y, 0, 0);
+        double len = Util.euclideanDistance(force.x, force.y, 0, 0);
         if( len < 1e-3 )
             return force;
         

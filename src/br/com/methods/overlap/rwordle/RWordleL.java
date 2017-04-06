@@ -6,6 +6,14 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ */    /*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */    /*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package br.com.methods.overlap.rwordle;
@@ -13,7 +21,7 @@ package br.com.methods.overlap.rwordle;
 import br.com.methods.overlap.OverlapRemoval;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
-import static br.com.methods.utils.Util.distanciaEuclideana;
+import static br.com.methods.utils.Util.euclideanDistance;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
@@ -75,7 +83,7 @@ public class RWordleL implements OverlapRemoval {
          */         
         ArrayList<OverlapRect> novos = new ArrayList<>();
         for( int i = 0; i < rectangles.size(); ++i ) {
-            double distance = Util.distanciaEuclideana(0, 0, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
+            double distance = Util.euclideanDistance(0, 0, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
                         
             novos.add(new OverlapRect((rectangles.get(i).getUX()-distance), (rectangles.get(i).getUY()-distance), 
                                     rectangles.get(i).getWidth(), rectangles.get(i).getHeight(), rectangles.get(i).getId()));            
@@ -96,7 +104,7 @@ public class RWordleL implements OverlapRemoval {
          * we perform another translation to bring the elements of their position
          */
         for( int i = 0; i < novos.size(); ++i ) {
-            double aux = distanciaEuclideana(0, 0, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
+            double aux = euclideanDistance(0, 0, rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
             novos.get(i).setUX(novos.get(i).getUX()+aux);
             novos.get(i).setUY(novos.get(i).getUY()+aux);
         }
@@ -170,8 +178,8 @@ public class RWordleL implements OverlapRemoval {
                     ymax = Math.max(ymax, areaS.getBounds().getMaxY());
 
                     
-                    r.setRect(xmin, ymin, Util.distanciaEuclideana(xmin, ymin, xmax, ymin), 
-                                          Util.distanciaEuclideana(xmin, ymin, xmin, ymax));
+                    r.setRect(xmin, ymin, Util.euclideanDistance(xmin, ymin, xmax, ymin), 
+                                          Util.euclideanDistance(xmin, ymin, xmin, ymax));
 
                     xlinha = initialCenterX - r.getCenterX();
                     ylinha = initialCenterY - r.getCenterY();

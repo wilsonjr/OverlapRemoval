@@ -81,7 +81,7 @@ public class MST {
         
         for( int i = 0; i < representativos.size(); ++i ) {
             if( representativos.get(i).isPivot() ) {
-                double d = Util.distanciaEuclideana(representativos.get(i).getCenterX(), representativos.get(i).getCenterY(), 
+                double d = Util.euclideanDistance(representativos.get(i).getCenterX(), representativos.get(i).getCenterY(), 
                                                      r.getCenterX(), r.getCenterY());
                 if( menor > d ) {
                     menor = d;
@@ -102,7 +102,7 @@ public class MST {
             for( int j = 0; j < grupos.get(idx).size(); ++j ) {
                 
                     edges.add(new EDGE(grupos.get(idx).get(i).getId(), grupos.get(idx).get(j).getId(), 
-                                       Util.distanciaEuclideana(grupos.get(idx).get(i).getCenterX(), 
+                                       Util.euclideanDistance(grupos.get(idx).get(i).getCenterX(), 
                                                                 grupos.get(idx).get(i).getCenterY(), 
                                                                 grupos.get(idx).get(j).getCenterX(), 
                                                                 grupos.get(idx).get(j).getCenterY())));
@@ -203,7 +203,7 @@ public class MST {
         
         for( int i = 0; i < components.length; ++i ) {
             if( components[i] == key ) {
-                double d = Util.distanciaEuclideana(centerX, centerY, C.get(i).getCenterX(), C.get(i).getCenterY());
+                double d = Util.euclideanDistance(centerX, centerY, C.get(i).getCenterX(), C.get(i).getCenterY());
                 if( dist > d ) {
                     dist = d;
                     idx = i;

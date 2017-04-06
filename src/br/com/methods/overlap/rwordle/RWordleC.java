@@ -63,7 +63,7 @@ public class RWordleC implements OverlapRemoval {
         ArrayList<IDShape> shapes = new ArrayList<>();
         for( int i = 0; i < rectangles.size(); ++i ) {
             shapes.add(new IDShape(rectangles.get(i),
-                                                 Util.distanciaEuclideana(centerX, centerY, 
+                                                 Util.euclideanDistance(centerX, centerY, 
                                                      rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY()), 
                                                     rectangles.get(i).getId()) );            
         }        

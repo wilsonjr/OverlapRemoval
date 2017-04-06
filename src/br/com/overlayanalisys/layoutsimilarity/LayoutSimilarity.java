@@ -59,11 +59,11 @@ public class LayoutSimilarity implements Metric {
         double rBarra = 0.0;
         ArrayList<Double> rij = new ArrayList<>();
         for( int i = 0; i < edges.size(); ++i ) {
-            double dOri = Util.distanciaEuclideana(pts1.get(edges.get(i).getU().getIdx()).getCenterX(), 
+            double dOri = Util.euclideanDistance(pts1.get(edges.get(i).getU().getIdx()).getCenterX(), 
                                                    pts1.get(edges.get(i).getU().getIdx()).getCenterY(), 
                                                    pts1.get(edges.get(i).getV().getIdx()).getCenterX(), 
                                                    pts1.get(edges.get(i).getV().getIdx()).getCenterY());
-            double dMod = Util.distanciaEuclideana(pts2.get(edges.get(i).getU().getIdx()).getCenterX(), 
+            double dMod = Util.euclideanDistance(pts2.get(edges.get(i).getU().getIdx()).getCenterX(), 
                                                    pts2.get(edges.get(i).getU().getIdx()).getCenterY(), 
                                                    pts2.get(edges.get(i).getV().getIdx()).getCenterX(), 
                                                    pts2.get(edges.get(i).getV().getIdx()).getCenterY());
@@ -114,11 +114,11 @@ public class LayoutSimilarity implements Metric {
         
         ArrayList<Double> rij = new ArrayList<>();
         for( int i = 0; i < edges.size(); ++i ) {
-            double dOri = Util.distanciaEuclideana(pts1.get(edges.get(i).getU().getIdx()).getCenterX(), 
+            double dOri = Util.euclideanDistance(pts1.get(edges.get(i).getU().getIdx()).getCenterX(), 
                                                    pts1.get(edges.get(i).getU().getIdx()).getCenterY(), 
                                                    pts1.get(edges.get(i).getV().getIdx()).getCenterX(), 
                                                    pts1.get(edges.get(i).getV().getIdx()).getCenterY());
-            double dMod = Util.distanciaEuclideana(pts2.get(edges.get(i).getU().getIdx()).getCenterX(), 
+            double dMod = Util.euclideanDistance(pts2.get(edges.get(i).getU().getIdx()).getCenterX(), 
                                                    pts2.get(edges.get(i).getU().getIdx()).getCenterY(), 
                                                    pts2.get(edges.get(i).getV().getIdx()).getCenterX(), 
                                                    pts2.get(edges.get(i).getV().getIdx()).getCenterY());

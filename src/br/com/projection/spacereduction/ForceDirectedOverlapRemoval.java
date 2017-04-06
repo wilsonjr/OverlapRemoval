@@ -80,7 +80,7 @@ public class ForceDirectedOverlapRemoval {
         // f(a,b) = kr*min{dx, dy}
         double f = KR*Math.min(dx, dy);
         Point2D dir = new Point2D.Double(rectJ.getCenterX()-rectI.getCenterX(), rectJ.getCenterY()-rectI.getCenterY());
-        double distanceToOrigin = Util.distanciaEuclideana(dir.getX(), dir.getY(), 0, 0);
+        double distanceToOrigin = Util.euclideanDistance(dir.getX(), dir.getY(), 0, 0);
         if( distanceToOrigin < 1e-5 ) {
             Random rand = new Random(2);
             dir = new Point2D.Double(-1 + 2*rand.nextDouble(), -1 + 2*rand.nextDouble());

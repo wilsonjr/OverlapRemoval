@@ -67,7 +67,7 @@ public class Dbscan {
         
         ArrayList<DbscanPoint> seeds = new ArrayList<>();
         for( int i = 0; i < points.size(); ++i ) {
-            double d = Util.distanciaEuclideana(p.point.x, p.point.y, points.get(i).point.x, points.get(i).point.y);
+            double d = Util.euclideanDistance(p.point.x, p.point.y, points.get(i).point.x, points.get(i).point.y);
             if( d < epsilon ) 
                 seeds.add(points.get(i));
         }
@@ -80,7 +80,7 @@ public class Dbscan {
                 DbscanPoint first = seeds.get(0);
                 ArrayList<DbscanPoint> nseeds = new ArrayList<>();
                 for( int i = 0; i < points.size(); ++i ) {
-                    double d = Util.distanciaEuclideana(first.point.x, first.point.y, points.get(i).point.x, points.get(i).point.y);
+                    double d = Util.euclideanDistance(first.point.x, first.point.y, points.get(i).point.x, points.get(i).point.y);
                     if( d < epsilon ) 
                         nseeds.add(points.get(i));
                 }

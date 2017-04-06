@@ -181,12 +181,12 @@ public class ProjSnippet implements OverlapRemoval {
             System.out.print(v.getId()+": ");
             for( int j = 0; j < e.length; ++j ) {                
                 if( v.getId() != (long)e[j].getY() ) {
-                    v.add(new Edge(i, (Long)e[j].getY(), Util.distanciaEuclideana(data.get(i).getX()[0], 
+                    v.add(new Edge(i, (Long)e[j].getY(), Util.euclideanDistance(data.get(i).getX()[0], 
                                                                                   data.get(i).getX()[1], 
                                                                                   e[j].getX()[0],
                                                                                   e[j].getX()[1])));
                     grafo[((Long)e[j].getY()).intValue()].add(new Edge((Long)e[j].getY(), i, 
-                                                    Util.distanciaEuclideana(data.get(i).getX()[0], 
+                                                    Util.euclideanDistance(data.get(i).getX()[0], 
                                                                                   data.get(i).getX()[1], 
                                                                                   e[j].getX()[0],
                                                                                   e[j].getX()[1])));
@@ -229,7 +229,7 @@ public class ProjSnippet implements OverlapRemoval {
              int j = (int)e.getV();
              if( grafo[i].getComponente() != grafo[j].getComponente() ) {
                  grafo[i].add(new Edge(i, j,
-                         Util.distanciaEuclideana(retangulos.get(i).getUX(), retangulos.get(i).getLY(), 
+                         Util.euclideanDistance(retangulos.get(i).getUX(), retangulos.get(i).getLY(), 
                                                   retangulos.get(j).getUX(), retangulos.get(j).getLY())));
                  
              }
@@ -282,7 +282,7 @@ public class ProjSnippet implements OverlapRemoval {
              for( int j = 0; j < grafo.length; ++j ) {
                  if( i == j )
                      continue;                 
-                 v.add(new Edge(i, j, Util.distanciaEuclideana(retangulos.get(i).getUX(), 
+                 v.add(new Edge(i, j, Util.euclideanDistance(retangulos.get(i).getUX(), 
                                                                retangulos.get(i).getLY(), 
                                                                retangulos.get(j).getUX(), 
                                                                retangulos.get(j).getLY())));

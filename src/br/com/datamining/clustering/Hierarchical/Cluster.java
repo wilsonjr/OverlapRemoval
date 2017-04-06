@@ -72,7 +72,7 @@ public class Cluster {
     }
 
     public double distanceTo(Cluster c) {
-        return Util.distanciaEuclideana(points.get(0).x, points.get(0).y, c.getPoints().get(0).x, c.getPoints().get(0).y);
+        return Util.euclideanDistance(points.get(0).x, points.get(0).y, c.getPoints().get(0).x, c.getPoints().get(0).y);
     }
     
     @Override
