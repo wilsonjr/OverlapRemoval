@@ -1164,6 +1164,17 @@ public class Util {
         return r;
     }
     
+    public static double[] multiply(double[] b, double[][] a) {
+        double[] ans = new double[a[0].length];
+        for( int i = 0; i < a[0].length; ++i ) {
+            ans[i] = 0;
+            for( int j = 0; j < a.length; ++j )
+                ans[i] += a[j][i]*b[j];
+        }
+        
+        return ans;
+    }
+    
     public static double[] multiply(double[][] a, double[] b) {
         double[] ans = new double[a.length];
         for( int i = 0; i < a.length; ++i ) {
@@ -1219,6 +1230,25 @@ public class Util {
         return m;
     }
     
+    public static double sign(double v) {
+        return v == 0 ? 0 : (v < 0 ? -1 : 1);
+    }
+    
+    public static double norm(double[] v) {
+        double s = 0;
+        for( int i = 0; i < v.length; ++i )
+            s += v[i]*v[i];
+        
+        return Math.sqrt(s);
+    }
+    
+    public static double[] copyColumn(double[][] m, int index) {
+        double[] v = new double[m.length];
+        
+        for( int i = 0; i < v.length; ++i )
+            v[i] = m[i][index];
+        return v;
+    }
     
     
     
