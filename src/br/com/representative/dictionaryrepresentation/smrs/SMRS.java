@@ -57,4 +57,89 @@ public class SMRS {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
+    private double computeLambda(double[][] Y, boolean affine) {
+        
+        int n = Y[0].length;
+        double lambda = 0;
+        
+        if( !affine ) {
+            double[] T = new double[n];
+            double max = Double.MIN_VALUE;
+            
+            for( int i = 0; i < T.length; ++i ) {
+                double[] yi = Util.copyColumn(Y, i);
+                double[] yiY = Util.multiply(yi, Y);
+                T[i] = Util.norm(yiY);    
+                max = Math.max(max, T[i]);
+            }
+                
+            lambda = max;
+        } else {
+            double[] T = new double[n];
+            double max = Double.MIN_VALUE;
+            
+            // equivalent
+            // ymean = mean(Y,2);
+            // (ymean*ones(1,N)-Y))
+            double[] ymean = Util.mean(Y, 1);
+            double[][] aux = Util.reapmat(ymean, n);
+            double[][] ymeanOnesMinusY = Util.minus(aux, Y);
+            
+            
+            for( int i = 0; i < T.length; ++i ) {
+                double[] yi = Util.copyColumn(Y, i);
+                double[] yiY = Util.multiply(yi, ymeanOnesMinusY);
+                T[i] = Util.norm(yiY);
+                max = Math.max(max, T[i]);
+            }
+                
+            lambda = max;
+        }
+        
+        return lambda;
+    }
+    
+    private double[][] shrinkL1Lq(double[][] C1, double lambda, int q) {
+        
+        int d = C1.length;
+        int n = C1[0].length;
+        
+        if( q == 1 ) {
+            double[][] C2 = new double[C1.length][C1[0].length];
+            
+            for( int i = 0; i < C1.length; ++i )
+                for( int j = 0; j < C1[0].length; ++j ) {
+                    C2[i][j] = Math.abs(C1[i][j])-lambda;
+                    C2[i][j] = Math.max(C2[i][j], 0);                    
+                    C2[i][j] = C2[i][j]*Util.sign(C1[i][j]);                   
+                }            
+            return C2;
+        } else {
+            
+            double[] r = new double[d];
+            
+            for( int i = 0; i < r.length; ++i )
+                r[i] = Math.max(Util.norm(C1[i])-lambda, 0);
+            
+            for( int i = 0; i < r.length; ++i )
+                r[i] = r[i]/(r[i]+lambda);
+            double[][] aux = Util.reapmat(r, n);
+            
+            double[][] C2 = new double[C1.length][C1[0].length];
+            for( int i = 0; i < C1.length; ++i )
+                for( int j = 0; j < C1[0].length; ++j )
+                    C2[i][j] = aux[i][j]*C1[i][j];
+            return C2;
+        }
+    }
+    
+    private double errorCoef(double[][] Z, double[][] C) {        
+        double error = 0;        
+        for( int i = 0; i < C.length; ++i )
+            for( int j = 0; j < C[0].length; ++j )
+                error += Math.abs(Z[i][j]-C[i][j]);
+        
+        return error/(C.length*C[0].length);
+    }
+    
 }
