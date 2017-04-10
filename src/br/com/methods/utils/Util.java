@@ -1249,6 +1249,13 @@ public class Util {
             v[i] = m[i][index];
         return v;
     }
+
+    public static double norm(double[] d, double q) {
+        double sum = 0;
+        for( int i = 0; i < d.length; ++i )
+            sum += Math.pow(d[i], q);
+        return Math.pow(sum, 1.0/q);
+    }
     
     
     

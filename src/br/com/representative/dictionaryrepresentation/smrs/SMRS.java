@@ -53,8 +53,25 @@ public class SMRS {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private int[] findRep(double[][] C, double thrS, double q) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private int[] findRep(double[][] C, double thr, double q) {
+        
+        int n = C.length;
+        Item[] r = new Item[n];
+        for( int i = 0; i < n; ++i ) 
+            r[i] = new Item(Util.norm(C[i], q), i);
+        
+        Arrays.sort(r, (Item a, Item b)->{ return (a.value > b.value ? 1 : (a.value < b.value ? -1 : 0)); });
+        double sumOfR = Arrays.stream(r).mapToDouble((Item i)->i.value).sum();
+        
+        double sum = 0;
+        int i = 0;
+        for( ; i < n; ++i ) {
+            sum += r[i].value;
+            if( sum/sumOfR > thr )
+                break;
+        }
+        
+        return Arrays.copyOfRange(Arrays.stream(r).mapToInt((Item item)->item.index).toArray(), 0, i+1);
     }
     
     private double computeLambda(double[][] Y, boolean affine) {
@@ -140,6 +157,16 @@ public class SMRS {
                 error += Math.abs(Z[i][j]-C[i][j]);
         
         return error/(C.length*C[0].length);
+    }
+    
+    private class Item {
+        public double value;
+        public int index;
+        
+        public Item(double value, int index) {
+            this.value = value;
+            this.index = index;
+        }
     }
     
 }
