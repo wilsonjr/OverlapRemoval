@@ -26,7 +26,7 @@ public class SMRS {
         // setting up some parameters, using parameters proposed by the author of the technique
         double alpha = 5;
         double r = 0;
-        double q = 2;
+        int q = 2;
         
         double[] regParam = {alpha, alpha};
         boolean affine = true;
@@ -49,8 +49,100 @@ public class SMRS {
         
     }
 
-    private double[][] almLasso(double[][] Y, boolean affine, double[] regParam, double q, double thr, int maxIter) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private double[][] almLasso(double[][] Y, boolean affine, double[] alpha, int q, double thr, int maxIter) {
+        double alpha1 = alpha[0];
+        double alpha2 = alpha[1];
+        double thr1 = thr, thr2 = thr;
+        
+        int d = Y.length, n = Y[0].length;
+        double mu1p = alpha1 * 1.0/computeLambda(Y, affine);
+        double mu2p = alpha2 * 1.0;
+        
+        if( !affine ) {
+            double mu1 = mu1p;
+            double mu2 = mu2p;
+            double[][] P = Util.multiply(Util.transposed(Y), Y);
+            double[][] mu1P = Util.multiply(mu1, P);
+            double[][] Atemp = Util.sum(mu1P, Util.multiply(mu2, Util.eye(n)));
+            double[][] A = Util.inverse(Atemp);
+            
+            double[][] C1 = Util.createMatrix(n, n, 0.0);
+            double[][] Lambda2 = Util.createMatrix(n, n, 0.0);
+            
+            double err1 = 10*thr1;
+            int i = 1;
+            double[][] C2 = null;
+            while( err1 > thr1 && i < maxIter ) {
+                
+                double[][] Z = Util.multiply(A, Util.sum(mu1P, Util.minus(Util.multiply(mu2, C1), Lambda2)));
+                // same as Z+Lambda2./mu2
+                C2 = shrinkL1Lq(Util.sum(Z, Util.multiply(1.0/mu2, Lambda2)), 1.0/mu2, q);
+                
+                Lambda2 = Util.sum(Lambda2, Util.multiply(mu2, Util.minus(Z, C2)));
+                    
+                err1 = errorCoef(Z, C2);
+                
+                C1 = C2;
+                i++;
+                if( i%100 == 0 )
+                    System.out.printf("Iteration %5d, ||Z-C|| = %2.5f \n", i, err1);
+            }
+            
+            System.out.printf("Terminating ADMM at iteration %5d, \n ||Z - C|| = %2.5f, \n",i,err1);
+            
+            
+            return C2;
+        } else {
+            double mu1 = mu1p;
+            double mu2 = mu2p;
+            double[][] P = Util.multiply(Util.transposed(Y), Y);
+            double[][] mu1P = Util.multiply(mu1, P);
+            double[][] Atemp = Util.sum(Util.sum(mu1P, Util.multiply(mu2, Util.eye(n))), Util.multiply(mu2, Util.createMatrix(n, n, 1.0)));
+            double[][] A = Util.inverse(Atemp);
+            
+            double[][] C1 = Util.createMatrix(n, n, 0.0);            
+            double[][] Lambda2 = Util.createMatrix(n, n, 0.0);
+            double[] lambda3 = new double[n];
+            Arrays.fill(lambda3, 0.0);
+            
+            double err1 = 10*thr1, err2 = 10*thr2;
+            int i = 1;
+            double[][] C2 = null;
+            while( (err1 > thr1 || err2 > thr2) && i < maxIter ) {
+                
+                double[][] Z = Util.multiply(A, 
+                                             Util.sum(
+                                                      Util.multiply(mu1, P), 
+                                                      Util.sum(
+                                                               Util.multiply(
+                                                                             mu2, 
+                                                                             Util.minus(C1, Util.multiply(1.0/mu2, Lambda2))
+                                                                             ), 
+                                                               Util.sum(
+                                                                        Util.multiply(mu2, Util.createMatrix(n, n, 1.0)), 
+                                                                        Util.repmatRow(lambda3, n)
+                                                                        )
+                                                               )
+                                                     ));
+                C2 = shrinkL1Lq(Util.sum(Z, Util.multiply(1.0/mu2, Lambda2)), 1.0/mu2, q);
+                
+                Lambda2 = Util.sum(Lambda2, Util.multiply(mu2, Util.minus(Z, C2)));
+                
+                double[][] sumZ1 = Util.sum(Z, 0);
+                for( int j = 0; j < sumZ1.length; ++j ) {
+                    lambda3[j] = mu2 * (1-sumZ1[0][j]) + lambda3[j];
+                }
+                
+                err1 = errorCoef(Z, C2);
+                err2 = errorCoef(sumZ1, Util.createMatrix(1, n, 1.0));
+                 
+                i++;
+                System.out.printf("Iteration %5d, ||Z - C|| = %2.5f, ||1 - C^T 1|| = %2.5f, \n",i,err1,err2);
+            }
+            
+            System.out.printf("Terminating ADMM at iteration %5d, \n ||Z - C|| = %2.5f, ||1 - C^T 1|| = %2.5f. \n",i,err1,err2);
+            return C2;
+        }
     }
 
     private int[] findRep(double[][] C, double thr, double q) {
