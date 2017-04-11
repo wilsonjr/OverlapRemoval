@@ -1,5 +1,6 @@
 package br.com.methods.utils;
 
+import Jama.Matrix;
 import br.com.methods.overlap.prism.PRISMEdge;
 import br.com.methods.overlap.prism.PRISMPoint;
 import br.com.methods.overlap.prism.SetPoint;
@@ -8,6 +9,7 @@ import java.awt.Polygon;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -1186,6 +1188,15 @@ public class Util {
         return ans;
     }
     
+    public static double[][] multiply(double value, double[][] m) {
+        double[][] valueM = new double[m.length][m[0].length];
+        for( int i = 0; i < valueM.length; ++i )
+            for( int j = 0; j < valueM[0].length; ++j )
+                valueM[i][j] = value*m[i][j];
+        return valueM;
+        
+    }
+    
     public static double[][] minus(double[][] a, double[][] b) {
         double[][] r = new double[a.length][a[0].length];
         for( int i = 0; i < r.length; ++i )
@@ -1230,6 +1241,17 @@ public class Util {
         return m;
     }
     
+    public static double[][] repmatRow(double[] v, int n) {
+        
+        double[][] m = new double[v.length][n];
+        
+        for( int i = 0; i < n; ++i )
+            for( int j = 0; j < m.length; ++j )
+                m[j][i] = v[i];
+        
+        return m;
+    }
+    
     public static double sign(double v) {
         return v == 0 ? 0 : (v < 0 ? -1 : 1);
     }
@@ -1257,6 +1279,60 @@ public class Util {
         return Math.pow(sum, 1.0/q);
     }
     
+    public static double[][] eye(int n) {
+        
+        double[][] identity = new double[n][n];
+        for( int i = 0; i < n; ++i ) {
+            for( int j = 0; j < n; ++j )
+                identity[i][j] = 0.0;
+            identity[i][i] = 1;
+        }
+        return identity;
+    }
+
+    public static double[][] sum(double[][] a, double[][] b) {
+        double[][] c = new double[a.length][a[0].length];
+        
+        for( int i = 0; i < c.length; ++i )
+            for( int j = 0; j < c[0].length; ++j )
+                c[i][j] = a[i][j]+b[i][j];
+        return c;
+    }
+
+    public static double[][] inverse(double[][] m) {
+        Matrix jamaM = new Matrix(m);
+        Matrix inverseM = jamaM.inverse();
+        return inverseM.getArrayCopy();
+    }
+
+    public static double[][] createMatrix(int n, int m, double value) {
+        double[][] matrix = new double[n][n];
+        for( int i = 0; i < n; ++i )
+            for( int j = 0; j < m; ++j )
+                matrix[i][j] = value;
+        return matrix;
+    }
     
+    public static double[][] sum(double[][] m, int dim) {
+        
+        if( dim == 0 ) {
+            double[][] s = new double[1][m[0].length];
+            for( int i = 0; i < m[0].length; ++i ) {
+                s[0][i] = 0;
+                for( int j = 0; j < m.length; ++j )
+                    s[0][i] += m[j][i];
+            }
+            return s;
+        } else {
+            double[][] s = new double[1][m[0].length];
+            for( int i = 0; i < m.length; ++i ) {
+                s[i][0] = 0;
+                for( int j = 0; j < m[0].length; ++j )
+                    s[i][0] += m[i][j];
+            }
+            return s;
+        }
+        
+    }
     
 }
