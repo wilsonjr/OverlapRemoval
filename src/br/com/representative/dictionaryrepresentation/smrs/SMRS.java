@@ -16,13 +16,18 @@ import java.util.List;
 public class SMRS {
     
     private double[][] items;
+    private int[] representatives;
     
     public SMRS(List<? extends List<Double>> items) {
-        this.items = Util.elementMatrix(items);
+        this.items = new double[items.size()][items.get(0).size()];
+        for( int i = 0; i < this.items.length; ++i )
+            for( int j = 0; j < this.items[0].length; ++j )
+                this.items[i][j] = items.get(i).get(j);
+        System.out.println("Dimensions: "+this.items.length+", "+this.items[0].length);
     }
     
     public void execute() {
-        
+       
         // setting up some parameters, using parameters proposed by the author of the technique
         double alpha = 5;
         double r = 0;
@@ -45,8 +50,13 @@ public class SMRS {
         
         double[][] C = almLasso(Y, affine, regParam, q, thr, maxIter);
         
-        int[] indexes = findRep(C, thrS, q);
+        representatives = findRep(C, thrS, q);
         
+        System.out.println("sInd = \n");
+        for( int i = 0; i < representatives.length; ++i )
+            System.out.printf("   %d", representatives[i]+1);
+        System.out.println();
+//        
     }
 
     private double[][] almLasso(double[][] Y, boolean affine, double[] alpha, int q, double thr, int maxIter) {
@@ -57,7 +67,6 @@ public class SMRS {
         int d = Y.length, n = Y[0].length;
         double mu1p = alpha1 * 1.0/computeLambda(Y, affine);
         double mu2p = alpha2 * 1.0;
-        
         if( !affine ) {
             double mu1 = mu1p;
             double mu2 = mu2p;
@@ -95,12 +104,13 @@ public class SMRS {
         } else {
             double mu1 = mu1p;
             double mu2 = mu2p;
+          
             double[][] P = Util.multiply(Util.transposed(Y), Y);
             double[][] mu1P = Util.multiply(mu1, P);
             double[][] Atemp = Util.sum(Util.sum(mu1P, Util.multiply(mu2, Util.eye(n))), Util.multiply(mu2, Util.createMatrix(n, n, 1.0)));
             double[][] A = Util.inverse(Atemp);
             
-            double[][] C1 = Util.createMatrix(n, n, 0.0);            
+            double[][] C1 = Util.createMatrix(n, n, 0.0);   
             double[][] Lambda2 = Util.createMatrix(n, n, 0.0);
             double[] lambda3 = new double[n];
             Arrays.fill(lambda3, 0.0);
@@ -108,7 +118,7 @@ public class SMRS {
             double err1 = 10*thr1, err2 = 10*thr2;
             int i = 1;
             double[][] C2 = null;
-            while( (err1 > thr1 || err2 > thr2) && i < maxIter ) {
+            while( (err1 > thr1 || err2 > thr1) && i < maxIter ) {
                 
                 double[][] Z = Util.multiply(A, 
                                              Util.sum(
@@ -127,20 +137,20 @@ public class SMRS {
                 C2 = shrinkL1Lq(Util.sum(Z, Util.multiply(1.0/mu2, Lambda2)), 1.0/mu2, q);
                 
                 Lambda2 = Util.sum(Lambda2, Util.multiply(mu2, Util.minus(Z, C2)));
-                
                 double[][] sumZ1 = Util.sum(Z, 0);
-                for( int j = 0; j < sumZ1.length; ++j ) {
+                for( int j = 0; j < sumZ1[0].length; ++j ) {
                     lambda3[j] = mu2 * (1-sumZ1[0][j]) + lambda3[j];
                 }
-                
                 err1 = errorCoef(Z, C2);
                 err2 = errorCoef(sumZ1, Util.createMatrix(1, n, 1.0));
-                 
+                
+                C1 = C2;
                 i++;
-                System.out.printf("Iteration %5d, ||Z - C|| = %2.5f, ||1 - C^T 1|| = %2.5f, \n",i,err1,err2);
+                if( i%100 == 0 )
+                    System.out.println("Iteration "+i+", ||Z - C|| = "+err1+", ||1 - C^T 1|| = "+err2);
             }
             
-            System.out.printf("Terminating ADMM at iteration %5d, \n ||Z - C|| = %2.5f, ||1 - C^T 1|| = %2.5f. \n",i,err1,err2);
+            System.out.println("Terminating ADMM at iteration "+i+",\n ||Z - C|| = "+err1+", ||1 - C^T 1|| = "+err2);
             return C2;
         }
     }
@@ -152,7 +162,7 @@ public class SMRS {
         for( int i = 0; i < n; ++i ) 
             r[i] = new Item(Util.norm(C[i], q), i);
         
-        Arrays.sort(r, (Item a, Item b)->{ return (a.value > b.value ? 1 : (a.value < b.value ? -1 : 0)); });
+        Arrays.sort(r, (Item a, Item b)->{ return (a.value < b.value ? 1 : (a.value > b.value ? -1 : 0)); });
         double sumOfR = Arrays.stream(r).mapToDouble((Item i)->i.value).sum();
         
         double sum = 0;
@@ -249,6 +259,10 @@ public class SMRS {
                 error += Math.abs(Z[i][j]-C[i][j]);
         
         return error/(C.length*C[0].length);
+    }
+    
+    public int[] getRepresentatives() {
+        return representatives;
     }
     
     private class Item {

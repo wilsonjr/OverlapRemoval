@@ -51,6 +51,7 @@ import br.com.methods.utils.Util;
 import br.com.projection.spacereduction.ContextPreserving;
 import br.com.representative.Dijsktra;
 import br.com.representative.csm.CSM;
+import br.com.representative.dictionaryrepresentation.smrs.SMRS;
 import br.com.representative.ksvd.KSvd;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -178,6 +179,7 @@ public class Menu extends javax.swing.JFrame {
         dijsktraRepresentativeJMenuItem = new javax.swing.JMenuItem();
         csmJMenuItem = new javax.swing.JMenuItem();
         ksvdJMenuItem = new javax.swing.JMenuItem();
+        smrsJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -451,6 +453,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu8.add(ksvdJMenuItem);
+
+        smrsJMenuItem.setText("SMRS");
+        smrsJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                smrsJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(smrsJMenuItem);
 
         jMenuBar1.add(jMenu8);
 
@@ -1305,6 +1315,39 @@ public class Menu extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_showHideJMenuItemActionPerformed
 
+    private void smrsJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_smrsJMenuItemActionPerformed
+        JFileChooser jFileChooser = new JFileChooser();
+        int result = jFileChooser.showOpenDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            try {                 
+                File file = jFileChooser.getSelectedFile();
+                Scanner scn = new Scanner(file);
+              ArrayList<ArrayList<Double>> attrs = new ArrayList<>();
+                while( scn.hasNext() ) {
+                    
+                    attrs.add(new ArrayList<>());
+                    String[] linhas = scn.nextLine().split(",");
+                    for( int i = 0; i < linhas.length; ++i ) 
+                        attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                        
+                    
+                }
+                
+                SMRS smrs = new SMRS(attrs);
+                smrs.execute();
+                /*
+                
+                
+                if( view != null ) {
+                    view.cleanImage();
+                    view.repaint();            
+                }*/
+                
+            } catch( FileNotFoundException e ) {
+
+            }
+        }
+    }//GEN-LAST:event_smrsJMenuItemActionPerformed
+
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1660,6 +1703,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem salvarImagemJMenuItem;
     private javax.swing.JMenuItem saveDataCoordJMenuItem;
     private javax.swing.JMenuItem showHideJMenuItem;
+    private javax.swing.JMenuItem smrsJMenuItem;
     private javax.swing.JMenuItem sssJMenuItem;
     private javax.swing.JScrollPane telaJScrollPane;
     private javax.swing.JMenuItem viewSelectedJMenuItem;

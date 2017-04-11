@@ -1306,7 +1306,7 @@ public class Util {
     }
 
     public static double[][] createMatrix(int n, int m, double value) {
-        double[][] matrix = new double[n][n];
+        double[][] matrix = new double[n][m];
         for( int i = 0; i < n; ++i )
             for( int j = 0; j < m; ++j )
                 matrix[i][j] = value;
@@ -1322,9 +1322,10 @@ public class Util {
                 for( int j = 0; j < m.length; ++j )
                     s[0][i] += m[j][i];
             }
+           
             return s;
         } else {
-            double[][] s = new double[1][m[0].length];
+            double[][] s = new double[m[0].length][1];
             for( int i = 0; i < m.length; ++i ) {
                 s[i][0] = 0;
                 for( int j = 0; j < m[0].length; ++j )
@@ -1334,5 +1335,20 @@ public class Util {
         }
         
     }
+    
+    public static void print(double[][] m) {
+        
+        for( int i = 0; i < m.length; ++i ) {
+            
+            System.out.printf("%.4f", m[i][0]);
+            for( int j = 1; j < m[i].length; ++j )
+                System.out.printf(",%.4f",m[i][j]);
+            
+            System.out.println();
+        }
+        
+    }
+    
+    
     
 }
