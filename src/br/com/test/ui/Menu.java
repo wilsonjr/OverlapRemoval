@@ -1322,25 +1322,28 @@ public class Menu extends javax.swing.JFrame {
             try {                 
                 File file = jFileChooser.getSelectedFile();
                 Scanner scn = new Scanner(file);
-              ArrayList<ArrayList<Double>> attrs = new ArrayList<>();
+                scn.nextLine();
+                scn.nextLine();
+                scn.nextLine();
+                scn.nextLine();
+                ArrayList<ArrayList<Double>> attrs = new ArrayList<>();
                 while( scn.hasNext() ) {
                     
                     attrs.add(new ArrayList<>());
-                    String[] linhas = scn.nextLine().split(",");
-                    for( int i = 0; i < linhas.length; ++i ) 
+                    String[] linhas = scn.nextLine().split(";");
+                    for( int i = 1; i < linhas.length-1; ++i ) 
                         attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                        
                     
                 }
-                
                 SMRS smrs = new SMRS(attrs);
                 smrs.execute();
-                /*
                 
+                selectedRepresentatives = smrs.getRepresentatives();
                 
                 if( view != null ) {
                     view.cleanImage();
                     view.repaint();            
-                }*/
+                }
                 
             } catch( FileNotFoundException e ) {
 

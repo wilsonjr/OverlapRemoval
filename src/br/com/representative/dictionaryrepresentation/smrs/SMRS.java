@@ -19,10 +19,7 @@ public class SMRS {
     private int[] representatives;
     
     public SMRS(List<? extends List<Double>> items) {
-        this.items = new double[items.size()][items.get(0).size()];
-        for( int i = 0; i < this.items.length; ++i )
-            for( int j = 0; j < this.items[0].length; ++j )
-                this.items[i][j] = items.get(i).get(j);
+        this.items = Util.elementMatrix(items);
         System.out.println("Dimensions: "+this.items.length+", "+this.items[0].length);
     }
     
