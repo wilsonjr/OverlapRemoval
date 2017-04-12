@@ -10,6 +10,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -1354,6 +1355,41 @@ public class Util {
         for( int i = 0; i < D.length; ++i )
             value = Math.min(value, Arrays.stream(D[i]).min().getAsDouble());            
         return value;
+    }
+
+    public static double[][] sort(double[][] U) {
+        double[][] Ut = transposed(U);
+        
+        for( int i = 0; i < Ut.length; ++i ) {
+            List<Double> list = new ArrayList<>();
+            for( int j = 0; j < Ut[i].length; ++j )
+                list.add(Ut[i][j]);
+            Collections.sort(list, Collections.reverseOrder());
+            for( int j = 0; j < Ut[i].length; ++j )
+                Ut[i][j] = list.get(j);
+        }
+            
+        
+        return transposed(Ut);
+    }
+
+    public static double[][] range(double[][] V, int iInit, int iFinal, int jInit, int jFinal) {
+        double[][] m = new double[iFinal-iInit][jFinal-jInit];
+        
+        for( int i = iInit, mi = 0; i < iFinal; ++i, ++mi )
+            for( int j = jInit, mj = 0; j < jFinal; ++j, ++mj )
+                m[mi][mj] = V[i][j];
+        return m;
+    }
+
+    public static double[][] select(double[][] m, List<Integer> columns) {
+        double[][] filtered = new double[m.length][columns.size()];
+        
+        for( int i = 0; i < filtered.length; ++i )
+            for( int j = 0; j < columns.size(); ++j )
+                filtered[i][j] = m[i][columns.get(j)];
+        
+        return filtered;
     }
     
     

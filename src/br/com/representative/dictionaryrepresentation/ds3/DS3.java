@@ -34,6 +34,64 @@ public class DS3 {
         
     }
     
+    private double[][] ds3(double[][] D, int p, double rho, double mu, int maxIter, double[] CFD)
+    {
+        
+        
+        
+        
+        
+        
+        return null;
+    }
+    
+    private double[][] bclsSolver(double[][] U) {
+        int m = U.length, n = U[0].length;
+        
+        double[][] V = Util.sort(U);
+        
+        List<Integer> activeSet = new ArrayList<>();
+        for( int i = 0; i < n; ++i )
+            activeSet.add(i);
+        
+        double[] theta = new double[n];
+        Arrays.fill(theta, 0);
+        
+        int i = 1;
+        while( !activeSet.isEmpty() && i <= m ) {
+            List<Integer> idx = new ArrayList<>();
+            
+            double[][] auxSum = Util.sum(Util.select(Util.range(V, 0, i, 0, n), activeSet), 0);
+            for( int j = 0; j < activeSet.size(); ++j )
+                if( V[i][activeSet.get(j)] - (auxSum[0][j]-1.0)/(double)i <= 0 )
+                    idx.add(activeSet.get(j));
+            
+            if( !idx.isEmpty() ) {
+                double[][] filteredVsum = Util.sum(Util.select(Util.range(V, 0, i-1, 0, n), idx), 0);
+
+                for( int j = 0; j < idx.size(); ++j )
+                    theta[idx.get(j)] = (filteredVsum[0][j]-1.0)/(double)(i-1.0);
+
+                activeSet.removeAll(idx); 
+            }
+            i++;
+        }
+        
+        if( !activeSet.isEmpty() ) {
+            double[][] filteredVsum = Util.sum(Util.select(Util.range(V, 0, m, 0, n), activeSet), 0);
+
+            for( int j = 0; j < activeSet.size(); ++j )
+                theta[activeSet.get(j)] = (filteredVsum[0][j]-1.0)/(double)m;
+        }
+        
+        double[][] C = Util.minus(U, Util.repmatRow(theta, m));
+        for( i = 0; i < C.length; ++i )
+            for( int j = 0; j < C[0].length; ++j )
+                C[i][j] = Math.max(C[i][j], 0);
+        
+        return C;
+    }
+    
     // we will use q == 2 since it's faster and produce acceptable results
     private double[] computeRegularizer(double[][] D, int q) {
         
