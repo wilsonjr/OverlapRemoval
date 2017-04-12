@@ -13,6 +13,7 @@ package br.com.representative.dictionaryrepresentation.ds3;
  */
 
 import br.com.methods.utils.Util;
+import br.com.representative.dictionaryrepresentation.smrs.SMRS;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,7 +47,8 @@ public class DS3 {
         int maxIter = 3000;
         double errThr = 1*10e-7;        
         
-        ds3(D, p, rho, mu, maxIter, CFD, errThr);
+        double[][] Z = ds3(D, p, rho, mu, maxIter, CFD, errThr);
+        formRepresentatives(Z);
     }
     
     private double[][] ds3(double[][] D, int p, double rho, double mu, int maxIter, double[] CFD, double errThr)
@@ -211,5 +213,44 @@ public class DS3 {
     
     public int[] getRepresentatives() {
         return representatives;
+    }
+
+    private void formRepresentatives(double[][] C) {
+        double ratio = 0.1;
+        int n = C.length;
+        
+        double[] r = new double[n];        
+        for( int i = 0; i < n; ++i ) 
+            r[i] = Util.infNorm(C[i]);
+        
+        double rnorm = Util.infNorm(r);
+        List<Integer> sInd = new ArrayList<>();
+        for( int i = 0; i < r.length; ++i ) 
+            if( r[i] >= ratio*rnorm ) 
+                sInd.add(i);
+        
+        Item[] v = new Item[sInd.size()];
+        for( int i = 0; i < v.length; ++i ) {
+            v[i].value = Util.norm(C[sInd.get(i)]);
+            v[i].index = sInd.get(i);
+        }
+        
+        Arrays.sort(v, (Item a, Item b)->{ return (a.value < b.value ? 1 : (a.value > b.value ? -1 : 0)); });
+        representatives = new int[v.length];
+        for( int i = 0; i < v.length; ++i ) {
+            representatives[i] = v[i].index;
+        }
+        
+    }
+    
+    
+      private class Item {
+        public double value;
+        public int index;
+        
+        public Item(double value, int index) {
+            this.value = value;
+            this.index = index;
+        }
     }
 }

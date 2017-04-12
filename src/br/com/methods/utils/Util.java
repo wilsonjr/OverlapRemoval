@@ -1272,6 +1272,16 @@ public class Util {
             v[i] = m[i][index];
         return v;
     }
+    
+    public static double infNorm(double[] v) {
+        double greater = -1;
+        
+        for( int i = 0; i < v.length; ++i )
+            greater = Math.max(greater, Math.abs(v[i]));
+        
+        return greater;
+    }
+            
 
     public static double norm(double[] d, double q) {
         double sum = 0;
