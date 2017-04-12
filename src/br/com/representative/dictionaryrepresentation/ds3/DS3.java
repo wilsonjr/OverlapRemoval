@@ -13,7 +13,6 @@ package br.com.representative.dictionaryrepresentation.ds3;
  */
 
 import br.com.methods.utils.Util;
-import br.com.representative.dictionaryrepresentation.smrs.SMRS;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +30,7 @@ public class DS3 {
         this.D = D;
     }
    
-    private void execute() {
+    public void execute() {
         double max = Double.MIN_VALUE;
         
         for( int i = 0; i < D.length; ++i )
@@ -39,10 +38,11 @@ public class DS3 {
                 D[i][j] = D[i][j]/max;
         
         int p = 2;
+        double alpha = 3;
         double[] CFD = new double[D.length];
         Arrays.fill(CFD, 1.0);
         double[] rhov = computeRegularizer(D, p);
-        double rho = rhov[1];
+        double rho = alpha*rhov[1];
         double mu = 1*10e-1;
         int maxIter = 3000;
         double errThr = 1*10e-7;        

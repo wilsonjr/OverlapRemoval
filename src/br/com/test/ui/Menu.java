@@ -51,6 +51,7 @@ import br.com.methods.utils.Util;
 import br.com.projection.spacereduction.ContextPreserving;
 import br.com.representative.Dijsktra;
 import br.com.representative.csm.CSM;
+import br.com.representative.dictionaryrepresentation.ds3.DS3;
 import br.com.representative.dictionaryrepresentation.smrs.SMRS;
 import br.com.representative.ksvd.KSvd;
 import java.awt.Color;
@@ -180,6 +181,7 @@ public class Menu extends javax.swing.JFrame {
         csmJMenuItem = new javax.swing.JMenuItem();
         ksvdJMenuItem = new javax.swing.JMenuItem();
         smrsJMenuItem = new javax.swing.JMenuItem();
+        ds3JMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -461,6 +463,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu8.add(smrsJMenuItem);
+
+        ds3JMenuItem.setText("DS3");
+        ds3JMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ds3JMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(ds3JMenuItem);
 
         jMenuBar1.add(jMenu8);
 
@@ -1351,6 +1361,36 @@ public class Menu extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_smrsJMenuItemActionPerformed
 
+    private void ds3JMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ds3JMenuItemActionPerformed
+        JFileChooser jFileChooser = new JFileChooser();
+        int result = jFileChooser.showOpenDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            try {                 
+                File file = jFileChooser.getSelectedFile();
+                Scanner scn = new Scanner(file);
+                ArrayList<ArrayList<Double>> attrs = new ArrayList<>();
+                while( scn.hasNext() ) {
+                    
+                    attrs.add(new ArrayList<>());
+                    String[] linhas = scn.nextLine().split(",");
+                    for( int i = 1; i < linhas.length-1; ++i ) 
+                        attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                        
+                    
+                }
+                double[][] m = new double[attrs.size()][attrs.get(0).size()];
+                for( int i = 0; i < m.length; ++i )
+                    for( int j = 0; j < m[0].length; ++j )
+                        m[i][j] = attrs.get(i).get(j);
+                
+                DS3 ds3 = new DS3(m);
+                ds3.execute();
+                
+            } catch( FileNotFoundException e ) {
+
+            }
+        }
+    }//GEN-LAST:event_ds3JMenuItemActionPerformed
+
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1671,6 +1711,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem dbscanJMenuItem;
     private javax.swing.JMenuItem decrementJMenuItem;
     private javax.swing.JMenuItem dijsktraRepresentativeJMenuItem;
+    private javax.swing.JMenuItem ds3JMenuItem;
     private javax.swing.JMenuItem extractParametersJMenuItem;
     private javax.swing.JMenuItem gnatJMenuItem;
     private javax.swing.JMenuItem hexBoardJMenuItem;
