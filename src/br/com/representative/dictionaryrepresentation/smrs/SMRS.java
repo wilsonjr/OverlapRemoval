@@ -75,7 +75,7 @@ public class SMRS {
             double mu2 = mu2p;
             double[][] P = Util.multiply(Util.transposed(Y), Y);
             double[][] mu1P = Util.multiply(mu1, P);
-            double[][] Atemp = Util.sum(mu1P, Util.multiply(mu2, Util.eye(n)));
+            double[][] Atemp = Util.sum(mu1P, Util.multiply(mu2, Util.eye(n, 1)));
             double[][] A = Util.inverse(Atemp);
             
             double[][] C1 = Util.createMatrix(n, n, 0.0);
@@ -110,7 +110,7 @@ public class SMRS {
           
             double[][] P = Util.multiply(Util.transposed(Y), Y);
             double[][] mu1P = Util.multiply(mu1, P);
-            double[][] Atemp = Util.sum(Util.sum(mu1P, Util.multiply(mu2, Util.eye(n))), Util.multiply(mu2, Util.createMatrix(n, n, 1.0)));
+            double[][] Atemp = Util.sum(Util.sum(mu1P, Util.multiply(mu2, Util.eye(n, 1))), Util.multiply(mu2, Util.createMatrix(n, n, 1.0)));
             double[][] A = Util.inverse(Atemp);
             
             double[][] C1 = Util.createMatrix(n, n, 0.0);   

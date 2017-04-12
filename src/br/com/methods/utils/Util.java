@@ -1279,13 +1279,13 @@ public class Util {
         return Math.pow(sum, 1.0/q);
     }
     
-    public static double[][] eye(int n) {
+    public static double[][] eye(int n, double v) {
         
         double[][] identity = new double[n][n];
         for( int i = 0; i < n; ++i ) {
             for( int j = 0; j < n; ++j )
                 identity[i][j] = 0.0;
-            identity[i][i] = 1;
+            identity[i][i] = v;
         }
         return identity;
     }
@@ -1347,6 +1347,13 @@ public class Util {
             System.out.println();
         }
         
+    }
+
+    public static double min(double[][] D) {
+        double value = Double.MAX_VALUE;
+        for( int i = 0; i < D.length; ++i )
+            value = Math.min(value, Arrays.stream(D[i]).min().getAsDouble());            
+        return value;
     }
     
     
