@@ -65,7 +65,8 @@ public class DS3 {
         else
             rhoMin = Util.min(D);
         
-        return null;
+        double[] minAndMaxRho = {rhoMin, rhoMax};
+        return minAndMaxRho;
     }
     
     private double[][] shrinkL1Lq(double[][] C1, double lambda, int q) {
