@@ -23,26 +23,75 @@ import java.util.List;
  */
 public class DS3 {
     
-    private final double[][] items;
+    private final double[][] D;
     private int[] representatives;
     
-    public DS3(List<? extends List<Double>> items) {
-        this.items = Util.elementMatrix(items);
+    public DS3(double[][] D) {
+        this.D = D;
     }
    
     private void execute() {
+        double max = Double.MIN_VALUE;
         
+        for( int i = 0; i < D.length; ++i )
+            for( int j = 0; j < D[0].length; ++j )
+                D[i][j] = D[i][j]/max;
+        
+        int p = 2;
+        double[] CFD = new double[D.length];
+        Arrays.fill(CFD, 1.0);
+        double[] rhov = computeRegularizer(D, p);
+        double rho = rhov[1];
+        double mu = 1*10e-1;
+        int maxIter = 3000;
+        double errThr = 1*10e-7;        
+        
+        ds3(D, p, rho, mu, maxIter, CFD, errThr);
     }
     
-    private double[][] ds3(double[][] D, int p, double rho, double mu, int maxIter, double[] CFD)
+    private double[][] ds3(double[][] D, int p, double rho, double mu, int maxIter, double[] CFD, double errThr)
     {
+        int nr = D.length, nc = D[0].length;
+        boolean terminate = false;
+        int k = 1;
         
+        double[][] aux = Util.sum(D, 1);
+        int idx = 0;        
+        for( int i = 0; i < aux.length; ++i )
+            if( aux[i][0] < aux[idx][0] )
+                idx = i;
+        double[][] C1 = Util.createMatrix(D.length, D[0].length, 0);
+        for( int i = 0; i < C1[0].length; ++i )
+            C1[idx][i] = 1;
+        double[][] Lambda = Util.createMatrix(nr, nc, 0);
         
+        for( int i = 0; i < CFD.length; ++i )
+            CFD[i] = (rho/mu)*CFD[i];
         
+        double[][] C2 = null;
+        while( !terminate ) {
+            double[][] Z = shrinkL1Lq(Util.minus(C1, Util.multiply(1.0/mu, Util.sum(Lambda, D))), CFD, p);
+            C2 = bclsSolver(Util.sum(Z, Util.multiply(1.0/mu, Lambda)));
+            
+            Lambda = Util.sum(Lambda, Util.multiply(mu, Util.minus(Z, C2)));
+            
+            double err1 = errorCoef(Z, C2);
+            double err2 = errorCoef(C1, C2);
+            
+            if( k >= maxIter || (err1 <= errThr && err2 <= errThr) ) {
+                terminate = true;
+                System.out.printf("Terminating: \n");
+                System.out.printf("||Z-C||= %1.2f, ||C1-C2||= %1.2f, iteration = %.0f \n\n",err1,err2,k);
+            } else {
+                k++;
+                if( k%100 == 0 ) 
+                    System.out.printf("||Z-C||= %1.2f, ||C1-C2||= %1.2f, iteration = %.0f \n",err1,err2,k);                    
+            }
+            
+            C1 = C2;
+        }
         
-        
-        
-        return null;
+        return C2;
     }
     
     private double[][] bclsSolver(double[][] U) {
@@ -127,38 +176,28 @@ public class DS3 {
         return minAndMaxRho;
     }
     
-    private double[][] shrinkL1Lq(double[][] C1, double lambda, int q) {
+    private double[][] shrinkL1Lq(double[][] C1, double[] lambda, int q) {
         
         int d = C1.length;
         int n = C1[0].length;
         
-        if( q == 1 ) {
-            double[][] C2 = new double[C1.length][C1[0].length];
-            
-            for( int i = 0; i < C1.length; ++i )
-                for( int j = 0; j < C1[0].length; ++j ) {
-                    C2[i][j] = Math.abs(C1[i][j])-lambda;
-                    C2[i][j] = Math.max(C2[i][j], 0);                    
-                    C2[i][j] = C2[i][j]*Util.sign(C1[i][j]);                   
-                }            
-            return C2;
-        } else {
-            
-            double[] r = new double[d];
-            
-            for( int i = 0; i < r.length; ++i )
-                r[i] = Math.max(Util.norm(C1[i])-lambda, 0);
-            
-            for( int i = 0; i < r.length; ++i )
-                r[i] = r[i]/(r[i]+lambda);
-            double[][] aux = Util.reapmat(r, n);
-            
-            double[][] C2 = new double[C1.length][C1[0].length];
-            for( int i = 0; i < C1.length; ++i )
-                for( int j = 0; j < C1[0].length; ++j )
-                    C2[i][j] = aux[i][j]*C1[i][j];
-            return C2;
-        }
+        double[] r = new double[d];
+
+        double[][] sumAux = Util.sum(Util.multiply(C1, C1), 1);
+        
+        for( int i = 0; i < r.length; ++i )
+            r[i] = Math.max(Math.sqrt(sumAux[i][0])-lambda[i], 0);
+
+        for( int i = 0; i < r.length; ++i )
+            r[i] = r[i]/(r[i]+lambda[i]);
+        double[][] aux = Util.reapmat(r, n);
+
+        double[][] C2 = new double[C1.length][C1[0].length];
+        for( int i = 0; i < C1.length; ++i )
+            for( int j = 0; j < C1[0].length; ++j )
+                C2[i][j] = aux[i][j]*C1[i][j];
+        return C2;
+        
     }
     
     private double errorCoef(double[][] Z, double[][] C) {        
