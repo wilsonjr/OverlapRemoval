@@ -5,6 +5,13 @@
  */
 package br.com.representative.dictionaryrepresentation.smrs;
 
+/**
+ * Implementation of the techniques described in the paper:
+ *  E. Elhamifar, G. Sapiro, and R. Vidal, See All by Looking at A Few: Sparse Modeling for Finding Representative Objects,
+ * IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2012.
+ * Based on http://www.ccs.neu.edu/home/eelhami/codes.htm
+ */
+
 import br.com.methods.utils.Util;
 import java.util.Arrays;
 import java.util.List;
@@ -15,12 +22,11 @@ import java.util.List;
  */
 public class SMRS {
     
-    private double[][] items;
+    private final double[][] items;
     private int[] representatives;
     
     public SMRS(List<? extends List<Double>> items) {
         this.items = Util.elementMatrix(items);
-        System.out.println("Dimensions: "+this.items.length+", "+this.items[0].length);
     }
     
     public void execute() {
