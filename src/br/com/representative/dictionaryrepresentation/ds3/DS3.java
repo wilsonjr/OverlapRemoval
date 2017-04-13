@@ -35,20 +35,28 @@ public class DS3 {
         
         for( int i = 0; i < D.length; ++i )
             for( int j = 0; j < D[0].length; ++j )
+                max = Math.max(max, D[i][j]);
+        Util.print(D);
+        System.out.println();
+        for( int i = 0; i < D.length; ++i )
+            for( int j = 0; j < D[0].length; ++j )
                 D[i][j] = D[i][j]/max;
+        
+        Util.print(D);
         
         int p = 2;
         double alpha = 3;
         double[] CFD = new double[D.length];
         Arrays.fill(CFD, 1.0);
         double[] rhov = computeRegularizer(D, p);
-        double rho = alpha*rhov[1];
+        System.out.println("rho_min: "+rhov[0]+", rho_max: "+rhov[1]);
+        double rho = (rhov[0]+rhov[1])/2;
         double mu = 1*10e-1;
         int maxIter = 3000;
         double errThr = 1*10e-7;        
         
-        double[][] Z = ds3(D, p, rho, mu, maxIter, CFD, errThr);
-        formRepresentatives(Z);
+//        double[][] Z = ds3(D, p, rho, mu, maxIter, CFD, errThr);
+//        formRepresentatives(Z);
     }
     
     private double[][] ds3(double[][] D, int p, double rho, double mu, int maxIter, double[] CFD, double errThr)
@@ -150,7 +158,7 @@ public class DS3 {
         double[][] s = Util.sum(D, 1);
         int idx = 0;
         for( int i = 0; i < s.length; ++i )
-            idx = s[i][0] > s[idx][0] ? i : idx;
+            idx = s[i][0] < s[idx][0] ? i : idx;
         
         double rhoMax = Double.MIN_VALUE, rhoMin;
         int[] idxC = new int[nr-1];
@@ -160,11 +168,9 @@ public class DS3 {
         
         double[] v = new double[D[0].length];
         double sqrtNr = Math.sqrt(nr);
-        for( int i = 0; i < idxC.length; ++i ) {
-            
+        for( int i = 0; i < idxC.length; ++i ) {            
             for( int j = 0; j < v.length; ++j )
-                v[j] = D[idxC[i]][j] - D[idx][j];
-            
+                v[j] = D[idxC[i]][j] - D[idx][j];           
             double p = sqrtNr*(Util.norm(v)*Util.norm(v)) / (2*Arrays.stream(v).sum());
             rhoMax = Math.max(rhoMax, p);            
         }

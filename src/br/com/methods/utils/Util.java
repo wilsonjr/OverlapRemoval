@@ -1336,7 +1336,7 @@ public class Util {
            
             return s;
         } else {
-            double[][] s = new double[m[0].length][1];
+            double[][] s = new double[m.length][1];
             for( int i = 0; i < m.length; ++i ) {
                 s[i][0] = 0;
                 for( int j = 0; j < m[0].length; ++j )

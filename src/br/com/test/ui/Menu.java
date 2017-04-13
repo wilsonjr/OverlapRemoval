@@ -1373,7 +1373,7 @@ public class Menu extends javax.swing.JFrame {
                     
                     attrs.add(new ArrayList<>());
                     String[] linhas = scn.nextLine().split(",");
-                    for( int i = 1; i < linhas.length-1; ++i ) 
+                    for( int i = 0; i < linhas.length; ++i ) 
                         attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                        
                     
                 }
@@ -1381,7 +1381,8 @@ public class Menu extends javax.swing.JFrame {
                 for( int i = 0; i < m.length; ++i )
                     for( int j = 0; j < m[0].length; ++j )
                         m[i][j] = attrs.get(i).get(j);
-                
+                Util.print(m);
+                System.out.println();
                 DS3 ds3 = new DS3(m);
                 ds3.execute();
                 
