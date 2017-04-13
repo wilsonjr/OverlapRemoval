@@ -1352,9 +1352,13 @@ public class Util {
         for( int i = 0; i < m.length; ++i ) {
             
             System.out.printf("%.4f", m[i][0]);
-            for( int j = 1; j < m[i].length; ++j )
-                System.out.printf(",%.4f",m[i][j]);
-            
+            if( m[i][0] == 0 && i != 0  )
+                    System.out.printf(" >>(%d,%d) tem zero << ", i,0);
+            for( int j = 1; j < m[i].length; ++j ) {
+                System.out.printf(";%.4f",m[i][j]);
+                if( m[i][j] == 0 && i != j )
+                    System.out.printf(" >>(%d,%d) tem zero << ", i,j);
+            }
             System.out.println();
         }
         
@@ -1363,7 +1367,8 @@ public class Util {
     public static double min(double[][] D) {
         double value = Double.MAX_VALUE;
         for( int i = 0; i < D.length; ++i )
-            value = Math.min(value, Arrays.stream(D[i]).min().getAsDouble());            
+            for( int j = 0; j < D[0].length; ++j )
+                value = Math.min(value, D[i][j]);
         return value;
     }
 

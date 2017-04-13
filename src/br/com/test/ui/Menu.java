@@ -1362,33 +1362,19 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_smrsJMenuItemActionPerformed
 
     private void ds3JMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ds3JMenuItemActionPerformed
-        JFileChooser jFileChooser = new JFileChooser();
-        int result = jFileChooser.showOpenDialog(this);
-        if( result == JFileChooser.APPROVE_OPTION ) {
-            try {                 
-                File file = jFileChooser.getSelectedFile();
-                Scanner scn = new Scanner(file);
-                ArrayList<ArrayList<Double>> attrs = new ArrayList<>();
-                while( scn.hasNext() ) {
-                    
-                    attrs.add(new ArrayList<>());
-                    String[] linhas = scn.nextLine().split(",");
-                    for( int i = 0; i < linhas.length; ++i ) 
-                        attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                        
-                    
-                }
-                double[][] m = new double[attrs.size()][attrs.get(0).size()];
-                for( int i = 0; i < m.length; ++i )
-                    for( int j = 0; j < m[0].length; ++j )
-                        m[i][j] = attrs.get(i).get(j);
-                Util.print(m);
-                System.out.println();
-                DS3 ds3 = new DS3(m);
-                ds3.execute();
-                
-            } catch( FileNotFoundException e ) {
-
-            }
+//        
+        double[][] distances = new double[rectangles.size()][rectangles.size()];
+        for( int i = 0; i < distances.length; ++i )
+            for( int j = 0; j < distances[0].length; ++j )
+                distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
+        
+        DS3 ds3 = new DS3(distances);
+        ds3.execute();
+        selectedRepresentatives = ds3.getRepresentatives();
+        
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
         }
     }//GEN-LAST:event_ds3JMenuItemActionPerformed
 

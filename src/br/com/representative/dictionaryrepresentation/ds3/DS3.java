@@ -36,27 +36,33 @@ public class DS3 {
         for( int i = 0; i < D.length; ++i )
             for( int j = 0; j < D[0].length; ++j )
                 max = Math.max(max, D[i][j]);
-        Util.print(D);
-        System.out.println();
+        
         for( int i = 0; i < D.length; ++i )
             for( int j = 0; j < D[0].length; ++j )
                 D[i][j] = D[i][j]/max;
         
-        Util.print(D);
         
         int p = 2;
-        double alpha = 3;
+        double alpha = 0.4;
         double[] CFD = new double[D.length];
         Arrays.fill(CFD, 1.0);
         double[] rhov = computeRegularizer(D, p);
-        System.out.println("rho_min: "+rhov[0]+", rho_max: "+rhov[1]);
-        double rho = (rhov[0]+rhov[1])/2;
+        System.out.println(">>>>>> "+D[0][0]);
+        System.out.println("rhov0: "+rhov[0]);
+        createScale(rhov, D.length, 150);
+        System.out.println("rhov1: "+rhov[1]);
+        createScale(rhov, D.length, 1);
+        System.out.println("-----------------------------------");
+        double guessed = createScale(rhov, D.length, (int) ((20.0/100.0)*D.length));
+        double rho = (rhov[0]+rhov[1])/5.0;
+        System.out.println("rho: "+rho);
         double mu = Math.pow(10, -1);
         int maxIter = 3000;
-        double errThr = Math.pow(10, -7);        
+        double errThr = Math.pow(10, -5);        
         
         double[][] Z = ds3(D, p, rho, mu, maxIter, CFD, errThr);
-//        formRepresentatives(Z);
+        formRepresentatives(Z);        
+//    
     }
     
     private double[][] ds3(double[][] D, int p, double rho, double mu, int maxIter, double[] CFD, double errThr)
@@ -70,13 +76,10 @@ public class DS3 {
         for( int i = 0; i < aux.length; ++i )
             if( aux[i][0] < aux[idx][0] )
                 idx = i;
-        System.out.println("IDX: "+idx);
         double[][] C1 = Util.createMatrix(D.length, D[0].length, 0);
         for( int i = 0; i < C1[0].length; ++i )
             C1[idx][i] = 1;
-        System.out.println("C1 = ");
-        Util.print(C1);
-        System.out.println();
+    
         double[][] Lambda = Util.createMatrix(nr, nc, 0);
         
         for( int i = 0; i < CFD.length; ++i )
@@ -84,33 +87,33 @@ public class DS3 {
         
         double[][] C2 = null;
         while( !terminate ) {
-            System.out.println("mu: "+mu);
-            System.out.println("lambdaD = ");
-            Util.print(Util.sum(Lambda, D));
-            System.out.println();
-            System.out.println("lambdaDMu = ");
-            Util.print(Util.multiply(1.0/mu, Util.sum(Lambda, D)));
-            System.out.println();
-            System.out.println("passando = ");
-            Util.print(Util.minus(
-                            C1, 
-                            Util.multiply(1.0/mu, Util.sum(Lambda, D))
-                                 ));
-            System.out.println();
+//            System.out.println("mu: "+mu);
+//            System.out.println("lambdaD = ");
+//            Util.print(Util.sum(Lambda, D));
+//            System.out.println();
+//            System.out.println("lambdaDMu = ");
+//            Util.print(Util.multiply(1.0/mu, Util.sum(Lambda, D)));
+//            System.out.println();
+//            System.out.println("passando = ");
+//            Util.print(Util.minus(
+//                            C1, 
+//                            Util.multiply(1.0/mu, Util.sum(Lambda, D))
+//                                 ));
+//            System.out.println();
             
-            System.out.println("CFD = ");
-            for( int i = 0; i < CFD.length; ++i )
-                System.out.print(" "+CFD[i]+" ");
-            System.out.println();
+//            System.out.println("CFD = ");
+//            for( int i = 0; i < CFD.length; ++i )
+//                System.out.print(" "+CFD[i]+" ");
+//            System.out.println();
             
             double[][] Z = shrinkL1Lq(Util.minus(C1, Util.multiply(1.0/mu, Util.sum(Lambda, D))), CFD, p);
             C2 = bclsSolver(Util.sum(Z, Util.multiply(1.0/mu, Lambda)));
-            System.out.println("Z = ");
-            Util.print(Z);
-            System.out.println();
-            System.out.println("C2 = ");
-            Util.print(C2);
-            System.out.println();
+//            System.out.println("Z = ");
+//            Util.print(Z);
+//            System.out.println();
+//            System.out.println("C2 = ");
+//            Util.print(C2);
+//            System.out.println();
             
             
             Lambda = Util.sum(Lambda, Util.multiply(mu, Util.minus(Z, C2)));
@@ -121,11 +124,16 @@ public class DS3 {
             if( k >= maxIter || (err1 <= errThr && err2 <= errThr) ) {
                 terminate = true;
                 System.out.printf("Terminating: \n");
-                System.out.printf("||Z-C||= %1.2f, ||C1-C2||= %1.2f, iteration = %d \n\n",err1,err2,k);
+                formRepresentatives(C2);
+                System.out.println("||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");
             } else {
                 k++;
-                if( k%100 == 0 ) 
-                    System.out.printf("||Z-C||= %1.2f, ||C1-C2||= %1.2f, iteration = %d \n",err1,err2,k);                    
+                if( k%100 == 0 ) {
+                    formRepresentatives(C2);
+//                    if( representatives.length <= (int)((20.0/100.0)*D.length) )
+//                        terminate = true;
+                    System.out.println("||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");       
+                }
             }
             
             C1 = C2;
@@ -205,9 +213,14 @@ public class DS3 {
             rhoMax = Math.max(rhoMax, p);            
         }
         
-        if( nr == nc )
-            rhoMin = Util.min(Util.sum(D, Util.eye(nr, Math.pow(10, 10))));
-        else
+        if( nr == nc ) {
+            double value = Math.pow(10, 10);
+            for( int i = 0; i < D.length; ++i )
+                D[i][i] = value;
+            rhoMin = Util.min(D);
+            for( int i = 0; i < D.length; ++i )
+                D[i][i] = 0;
+        } else 
             rhoMin = Util.min(D);
         
         double[] minAndMaxRho = {rhoMin, rhoMax};
@@ -228,31 +241,31 @@ public class DS3 {
 
         double[][] sumAux = Util.sum(powered, 1);
         
-        System.out.println("sum = ");
+      //  System.out.println("sum = ");
         for( int i = 0; i < r.length; ++i ) {
-            System.out.print(" "+sumAux[i][0]+" ");
+      //      System.out.print(" "+sumAux[i][0]+" ");
             r[i] = Math.max(Math.sqrt(sumAux[i][0])-lambda[i], 0);
         }
-        System.out.println();
+      //  System.out.println();
         
-        System.out.println("lambda = ");
-        for( int i = 0; i < lambda.length; ++i ) {
-            System.out.print(" "+lambda[i]+" ");
-        }
-        System.out.println();
-        System.out.println("r = ");
-        for( int i = 0; i < r.length; ++i )
-            System.out.print(" "+r[i]+" ");
-        System.out.println();
+//        System.out.println("lambda = ");
+//        for( int i = 0; i < lambda.length; ++i ) {
+//            System.out.print(" "+lambda[i]+" ");
+//        }
+//        System.out.println();
+//        System.out.println("r = ");
+//        for( int i = 0; i < r.length; ++i )
+//            System.out.print(" "+r[i]+" ");
+//        System.out.println();
         
         for( int i = 0; i < r.length; ++i )
             r[i] = r[i]/(r[i]+lambda[i]);
         
         double[][] aux = Util.reapmat(r, n);
         
-        System.out.println("aux = ");
-        Util.print(aux);
-        System.out.println();
+//        System.out.println("aux = ");
+//        Util.print(aux);
+//        System.out.println();
 
         double[][] C2 = new double[C1.length][C1[0].length];
         for( int i = 0; i < C1.length; ++i )
@@ -294,10 +307,9 @@ public class DS3 {
                 sInd.add(i);
         
         Item[] v = new Item[sInd.size()];
-        for( int i = 0; i < v.length; ++i ) {
-            v[i].value = Util.norm(C[sInd.get(i)]);
-            v[i].index = sInd.get(i);
-        }
+        for( int i = 0; i < v.length; ++i )
+            v[i] = new Item(Util.norm(C[sInd.get(i)]), sInd.get(i));
+        
         
         Arrays.sort(v, (Item a, Item b)->{ return (a.value < b.value ? 1 : (a.value > b.value ? -1 : 0)); });
         representatives = new int[v.length];
@@ -305,6 +317,13 @@ public class DS3 {
             representatives[i] = v[i].index;
         }
         
+    }
+
+    private double createScale(double[] rhov, int n, int size) {
+        double m = (rhov[0] - rhov[1])/(n-1);       
+        double y = m*(size-n) + rhov[0];
+        System.out.println("Returning "+y);
+        return y;
     }
     
     
