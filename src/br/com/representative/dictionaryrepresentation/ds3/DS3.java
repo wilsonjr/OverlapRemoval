@@ -55,7 +55,7 @@ public class DS3 {
         int maxIter = 3000;
         double errThr = 1*10e-7;        
         
-//        double[][] Z = ds3(D, p, rho, mu, maxIter, CFD, errThr);
+        double[][] Z = ds3(D, p, rho, mu, maxIter, CFD, errThr);
 //        formRepresentatives(Z);
     }
     
@@ -80,8 +80,18 @@ public class DS3 {
         
         double[][] C2 = null;
         while( !terminate ) {
+            System.out.println("passando = ");
+            Util.print(Util.minus(C1, Util.multiply(1.0/mu, Util.sum(Lambda, D))));
+            System.out.println();
             double[][] Z = shrinkL1Lq(Util.minus(C1, Util.multiply(1.0/mu, Util.sum(Lambda, D))), CFD, p);
             C2 = bclsSolver(Util.sum(Z, Util.multiply(1.0/mu, Lambda)));
+            System.out.println("Z = ");
+            Util.print(Z);
+            System.out.println();
+            System.out.println("C2 = ");
+            Util.print(C2);
+            System.out.println();
+            
             
             Lambda = Util.sum(Lambda, Util.multiply(mu, Util.minus(Z, C2)));
             
@@ -91,11 +101,11 @@ public class DS3 {
             if( k >= maxIter || (err1 <= errThr && err2 <= errThr) ) {
                 terminate = true;
                 System.out.printf("Terminating: \n");
-                System.out.printf("||Z-C||= %1.2f, ||C1-C2||= %1.2f, iteration = %.0f \n\n",err1,err2,k);
+                System.out.printf("||Z-C||= %1.2f, ||C1-C2||= %1.2f, iteration = %d \n\n",err1,err2,k);
             } else {
                 k++;
                 if( k%100 == 0 ) 
-                    System.out.printf("||Z-C||= %1.2f, ||C1-C2||= %1.2f, iteration = %.0f \n",err1,err2,k);                    
+                    System.out.printf("||Z-C||= %1.2f, ||C1-C2||= %1.2f, iteration = %d \n",err1,err2,k);                    
             }
             
             C1 = C2;
@@ -122,7 +132,7 @@ public class DS3 {
             
             double[][] auxSum = Util.sum(Util.select(Util.range(V, 0, i, 0, n), activeSet), 0);
             for( int j = 0; j < activeSet.size(); ++j )
-                if( V[i][activeSet.get(j)] - (auxSum[0][j]-1.0)/(double)i <= 0 )
+                if( V[i-1][activeSet.get(j)] - (auxSum[0][j]-1.0)/(double)i <= 0 )
                     idx.add(activeSet.get(j));
             
             if( !idx.isEmpty() ) {
