@@ -56,6 +56,7 @@ import br.com.representative.dictionaryrepresentation.smrs.SMRS;
 import br.com.representative.ksvd.KSvd;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -88,6 +89,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -110,6 +112,7 @@ public class Menu extends javax.swing.JFrame {
     private int nivelDendrogram = 0, indexRepresentatives = -1;
     private int[] selectedRepresentatives = null;
     private boolean hideShowNumbers = false;
+    private double iImage = 0;
     
     private ArrayList<ChangeRetangulo> cRetangulo = null;
     /**
@@ -1368,13 +1371,36 @@ public class Menu extends javax.swing.JFrame {
             for( int j = 0; j < distances[0].length; ++j )
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
         
-        DS3 ds3 = new DS3(distances);
-        ds3.execute();
-        selectedRepresentatives = ds3.getRepresentatives();
         
-        if( view != null ) {
-            view.cleanImage();
-            view.repaint();
+        for( double i = 0.01; i < 0.05; i += 0.01 ) {
+            iImage = i;
+            DS3 ds3 = new DS3(distances);
+            ds3.execute(i);
+            selectedRepresentatives = ds3.getRepresentatives();
+            
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    if( view != null ) {
+                        System.out.println("Estou pintando aqui..");
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                view.cleanImage();
+                        view.repaint();
+                            }
+                        });
+                        
+                        try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                }
+                    }
+                }
+            });
+            
+                        
+            
         }
     }//GEN-LAST:event_ds3JMenuItemActionPerformed
 
@@ -1493,6 +1519,7 @@ public class Menu extends javax.swing.JFrame {
             if( imageBuffer == null ) {
                 adjustPanel();
                 setPreferredSize(getSize());
+                System.out.println("olaaa");
                 this.imageBuffer = new BufferedImage(getSize().width, getSize().height, BufferedImage.TYPE_INT_RGB);
 
                 java.awt.Graphics2D g2Buffer = this.imageBuffer.createGraphics();
@@ -1637,12 +1664,23 @@ public class Menu extends javax.swing.JFrame {
                     }
                 }
                 
-                
+                if( iImage != 0 ) {
+                try {
+                                File file = new File("C:\\Users\\Windows\\Desktop\\imagens\\imagem"+String.valueOf(iImage)+".png");
+                                System.out.println("Salvando imagem"+String.valueOf(iImage)+".png...");
+                                view.adjustPanel();
+                                BufferedImage img = view.getImage();
+                                ImageIO.write(img, "png", file);
+                            } catch( IOException e ) {
+                                System.out.println(e.getMessage());
+                            } }
                 g2Buffer.dispose();
+                
             } 
             if( imageBuffer != null )  {
-                g2.drawImage(this.imageBuffer, 0, 0, null);            
+                g2.drawImage(this.imageBuffer, 0, 0, null);                  
             }
+            
         }
         
         public void cleanImage() {

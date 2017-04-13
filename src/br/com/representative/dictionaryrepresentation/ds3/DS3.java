@@ -30,7 +30,7 @@ public class DS3 {
         this.D = D;
     }
    
-    public void execute() {
+    public void execute(double alpha) {
         double max = Double.MIN_VALUE;
         
         for( int i = 0; i < D.length; ++i )
@@ -43,7 +43,6 @@ public class DS3 {
         
         
         int p = 2;
-        double alpha = 0.4;
         double[] CFD = new double[D.length];
         Arrays.fill(CFD, 1.0);
         double[] rhov = computeRegularizer(D, p);
@@ -54,7 +53,8 @@ public class DS3 {
         createScale(rhov, D.length, 1);
         System.out.println("-----------------------------------");
         double guessed = createScale(rhov, D.length, (int) ((20.0/100.0)*D.length));
-        double rho = (rhov[0]+rhov[1])/5.0;
+        //double rho = (rhov[0]+rhov[1])/5.0;
+        double rho = rhov[1]*alpha;
         System.out.println("rho: "+rho);
         double mu = Math.pow(10, -1);
         int maxIter = 3000;
