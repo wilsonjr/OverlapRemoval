@@ -1371,37 +1371,25 @@ public class Menu extends javax.swing.JFrame {
             for( int j = 0; j < distances[0].length; ++j )
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
         
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            private double i = 0.0;
+            @Override
+            public void run() {
+                System.out.println("Ola: "+i);
+                iImage = i;
+                DS3 ds3 = new DS3(distances);
+                ds3.execute(i);
+                selectedRepresentatives = ds3.getRepresentatives();
+                
+                view.cleanImage();
+                view.repaint();
+                i += 0.01;
+                if( i >= 0.5 )
+                    cancel();
+            }
+        }, 0, 1000);        
         
-        for( double i = 0.01; i < 0.05; i += 0.01 ) {
-            iImage = i;
-            DS3 ds3 = new DS3(distances);
-            ds3.execute(i);
-            selectedRepresentatives = ds3.getRepresentatives();
-            
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if( view != null ) {
-                        System.out.println("Estou pintando aqui..");
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                view.cleanImage();
-                        view.repaint();
-                            }
-                        });
-                        
-                        try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException ex) {
-                }
-                    }
-                }
-            });
-            
-                        
-            
-        }
     }//GEN-LAST:event_ds3JMenuItemActionPerformed
 
     
@@ -1665,15 +1653,16 @@ public class Menu extends javax.swing.JFrame {
                 }
                 
                 if( iImage != 0 ) {
-                try {
-                                File file = new File("C:\\Users\\Windows\\Desktop\\imagens\\imagem"+String.valueOf(iImage)+".png");
-                                System.out.println("Salvando imagem"+String.valueOf(iImage)+".png...");
-                                view.adjustPanel();
-                                BufferedImage img = view.getImage();
-                                ImageIO.write(img, "png", file);
-                            } catch( IOException e ) {
-                                System.out.println(e.getMessage());
-                            } }
+                    try {
+                        File file = new File("C:\\Users\\wilson\\Desktop\\imagem\\imagem"+String.valueOf(iImage)+".png");
+                        System.out.println("Salvando imagem"+String.valueOf(iImage)+".png...");
+                        view.adjustPanel();
+                        BufferedImage img = view.getImage();
+                        ImageIO.write(img, "png", file);
+                    } catch( IOException e ) {
+                        System.out.println(e.getMessage());
+                    } 
+                }
                 g2Buffer.dispose();
                 
             } 
