@@ -184,6 +184,8 @@ public class Menu extends javax.swing.JFrame {
         csmJMenuItem = new javax.swing.JMenuItem();
         ksvdJMenuItem = new javax.swing.JMenuItem();
         smrsJMenuItem = new javax.swing.JMenuItem();
+        runDs3JMenuItem = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
         ds3JMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -467,7 +469,16 @@ public class Menu extends javax.swing.JFrame {
         });
         jMenu8.add(smrsJMenuItem);
 
-        ds3JMenuItem.setText("DS3");
+        runDs3JMenuItem.setText("DS3");
+        runDs3JMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                runDs3JMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(runDs3JMenuItem);
+        jMenu8.add(jSeparator2);
+
+        ds3JMenuItem.setText("Test DS3");
         ds3JMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ds3JMenuItemActionPerformed(evt);
@@ -1365,7 +1376,10 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_smrsJMenuItemActionPerformed
 
     private void ds3JMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ds3JMenuItemActionPerformed
-//        
+        
+        if( rectangles == null )
+            loadDataJMenuItemActionPerformed(null);
+        
         double[][] distances = new double[rectangles.size()][rectangles.size()];
         for( int i = 0; i < distances.length; ++i )
             for( int j = 0; j < distances[0].length; ++j )
@@ -1376,8 +1390,7 @@ public class Menu extends javax.swing.JFrame {
             private double i = 0.0;
             @Override
             public void run() {
-                System.out.println("Ola: "+i);
-                iImage = i;
+                iImage = i; 
                 DS3 ds3 = new DS3(distances);
                 ds3.execute(i);
                 selectedRepresentatives = ds3.getRepresentatives();
@@ -1385,12 +1398,31 @@ public class Menu extends javax.swing.JFrame {
                 view.cleanImage();
                 view.repaint();
                 i += 0.01;
-                if( i >= 0.5 )
+                if( i > 0.5 )
                     cancel();
             }
         }, 0, 1000);        
         
     }//GEN-LAST:event_ds3JMenuItemActionPerformed
+
+    private void runDs3JMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runDs3JMenuItemActionPerformed
+        if( rectangles == null )
+            loadDataJMenuItemActionPerformed(null);
+        
+        double[][] distances = new double[rectangles.size()][rectangles.size()];
+        for( int i = 0; i < distances.length; ++i )
+            for( int j = 0; j < distances[0].length; ++j )
+                distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
+                
+        DS3 ds3 = new DS3(distances);
+        ds3.execute(0.12); // gives the best results 
+        selectedRepresentatives = ds3.getRepresentatives();
+        
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
+    }//GEN-LAST:event_runDs3JMenuItemActionPerformed
 
     
     public double getMaxDistance() {
@@ -1744,6 +1776,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator10;
     private javax.swing.JPopupMenu.Separator jSeparator11;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator8;
     private javax.swing.JPopupMenu.Separator jSeparator9;
     private javax.swing.JMenuItem kMeansJMenuItem;
@@ -1755,6 +1788,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem omniJMenuItem;
     private javax.swing.JMenuItem prismJMenuItem;
     private javax.swing.JMenuItem projSnippetJMenuItem;
+    private javax.swing.JMenuItem runDs3JMenuItem;
     private javax.swing.JMenuItem rwordleCJMenuItem;
     private javax.swing.JMenuItem rwordleLJMenuItem;
     private javax.swing.JMenuItem sairJMenuItem;
