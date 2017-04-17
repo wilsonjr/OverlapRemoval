@@ -9,11 +9,14 @@ import java.awt.Polygon;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import kn.uni.voronoitreemap.datastructure.OpenList;
+import kn.uni.voronoitreemap.diagram.PowerDiagram;
+import kn.uni.voronoitreemap.j2d.PolygonSimple;
+import kn.uni.voronoitreemap.j2d.Site;
 
 /**
  * Classe utilizada para auxiliar nos métodos de remoção de sobreposição.
@@ -1457,6 +1460,42 @@ public class Util {
         
         return indexes;
     }
+    
+    public static Polygon[] voronoiDiagram(Polygon window, Point2D.Double[] points) {
+        
+        PowerDiagram diagram = new PowerDiagram();
+        OpenList sites = new OpenList();
+
+        PolygonSimple rootPolygon = new PolygonSimple();
+        for( int i = 0; i < window.xpoints.length; ++i )
+            rootPolygon.add(window.xpoints[i], window.ypoints[i]);
+
+
+        for( int i = 0; i < points.length; ++i ) {
+            Site site = new Site(points[i].x, points[i].y);
+            // site.setWeight(30);
+            sites.add(site);
+        }
+
+        diagram.setSites(sites);
+        diagram.setClipPoly(rootPolygon);
+        diagram.computeDiagram();
+
+        Polygon[] polygons = new Polygon[points.length];
+        for( int i = 0; i < sites.size; ++i ) {
+
+            PolygonSimple polygon = sites.array[i].getPolygon();
+            if( polygon != null ) {
+                Polygon poly = new Polygon(polygon.getXpointsClosed(), polygon.getYpointsClosed(), polygon.getXpointsClosed().length);
+                polygons[i] = poly;
+            }
+
+        }
+        
+        return polygons;
+    }
+    
+    
     
     
     

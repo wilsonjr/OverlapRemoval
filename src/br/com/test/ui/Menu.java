@@ -57,7 +57,6 @@ import br.com.representative.dictionaryrepresentation.smrs.SMRS;
 import br.com.representative.lowrank.ksvd.KSvd;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -69,6 +68,7 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
@@ -80,6 +80,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Timer;
@@ -90,7 +91,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
+import kn.uni.voronoitreemap.datastructure.OpenList;
+import kn.uni.voronoitreemap.diagram.PowerDiagram;
+import kn.uni.voronoitreemap.j2d.PolygonSimple;
+import kn.uni.voronoitreemap.j2d.Site;
 
 /**
  *
@@ -117,6 +121,9 @@ public class Menu extends javax.swing.JFrame {
     private HierarchicalClustering hc;
     
     private ArrayList<ChangeRetangulo> cRetangulo = null;
+    
+    private Polygon[] diagrams = null;
+    
     /**
      * Creates new form Menu
      */
@@ -191,6 +198,7 @@ public class Menu extends javax.swing.JFrame {
         runDs3JMenuItem = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         ds3JMenuItem = new javax.swing.JMenuItem();
+        voronoiDiagramJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -498,6 +506,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu8.add(ds3JMenuItem);
+
+        voronoiDiagramJMenuItem.setText("View Voronoi Diagram");
+        voronoiDiagramJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                voronoiDiagramJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(voronoiDiagramJMenuItem);
 
         jMenuBar1.add(jMenu8);
 
@@ -1459,6 +1475,30 @@ public class Menu extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_nextDendogramJMenuItemActionPerformed
 
+    private void voronoiDiagramJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_voronoiDiagramJMenuItemActionPerformed
+        
+        if( view != null ) {
+            Polygon window = new Polygon();
+            int width = view.getSize().width-50;
+            int height = view.getSize().height-50;
+            window.addPoint(0, 0);
+            window.addPoint(width, 0);
+            window.addPoint(width, height);
+            window.addPoint(0, height);
+            
+            Point2D.Double[] points = new Point2D.Double[selectedRepresentatives.length];
+            for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+                int index = selectedRepresentatives[i];
+                points[i] = new Point2D.Double(rectangles.get(index).getCenterX(), rectangles.get(index).getCenterY());
+            }
+            
+            diagrams = Util.voronoiDiagram(window, points);
+            
+            view.cleanImage();
+            view.repaint();
+        }
+    }//GEN-LAST:event_voronoiDiagramJMenuItemActionPerformed
+
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1729,6 +1769,16 @@ public class Menu extends javax.swing.JFrame {
                         System.out.println(e.getMessage());
                     } 
                 }
+                
+                if( diagrams != null ) {                    
+                    g2Buffer.setColor(Color.RED);                            
+                    
+                    for( int i = 0; i < diagrams.length; ++i ) 
+                        g2Buffer.drawPolygon(diagrams[i]);                    
+                }
+                
+                
+                
                 g2Buffer.dispose();
                 
             } 
@@ -1835,6 +1885,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem sssJMenuItem;
     private javax.swing.JScrollPane telaJScrollPane;
     private javax.swing.JMenuItem viewSelectedJMenuItem;
+    private javax.swing.JMenuItem voronoiDiagramJMenuItem;
     private javax.swing.JMenuItem vpscJMenuItem;
     // End of variables declaration//GEN-END:variables
 }
