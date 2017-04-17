@@ -1476,8 +1476,8 @@ public class Util {
 
         for( int i = 0; i < points.length; ++i ) {
             Site site = new Site(points[i].x, points[i].y);
-            if( i == 0 )
-                site.setWeight(30);
+           /// if( i == 0 )
+           ///     site.setWeight(30);
             sites.add(site);
         }
 

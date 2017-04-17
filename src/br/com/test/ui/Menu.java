@@ -80,7 +80,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Timer;
@@ -91,10 +90,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import kn.uni.voronoitreemap.datastructure.OpenList;
-import kn.uni.voronoitreemap.diagram.PowerDiagram;
-import kn.uni.voronoitreemap.j2d.PolygonSimple;
-import kn.uni.voronoitreemap.j2d.Site;
 
 /**
  *
@@ -1450,10 +1445,13 @@ public class Menu extends javax.swing.JFrame {
             loadDataJMenuItemActionPerformed(null);
         
         double[][] distances = new double[rectangles.size()][rectangles.size()];
-        for( int i = 0; i < distances.length; ++i )
+        for( int i = 0; i < distances.length; ++i ) {
             for( int j = 0; j < distances[0].length; ++j )
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
-                
+        }
+        
+        
+        
         RepresentativeFinder ds3 = new DS3(distances, 0.12); // gives the best results 
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
@@ -1492,7 +1490,20 @@ public class Menu extends javax.swing.JFrame {
                 points[i] = new Point2D.Double(rectangles.get(index).getCenterX(), rectangles.get(index).getCenterY());
             }
             
-            diagrams = Util.voronoiDiagram(window, points);
+            Point2D.Double[] pointsHull = new Point2D.Double[rectangles.size()];
+            for( int i = 0; i < rectangles.size(); ++i )
+                pointsHull[i] = new Point2D.Double(rectangles.get(i).x, rectangles.get(i).y);           
+            Point2D.Double[] hull = Util.convexHull(pointsHull);
+            
+            
+            
+            
+            Polygon windowHull = new Polygon();
+            for( int i = 0; i < hull.length; ++i ) {
+                windowHull.addPoint((int)hull[i].x, (int)hull[i].y);
+                System.out.println(">> "+(int)hull[i].x+" <-> "+(int)hull[i].y);
+            }
+            diagrams = Util.voronoiDiagram(windowHull, points);
             
             view.cleanImage();
             view.repaint();
@@ -1776,7 +1787,6 @@ public class Menu extends javax.swing.JFrame {
                     for( int i = 0; i < diagrams.length; ++i ) 
                         g2Buffer.drawPolygon(diagrams[i]);                    
                 }
-                
                 
                 
                 g2Buffer.dispose();
