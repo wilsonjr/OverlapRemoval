@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package br.com.representative.ksvd;
+package br.com.representative.lowrank.ksvd;
 
 import Jama.Matrix;
 import br.com.methods.utils.Util;
