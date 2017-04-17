@@ -10,11 +10,12 @@
 
 package br.com.overlayanalisys.sizeincrease;
 
+import br.com.methods.utils.GrahamScan;
+import br.com.methods.utils.Point2D;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
 import br.com.overlayanalisys.definition.Metric;
 import java.awt.Polygon;
-import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Iterator;
 

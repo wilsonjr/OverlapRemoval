@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package br.com.overlayanalisys.sizeincrease;
+package br.com.methods.utils;
 
 import java.util.Arrays;
 import java.util.Stack;
@@ -26,7 +26,6 @@ import java.util.Stack;
  */
 public class GrahamScan {
     private Stack<Point2D> hull = new Stack<>();
-
     /**
      * Computes the convex hull of the specified array of points.
      *
@@ -84,10 +83,17 @@ public class GrahamScan {
      */
     public Iterable<Point2D> hull() {
         Stack<Point2D> s = new Stack<>();
-        for (Point2D p : hull) s.push(p);
+        for (Point2D p : hull) 
+            s.push(p);
+        
         return s;
     }
 
+    public int size() {
+        return hull.size();
+    }
+    
+    
     // check that boundary of hull is strictly convex
     private boolean isConvex() {
         int N = hull.size();

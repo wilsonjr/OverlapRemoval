@@ -5,11 +5,14 @@ import br.com.methods.overlap.prism.PRISMEdge;
 import br.com.methods.overlap.prism.PRISMPoint;
 import br.com.methods.overlap.prism.SetPoint;
 import br.com.methods.overlap.vpsc.Event;
+import com.sun.org.apache.xerces.internal.xni.grammars.Grammar;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -1473,7 +1476,8 @@ public class Util {
 
         for( int i = 0; i < points.length; ++i ) {
             Site site = new Site(points[i].x, points[i].y);
-            // site.setWeight(30);
+            if( i == 0 )
+                site.setWeight(30);
             sites.add(site);
         }
 
@@ -1494,6 +1498,26 @@ public class Util {
         
         return polygons;
     }
+    
+    public static Point2D.Double[] convexHull(Point2D.Double[] pts) {
+        br.com.methods.utils.Point2D[] points = new br.com.methods.utils.Point2D[pts.length];
+        for( int i = 0; i < points.length; ++i )
+            points[i] = new br.com.methods.utils.Point2D(pts[i].x, pts[i].y);
+        
+        GrahamScan gs = new GrahamScan(points);
+        Point2D.Double[] hull = new Point2D.Double[gs.size()];
+        int i = 0;
+        Iterator<br.com.methods.utils.Point2D> it1 = gs.hull().iterator();        
+        while( it1.hasNext() ) {
+            br.com.methods.utils.Point2D pp = it1.next();
+            hull[i++] = new Point2D.Double(pp.x(), pp.y());
+        }
+        
+        return hull;
+    }
+    
+    
+    
     
     
     

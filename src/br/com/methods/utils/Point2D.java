@@ -4,9 +4,8 @@
  * and open the template in the editor.
  */
 
-package br.com.overlayanalisys.sizeincrease;
+package br.com.methods.utils;
 
-import java.util.Arrays;
 import java.util.Comparator;
 
 
