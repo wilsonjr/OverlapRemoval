@@ -8,6 +8,7 @@ package br.com.representative.ksvd;
 
 import Jama.Matrix;
 import br.com.methods.utils.Util;
+import br.com.representative.RepresentativeFinder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,13 +21,11 @@ import org.ejml.interfaces.decomposition.SingularValueDecomposition;
  *
  * @author wilson
  */
-public class KSvd {
-    private double[][] items;
-    private int dictsize;
-    private double[] ans;
+public class KSvd extends RepresentativeFinder {
+    private final double[][] items;
+    private final int dictsize;
     private double[][] D;
-    private double[][] itemsc;
-    private int[] representatives;
+    private final double[][] itemsc;
     
     public KSvd(List<? extends List<Double>> items, int dictsize) {
         this.items = Util.elementMatrix(items);
@@ -34,12 +33,13 @@ public class KSvd {
         this.dictsize = dictsize;
     }
     
+    @Override
     public void execute() {
         
         D = initialDict();        
         int maxiter = 30, n = D.length;
         
-        double[] gamma = null;
+        double[] gamma;
         double[] y = new double[n];
         double previousError = 0, error = 0;
         int count;
@@ -108,7 +108,7 @@ public class KSvd {
                       //  System.out.println("Finished step 4");
                         
                     } else {
-                        System.out.println("It doesn't perform SVD.");
+                        System.err.println("It doesn't perform SVD.");
                         return;
                     }
                  //   System.out.println("Finished step 4");
@@ -122,11 +122,10 @@ public class KSvd {
             
         }
                
-        
-        System.out.println("K-SVD execution finished with "+count+" iteration(s)");
-        System.out.println("Forming representatives...");
+        System.err.println("K-SVD execution finished with "+count+" iteration(s)");
+        System.err.println("Selecting representatives...");
         formRepresentatives();
-        System.out.println("Done.");
+        System.err.println("Done.");
         
     }
 
@@ -233,10 +232,6 @@ public class KSvd {
         return copy;
     }
     
-    public int[] getRepresentatives() {
-        return representatives;
-    }
-
     private void formRepresentatives() {
         int count = 0;
         representatives = new int[D[0].length];
@@ -256,8 +251,6 @@ public class KSvd {
                     index = k;
                 }
             }
-            
-            System.out.println(">> "+index);
             representatives[count++] = index;            
         }
     }

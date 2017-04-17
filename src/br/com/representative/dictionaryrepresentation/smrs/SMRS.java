@@ -13,6 +13,7 @@ package br.com.representative.dictionaryrepresentation.smrs;
  */
 
 import br.com.methods.utils.Util;
+import br.com.representative.RepresentativeFinder;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,27 +21,26 @@ import java.util.List;
  *
  * @author Windows
  */
-public class SMRS {
+public class SMRS extends RepresentativeFinder {
     
     private final double[][] items;
-    private int[] representatives;
     
     public SMRS(List<? extends List<Double>> items) {
         this.items = Util.elementMatrix(items);
     }
     
+    @Override
     public void execute() {
        
         // setting up some parameters, using parameters proposed by the author of the technique
         double alpha = 5;
-        double r = 0;
         int q = 2;
         
         double[] regParam = {alpha, alpha};
         boolean affine = true;
         double thr = Math.pow(10, -7);
         int maxIter = 5000;
-        double thrS = 0.99, thrP = 0.95;
+        double thrS = 0.99;
         int N = items[0].length;
         
         double[][] Y = Arrays.stream(items)
@@ -54,12 +54,6 @@ public class SMRS {
         double[][] C = almLasso(Y, affine, regParam, q, thr, maxIter);
         
         representatives = findRep(C, thrS, q);
-        
-        System.out.println("sInd = \n");
-        for( int i = 0; i < representatives.length; ++i )
-            System.out.printf("   %d", representatives[i]+1);
-        System.out.println();
-//        
     }
 
     private double[][] almLasso(double[][] Y, boolean affine, double[] alpha, int q, double thr, int maxIter) {
@@ -182,7 +176,7 @@ public class SMRS {
     private double computeLambda(double[][] Y, boolean affine) {
         
         int n = Y[0].length;
-        double lambda = 0;
+        double lambda;
         
         if( !affine ) {
             double[] T = new double[n];
@@ -263,11 +257,7 @@ public class SMRS {
         
         return error/(C.length*C[0].length);
     }
-    
-    public int[] getRepresentatives() {
-        return representatives;
-    }
-    
+        
     private class Item {
         public double value;
         public int index;

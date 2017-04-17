@@ -7,6 +7,7 @@
 package br.com.representative.csm;
 
 import br.com.methods.utils.Util;
+import br.com.representative.RepresentativeFinder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.ejml.data.DenseMatrix64F;
@@ -18,12 +19,11 @@ import org.ejml.interfaces.decomposition.SingularValueDecomposition;
  *
  * @author wilson
  */
-public class CSM {
+public class CSM extends RepresentativeFinder {
     
-    private ArrayList<ArrayList<Double>> items;
+    private final ArrayList<ArrayList<Double>> items;
     private int c, k;
     private IndexPI[] columns;
-    private int[] indexes;
     
     public CSM(ArrayList<ArrayList<Double>> items, int c, int k) {
         this.items = items;
@@ -31,8 +31,8 @@ public class CSM {
         this.k = k; // k == n give better results
     }
     
-    public void execute() {
-     
+    @Override
+    public void execute() {     
         Matrix vT = decomposeAndGetVt();        
         
         columns = new IndexPI[vT.getNumCols()];
@@ -58,13 +58,9 @@ public class CSM {
     private void createIndexes() {
         Arrays.sort(columns);
         
-        indexes = new int[c];
+        representatives = new int[c];
         for( int i = 0; i < c; ++i )
-            indexes[i] = columns[i].index;
-    }
-
-    public int[] getRepresentatives() {
-        return indexes;
+            representatives[i] = columns[i].index;
     }
     
     private class IndexPI implements Comparable<IndexPI> {

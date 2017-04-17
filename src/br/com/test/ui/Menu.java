@@ -50,6 +50,7 @@ import br.com.methods.utils.RetanguloVis;
 import br.com.methods.utils.Util;
 import br.com.projection.spacereduction.ContextPreserving;
 import br.com.representative.Dijsktra;
+import br.com.representative.RepresentativeFinder;
 import br.com.representative.csm.CSM;
 import br.com.representative.dictionaryrepresentation.ds3.DS3;
 import br.com.representative.dictionaryrepresentation.smrs.SMRS;
@@ -1391,8 +1392,8 @@ public class Menu extends javax.swing.JFrame {
             @Override
             public void run() {
                 iImage = i; 
-                DS3 ds3 = new DS3(distances);
-                ds3.execute(i);
+                DS3 ds3 = new DS3(distances, i);
+                ds3.execute();
                 selectedRepresentatives = ds3.getRepresentatives();
                 
                 view.cleanImage();
@@ -1414,8 +1415,8 @@ public class Menu extends javax.swing.JFrame {
             for( int j = 0; j < distances[0].length; ++j )
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
                 
-        DS3 ds3 = new DS3(distances);
-        ds3.execute(0.12); // gives the best results 
+        RepresentativeFinder ds3 = new DS3(distances, 0.12); // gives the best results 
+        ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
         
         if( view != null ) {
@@ -1539,7 +1540,6 @@ public class Menu extends javax.swing.JFrame {
             if( imageBuffer == null ) {
                 adjustPanel();
                 setPreferredSize(getSize());
-                System.out.println("olaaa");
                 this.imageBuffer = new BufferedImage(getSize().width, getSize().height, BufferedImage.TYPE_INT_RGB);
 
                 java.awt.Graphics2D g2Buffer = this.imageBuffer.createGraphics();

@@ -13,6 +13,7 @@ package br.com.representative.dictionaryrepresentation.ds3;
  */
 
 import br.com.methods.utils.Util;
+import br.com.representative.RepresentativeFinder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,16 +22,22 @@ import java.util.List;
  *
  * @author Windows
  */
-public class DS3 {
+public class DS3 extends RepresentativeFinder {
     
     private final double[][] D;
-    private int[] representatives;
+    private double alpha;
     
     public DS3(double[][] D) {
-        this.D = D;
+        this(D, 0.12);
     }
-   
-    public void execute(double alpha) {
+    
+    public DS3(double[][] D, double alpha) {
+        this.D = D;
+        this.alpha = alpha;
+    }
+       
+    @Override
+    public void execute() {
         double max = Double.MIN_VALUE;
         
         for( int i = 0; i < D.length; ++i )
@@ -46,7 +53,6 @@ public class DS3 {
         Arrays.fill(CFD, 1.0);
         double[] rhov = computeRegularizer(D, p);
         double rho = rhov[1]*alpha;
-        System.out.println("rho: "+rho);
         double mu = Math.pow(10, -1);
         int maxIter = 3000;
         double errThr = Math.pow(10, -5);        
@@ -89,15 +95,14 @@ public class DS3 {
             
             if( k >= maxIter || (err1 <= errThr && err2 <= errThr) ) {
                 terminate = true;
-                System.out.printf("Terminating: \n");
                 formRepresentatives(C2);
-                System.out.println("||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");
+                System.err.println("Finishing: ||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");
             } else {
                 k++;
-                if( k%100 == 0 ) {
+                /*if( k%100 == 0 ) {
                     formRepresentatives(C2);
-                    System.out.println("||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");       
-                }
+                    System.err.println("||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");       
+                }*/
             }
             
             C1 = C2;
@@ -229,10 +234,7 @@ public class DS3 {
         
         return error/(C.length*C[0].length);
     }
-    
-    public int[] getRepresentatives() {
-        return representatives;
-    }
+   
 
     private void formRepresentatives(double[][] C) {
         double ratio = 0.1;
