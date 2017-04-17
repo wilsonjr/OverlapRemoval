@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.datamining.clustering.Hierarchical;
+package br.com.representative.clustering.hierarchical;
 
 import java.util.List;
 

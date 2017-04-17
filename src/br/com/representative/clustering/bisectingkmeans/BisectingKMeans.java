@@ -4,11 +4,12 @@
  * and open the template in the editor.
  */
 
-package br.com.dataming.clustering.BisectingKMeans;
+package br.com.representative.clustering.bisectingkmeans;
 
 import br.com.datamining.clustering.InitialMedoidApproach;
-import br.com.datamining.clustering.KMeans.KMeans;
+import br.com.representative.clustering.kmeans.KMeans;
 import br.com.methods.utils.Util;
+import br.com.representative.RepresentativeFinder;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,14 +19,14 @@ import java.util.Map;
  *
  * @author wilson
  */
-public class BisectingKMeans {
+public class BisectingKMeans extends RepresentativeFinder {
     
     private InitialMedoidApproach initialGuess;
     private ArrayList<Point.Double> items;
     private ArrayList<ArrayList<Integer>> clusters;
     private int K;
     private Point.Double[] centroids;
-    private int ITER = 10;
+    private final int ITER = 10;
     
     
     public BisectingKMeans(ArrayList<Point.Double> items, InitialMedoidApproach initialGuess, int k) {
@@ -37,6 +38,7 @@ public class BisectingKMeans {
         this.K = k;
     }
     
+    @Override
     public void execute() {
         // we start with the whole data as a cluster 
         clusters = new ArrayList<>();
@@ -63,9 +65,11 @@ public class BisectingKMeans {
             
             clusters.remove(index);            
             clusters.add(chosenSplit.get(0));
-            clusters.add(chosenSplit.get(1));
-            
+            clusters.add(chosenSplit.get(1));            
         }
+        
+        
+        representatives = Util.selectRepresentatives(clusters, items);
     }
     
     public Point.Double[] getCentroids() {

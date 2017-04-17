@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.datamining.clustering.KMedoid;
+package br.com.representative.clustering.kmedoid;
 
 import br.com.datamining.clustering.InitialMedoidApproach;
 import br.com.methods.utils.Util;
+import br.com.representative.RepresentativeFinder;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +16,7 @@ import java.util.Arrays;
  *
  * @author Windows
  */
-public class KMedoid {
+public class KMedoid extends RepresentativeFinder {
     
     private ArrayList<Point.Double> items;
     private InitialMedoidApproach initialGuessApproach;
@@ -31,6 +32,7 @@ public class KMedoid {
         this.K = k;
     }
     
+    @Override
     public void execute() {
         Point.Double[] newGuess = initialGuessApproach.getInitialGuess(items, K);
         Point.Double[] oldGuess = null;
@@ -87,6 +89,9 @@ public class KMedoid {
             
             
         } while( !Arrays.equals(oldGuess, newGuess) && iter++ < maxIterations );
+        
+        
+        representatives = Util.selectRepresentatives(newGuess, items);
     }
     
     public ArrayList<ArrayList<Integer>> getClusters() {

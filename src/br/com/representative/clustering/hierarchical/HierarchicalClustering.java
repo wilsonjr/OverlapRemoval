@@ -4,8 +4,11 @@
  * and open the template in the editor.
  */
 
-package br.com.datamining.clustering.Hierarchical;
+package br.com.representative.clustering.hierarchical;
 
+import br.com.methods.utils.Util;
+import br.com.representative.RepresentativeFinder;
+import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,17 +21,17 @@ import java.util.PriorityQueue;
  *
  * @author wilson
  */
-public class HierarchicalClustering {
+public class HierarchicalClustering extends RepresentativeFinder {
     
-    private ArrayList<Cluster> clusters, backup;
-    private ArrayList<? extends Rectangle2D.Double> items;
+    private ArrayList<Cluster> clusters;
+    private ArrayList<Point.Double> items;
     private PriorityQueue<Linkage> linkages;
     private Map<String, Linkage> linkageMap;
     private LinkageStrategy linkageStrategy;
     private ArrayList<ArrayList<ArrayList<Integer>>> clusterHierarchy;
-            
+    private int dendogramLevel = 0;
     
-    public HierarchicalClustering(ArrayList<? extends Rectangle2D.Double> items, LinkageStrategy linkageStrategy) {                
+    public HierarchicalClustering(ArrayList<Point.Double> items, LinkageStrategy linkageStrategy) {                
         if( items == null )
             throw new NullPointerException("Data cannot be null");
         
@@ -36,6 +39,7 @@ public class HierarchicalClustering {
         this.linkageStrategy = linkageStrategy;
     }
     
+    @Override
     public void execute() {
         // 1. create one cluster for each element
         createClusters(items);
@@ -46,6 +50,8 @@ public class HierarchicalClustering {
         // 3. extract a pair of clusters with the smallest distance
         agglomerate();
         Collections.reverse(clusterHierarchy);
+        
+        
     }
 
     private void agglomerate() {
@@ -108,7 +114,7 @@ public class HierarchicalClustering {
     }
 
     
-    private void createClusters(ArrayList<? extends Rectangle2D.Double> items) {
+    private void createClusters(ArrayList<Point.Double> items) {
         clusters = new ArrayList<>();      
         clusterHierarchy = new ArrayList<>();
         clusterHierarchy.add(new ArrayList<>());
@@ -152,9 +158,17 @@ public class HierarchicalClustering {
         clusters.get(0).print("");
     }
     
-    public ArrayList<ArrayList<ArrayList<Integer>>> getClusterHierarchy() {
-        
+    public ArrayList<ArrayList<ArrayList<Integer>>> getClusterHierarchy() {        
         return clusterHierarchy;
     }
     
+    public void setDendogramLevel(int dendogramLevel) {
+        this.dendogramLevel = dendogramLevel % clusterHierarchy.size();
+    }
+    
+    @Override
+    public int[] getRepresentatives() {
+        representatives = Util.selectRepresentatives(clusterHierarchy.get(dendogramLevel), items);
+        return representatives;
+    }
 }

@@ -19,13 +19,13 @@
 package br.com.test.ui;
 
 
-import br.com.dataming.clustering.BisectingKMeans.BisectingKMeans;
-import br.com.dataming.clustering.Dbscan.Dbscan;
+import br.com.representative.clustering.bisectingkmeans.BisectingKMeans;
+import br.com.representative.clustering.dbscan.Dbscan;
 import br.com.datamining.clustering.FarPointsMedoidApproach;
-import br.com.datamining.clustering.Hierarchical.HierarchicalClustering;
-import br.com.datamining.clustering.Hierarchical.SingleLinkageStrategy;
-import br.com.datamining.clustering.KMeans.KMeans;
-import br.com.datamining.clustering.KMedoid.KMedoid;
+import br.com.representative.clustering.hierarchical.HierarchicalClustering;
+import br.com.representative.clustering.hierarchical.SingleLinkageStrategy;
+import br.com.representative.clustering.kmeans.KMeans;
+import br.com.representative.clustering.kmedoid.KMedoid;
 import br.com.datamining.clustering.RandomMedoidApproach;
 import br.com.test.draw.color.GrayScale;
 import br.com.test.draw.color.RainbowScale;
@@ -114,6 +114,7 @@ public class Menu extends javax.swing.JFrame {
     private int[] selectedRepresentatives = null;
     private boolean hideShowNumbers = false;
     private double iImage = 0;
+    private HierarchicalClustering hc;
     
     private ArrayList<ChangeRetangulo> cRetangulo = null;
     /**
@@ -171,11 +172,13 @@ public class Menu extends javax.swing.JFrame {
         jMenu4 = new javax.swing.JMenu();
         extractParametersJMenuItem = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
-        hierarchicalClusteringJMenuItem = new javax.swing.JMenuItem();
         kMeansJMenuItem = new javax.swing.JMenuItem();
         kMedoidJMenuItem = new javax.swing.JMenuItem();
         bisectingKMeansJMenuItem = new javax.swing.JMenuItem();
         dbscanJMenuItem = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
+        hierarchicalClusteringJMenuItem = new javax.swing.JMenuItem();
+        nextDendogramJMenuItem = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         incrementJMenuItem = new javax.swing.JMenuItem();
         decrementJMenuItem = new javax.swing.JMenuItem();
@@ -366,14 +369,6 @@ public class Menu extends javax.swing.JFrame {
 
         jMenu6.setText("Clustering");
 
-        hierarchicalClusteringJMenuItem.setText("Hierarchical Clustering");
-        hierarchicalClusteringJMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                hierarchicalClusteringJMenuItemActionPerformed(evt);
-            }
-        });
-        jMenu6.add(hierarchicalClusteringJMenuItem);
-
         kMeansJMenuItem.setText("k-means");
         kMeansJMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -405,6 +400,23 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu6.add(dbscanJMenuItem);
+        jMenu6.add(jSeparator3);
+
+        hierarchicalClusteringJMenuItem.setText("Hierarchical Clustering");
+        hierarchicalClusteringJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hierarchicalClusteringJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu6.add(hierarchicalClusteringJMenuItem);
+
+        nextDendogramJMenuItem.setText("Next Dendrogram Level");
+        nextDendogramJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nextDendogramJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu6.add(nextDendogramJMenuItem);
 
         jMenuBar1.add(jMenu6);
 
@@ -1158,13 +1170,21 @@ public class Menu extends javax.swing.JFrame {
 
     private void hierarchicalClusteringJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hierarchicalClusteringJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        HierarchicalClustering hc = new HierarchicalClustering(rects, new SingleLinkageStrategy());        
+        ArrayList<Point.Double> points = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i )
+            points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+        hc = new HierarchicalClustering(points, new SingleLinkageStrategy());        
         hc.execute();
         
-        clusters = hc.getClusterHierarchy();
-        currentCluster = clusters.get(0);
-        view.cleanImage();
-        view.repaint();
+        nivelDendrogram = 0;
+        hc.setDendogramLevel(nivelDendrogram);
+        selectedRepresentatives = hc.getRepresentatives();
+        //clusters = hc.getClusterHierarchy();
+        //currentCluster = clusters.get(0);
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
     }//GEN-LAST:event_hierarchicalClusteringJMenuItemActionPerformed
 
     private void incrementJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_incrementJMenuItemActionPerformed
@@ -1189,12 +1209,15 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
                 
-        KMeans kmeans = new KMeans(points, new FarPointsMedoidApproach(), 3);
+        RepresentativeFinder kmeans = new KMeans(points, new FarPointsMedoidApproach(), 3);
         kmeans.execute();
-        currentCluster = kmeans.getClusters();        
+        ///currentCluster = kmeans.getClusters();        
+        selectedRepresentatives = kmeans.getRepresentatives();
         
-        view.cleanImage();
-        view.repaint();
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
     }//GEN-LAST:event_kMeansJMenuItemActionPerformed
 
     private void kMedoidJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kMedoidJMenuItemActionPerformed
@@ -1203,12 +1226,15 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
                 
-        KMedoid kmedoid = new KMedoid(points, new FarPointsMedoidApproach(), 2);
+        RepresentativeFinder kmedoid = new KMedoid(points, new FarPointsMedoidApproach(), 4);
         kmedoid.execute();
-        currentCluster = kmedoid.getClusters();        
+        //currentCluster = kmedoid.getClusters();        
+        selectedRepresentatives = kmedoid.getRepresentatives();
         
-        view.cleanImage();
-        view.repaint();
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
     }//GEN-LAST:event_kMedoidJMenuItemActionPerformed
 
     private void bisectingKMeansJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bisectingKMeansJMenuItemActionPerformed
@@ -1217,12 +1243,15 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
         
-        BisectingKMeans bkmeans = new BisectingKMeans(points, new RandomMedoidApproach(), 2);
+        RepresentativeFinder bkmeans = new BisectingKMeans(points, new RandomMedoidApproach(), 4);
         bkmeans.execute();
-        currentCluster = bkmeans.getClusters();
+        //currentCluster = bkmeans.getClusters();
+        selectedRepresentatives = bkmeans.getRepresentatives();
         
-        view.cleanImage();
-        view.repaint();
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
     }//GEN-LAST:event_bisectingKMeansJMenuItemActionPerformed
 
     private void dbscanJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbscanJMenuItemActionPerformed
@@ -1231,21 +1260,15 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
         
-        for( int i = 0; i < rects.size(); ++i ) {
-            for( int j = 0; j < rects.size(); ++j )
-                System.out.printf("%.2f ",Util.euclideanDistance(points.get(i).x, points.get(i).y, 
-                        points.get(j).x, points.get(j).y));
-            System.out.println();
-        }
-        
-        Dbscan dbscan = new Dbscan(points);
-        dbscan.setEpsilon(100);
-        dbscan.setMinPts(2);
+        RepresentativeFinder dbscan = new Dbscan(points, 100, 2);
         dbscan.execute();
-        currentCluster = dbscan.getClusters();
+        //currentCluster = dbscan.getClusters();
+        selectedRepresentatives = dbscan.getRepresentatives();
         
-        view.cleanImage();
-        view.repaint();
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
     }//GEN-LAST:event_dbscanJMenuItemActionPerformed
 
     private void csmJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_csmJMenuItemActionPerformed
@@ -1424,6 +1447,17 @@ public class Menu extends javax.swing.JFrame {
             view.repaint();
         }
     }//GEN-LAST:event_runDs3JMenuItemActionPerformed
+
+    private void nextDendogramJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextDendogramJMenuItemActionPerformed
+        hc.setDendogramLevel(++nivelDendrogram);
+        selectedRepresentatives = hc.getRepresentatives();
+        //clusters = hc.getClusterHierarchy();
+        //currentCluster = clusters.get(0);
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
+    }//GEN-LAST:event_nextDendogramJMenuItemActionPerformed
 
     
     public double getMaxDistance() {
@@ -1777,6 +1811,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator10;
     private javax.swing.JPopupMenu.Separator jSeparator11;
     private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator8;
     private javax.swing.JPopupMenu.Separator jSeparator9;
     private javax.swing.JMenuItem kMeansJMenuItem;
@@ -1785,6 +1820,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem limparJMenuItem;
     private javax.swing.JMenuItem loadDataJMenuItem;
     private javax.swing.JMenuItem mstJMenuItem;
+    private javax.swing.JMenuItem nextDendogramJMenuItem;
     private javax.swing.JMenuItem omniJMenuItem;
     private javax.swing.JMenuItem prismJMenuItem;
     private javax.swing.JMenuItem projSnippetJMenuItem;

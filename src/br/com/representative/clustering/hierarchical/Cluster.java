@@ -4,9 +4,10 @@
  * and open the template in the editor.
  */
 
-package br.com.datamining.clustering.Hierarchical;
+package br.com.representative.clustering.hierarchical;
 
 import br.com.methods.utils.Util;
+import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,18 +18,18 @@ import java.util.List;
  */
 public class Cluster {
     private String id;
-    private ArrayList<Rectangle2D.Double> points = new ArrayList<>();
+    private ArrayList<Point.Double> points = new ArrayList<>();
     private ArrayList<Cluster> sons = new ArrayList<>();
     private Cluster parent;
     private HierarchicalClustering hc;
     
-    public Cluster(Rectangle2D.Double r, int id) {
+    public Cluster(Point.Double r, int id) {
         parent = null;
         points.add(r);
         this.id = String.valueOf(id);
     }
     
-    public Cluster(Rectangle2D.Double r, int id, HierarchicalClustering hc) {
+    public Cluster(Point.Double r, int id, HierarchicalClustering hc) {
         this(r, id);
         this.hc = hc;
     }
@@ -51,11 +52,11 @@ public class Cluster {
         return sons;
     }
     
-    public void addPoints(List<Rectangle2D.Double> p) {        
+    public void addPoints(List<Point.Double> p) {        
         points.addAll(p);
     }
     
-    public List<Rectangle2D.Double> getPoints() {
+    public List<Point.Double> getPoints() {
         return points;
     }
     

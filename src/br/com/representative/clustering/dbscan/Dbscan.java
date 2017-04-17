@@ -4,9 +4,10 @@
  * and open the template in the editor.
  */
 
-package br.com.dataming.clustering.Dbscan;
+package br.com.representative.clustering.dbscan;
 
 import br.com.methods.utils.Util;
+import br.com.representative.RepresentativeFinder;
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -14,7 +15,7 @@ import java.util.ArrayList;
  *
  * @author wilson
  */
-public class Dbscan {
+public class Dbscan extends RepresentativeFinder {
     
     private ArrayList<Point.Double> items;
     private ArrayList<ArrayList<Integer>> clusters;
@@ -23,7 +24,7 @@ public class Dbscan {
     private double epsilon;
     private int minPts;
     
-    public Dbscan(ArrayList<Point.Double> items) {
+    public Dbscan(ArrayList<Point.Double> items, double epsilon, int minPts) {
         if( items == null )
             throw new NullPointerException("Data cannot be null");
         
@@ -32,6 +33,8 @@ public class Dbscan {
         for( int i = 0; i < this.items.size(); ++i )
             this.points.add(new DbscanPoint(this.items.get(i)));        
         this.currentCluster = 0;
+        this.epsilon = epsilon;
+        this.minPts = minPts;
     }
     
     public void setEpsilon(double epsilon) {
@@ -42,6 +45,7 @@ public class Dbscan {
         this.minPts = minPts;
     }
     
+    @Override
     public void execute() {
        
         for( int i = 0; i < points.size(); ++i ) {
@@ -60,7 +64,10 @@ public class Dbscan {
        
         for( int i = 0; i < points.size(); ++i )
             if( points.get(i).processed() )
-                clusters.get(points.get(i).cluster).add(i);       
+                clusters.get(points.get(i).cluster).add(i);  
+        
+        
+        representatives = Util.selectRepresentatives(clusters, items);
     }
 
     private void tryExpand(DbscanPoint p) {

@@ -199,14 +199,6 @@
             <Property name="text" type="java.lang.String" value="Clustering"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="hierarchicalClusteringJMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Hierarchical Clustering"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hierarchicalClusteringJMenuItemActionPerformed"/>
-              </Events>
-            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="kMeansJMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="k-means"/>
@@ -237,6 +229,24 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dbscanJMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator3">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="hierarchicalClusteringJMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Hierarchical Clustering"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hierarchicalClusteringJMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="nextDendogramJMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Next Dendrogram Level"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nextDendogramJMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>

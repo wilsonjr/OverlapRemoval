@@ -1406,6 +1406,57 @@ public class Util {
         
         return filtered;
     }
+
+    public static int[] selectRepresentatives(Point2D.Double[] centroids, List<Point2D.Double> items) {
+        int[] indexes = new int[centroids.length];
+        
+        for( int i = 0; i < centroids.length; ++i ) {
+            double distance = Util.euclideanDistance(items.get(0).x, items.get(0).y, centroids[i].x, centroids[i].y);
+            int index = 0;
+            
+            for( int j = 1; j < items.size(); ++j ) {
+                
+                double dj = Util.euclideanDistance(items.get(j).x, items.get(j).y, centroids[i].x, centroids[i].y);
+                if( dj < distance ) {
+                    index = j;
+                    distance = dj;
+                }                
+            }
+            
+            indexes[i] = index;
+            
+        }
+        
+        return indexes;
+    }
+    
+    public static int[] selectRepresentatives(ArrayList<ArrayList<Integer>> clusters, ArrayList<Point2D.Double> items) {
+        int[] indexes = new int[clusters.size()];
+        
+        for( int i = 0; i < clusters.size(); ++i ) {
+            
+            List<Point2D.Double> itemsInCluster = new ArrayList<>();
+            Point2D.Double[] centroid = new Point2D.Double[1];
+            centroid[0] = new Point2D.Double(0, 0);
+                        
+            for( int j = 0; j < clusters.get(i).size(); ++j ) {                
+                int index = clusters.get(i).get(j);
+                
+                centroid[0].x += items.get(index).x;
+                centroid[0].y += items.get(index).y;
+                
+                itemsInCluster.add(items.get(index));
+            }
+            
+            centroid[0].x /= (double) clusters.get(i).size();
+            centroid[0].y /= (double) clusters.get(i).size();
+            
+            int[] index = Util.selectRepresentatives(centroid, itemsInCluster);
+            indexes[i] = index[0];
+        }
+        
+        return indexes;
+    }
     
     
     
