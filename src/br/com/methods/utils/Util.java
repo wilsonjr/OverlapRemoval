@@ -9,7 +9,9 @@ import java.awt.Polygon;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,8 @@ import kn.uni.voronoitreemap.datastructure.OpenList;
 import kn.uni.voronoitreemap.diagram.PowerDiagram;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
 import kn.uni.voronoitreemap.j2d.Site;
+import math.geom2d.polygon.Polygons2D;
+import math.geom2d.polygon.SimplePolygon2D;
 
 /**
  * Classe utilizada para auxiliar nos métodos de remoção de sobreposição.
@@ -1512,6 +1516,47 @@ public class Util {
         }
         
         return hull;
+    }
+
+    public static Polygon[] clipBounds(Polygon[] diagrams, Point2D.Double[] pts) {
+        
+        SimplePolygon2D p1 = new SimplePolygon2D();
+        for( int i = 0; i < pts.length; ++i ) {
+            p1.addVertex(new math.geom2d.Point2D(pts[i].x, pts[i].y));
+        }
+       
+        
+        Polygon[] intersects = new Polygon[diagrams.length];
+        for( int i = 0; i < diagrams.length; ++i ) {
+            SimplePolygon2D p2 = new SimplePolygon2D();
+            if( diagrams[i] != null ) {
+                for( int j = 0; j < diagrams[i].xpoints.length; ++j )
+                    p2.addVertex(new math.geom2d.Point2D(diagrams[i].xpoints[j], diagrams[i].ypoints[j]));
+                SimplePolygon2D p = (SimplePolygon2D) Polygons2D.intersection(p1, p2);
+                intersects[i] = new Polygon();
+                for( math.geom2d.Point2D point: p.vertices() )
+                    intersects[i].addPoint((int)point.x(), (int)point.y());
+            } else
+                System.out.println("diagrams[i] null!");
+        }
+        
+        
+        return intersects;
+    }
+
+    public static int[] distinct(int[] selectedRepresentatives, Point2D.Double[] points, int size) {
+        
+        Arrays.sort(points, (Point2D.Double a, Point2D.Double b) -> {
+            int c = new Double(a.x).compareTo(b.x);
+            if( c == 0 )
+                new Double(a.y).compareTo(b.y);                
+            return c;
+        });
+        
+        
+        
+        
+        return null;
     }
     
     

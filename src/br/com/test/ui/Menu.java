@@ -78,12 +78,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -118,6 +121,8 @@ public class Menu extends javax.swing.JFrame {
     private ArrayList<ChangeRetangulo> cRetangulo = null;
     
     private Polygon[] diagrams = null;
+    private Polygon hullPolygon = null;
+    private Polygon[] intersects = null;
     
     /**
      * Creates new form Menu
@@ -1444,10 +1449,12 @@ public class Menu extends javax.swing.JFrame {
         if( rectangles == null )
             loadDataJMenuItemActionPerformed(null);
         
+        Point2D.Double[] points = new Point2D.Double[rectangles.size()];
         double[][] distances = new double[rectangles.size()][rectangles.size()];
         for( int i = 0; i < distances.length; ++i ) {
             for( int j = 0; j < distances[0].length; ++j )
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
+            points[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
         }
         
         
@@ -1456,6 +1463,8 @@ public class Menu extends javax.swing.JFrame {
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
         
+        
+        selectedRepresentatives = Util.distinct(selectedRepresentatives, points, 0);
         if( view != null ) {
             view.cleanImage();
             view.repaint();
@@ -1475,14 +1484,15 @@ public class Menu extends javax.swing.JFrame {
 
     private void voronoiDiagramJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_voronoiDiagramJMenuItemActionPerformed
         
-        if( view != null ) {
+        if( view != null && selectedRepresentatives != null ) {
             Polygon window = new Polygon();
-            int width = view.getSize().width-50;
-            int height = view.getSize().height-50;
+            int width = view.getSize().width;
+            int height = view.getSize().height;
             window.addPoint(0, 0);
             window.addPoint(width, 0);
             window.addPoint(width, height);
             window.addPoint(0, height);
+            
             
             Point2D.Double[] points = new Point2D.Double[selectedRepresentatives.length];
             for( int i = 0; i < selectedRepresentatives.length; ++i ) {
@@ -1490,20 +1500,23 @@ public class Menu extends javax.swing.JFrame {
                 points[i] = new Point2D.Double(rectangles.get(index).getCenterX(), rectangles.get(index).getCenterY());
             }
             
+            int n = (int)Arrays.stream(points).distinct().count();
+            Iterator<Point2D.Double> it = Arrays.stream(points).distinct().iterator();
+            int k = 0;
+            points = new Point2D.Double[n];
+            while( it.hasNext() ) {
+                Point2D.Double p = it.next();
+                points[k++] = p;
+            }
+            
             Point2D.Double[] pointsHull = new Point2D.Double[rectangles.size()];
             for( int i = 0; i < rectangles.size(); ++i )
-                pointsHull[i] = new Point2D.Double(rectangles.get(i).x, rectangles.get(i).y);           
+                pointsHull[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());           
             Point2D.Double[] hull = Util.convexHull(pointsHull);
             
+            diagrams = Util.voronoiDiagram(window, points);
             
-            
-            
-            Polygon windowHull = new Polygon();
-            for( int i = 0; i < hull.length; ++i ) {
-                windowHull.addPoint((int)hull[i].x, (int)hull[i].y);
-                System.out.println(">> "+(int)hull[i].x+" <-> "+(int)hull[i].y);
-            }
-            diagrams = Util.voronoiDiagram(windowHull, points);
+            intersects = Util.clipBounds(diagrams, hull);
             
             view.cleanImage();
             view.repaint();
@@ -1788,6 +1801,17 @@ public class Menu extends javax.swing.JFrame {
                         g2Buffer.drawPolygon(diagrams[i]);                    
                 }
                 
+//                if( hullPolygon != null ) {
+//                    g2Buffer.setColor(Color.BLUE);
+//                    g2Buffer.drawPolygon(hullPolygon);
+//                }
+                
+                if( intersects != null ) {
+                    g2Buffer.setColor(Color.MAGENTA);
+                    
+                    for( int i = 0; i < intersects.length; ++i )  
+                        g2Buffer.drawPolygon(intersects[i]);
+                }
                 
                 g2Buffer.dispose();
                 
