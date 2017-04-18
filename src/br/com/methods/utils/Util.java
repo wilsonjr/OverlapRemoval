@@ -1561,12 +1561,17 @@ public class Util {
         List<Item> elements = new ArrayList<>();
         elements.add(new Item(items[0].x, items[0].y, items[0].index));
         for( int i = 1; i < items.length; ++i ) {
-            Rectangle r1 = new Rectangle((int)elements.get(elements.size()-1).x-radius, 
-                                         (int)elements.get(elements.size()-1).y-radius, 
-                                         2*radius, 2*radius);
-            Rectangle r2 = new Rectangle((int)items[i].x-radius, (int)items[i].x-radius, 2*radius, 2*radius);
-            if( !r1.intersects(r2) )
-                elements.add(new Item(items[i].x, items[i].y, items[i].index));            
+            if( radius != 0 ) {
+                Rectangle r1 = new Rectangle((int)elements.get(elements.size()-1).x-radius, 
+                                             (int)elements.get(elements.size()-1).y-radius, 
+                                             2*radius, 2*radius);
+                Rectangle r2 = new Rectangle((int)items[i].x-radius, (int)items[i].x-radius, 2*radius, 2*radius);
+                if( !r1.intersects(r2) )
+                    elements.add(new Item(items[i].x, items[i].y, items[i].index));      
+            } else {
+                if( !(elements.get(elements.size()-1).x == items[i].x && elements.get(elements.size()-1).y == items[i].y) )
+                    elements.add(new Item(items[i].x, items[i].y, items[i].index));      
+            }
         }
         
         int[] distinctPoints = new int[elements.size()];

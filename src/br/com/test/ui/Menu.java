@@ -1462,8 +1462,6 @@ public class Menu extends javax.swing.JFrame {
         RepresentativeFinder ds3 = new DS3(distances, 0.12); // gives the best results 
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
-        
-        
         selectedRepresentatives = Util.distinct(selectedRepresentatives, points, 0);
         if( view != null ) {
             view.cleanImage();
@@ -1794,12 +1792,12 @@ public class Menu extends javax.swing.JFrame {
                     } 
                 }
                 
-                if( diagrams != null ) {                    
-                    g2Buffer.setColor(Color.RED);                            
-                    
-                    for( int i = 0; i < diagrams.length; ++i ) 
-                        g2Buffer.drawPolygon(diagrams[i]);                    
-                }
+//                if( diagrams != null ) {                    
+//                    g2Buffer.setColor(Color.RED);                            
+//                    
+//                    for( int i = 0; i < diagrams.length; ++i ) 
+//                        g2Buffer.drawPolygon(diagrams[i]);                    
+//                }
                 
 //                if( hullPolygon != null ) {
 //                    g2Buffer.setColor(Color.BLUE);
@@ -1807,7 +1805,7 @@ public class Menu extends javax.swing.JFrame {
 //                }
                 
                 if( intersects != null ) {
-                    g2Buffer.setColor(Color.MAGENTA);
+                    g2Buffer.setColor(Color.BLUE);
                     
                     for( int i = 0; i < intersects.length; ++i )  
                         g2Buffer.drawPolygon(intersects[i]);
