@@ -6,6 +6,7 @@ import br.com.methods.overlap.prism.PRISMPoint;
 import br.com.methods.overlap.prism.SetPoint;
 import br.com.methods.overlap.vpsc.Event;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -1544,20 +1545,49 @@ public class Util {
         return intersects;
     }
 
-    public static int[] distinct(int[] selectedRepresentatives, Point2D.Double[] points, int size) {
+    public static int[] distinct(int[] selectedRepresentatives, Point2D.Double[] points, int radius) {
         
-        Arrays.sort(points, (Point2D.Double a, Point2D.Double b) -> {
+        Item[] items = new Item[selectedRepresentatives.length];
+        for( int i = 0; i < items.length; ++i )
+            items[i] = new Item(points[selectedRepresentatives[i]].x, points[selectedRepresentatives[i]].y, selectedRepresentatives[i]);
+        
+        Arrays.sort(items, (Item a, Item b) -> {
             int c = new Double(a.x).compareTo(b.x);
             if( c == 0 )
                 new Double(a.y).compareTo(b.y);                
             return c;
         });
         
+        List<Item> elements = new ArrayList<>();
+        elements.add(new Item(items[0].x, items[0].y, items[0].index));
+        for( int i = 1; i < items.length; ++i ) {
+            Rectangle r1 = new Rectangle((int)elements.get(elements.size()-1).x-radius, 
+                                         (int)elements.get(elements.size()-1).y-radius, 
+                                         2*radius, 2*radius);
+            Rectangle r2 = new Rectangle((int)items[i].x-radius, (int)items[i].x-radius, 2*radius, 2*radius);
+            if( !r1.intersects(r2) )
+                elements.add(new Item(items[i].x, items[i].y, items[i].index));            
+        }
+        
+        int[] distinctPoints = new int[elements.size()];
+        for( int i = 0; i < distinctPoints.length; ++i )
+            distinctPoints[i] = elements.get(i).index;
         
         
-        
-        return null;
+        return distinctPoints;
     }
+    
+    private static class Item {
+        public double x;
+        public double y;
+        public int index;
+        
+        public Item(double x, double y, int index) {
+            this.x = x;
+            this.y = y;
+            this.index = index;
+        }
+    } 
     
     
     
