@@ -5,6 +5,8 @@ import br.com.methods.overlap.prism.PRISMEdge;
 import br.com.methods.overlap.prism.PRISMPoint;
 import br.com.methods.overlap.prism.SetPoint;
 import br.com.methods.overlap.vpsc.Event;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
@@ -1620,6 +1622,83 @@ public class Util {
         
         return hash;
     } 
+    
+    
+    public static Color[] createGradient(Color first, Color last, int steps) {
+        
+        Color diff = new Color(last.getRed()-first.getRed(), last.getGreen()-first.getGreen(), 
+                               last.getBlue()-first.getBlue(), last.getAlpha()-first.getAlpha());
+        
+        Color[] gradient = new Color[steps];
+        
+        for( int i = 0; i < steps; ++i )
+            gradient[i] = new Color(first.getRed() + (int)(i*diff.getRed()/(double)steps), first.getGreen() + (int)(i*diff.getGreen()/(double)steps),
+                                    first.getBlue() + (int)(i*diff.getBlue()/(double)steps), first.getAlpha() + (int)(i*diff.getAlpha()/(double)steps));
+        
+        gradient[steps-1] = last;
+                
+        
+        return gradient;          
+    }
+    
+    public static int[][] fillSphere(int radius, int[][] sphere, int x, int y, int n) {
+        int radius2 = radius*radius;
+        int area = radius2 << 2;
+        int rr = radius << 1;
+        
+        for( int i = 0; i < area; ++i ) {
+            
+            int tx = i%rr - radius;
+            int ty = i/rr - radius;            
+            if( tx*tx + ty*ty <= radius2 && (x+tx) < sphere.length && (y+ty) < sphere[0].length ) {
+                sphere[x+tx][y+ty] = (int)Util.euclideanDistance(x, y, x+tx, y+ty);
+            }
+        }
+        sphere[x][y] = 1;
+        
+        return sphere;
+    }
+
+    public static void paintSphere(Point2D.Double[] points, int[] selectedRepresentatives, Map<Integer, List<Integer>> hashRepresentative, 
+                                    Graphics2D g2Buffer) {
+        
+        Map<Point2D.Double, Color> hash = new HashMap<>();
+        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+            int radius = hashRepresentative.get(selectedRepresentatives[i]).size()*3;
+            Point2D.Double p = points[selectedRepresentatives[i]];
+            int x = (int)p.x;
+            int y = (int)p.y;
+            Color[] gradient = Util.createGradient(Color.RED, Color.WHITE, radius+1);
+            
+            int radius2 = radius*radius;
+            int area = radius2 << 2;
+            int rr = radius << 1;
+
+            for( int j = 0; j < area; ++j ) {
+
+                int tx = j%rr - radius;
+                int ty = j/rr - radius;            
+                if( tx*tx + ty*ty <= radius2  ) {
+                    Point2D.Double pp = new Point2D.Double(x+tx, y+ty);
+                    if( !hash.containsKey(pp) ) {
+                        hash.put(pp, gradient[(int)Util.euclideanDistance(x, y, x+tx, y+ty)]);
+                        g2Buffer.setColor(gradient[(int)Util.euclideanDistance(x, y, x+tx, y+ty)]);
+                    } else {
+                        Color c = hash.get(pp);
+                        Color computed = gradient[(int)Util.euclideanDistance(x, y, x+tx, y+ty)];
+                        System.out.println("New Red: "+c.getRed()+" + "+computed.getRed());
+                        Color newC = new Color(Math.min(c.getRed()+computed.getRed(), 255), c.getGreen(), c.getBlue(), c.getAlpha());
+                        hash.put(pp, newC);
+                        g2Buffer.setColor(newC);
+                    }
+                    g2Buffer.fillRect(x+tx, y+ty, 1,1);
+                }
+            }
+            
+        }
+        
+    }
+             
     
     
     

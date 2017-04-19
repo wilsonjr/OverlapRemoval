@@ -127,6 +127,8 @@ public class Menu extends javax.swing.JFrame {
     
     private Map<Integer, List<Integer>> hashRepresentative = null;
     private List<Integer> nearest = null;
+    private int[][] heatmap = null;
+    private int maxValue;
     
     /**
      * Creates new form Menu
@@ -1457,6 +1459,29 @@ public class Menu extends javax.swing.JFrame {
         selectedRepresentatives = Util.distinct(selectedRepresentatives, points, 0);
         hashRepresentative = Util.createIndex(selectedRepresentatives, points);
         
+//        //view.adjustPanel();
+//        int width = view.getSize().width;
+//        int height = view.getSize().height;
+//        heatmap = new int[width][height];
+//        System.out.println(">> "+width+", "+height);
+//        
+//        //for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+//            int radius = hashRepresentative.get(selectedRepresentatives[0]).size()*3;
+//            Point2D.Double p = points[selectedRepresentatives[0]];
+//            System.out.println("RADIUS: "+radius);
+//            System.out.println("x: "+p.x+", y: "+p.y);
+//
+//            heatmap = Util.fillSphere(radius, heatmap, (int)p.x, (int)p.y, hashRepresentative.get(selectedRepresentatives[0]).size());
+//        //}
+//        
+//        
+//        
+//        System.out.println("OK OK");
+//        for( int i = 0; i < heatmap.length; ++i ) {
+//            for( int j = 0; j < heatmap[i].length; ++j )
+//                maxValue = Math.max(maxValue, heatmap[i][j]);
+//        }
+        
         if( view != null ) {
             view.cleanImage();
             view.repaint();
@@ -1506,8 +1531,7 @@ public class Menu extends javax.swing.JFrame {
                 pointsHull[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());           
             Point2D.Double[] hull = Util.convexHull(pointsHull);
             
-            diagrams = Util.voronoiDiagram(window, points);
-            
+            diagrams = Util.voronoiDiagram(window, points);            
             intersects = Util.clipBounds(diagrams, hull);
             
             view.cleanImage();
@@ -1724,9 +1748,9 @@ public class Menu extends javax.swing.JFrame {
                         
                         for( int i = 0; i < selectedRepresentatives.length; ++i ) {
                             RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
+//                            g2Buffer.setColor(Color.RED);
+//                            g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             g2Buffer.setColor(Color.RED);
-                            g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                            g2Buffer.setColor(Color.BLACK);
                             g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             if( hideShowNumbers ) {
                                 g2Buffer.setColor(Color.GREEN);
@@ -1814,6 +1838,8 @@ public class Menu extends javax.swing.JFrame {
                     } 
                 }
                 
+                
+                
 //                if( diagrams != null ) {                    
 //                    g2Buffer.setColor(Color.RED);                            
 //                    
@@ -1832,6 +1858,29 @@ public class Menu extends javax.swing.JFrame {
                     for( int i = 0; i < intersects.length; ++i )  
                         g2Buffer.drawPolygon(intersects[i]);
                 }
+                
+                
+               // if( heatmap != null ) {
+//                    Color[] gradient = Util.createGradient(Color.RED, Color.WHITE, maxValue+1);
+//                    for( int i = 0; i < heatmap.length; ++i )
+//                        for( int j = 0; j < heatmap[i].length; ++j ) {
+//                            if( heatmap[i][j] != 0 ) {
+//                                Color c = gradient[heatmap[i][j]];
+//                                System.out.println((new Color(255-c.getRed(), 255-c.getGreen(), 255-c.getBlue(), c.getAlpha())).toString());
+//                                g2Buffer.setColor(new Color(c.getRed(), 255-c.getGreen(), 255-c.getBlue(), c.getAlpha()));
+//                                g2Buffer.fillRect(i, j, 1,1);
+//                            }
+//                        }
+                    if( selectedRepresentatives != null ) {
+                        
+                        Point2D.Double[] ps = new Point2D.Double[rectangles.size()];
+                        for( int i = 0; i < ps.length; ++i )
+                            ps[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
+
+                        Util.paintSphere(ps, selectedRepresentatives, hashRepresentative, g2Buffer);
+                    }
+               // }
+                
                 
                 g2Buffer.dispose();
                 
