@@ -82,11 +82,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -123,6 +124,9 @@ public class Menu extends javax.swing.JFrame {
     private Polygon[] diagrams = null;
     private Polygon hullPolygon = null;
     private Polygon[] intersects = null;
+    
+    private Map<Integer, List<Integer>> hashRepresentative = null;
+    private List<Integer> nearest = null;
     
     /**
      * Creates new form Menu
@@ -678,8 +682,6 @@ public class Menu extends javax.swing.JFrame {
     }
     
     private void reduceKNN(int id, Pair[][] knn, ArrayList<ChangeRetangulo> R) {
-        
-        
         if( R.get(id).third.getUX() != 0.0 || R.get(id).third.getUY() != 0.0 )
             return;
         
@@ -807,16 +809,6 @@ public class Menu extends javax.swing.JFrame {
                 RECTSIZE, RECTSIZE, rectangles.get(idx).cor, rectangles.get(idx).numero));
         
         });
-        
-
-
-         
-        
-        
-        
-        
-        
-        
         
     }
 
@@ -1463,6 +1455,8 @@ public class Menu extends javax.swing.JFrame {
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
         selectedRepresentatives = Util.distinct(selectedRepresentatives, points, 0);
+        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        
         if( view != null ) {
             view.cleanImage();
             view.repaint();
@@ -1597,22 +1591,46 @@ public class Menu extends javax.swing.JFrame {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    iniX = e.getX();
+                    /*iniX = e.getX();
                     iniY = e.getY();
                     
-                  /* if( r1 == null )
-                        r1 = new RetanguloVis(iniX, iniY, 30, 30, Color.red, 1);
-                    else if( r2 == null )
-                        r2 = new RetanguloVis(iniX, iniY, 30, 30, Color.red, 2);*/
                     //RainbowScale rbS = new RainbowScale();
                     GrayScale gS = new GrayScale();
                     rectangles.add(new RetanguloVis(iniX, iniY, RECTSIZE, RECTSIZE, 
                                                 //gS.getColor((globalCounterColor++*10)%255), globalCounter++));   
-                                                gS.getColor(0), globalCounter++));
-                    cleanImage();
-                    repaint();   
-                }                   
+                                                gS.getColor(0), globalCounter++));*/
+                     
+                } 
+                
             }); 
+            
+            addMouseMotionListener(new MouseAdapter() {
+
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                    int index = -1;
+                    if( selectedRepresentatives != null ) {
+                        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+                            Point2D.Double p = new Point2D.Double(rectangles.get(selectedRepresentatives[i]).getCenterX(), 
+                                               rectangles.get(selectedRepresentatives[i]).getCenterY());
+                            if( Util.euclideanDistance(e.getX(), e.getY(), p.x, p.y) < RECTSIZE/2 ) {
+                                index = selectedRepresentatives[i];
+                                break;
+                            }
+                        }
+
+                        nearest = null;
+                        if( index != -1 ) {
+                            nearest = hashRepresentative.get(index);
+
+                        }
+                        cleanImage();
+                        repaint();  
+                    }
+                }
+            
+            
+            });
                      
         }
         
@@ -1655,7 +1673,6 @@ public class Menu extends javax.swing.JFrame {
                             Color cor = rbS.getColor((i+1)*passo);                            
                             for( int j = 0; j < indexes.get(i).size(); ++j ) {
                                 int index = indexes.get(i).get(j);
-                                System.out.print(index+" ");
                                 rectangles.get(index).cor = cor;
                             }                            
                             System.out.println();
@@ -1717,9 +1734,14 @@ public class Menu extends javax.swing.JFrame {
                                 g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
                             }
                         }
-                        
-                        
-                        
+                    }
+                    
+                    if( nearest != null ) {                        
+                        for( int i = 0; i < nearest.size(); ++i ) {
+                            RetanguloVis r = rectangles.get(nearest.get(i));
+                            g2Buffer.setColor(Color.GREEN);
+                            g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                        }
                     }
                 }
                 

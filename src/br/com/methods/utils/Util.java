@@ -12,10 +12,12 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import kn.uni.voronoitreemap.datastructure.OpenList;
 import kn.uni.voronoitreemap.diagram.PowerDiagram;
@@ -1582,6 +1584,45 @@ public class Util {
         return distinctPoints;
     }
     
+    public static Map<Integer, List<Integer>> createIndex(int[] representatives, Point2D.Double[] points) {
+        Map<Integer, List<Integer>> hash = new HashMap<>();
+        Set<Integer> representativeSet = new HashSet<>();
+        
+        for( int i = 0; i < representatives.length; ++i ) {
+            hash.put(representatives[i], new ArrayList<>());
+            representativeSet.add(representatives[i]);
+        }
+        
+        for( int i = 0; i < points.length; ++i ) {
+            
+            if( representativeSet.contains(i) )
+                continue;
+            
+            int index = -1;
+            double minDist = Double.MAX_VALUE;
+            for( int j = 0; j < representatives.length; ++j ) {
+                if( i == representatives[j] )
+                    continue;
+                
+                Point2D.Double p1 = points[i];
+                Point2D.Double p2 = points[representatives[j]];
+                
+                double dist = Util.euclideanDistance(p1.x, p1.y, p2.x, p2.y);
+                if( dist < minDist ) {
+                    minDist = dist;
+                    index = j;
+                }
+            }
+            
+            List<Integer> nearest = hash.get(representatives[index]);
+            nearest.add(i);
+        }
+        
+        return hash;
+    } 
+    
+    
+    
     private static class Item {
         public double x;
         public double y;
@@ -1593,12 +1634,5 @@ public class Util {
             this.index = index;
         }
     } 
-    
-    
-    
-    
-    
-    
-    
     
 }
