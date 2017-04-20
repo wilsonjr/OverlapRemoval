@@ -1637,10 +1637,8 @@ public class Util {
                                     first.getGreen() + (int)(i*diff.getGreen()/(double)steps),
                                     first.getBlue() + (int)(i*diff.getBlue()/(double)steps), 
                                     255-(int)(i*255/(double)steps));
-        }
-        
-        gradient[steps-1] = last;
-                
+        }        
+        gradient[steps-1] = last;                
         
         return gradient;          
     }
@@ -1663,12 +1661,11 @@ public class Util {
         return sphere;
     }
 
-    public static void paintSphere(Point2D.Double[] points, int[] selectedRepresentatives, 
-                                   Map<Integer, List<Integer>> hashRepresentative, 
+    public static void paintSphere(Point2D.Double[] points, int[] selectedRepresentatives, Map<Integer, List<Integer>> hashRepresentative, 
                                    Graphics2D g2Buffer) {        
         
         for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-            int radius = hashRepresentative.get(selectedRepresentatives[i]).size()*5;
+            int radius = (int)(Math.sqrt(hashRepresentative.get(selectedRepresentatives[i]).size())*20);
             Point2D.Double p = points[selectedRepresentatives[i]];
             int x = (int)p.x;
             int y = (int)p.y;
@@ -1679,44 +1676,19 @@ public class Util {
             int rr = radius << 1;
 
             for( int j = 0; j < area; ++j ) {
-
                 int tx = j%rr - radius;
                 int ty = j/rr - radius;            
                 if( tx*tx + ty*ty <= radius2  ) {
-                    g2Buffer.setColor(gradient[(int)Util.euclideanDistance(x, y, x+tx, y+ty)]);
+                    int index = (int)Util.euclideanDistance(x, y, x+tx, y+ty);
+                    Color c = new Color(gradient[index].getRed(), gradient[index].getGreen(), gradient[index].getBlue());
+                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, gradient[index].getAlpha()/255.0f));
+                    g2Buffer.setColor(c);
                     g2Buffer.fillRect(x+tx, y+ty, 1,1);
                 }
             }
         }
     }
     
-    
-    public static void paintSphere(Point2D.Double[] points, 
-                                   Map<Integer, List<Integer>> hashRepresentative, 
-                                   Graphics2D g2Buffer) {        
-        
-        for( int i = 0; i < points.length; ++i ) {
-            int radius = 50;
-            Point2D.Double p = points[i];
-            int x = (int)p.x;
-            int y = (int)p.y;
-            Color[] gradient = Util.createGradient(Color.RED, Color.WHITE, radius+1);
-            
-            int radius2 = radius*radius;
-            int area = radius2 << 2;
-            int rr = radius << 1;
-
-            for( int j = 0; j < area; ++j ) {
-
-                int tx = j%rr - radius;
-                int ty = j/rr - radius;            
-                if( tx*tx + ty*ty <= radius2  ) {
-                    g2Buffer.setColor(gradient[(int)Util.euclideanDistance(x, y, x+tx, y+ty)]);
-                    g2Buffer.fillRect(x+tx, y+ty, 1,1);
-                }
-            }
-        }
-    }
              
     private static class Item {
         public double x;

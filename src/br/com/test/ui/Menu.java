@@ -1678,7 +1678,7 @@ public class Menu extends javax.swing.JFrame {
             if( imageBuffer == null ) {
                 adjustPanel();
                 setPreferredSize(getSize());
-                this.imageBuffer = new BufferedImage(getSize().width, getSize().height, BufferedImage.TYPE_INT_RGB);
+                this.imageBuffer = new BufferedImage(getSize().width, getSize().height, BufferedImage.TYPE_INT_ARGB);
                 
                 java.awt.Graphics2D g2Buffer = this.imageBuffer.createGraphics();
                 g2Buffer.setColor(this.getBackground());
@@ -1749,8 +1749,10 @@ public class Menu extends javax.swing.JFrame {
                     if( nearest != null ) {                        
                         for( int i = 0; i < nearest.size(); ++i ) {
                             RetanguloVis r = rectangles.get(nearest.get(i));
-                            g2Buffer.setColor(Color.GREEN);
-                            g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
+                            g2Buffer.setColor(Color.BLUE);
+                            g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1f));
                         }
                     }
                 }
@@ -1849,11 +1851,13 @@ public class Menu extends javax.swing.JFrame {
                     for( int i = 0; i < ps.length; ++i )
                         ps[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
 
-//                    Util.paintSphere(ps, selectedRepresentatives, hashRepresentative, g2Buffer);
-                    Util.paintSphere(ps, hashRepresentative, g2Buffer);
+                    Util.paintSphere(ps, selectedRepresentatives, hashRepresentative, g2Buffer);
                     
                     for( int i = 0; i < selectedRepresentatives.length; ++i ) {
                         RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
+                        g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                        g2Buffer.setColor(Color.RED);
+                        g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                         g2Buffer.setColor(Color.BLACK);
                         g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                         if( hideShowNumbers ) {
