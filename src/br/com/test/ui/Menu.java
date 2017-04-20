@@ -85,7 +85,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.imageio.ImageIO;
@@ -129,6 +128,7 @@ public class Menu extends javax.swing.JFrame {
     private List<Integer> nearest = null;
     private int[][] heatmap = null;
     private int maxValue;
+    private Point2D.Double[] centerPoints = null;
     
     /**
      * Creates new form Menu
@@ -564,6 +564,11 @@ public class Menu extends javax.swing.JFrame {
 
                     rectangles.add(new RetanguloVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo*10)%255), id++));                
                 }
+                
+                centerPoints = new Point2D.Double[rectangles.size()];
+                for( int i = 0; i < centerPoints.length; ++i )
+                    centerPoints[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
+                
 
                 loadedData = true;
                 if( view != null ) {
@@ -1451,8 +1456,6 @@ public class Menu extends javax.swing.JFrame {
             points[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
         }
         
-        
-        
         RepresentativeFinder ds3 = new DS3(distances, 0.12); // gives the best results 
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
@@ -1473,14 +1476,7 @@ public class Menu extends javax.swing.JFrame {
 //
 //            heatmap = Util.fillSphere(radius, heatmap, (int)p.x, (int)p.y, hashRepresentative.get(selectedRepresentatives[0]).size());
 //        //}
-//        
-//        
-//        
-//        System.out.println("OK OK");
-//        for( int i = 0; i < heatmap.length; ++i ) {
-//            for( int j = 0; j < heatmap[i].length; ++j )
-//                maxValue = Math.max(maxValue, heatmap[i][j]);
-//        }
+    
         
         if( view != null ) {
             view.cleanImage();
@@ -1847,11 +1843,9 @@ public class Menu extends javax.swing.JFrame {
                 
                 if( selectedRepresentatives != null ) {
 
-                    Point2D.Double[] ps = new Point2D.Double[rectangles.size()];
-                    for( int i = 0; i < ps.length; ++i )
-                        ps[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
+                    
 
-                    Util.paintSphere(ps, selectedRepresentatives, hashRepresentative, g2Buffer);
+                    Util.paintSphere(centerPoints, selectedRepresentatives, hashRepresentative, g2Buffer);
                     
                     for( int i = 0; i < selectedRepresentatives.length; ++i ) {
                         RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
