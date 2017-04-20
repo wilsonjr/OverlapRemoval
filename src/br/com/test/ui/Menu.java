@@ -1679,7 +1679,7 @@ public class Menu extends javax.swing.JFrame {
                 adjustPanel();
                 setPreferredSize(getSize());
                 this.imageBuffer = new BufferedImage(getSize().width, getSize().height, BufferedImage.TYPE_INT_RGB);
-
+                
                 java.awt.Graphics2D g2Buffer = this.imageBuffer.createGraphics();
                 g2Buffer.setColor(this.getBackground());
                 g2Buffer.fillRect(0, 0, 5000, 5000);
@@ -1706,59 +1706,45 @@ public class Menu extends javax.swing.JFrame {
                     
                     
                     
-                    
-                    for( RetanguloVis r: rectangles ) {                    
-                        ///g2Buffer.setColor(r.cor);
-                        int cinza = (int) (((double)(r.getHealth()-menor)/(double)(maior-menor))*255.0);
-                        g2Buffer.setColor(r.cor);
+                    if( selectedRepresentatives == null ) {
+                        for( RetanguloVis r: rectangles ) {                    
+                            ///g2Buffer.setColor(r.cor);
+                            int cinza = (int) (((double)(r.getHealth()-menor)/(double)(maior-menor))*255.0);
+                            g2Buffer.setColor(r.cor);
 
-                        if( r.isHexBoard ) {
-                            int a = (int)Math.sqrt(Math.pow(HEXBOARD_SIZE, 2) - Math.pow(HEXBOARD_SIZE/2, 2));
-                            Point p = r.getP();
-                            Polygon poly = new Polygon();
-                            poly.addPoint(p.x, p.y - HEXBOARD_SIZE);
-                            poly.addPoint(p.x + a, p.y - HEXBOARD_SIZE/2);
-                            poly.addPoint(p.x + a, p.y + HEXBOARD_SIZE/2);
-                            poly.addPoint(p.x, p.y + HEXBOARD_SIZE);
-                            poly.addPoint(p.x - a, p.y + HEXBOARD_SIZE/2);
-                            poly.addPoint(p.x - a, p.y - HEXBOARD_SIZE/2);
-                            g2Buffer.fillPolygon(poly);
-                            g2Buffer.setColor(Color.WHITE);
-                            g2Buffer.drawPolygon(poly);
-                        } else {
-                            if( r.isPivot() ) {
-                                pivots.add(r);
+                            if( r.isHexBoard ) {
+                                int a = (int)Math.sqrt(Math.pow(HEXBOARD_SIZE, 2) - Math.pow(HEXBOARD_SIZE/2, 2));
+                                Point p = r.getP();
+                                Polygon poly = new Polygon();
+                                poly.addPoint(p.x, p.y - HEXBOARD_SIZE);
+                                poly.addPoint(p.x + a, p.y - HEXBOARD_SIZE/2);
+                                poly.addPoint(p.x + a, p.y + HEXBOARD_SIZE/2);
+                                poly.addPoint(p.x, p.y + HEXBOARD_SIZE);
+                                poly.addPoint(p.x - a, p.y + HEXBOARD_SIZE/2);
+                                poly.addPoint(p.x - a, p.y - HEXBOARD_SIZE/2);
+                                g2Buffer.fillPolygon(poly);
+                                g2Buffer.setColor(Color.WHITE);
+                                g2Buffer.drawPolygon(poly);
                             } else {
-                                //g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                                //g2Buffer.setColor(Color.BLACK);
-                               // g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                                g2Buffer.setColor(Color.BLUE);
-                                g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                if( r.isPivot() ) {
+                                    pivots.add(r);
+                                } else {
+                                    //g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                    //g2Buffer.setColor(Color.BLACK);
+                                   // g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                    g2Buffer.setColor(Color.BLUE);
+                                    g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                }
                             }
-                        }
 
-                        if( !r.isPivot() && hideShowNumbers ) {
-                            g2Buffer.setColor(Color.RED);
-                            g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                            g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
-                        }
-                    }
-                    if( selectedRepresentatives != null ) {
-                        
-                        
-                        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-                            RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
-//                            g2Buffer.setColor(Color.RED);
-//                            g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                            g2Buffer.setColor(Color.RED);
-                            g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                            if( hideShowNumbers ) {
-                                g2Buffer.setColor(Color.GREEN);
+                            if( !r.isPivot() && hideShowNumbers ) {
+                                g2Buffer.setColor(Color.RED);
                                 g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                                g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
+                                g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
                             }
                         }
                     }
+                   
                     
                     if( nearest != null ) {                        
                         for( int i = 0; i < nearest.size(); ++i ) {
@@ -1838,8 +1824,6 @@ public class Menu extends javax.swing.JFrame {
                     } 
                 }
                 
-                
-                
 //                if( diagrams != null ) {                    
 //                    g2Buffer.setColor(Color.RED);                            
 //                    
@@ -1859,29 +1843,27 @@ public class Menu extends javax.swing.JFrame {
                         g2Buffer.drawPolygon(intersects[i]);
                 }
                 
-                
-               // if( heatmap != null ) {
-//                    Color[] gradient = Util.createGradient(Color.RED, Color.WHITE, maxValue+1);
-//                    for( int i = 0; i < heatmap.length; ++i )
-//                        for( int j = 0; j < heatmap[i].length; ++j ) {
-//                            if( heatmap[i][j] != 0 ) {
-//                                Color c = gradient[heatmap[i][j]];
-//                                System.out.println((new Color(255-c.getRed(), 255-c.getGreen(), 255-c.getBlue(), c.getAlpha())).toString());
-//                                g2Buffer.setColor(new Color(c.getRed(), 255-c.getGreen(), 255-c.getBlue(), c.getAlpha()));
-//                                g2Buffer.fillRect(i, j, 1,1);
-//                            }
-//                        }
-                    if( selectedRepresentatives != null ) {
-                        
-                        Point2D.Double[] ps = new Point2D.Double[rectangles.size()];
-                        for( int i = 0; i < ps.length; ++i )
-                            ps[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
+                if( selectedRepresentatives != null ) {
 
-                        Util.paintSphere(ps, selectedRepresentatives, hashRepresentative, g2Buffer);
+                    Point2D.Double[] ps = new Point2D.Double[rectangles.size()];
+                    for( int i = 0; i < ps.length; ++i )
+                        ps[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
+
+//                    Util.paintSphere(ps, selectedRepresentatives, hashRepresentative, g2Buffer);
+                    Util.paintSphere(ps, hashRepresentative, g2Buffer);
+                    
+                    for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+                        RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
+                        g2Buffer.setColor(Color.BLACK);
+                        g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                        if( hideShowNumbers ) {
+                            g2Buffer.setColor(Color.GREEN);
+                            g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                            g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
+                        }
                     }
-               // }
-                
-                
+                }
+                                
                 g2Buffer.dispose();
                 
             } 

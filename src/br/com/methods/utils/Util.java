@@ -11,6 +11,7 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1631,9 +1632,12 @@ public class Util {
         
         Color[] gradient = new Color[steps];
         
-        for( int i = 0; i < steps; ++i )
-            gradient[i] = new Color(first.getRed() + (int)(i*diff.getRed()/(double)steps), first.getGreen() + (int)(i*diff.getGreen()/(double)steps),
-                                    first.getBlue() + (int)(i*diff.getBlue()/(double)steps), first.getAlpha() + (int)(i*diff.getAlpha()/(double)steps));
+        for( int i = 0; i < steps; ++i ) {
+            gradient[i] = new Color(first.getRed() + (int)(i*diff.getRed()/(double)steps), 
+                                    first.getGreen() + (int)(i*diff.getGreen()/(double)steps),
+                                    first.getBlue() + (int)(i*diff.getBlue()/(double)steps), 
+                                    255-(int)(i*255/(double)steps));
+        }
         
         gradient[steps-1] = last;
                 
@@ -1659,12 +1663,12 @@ public class Util {
         return sphere;
     }
 
-    public static void paintSphere(Point2D.Double[] points, int[] selectedRepresentatives, Map<Integer, List<Integer>> hashRepresentative, 
-                                    Graphics2D g2Buffer) {
+    public static void paintSphere(Point2D.Double[] points, int[] selectedRepresentatives, 
+                                   Map<Integer, List<Integer>> hashRepresentative, 
+                                   Graphics2D g2Buffer) {        
         
-        Map<Point2D.Double, Color> hash = new HashMap<>();
         for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-            int radius = hashRepresentative.get(selectedRepresentatives[i]).size()*3;
+            int radius = hashRepresentative.get(selectedRepresentatives[i]).size()*5;
             Point2D.Double p = points[selectedRepresentatives[i]];
             int x = (int)p.x;
             int y = (int)p.y;
@@ -1679,29 +1683,41 @@ public class Util {
                 int tx = j%rr - radius;
                 int ty = j/rr - radius;            
                 if( tx*tx + ty*ty <= radius2  ) {
-                    Point2D.Double pp = new Point2D.Double(x+tx, y+ty);
-                    if( !hash.containsKey(pp) ) {
-                        hash.put(pp, gradient[(int)Util.euclideanDistance(x, y, x+tx, y+ty)]);
-                        g2Buffer.setColor(gradient[(int)Util.euclideanDistance(x, y, x+tx, y+ty)]);
-                    } else {
-                        Color c = hash.get(pp);
-                        Color computed = gradient[(int)Util.euclideanDistance(x, y, x+tx, y+ty)];
-                        System.out.println("New Red: "+c.getRed()+" + "+computed.getRed());
-                        Color newC = new Color(Math.min(c.getRed()+computed.getRed(), 255), c.getGreen(), c.getBlue(), c.getAlpha());
-                        hash.put(pp, newC);
-                        g2Buffer.setColor(newC);
-                    }
+                    g2Buffer.setColor(gradient[(int)Util.euclideanDistance(x, y, x+tx, y+ty)]);
                     g2Buffer.fillRect(x+tx, y+ty, 1,1);
                 }
             }
-            
         }
+    }
+    
+    
+    public static void paintSphere(Point2D.Double[] points, 
+                                   Map<Integer, List<Integer>> hashRepresentative, 
+                                   Graphics2D g2Buffer) {        
         
+        for( int i = 0; i < points.length; ++i ) {
+            int radius = 50;
+            Point2D.Double p = points[i];
+            int x = (int)p.x;
+            int y = (int)p.y;
+            Color[] gradient = Util.createGradient(Color.RED, Color.WHITE, radius+1);
+            
+            int radius2 = radius*radius;
+            int area = radius2 << 2;
+            int rr = radius << 1;
+
+            for( int j = 0; j < area; ++j ) {
+
+                int tx = j%rr - radius;
+                int ty = j/rr - radius;            
+                if( tx*tx + ty*ty <= radius2  ) {
+                    g2Buffer.setColor(gradient[(int)Util.euclideanDistance(x, y, x+tx, y+ty)]);
+                    g2Buffer.fillRect(x+tx, y+ty, 1,1);
+                }
+            }
+        }
     }
              
-    
-    
-    
     private static class Item {
         public double x;
         public double y;
