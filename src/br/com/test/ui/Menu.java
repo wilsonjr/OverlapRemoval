@@ -1260,7 +1260,7 @@ public class Menu extends javax.swing.JFrame {
         
         RepresentativeFinder bkmeans = new BisectingKMeans(points, new RandomMedoidApproach(), 4);
         bkmeans.execute();
-        //currentCluster = bkmeans.getClusters();
+        currentCluster = ((BisectingKMeans)bkmeans).getClusters();
         selectedRepresentatives = bkmeans.getRepresentatives();
         
         if( view != null ) {
@@ -1277,7 +1277,7 @@ public class Menu extends javax.swing.JFrame {
         
         RepresentativeFinder dbscan = new Dbscan(points, 100, 2);
         dbscan.execute();
-        //currentCluster = dbscan.getClusters();
+        currentCluster = ((Dbscan)dbscan).getClusters();
         selectedRepresentatives = dbscan.getRepresentatives();
         
         if( view != null ) {
@@ -1629,7 +1629,7 @@ public class Menu extends javax.swing.JFrame {
                 @Override
                 public void mouseMoved(MouseEvent e) {
                     int index = -1;
-                    if( selectedRepresentatives != null ) {
+                    if( selectedRepresentatives != null && hashRepresentative != null ) {
                         for( int i = 0; i < selectedRepresentatives.length; ++i ) {
                             Point2D.Double p = new Point2D.Double(rectangles.get(selectedRepresentatives[i]).getCenterX(), 
                                                rectangles.get(selectedRepresentatives[i]).getCenterY());
@@ -1701,46 +1701,50 @@ public class Menu extends javax.swing.JFrame {
                     }
                     
                     
-                    
-                    if( selectedRepresentatives == null ) {
-                        for( RetanguloVis r: rectangles ) {                    
-                            ///g2Buffer.setColor(r.cor);
-                            int cinza = (int) (((double)(r.getHealth()-menor)/(double)(maior-menor))*255.0);
-                            g2Buffer.setColor(r.cor);
+                    for( RetanguloVis r: rectangles ) {                    
+                        ///g2Buffer.setColor(r.cor);
+                        int cinza = (int) (((double)(r.getHealth()-menor)/(double)(maior-menor))*255.0);
+                        g2Buffer.setColor(r.cor);
 
-                            if( r.isHexBoard ) {
-                                int a = (int)Math.sqrt(Math.pow(HEXBOARD_SIZE, 2) - Math.pow(HEXBOARD_SIZE/2, 2));
-                                Point p = r.getP();
-                                Polygon poly = new Polygon();
-                                poly.addPoint(p.x, p.y - HEXBOARD_SIZE);
-                                poly.addPoint(p.x + a, p.y - HEXBOARD_SIZE/2);
-                                poly.addPoint(p.x + a, p.y + HEXBOARD_SIZE/2);
-                                poly.addPoint(p.x, p.y + HEXBOARD_SIZE);
-                                poly.addPoint(p.x - a, p.y + HEXBOARD_SIZE/2);
-                                poly.addPoint(p.x - a, p.y - HEXBOARD_SIZE/2);
-                                g2Buffer.fillPolygon(poly);
-                                g2Buffer.setColor(Color.WHITE);
-                                g2Buffer.drawPolygon(poly);
+                        if( r.isHexBoard ) {
+                            int a = (int)Math.sqrt(Math.pow(HEXBOARD_SIZE, 2) - Math.pow(HEXBOARD_SIZE/2, 2));
+                            Point p = r.getP();
+                            Polygon poly = new Polygon();
+                            poly.addPoint(p.x, p.y - HEXBOARD_SIZE);
+                            poly.addPoint(p.x + a, p.y - HEXBOARD_SIZE/2);
+                            poly.addPoint(p.x + a, p.y + HEXBOARD_SIZE/2);
+                            poly.addPoint(p.x, p.y + HEXBOARD_SIZE);
+                            poly.addPoint(p.x - a, p.y + HEXBOARD_SIZE/2);
+                            poly.addPoint(p.x - a, p.y - HEXBOARD_SIZE/2);
+                            g2Buffer.fillPolygon(poly);
+                            g2Buffer.setColor(Color.WHITE);
+                            g2Buffer.drawPolygon(poly);
+                        } else {
+                            if( r.isPivot() ) {
+                                pivots.add(r);
                             } else {
-                                if( r.isPivot() ) {
-                                    pivots.add(r);
-                                } else {
-                                    //g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                                    //g2Buffer.setColor(Color.BLACK);
-                                   // g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                //g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                //g2Buffer.setColor(Color.BLACK);
+                               // g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                if( currentCluster != null ) {
+                                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
+                                    g2Buffer.setColor(r.cor);
+                                    g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                } else if( selectedRepresentatives == null || hashRepresentative == null ) {
                                     g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
                                     g2Buffer.setColor(Color.BLUE);
                                     g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                                 }
                             }
+                        }
 
-                            if( !r.isPivot() && hideShowNumbers ) {
-                                g2Buffer.setColor(Color.RED);
-                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                                g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
-                            }
+                        if( !r.isPivot() && hideShowNumbers ) {
+                            g2Buffer.setColor(Color.RED);
+                            g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                            g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
                         }
                     }
+                     
                    
                     
                     if( nearest != null ) {                        
@@ -1782,12 +1786,9 @@ public class Menu extends javax.swing.JFrame {
                 
                 
                 for( RetanguloVis r: pivots ) {
-                    
+                    System.out.println("Painting...");
                     g2Buffer.setColor(Color.RED);
-                    g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), 30, 30);
-                    g2Buffer.setColor(Color.WHITE);
-                    g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                    g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
+                    g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());                     
                 }
                 
                 if( cRetangulo != null ) {
@@ -1844,21 +1845,34 @@ public class Menu extends javax.swing.JFrame {
                 
                 if( selectedRepresentatives != null ) {
 
-                    
+                    if(  hashRepresentative != null ) {
 
-                    Util.paintSphere(centerPoints, selectedRepresentatives, hashRepresentative, g2Buffer);
-                    
-                    for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-                        RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
-                        g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
-                        g2Buffer.setColor(Color.RED);
-                        g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                        g2Buffer.setColor(Color.BLACK);
-                        g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                        if( hideShowNumbers ) {
-                            g2Buffer.setColor(Color.GREEN);
-                            g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                            g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
+                        Util.paintSphere(centerPoints, selectedRepresentatives, hashRepresentative, g2Buffer);
+
+                        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+                            RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
+                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                            g2Buffer.setColor(Color.RED);
+                            g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            g2Buffer.setColor(Color.BLACK);
+                            g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            if( hideShowNumbers ) {
+                                g2Buffer.setColor(Color.GREEN);
+                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                                g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
+                            }
+                        }
+                    } else {
+                        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+                            RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
+                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                            g2Buffer.setColor(Color.RED);
+                            g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            if( hideShowNumbers ) {
+                                g2Buffer.setColor(Color.GREEN);
+                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                                g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
+                            }
                         }
                     }
                 }
