@@ -1783,12 +1783,14 @@ public class Menu extends javax.swing.JFrame {
                     g2Buffer.setColor(Color.BLACK);
                     g2Buffer.fillRect((int)r3.getUX(), (int)r3.getUY(), 20, 20);
                 }
-                
-                
+                                
                 for( RetanguloVis r: pivots ) {
-                    System.out.println("Painting...");
-                    g2Buffer.setColor(Color.RED);
-                    g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());                     
+                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                    g2Buffer.setColor(Color.RED);                    
+                    g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());      
+                    g2Buffer.setColor(Color.BLACK);
+                    g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());                    
+                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
                 }
                 
                 if( cRetangulo != null ) {
@@ -1868,6 +1870,9 @@ public class Menu extends javax.swing.JFrame {
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
                             g2Buffer.setColor(Color.RED);
                             g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            g2Buffer.setColor(Color.BLACK);
+                            g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                    
                             if( hideShowNumbers ) {
                                 g2Buffer.setColor(Color.GREEN);
                                 g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
