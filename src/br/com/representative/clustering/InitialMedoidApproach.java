@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.datamining.clustering;
+package br.com.representative.clustering;
 
 import java.awt.Point;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -14,6 +14,6 @@ import java.util.ArrayList;
  */
 public interface InitialMedoidApproach {    
     
-    Point.Double[] getInitialGuess(ArrayList<Point.Double> items, int k);
+    Point.Double[] getInitialGuess(List<Point.Double> items, int k);
     
 }

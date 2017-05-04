@@ -21,27 +21,23 @@ import java.util.PriorityQueue;
  * @author wilson
  */
 public class HierarchicalClustering extends RepresentativeFinder {
-    
-    private ArrayList<Cluster> clusters;
-    private ArrayList<Point.Double> items;
+        
+    private List<Cluster> clusters;
     private PriorityQueue<Linkage> linkages;
     private Map<String, Linkage> linkageMap;
     private LinkageStrategy linkageStrategy;
-    private ArrayList<ArrayList<ArrayList<Integer>>> clusterHierarchy;
+    private List<List<List<Integer>>> clusterHierarchy;
     private int dendogramLevel = 0;
     
     public HierarchicalClustering(ArrayList<Point.Double> items, LinkageStrategy linkageStrategy) {                
-        if( items == null )
-            throw new NullPointerException("Data cannot be null");
-        
-        this.items = items;
+        super(items);
         this.linkageStrategy = linkageStrategy;
     }
     
     @Override
     public void execute() {
         // 1. create one cluster for each element
-        createClusters(items);
+        createClusters(getItems());
         
         // 2. compute distance between each par of elements
         computeDistances();
@@ -112,7 +108,7 @@ public class HierarchicalClustering extends RepresentativeFinder {
     }
 
     
-    private void createClusters(ArrayList<Point.Double> items) {
+    private void createClusters(List<Point.Double> items) {
         clusters = new ArrayList<>();      
         clusterHierarchy = new ArrayList<>();
         clusterHierarchy.add(new ArrayList<>());
@@ -148,7 +144,7 @@ public class HierarchicalClustering extends RepresentativeFinder {
         return u.getId()+"<->"+v.getId();
     }
     
-    public ArrayList<Cluster> getClusters() {
+    public List<Cluster> getClusters() {
         return clusters;
     }
     
@@ -156,7 +152,7 @@ public class HierarchicalClustering extends RepresentativeFinder {
         clusters.get(0).print("");
     }
     
-    public ArrayList<ArrayList<ArrayList<Integer>>> getClusterHierarchy() {        
+    public List<List<List<Integer>>> getClusterHierarchy() {        
         return clusterHierarchy;
     }
     
@@ -166,6 +162,7 @@ public class HierarchicalClustering extends RepresentativeFinder {
     
     @Override
     public int[] getRepresentatives() {
+        
         representatives = Util.selectRepresentatives(clusterHierarchy.get(dendogramLevel), items);
         return representatives;
     }

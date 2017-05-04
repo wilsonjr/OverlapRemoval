@@ -1444,7 +1444,7 @@ public class Util {
         return indexes;
     }
     
-    public static int[] selectRepresentatives(ArrayList<ArrayList<Integer>> clusters, ArrayList<Point2D.Double> items) {
+    public static int[] selectRepresentatives(List<? extends List<Integer>> clusters, List<Point2D.Double> items) {
         
         int[] indexes = new int[clusters.size()];
         
@@ -1695,6 +1695,7 @@ public class Util {
             }
         }
     }
+
     
              
     private static class Item {

@@ -3,41 +3,32 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.representative.clustering.kmedoid;
+package br.com.representative.clustering.partitioning;
 
-import br.com.datamining.clustering.InitialMedoidApproach;
+import br.com.representative.clustering.InitialMedoidApproach;
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeFinder;
+import br.com.representative.clustering.KMethod;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  *
  * @author Windows
  */
-public class KMedoid extends RepresentativeFinder {
-    
-    private ArrayList<Point.Double> items;
-    private InitialMedoidApproach initialGuessApproach;
-    private final int K;
-    private ArrayList<ArrayList<Integer>> clusters;
+public class KMedoid extends KMethod {
     
     public KMedoid(ArrayList<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
-        if( items == null )
-            throw new NullPointerException("Data cannot be null");
-        
-        this.items = items;
-        this.initialGuessApproach = initialGuessApproach;
-        this.K = k;
+        super(items, initialGuessApproach, k);
     }
     
     @Override
     public void execute() {
-        Point.Double[] newGuess = initialGuessApproach.getInitialGuess(items, K);
+        Point.Double[] newGuess = initialGuessApproach.getInitialGuess(getItems(), K);
         Point.Double[] oldGuess = null;
         
-        int maxIterations = 30, iter = 0;
+        int iter = 0;
         
         do {
             oldGuess = Arrays.copyOf(newGuess, newGuess.length);
@@ -68,7 +59,7 @@ public class KMedoid extends RepresentativeFinder {
                 double minCost = Double.MAX_VALUE;
                 int index = 0;
                 
-                ArrayList<Integer> cluster = clusters.get(i);                                
+                List<Integer> cluster = clusters.get(i);                                
                 for( int j = 0; j < cluster.size(); ++j ) {
                     double cost = 0;
                     Point.Double centroid = items.get(cluster.get(j));
@@ -88,14 +79,10 @@ public class KMedoid extends RepresentativeFinder {
             }
             
             
-        } while( !Arrays.equals(oldGuess, newGuess) && iter++ < maxIterations );
+        } while( !Arrays.equals(oldGuess, newGuess) && iter++ < ITER );
         
         
         representatives = Util.selectRepresentatives(newGuess, items);
-    }
-    
-    public ArrayList<ArrayList<Integer>> getClusters() {
-        return clusters;
     }
     
 }

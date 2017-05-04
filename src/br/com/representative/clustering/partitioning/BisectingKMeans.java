@@ -4,12 +4,11 @@
  * and open the template in the editor.
  */
 
-package br.com.representative.clustering.bisectingkmeans;
+package br.com.representative.clustering.partitioning;
 
-import br.com.datamining.clustering.InitialMedoidApproach;
-import br.com.representative.clustering.kmeans.KMeans;
+import br.com.representative.clustering.InitialMedoidApproach;
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeFinder;
+import br.com.representative.clustering.KMethod;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,22 +19,10 @@ import java.util.Map;
  *
  * @author wilson
  */
-public class BisectingKMeans extends RepresentativeFinder {
-    
-    private InitialMedoidApproach initialGuess;
-    private ArrayList<Point.Double> items;
-    private ArrayList<ArrayList<Integer>> clusters;
-    private int K;
-    private Point.Double[] centroids;
-    private final int ITER = 10;
+public class BisectingKMeans extends KMethod {
     
     public BisectingKMeans(ArrayList<Point.Double> items, InitialMedoidApproach initialGuess, int k) {
-        if( items == null )
-            throw new NullPointerException("Data cannot be null");
-        
-        this.items = items;
-        this.initialGuess = initialGuess;
-        this.K = k;
+        super(items, initialGuess, k);
     }
     
     @Override
@@ -60,9 +47,9 @@ public class BisectingKMeans extends RepresentativeFinder {
                     index = j;
                 }
             
-            ArrayList<Integer> cluster = clusters.get(index);
+            List<Integer> cluster = clusters.get(index);
             // choose the best split 
-            ArrayList<ArrayList<Integer>> chosenSplit = chooseSplit(cluster);            
+            List<List<Integer>> chosenSplit = chooseSplit(cluster);            
             tempCentroids.remove(index);
             tempCentroids.add(centroids[0]);
             tempCentroids.add(centroids[1]);
@@ -76,15 +63,8 @@ public class BisectingKMeans extends RepresentativeFinder {
         representatives = Util.selectRepresentatives(centroids, items);
     }
     
-    public Point.Double[] getCentroids() {
-        return centroids;
-    }
     
-    public ArrayList<ArrayList<Integer>> getClusters() {
-        return clusters;
-    }
-
-    private ArrayList<ArrayList<Integer>> chooseSplit(ArrayList<Integer> cluster) {
+    private List<List<Integer>> chooseSplit(List<Integer> cluster) {
         ArrayList<Point.Double> clusterItems = new ArrayList<>();
         Map<Integer, Integer> mapIndex = new HashMap<>();
         for( int j = 0; j < cluster.size(); ++j ) {
@@ -92,16 +72,16 @@ public class BisectingKMeans extends RepresentativeFinder {
             mapIndex.put(j, cluster.get(j));
         }
         
-        ArrayList<ArrayList<Integer>> chosenSplit = null;
+        List<List<Integer>> chosenSplit = null;
         double minEc = Double.MAX_VALUE;
             
         for( int x = 0; x < ITER; ++x ) {            
-            KMeans kmeans = new KMeans(clusterItems, initialGuess, 2);
+            KMeans kmeans = new KMeans(clusterItems, getInitialGuessApproach(), 2);
             kmeans.setMaxIterations(1);
             kmeans.execute();
             centroids = kmeans.getCentroids();
             
-            ArrayList<ArrayList<Integer>> splitCluster = kmeans.getClusters();
+            List<List<Integer>> splitCluster = kmeans.getClusters();
             for( int j = 0; j < splitCluster.size(); ++j ) {
                 for( int k = 0; k < splitCluster.get(j).size(); ++k ) 
                     splitCluster.get(j).set(k, mapIndex.get(splitCluster.get(j).get(k)));

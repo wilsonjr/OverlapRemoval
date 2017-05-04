@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-package br.com.representative.clustering.dbscan;
+package br.com.representative.clustering.partitioning;
 
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeFinder;
+import br.com.representative.clustering.Partitioning;
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -15,20 +15,15 @@ import java.util.ArrayList;
  *
  * @author wilson
  */
-public class Dbscan extends RepresentativeFinder {
+public class Dbscan extends Partitioning {
     
-    private ArrayList<Point.Double> items;
-    private ArrayList<ArrayList<Integer>> clusters;
     private ArrayList<DbscanPoint> points;
     private int currentCluster;
     private double epsilon;
     private int minPts;
     
     public Dbscan(ArrayList<Point.Double> items, double epsilon, int minPts) {
-        if( items == null )
-            throw new NullPointerException("Data cannot be null");
-        
-        this.items = items;        
+        super(items);
         this.points = new ArrayList<>();
         for( int i = 0; i < this.items.size(); ++i )
             this.points.add(new DbscanPoint(this.items.get(i)));        
@@ -56,6 +51,7 @@ public class Dbscan extends RepresentativeFinder {
                 tryExpand(p);
             }
         }
+        
 
         clusters = new ArrayList<>();
         for( int i = 0; i < currentCluster; ++i ) {
@@ -65,18 +61,6 @@ public class Dbscan extends RepresentativeFinder {
         for( int i = 0; i < points.size(); ++i )
             if( points.get(i).processed() )
                 clusters.get(points.get(i).cluster).add(i);  
-        
-        for( ArrayList<Integer> l: clusters ) {
-            
-            l.sort(Integer::compareTo);
-            for( Integer c: l ) {
-                System.out.print(" "+c);
-            }
-            
-            System.out.println("\n\n");
-        }
-        
-        
         
         representatives = Util.selectRepresentatives(clusters, items);
     }
@@ -118,9 +102,7 @@ public class Dbscan extends RepresentativeFinder {
         } 
     }
     
-    public ArrayList<ArrayList<Integer>> getClusters() {
-        return clusters;
-    }
+    
     
     private class DbscanPoint {
         

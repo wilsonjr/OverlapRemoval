@@ -3,36 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.representative.clustering.kmeans;
+package br.com.representative.clustering.partitioning;
 
-import br.com.datamining.clustering.InitialMedoidApproach;
+import br.com.representative.clustering.InitialMedoidApproach;
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeFinder;
+import br.com.representative.clustering.KMethod;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  *
  * @author Windows
  */
-public class KMeans extends RepresentativeFinder {
+public class KMeans extends KMethod {
     
-    private ArrayList<Point.Double> items;
-    private InitialMedoidApproach initialGuessApproach;
-    private final int K;
-    private ArrayList<ArrayList<Integer>> clusters;
-    private Point.Double[] centroids;
-    private int maxIterations;
     
     public KMeans(ArrayList<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
-        if( items == null )
-            throw new NullPointerException("Data cannot be null");
-        
-        this.items = items;
-        this.initialGuessApproach = initialGuessApproach;
-        this.K = k;
-        this.maxIterations = 30;
+        super(items, initialGuessApproach, k);
     }
     
     @Override
@@ -67,7 +56,7 @@ public class KMeans extends RepresentativeFinder {
              
              // compute de new centroids
              for( int i = 0; i < clusters.size(); ++i ) {
-                 ArrayList<Integer> cluster = clusters.get(i);
+                 List<Integer> cluster = clusters.get(i);
                  
                  if( cluster.isEmpty() ) {
                      cluster.add((int) (Math.random() * (items.size() - 1)));
@@ -83,22 +72,11 @@ public class KMeans extends RepresentativeFinder {
              }
              
             
-        } while( !Arrays.equals(oldGuess, newGuess) && iter++ < maxIterations );
+        } while( !Arrays.equals(oldGuess, newGuess) && iter++ < ITER );
         
         centroids = Arrays.copyOf(newGuess, newGuess.length);
         representatives = Util.selectRepresentatives(centroids, items);
     }
     
-    public ArrayList<ArrayList<Integer>> getClusters() {
-        return clusters;
-    }
-    
-    public Point.Double[] getCentroids() {
-        return centroids;
-    }
-    
-    public void setMaxIterations(int max) {
-        this.maxIterations = max;
-    }
     
 }

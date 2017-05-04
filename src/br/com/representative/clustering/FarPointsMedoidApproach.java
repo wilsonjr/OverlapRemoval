@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.datamining.clustering;
+package br.com.representative.clustering;
 
 import br.com.methods.utils.Util;
 import java.awt.Point;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class FarPointsMedoidApproach implements InitialMedoidApproach {
 
     @Override
-    public Point.Double[] getInitialGuess(ArrayList<Point.Double> items, int k) {
+    public Point.Double[] getInitialGuess(List<Point.Double> items, int k) {
         Point.Double[] medoids = new Point.Double[k];
         int count = 0, index = 0;
         

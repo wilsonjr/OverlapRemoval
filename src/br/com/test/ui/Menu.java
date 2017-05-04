@@ -19,13 +19,13 @@
 package br.com.test.ui;
 
 
-import br.com.representative.clustering.bisectingkmeans.BisectingKMeans;
-import br.com.representative.clustering.dbscan.Dbscan;
-import br.com.datamining.clustering.FarPointsMedoidApproach;
+import br.com.representative.clustering.partitioning.BisectingKMeans;
+import br.com.representative.clustering.partitioning.Dbscan;
+import br.com.representative.clustering.FarPointsMedoidApproach;
 import br.com.representative.clustering.hierarchical.HierarchicalClustering;
 import br.com.representative.clustering.hierarchical.SingleLinkageStrategy;
-import br.com.representative.clustering.kmeans.KMeans;
-import br.com.representative.clustering.kmedoid.KMedoid;
+import br.com.representative.clustering.partitioning.KMeans;
+import br.com.representative.clustering.partitioning.KMedoid;
 import br.com.test.draw.color.GrayScale;
 import br.com.test.draw.color.RainbowScale;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
@@ -50,10 +50,10 @@ import br.com.methods.utils.Util;
 import br.com.projection.spacereduction.ContextPreserving;
 import br.com.representative.Dijsktra;
 import br.com.representative.RepresentativeFinder;
-import br.com.representative.lowrank.csm.CSM;
-import br.com.representative.dictionaryrepresentation.ds3.DS3;
-import br.com.representative.dictionaryrepresentation.smrs.SMRS;
-import br.com.representative.lowrank.ksvd.KSvd;
+import br.com.representative.lowrank.CSM;
+import br.com.representative.dictionaryrepresentation.DS3;
+import br.com.representative.dictionaryrepresentation.SMRS;
+import br.com.representative.lowrank.KSvd;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -109,8 +109,8 @@ public class Menu extends javax.swing.JFrame {
     private Polygon p1, p2;
     private static final int RECTSIZE = 20;
     private int maior, menor;
-    private ArrayList<ArrayList<ArrayList<Integer>>> clusters = null;
-    private ArrayList<ArrayList<Integer>> currentCluster = null;
+    private List<List<List<Integer>>> clusters = null;
+    private List<List<Integer>> currentCluster = null;
     private int nivelDendrogram = 0, indexRepresentatives = -1;
     private int[] selectedRepresentatives = null;
     private boolean hideShowNumbers = false;
@@ -1705,7 +1705,7 @@ public class Menu extends javax.swing.JFrame {
                     if( currentCluster != null && !rectangles.isEmpty() ) {
                         RainbowScale rbS = new RainbowScale();
                         int passo = 30;                        
-                        ArrayList<ArrayList<Integer>> indexes = currentCluster;
+                        List<List<Integer>> indexes = currentCluster;
                         for( int i = 0; i < indexes.size(); ++i ) {
                             Color cor = rbS.getColor((i+1)*passo);                            
                             for( int j = 0; j < indexes.get(i).size(); ++j ) {

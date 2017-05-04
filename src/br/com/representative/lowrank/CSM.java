@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package br.com.representative.lowrank.csm;
+package br.com.representative.lowrank;
 
 import br.com.methods.utils.Util;
 import br.com.representative.RepresentativeFinder;

@@ -8,7 +8,6 @@ package br.com.representative.clustering.hierarchical;
 
 import br.com.methods.utils.Util;
 import java.awt.Point;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 

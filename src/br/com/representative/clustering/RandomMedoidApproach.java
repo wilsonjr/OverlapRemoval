@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.datamining.clustering;
+package br.com.representative.clustering;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 public class RandomMedoidApproach implements InitialMedoidApproach {
 
     @Override
-    public Point2D.Double[] getInitialGuess(ArrayList<Point2D.Double> items, int k) {
+    public Point2D.Double[] getInitialGuess(List<Point2D.Double> items, int k) {
         
         ArrayList<Integer> selected = new ArrayList<>();
         Point2D.Double[] medoids = new Point2D.Double[k];
