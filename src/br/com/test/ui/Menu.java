@@ -129,6 +129,7 @@ public class Menu extends javax.swing.JFrame {
     private int maxValue;
     private Point2D.Double[] centerPoints = null;
     private ArrayList<Point2D.Double> items = null;
+    private Point2D.Double[] points = null;
     /**
      * Creates new form Menu
      */
@@ -566,10 +567,10 @@ public class Menu extends javax.swing.JFrame {
                     items.add(new Point2D.Double(x, y));
                 }
                 
+                points = items.stream().toArray(Point2D.Double[]::new);
                 centerPoints = new Point2D.Double[rectangles.size()];
                 for( int i = 0; i < centerPoints.length; ++i )
-                    centerPoints[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
-                
+                    centerPoints[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());               
 
                 loadedData = true;
                 if( view != null ) {
@@ -1224,14 +1225,16 @@ public class Menu extends javax.swing.JFrame {
 
     private void kMeansJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kMeansJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        ArrayList<Point.Double> points = new ArrayList<>();
+        ArrayList<Point.Double> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+            elems.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
                 
-        RepresentativeFinder kmeans = new KMeans(points, new FarPointsMedoidApproach(), 3);
+        RepresentativeFinder kmeans = new KMeans(elems, new FarPointsMedoidApproach(), 3);
         kmeans.execute();
         currentCluster = ((KMeans)kmeans).getClusters();        
         selectedRepresentatives = kmeans.getRepresentatives();
+        selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
         
         if( view != null ) {
             view.cleanImage();
@@ -1241,14 +1244,16 @@ public class Menu extends javax.swing.JFrame {
 
     private void kMedoidJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kMedoidJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        ArrayList<Point.Double> points = new ArrayList<>();
+        ArrayList<Point.Double> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+            elems.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
                 
-        RepresentativeFinder kmedoid = new KMedoid(points, new FarPointsMedoidApproach(), 4);
+        RepresentativeFinder kmedoid = new KMedoid(elems, new FarPointsMedoidApproach(), 4);
         kmedoid.execute();
         currentCluster = ((KMedoid)kmedoid).getClusters();        
         selectedRepresentatives = kmedoid.getRepresentatives();
+        selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
         
         if( view != null ) {
             view.cleanImage();
@@ -1258,14 +1263,16 @@ public class Menu extends javax.swing.JFrame {
 
     private void bisectingKMeansJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bisectingKMeansJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        ArrayList<Point.Double> points = new ArrayList<>();
+        ArrayList<Point.Double> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+            elems.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
         
-        RepresentativeFinder bkmeans = new BisectingKMeans(points, new FarPointsMedoidApproach(), 4);
+        RepresentativeFinder bkmeans = new BisectingKMeans(elems, new FarPointsMedoidApproach(), 4);
         bkmeans.execute();
         currentCluster = ((BisectingKMeans)bkmeans).getClusters();
         selectedRepresentatives = bkmeans.getRepresentatives();
+        selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
         
         if( view != null ) {
             view.cleanImage();
@@ -1275,14 +1282,16 @@ public class Menu extends javax.swing.JFrame {
 
     private void dbscanJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbscanJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        ArrayList<Point.Double> points = new ArrayList<>();
+        ArrayList<Point.Double> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+            elems.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
         
-        RepresentativeFinder dbscan = new Dbscan(points, 100, 10);
+        RepresentativeFinder dbscan = new Dbscan(elems, 100, 10);
         dbscan.execute();
         currentCluster = ((Dbscan)dbscan).getClusters();
         selectedRepresentatives = dbscan.getRepresentatives();
+        selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
         
         if( view != null ) {
             view.cleanImage();
@@ -1316,11 +1325,14 @@ public class Menu extends javax.swing.JFrame {
                 csm.execute();
 
                 selectedRepresentatives = csm.getRepresentatives();
+                selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+                hashRepresentative = Util.createIndex(selectedRepresentatives, points);
                 
                 if( view != null ) {
                     view.cleanImage();
                     view.repaint();            
                 }
+                
             } catch( FileNotFoundException e ) {
 
             }
@@ -1360,6 +1372,8 @@ public class Menu extends javax.swing.JFrame {
                 ksvd.execute();
                 
                 selectedRepresentatives = ksvd.getRepresentatives();
+                selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+                hashRepresentative = Util.createIndex(selectedRepresentatives, points);
                 
                 if( view != null ) {
                     view.cleanImage();
@@ -1406,6 +1420,8 @@ public class Menu extends javax.swing.JFrame {
                 smrs.execute();
                 
                 selectedRepresentatives = smrs.getRepresentatives();
+                selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+                //hashRepresentative = Util.createIndex(selectedRepresentatives, points);
                 
                 if( view != null ) {
                     view.cleanImage();
@@ -1452,12 +1468,10 @@ public class Menu extends javax.swing.JFrame {
         if( rectangles == null )
             loadDataJMenuItemActionPerformed(null);
         
-        Point2D.Double[] points = new Point2D.Double[rectangles.size()];
         double[][] distances = new double[rectangles.size()][rectangles.size()];
         for( int i = 0; i < distances.length; ++i ) {
             for( int j = 0; j < distances[0].length; ++j )
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
-            points[i] = new Point2D.Double(rectangles.get(i).x, rectangles.get(i).y);
         }
         
         RepresentativeFinder ds3 = new DS3(distances, 0.12); // gives the best results 
@@ -1692,14 +1706,12 @@ public class Menu extends javax.swing.JFrame {
                         RainbowScale rbS = new RainbowScale();
                         int passo = 30;                        
                         ArrayList<ArrayList<Integer>> indexes = currentCluster;
-                        System.out.println("Painting "+nivelDendrogram+"th level");
                         for( int i = 0; i < indexes.size(); ++i ) {
                             Color cor = rbS.getColor((i+1)*passo);                            
                             for( int j = 0; j < indexes.get(i).size(); ++j ) {
                                 int index = indexes.get(i).get(j);
                                 rectangles.get(index).cor = cor;
-                            }                            
-                            System.out.println();
+                            }                    
                         }
                         
                     }

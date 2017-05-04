@@ -1566,10 +1566,8 @@ public class Util {
             return c;
         });
         
-        List<Item> elements = new ArrayList<>();       
-        
+        List<Item> elements = new ArrayList<>();               
         elements.add(new Item(items[0].x, items[0].y, items[0].index));
-        System.out.println(items[0]);
         
         for( int i = 1; i < items.length; ++i ) {
             
@@ -1580,13 +1578,8 @@ public class Util {
                                              2*radius, 2*radius);
                 Rectangle r2 = new Rectangle((int)items[i].x, (int)items[i].y, 2*radius, 2*radius);
                 
-                System.out.println("r1: "+r1.x+", "+r1.y+" .. "+(r1.x+r1.width)+", "+(r1.y+r1.height));
-                System.out.println("r1: "+r2.x+", "+r2.y+" .. "+(r2.x+r2.width)+", "+(r2.y+r2.height));
-                
-                if( !r1.intersects(r2) ) {
-                    System.out.println("Entrou: "+elements.get(elements.size()-1)+" <--> "+items[i]);
-                    elements.add(new Item(items[i].x, items[i].y, items[i].index));      
-                }
+                if( !r1.intersects(r2) )
+                    elements.add(new Item(items[i].x, items[i].y, items[i].index));    
             } else {
                 if( !(elements.get(elements.size()-1).x == items[i].x && elements.get(elements.size()-1).y == items[i].y) )
                     elements.add(new Item(items[i].x, items[i].y, items[i].index));      
