@@ -66,6 +66,17 @@ public class Dbscan extends RepresentativeFinder {
             if( points.get(i).processed() )
                 clusters.get(points.get(i).cluster).add(i);  
         
+        for( ArrayList<Integer> l: clusters ) {
+            
+            l.sort(Integer::compareTo);
+            for( Integer c: l ) {
+                System.out.print(" "+c);
+            }
+            
+            System.out.println("\n\n");
+        }
+        
+        
         
         representatives = Util.selectRepresentatives(clusters, items);
     }

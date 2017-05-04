@@ -129,7 +129,7 @@ public class Menu extends javax.swing.JFrame {
     private int[][] heatmap = null;
     private int maxValue;
     private Point2D.Double[] centerPoints = null;
-    
+    private ArrayList<Point2D.Double> items = null;
     /**
      * Creates new form Menu
      */
@@ -549,6 +549,7 @@ public class Menu extends javax.swing.JFrame {
         int result = jFileChooser.showOpenDialog(this);
         if( result == JFileChooser.APPROVE_OPTION ) {
             try {                 
+                items = new ArrayList<>();
                 File file = jFileChooser.getSelectedFile();
                 Scanner scn = new Scanner(file);
                 rectangles.clear();
@@ -562,7 +563,8 @@ public class Menu extends javax.swing.JFrame {
                     double y = Double.parseDouble(linha[2]);
                     int grupo = id;//Integer.parseInt(linha[3]);
 
-                    rectangles.add(new RetanguloVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo*10)%255), id++));                
+                    rectangles.add(new RetanguloVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo*10)%255), id++));   
+                    items.add(new Point2D.Double(x, y));
                 }
                 
                 centerPoints = new Point2D.Double[rectangles.size()];
@@ -1194,8 +1196,8 @@ public class Menu extends javax.swing.JFrame {
         nivelDendrogram = 0;
         hc.setDendogramLevel(nivelDendrogram);
         selectedRepresentatives = hc.getRepresentatives();
-        //clusters = hc.getClusterHierarchy();
-        //currentCluster = clusters.get(0);
+        clusters = hc.getClusterHierarchy();
+        currentCluster = clusters.get(0);
         if( view != null ) {
             view.cleanImage();
             view.repaint();
@@ -1206,6 +1208,8 @@ public class Menu extends javax.swing.JFrame {
         if( nivelDendrogram < clusters.size()-1 )
             nivelDendrogram++;
         currentCluster = clusters.get(nivelDendrogram);
+        selectedRepresentatives = Util.selectRepresentatives(currentCluster, items);
+        
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_incrementJMenuItemActionPerformed
@@ -1214,6 +1218,7 @@ public class Menu extends javax.swing.JFrame {
         if( nivelDendrogram > 0 )
             nivelDendrogram--;
         currentCluster = clusters.get(nivelDendrogram);
+        selectedRepresentatives = Util.selectRepresentatives(currentCluster, items);
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_decrementJMenuItemActionPerformed
@@ -1226,7 +1231,7 @@ public class Menu extends javax.swing.JFrame {
                 
         RepresentativeFinder kmeans = new KMeans(points, new FarPointsMedoidApproach(), 3);
         kmeans.execute();
-        ///currentCluster = kmeans.getClusters();        
+        currentCluster = ((KMeans)kmeans).getClusters();        
         selectedRepresentatives = kmeans.getRepresentatives();
         
         if( view != null ) {
@@ -1243,7 +1248,7 @@ public class Menu extends javax.swing.JFrame {
                 
         RepresentativeFinder kmedoid = new KMedoid(points, new FarPointsMedoidApproach(), 4);
         kmedoid.execute();
-        //currentCluster = kmedoid.getClusters();        
+        currentCluster = ((KMedoid)kmedoid).getClusters();        
         selectedRepresentatives = kmedoid.getRepresentatives();
         
         if( view != null ) {
@@ -1258,7 +1263,7 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
         
-        RepresentativeFinder bkmeans = new BisectingKMeans(points, new RandomMedoidApproach(), 4);
+        RepresentativeFinder bkmeans = new BisectingKMeans(points, new FarPointsMedoidApproach(), 4);
         bkmeans.execute();
         currentCluster = ((BisectingKMeans)bkmeans).getClusters();
         selectedRepresentatives = bkmeans.getRepresentatives();
@@ -1275,7 +1280,7 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
         
-        RepresentativeFinder dbscan = new Dbscan(points, 100, 2);
+        RepresentativeFinder dbscan = new Dbscan(points, 100, 10);
         dbscan.execute();
         currentCluster = ((Dbscan)dbscan).getClusters();
         selectedRepresentatives = dbscan.getRepresentatives();

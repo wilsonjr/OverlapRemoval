@@ -1445,6 +1445,7 @@ public class Util {
     }
     
     public static int[] selectRepresentatives(ArrayList<ArrayList<Integer>> clusters, ArrayList<Point2D.Double> items) {
+        
         int[] indexes = new int[clusters.size()];
         
         for( int i = 0; i < clusters.size(); ++i ) {
@@ -1452,6 +1453,7 @@ public class Util {
             List<Point2D.Double> itemsInCluster = new ArrayList<>();
             Point2D.Double[] centroid = new Point2D.Double[1];
             centroid[0] = new Point2D.Double(0, 0);
+            Map<Integer, Integer> map = new HashMap<>();
                         
             for( int j = 0; j < clusters.get(i).size(); ++j ) {                
                 int index = clusters.get(i).get(j);
@@ -1460,13 +1462,14 @@ public class Util {
                 centroid[0].y += items.get(index).y;
                 
                 itemsInCluster.add(items.get(index));
+                map.put(j, index);
             }
             
             centroid[0].x /= (double) clusters.get(i).size();
             centroid[0].y /= (double) clusters.get(i).size();
             
             int[] index = Util.selectRepresentatives(centroid, itemsInCluster);
-            indexes[i] = index[0];
+            indexes[i] = map.get(index[0]);
         }
         
         return indexes;

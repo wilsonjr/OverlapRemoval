@@ -9,7 +9,6 @@ package br.com.representative.clustering.hierarchical;
 import br.com.methods.utils.Util;
 import br.com.representative.RepresentativeFinder;
 import java.awt.Point;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -72,7 +71,6 @@ public class HierarchicalClustering extends RepresentativeFinder {
             u.setParent(uv);
             v.setParent(uv);
             
-            System.out.println("Unindo clusters: "+u.getId()+" <-> "+v.getId());
             
             clusters.remove(u);
             clusters.remove(v);
@@ -105,11 +103,11 @@ public class HierarchicalClustering extends RepresentativeFinder {
         clusterHierarchy.add(new ArrayList<>());
         int index = clusterHierarchy.size()-1;
         for( int i = 0; i < clusters.size(); ++i ) {
-            ArrayList<Integer> items = new ArrayList<>();
+            ArrayList<Integer> indexesCopy = new ArrayList<>();
             String[] indexes = clusters.get(i).getId().split("\\.");
             for( int j = 0; j < indexes.length; ++j )
-                items.add(Integer.parseInt(indexes[j]));
-            clusterHierarchy.get(index).add(items);
+                indexesCopy.add(Integer.parseInt(indexes[j]));
+            clusterHierarchy.get(index).add(indexesCopy);
         }
     }
 
