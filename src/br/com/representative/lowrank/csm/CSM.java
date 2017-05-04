@@ -28,13 +28,14 @@ public class CSM extends RepresentativeFinder {
     public CSM(ArrayList<ArrayList<Double>> items, int c, int k) {
         this.items = items;
         this.c = c;    
-        this.k = k; // k == n give better results
+       // this.k = Math.min(items.size(), items.get(0).size())/2+1; // k == n give better results
+        this.k = k;
     }
     
     @Override
     public void execute() {     
         Matrix vT = decomposeAndGetVt();        
-        
+        System.out.println("size vT: "+vT.getNumRows()+" x "+vT.getNumCols());
         columns = new IndexPI[vT.getNumCols()];
         for( int j = 0; j < vT.getNumCols(); ++j ) { // para cada coluna de vT
             columns[j] = new IndexPI(j, 0);            
@@ -50,8 +51,10 @@ public class CSM extends RepresentativeFinder {
         DenseMatrix64F A = new DenseMatrix64F(distanceMatrix);
         SingularValueDecomposition svd =  DecompositionFactory.svd(distanceMatrix.length,
                 distanceMatrix[0].length, true, true, false);
+        
         svd.decompose(A);
-        Matrix vT = svd.getV(null, true);
+        Matrix vT = svd.getV(null, false);
+            
         return vT;
     }
 
