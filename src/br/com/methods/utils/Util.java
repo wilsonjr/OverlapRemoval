@@ -1566,16 +1566,27 @@ public class Util {
             return c;
         });
         
-        List<Item> elements = new ArrayList<>();
+        List<Item> elements = new ArrayList<>();       
+        
         elements.add(new Item(items[0].x, items[0].y, items[0].index));
+        System.out.println(items[0]);
+        
         for( int i = 1; i < items.length; ++i ) {
+            
             if( radius != 0 ) {
-                Rectangle r1 = new Rectangle((int)elements.get(elements.size()-1).x-radius, 
-                                             (int)elements.get(elements.size()-1).y-radius, 
+                System.out.println(items[i]);
+                Rectangle r1 = new Rectangle((int)elements.get(elements.size()-1).x, 
+                                             (int)elements.get(elements.size()-1).y, 
                                              2*radius, 2*radius);
-                Rectangle r2 = new Rectangle((int)items[i].x-radius, (int)items[i].x-radius, 2*radius, 2*radius);
-                if( !r1.intersects(r2) )
+                Rectangle r2 = new Rectangle((int)items[i].x, (int)items[i].y, 2*radius, 2*radius);
+                
+                System.out.println("r1: "+r1.x+", "+r1.y+" .. "+(r1.x+r1.width)+", "+(r1.y+r1.height));
+                System.out.println("r1: "+r2.x+", "+r2.y+" .. "+(r2.x+r2.width)+", "+(r2.y+r2.height));
+                
+                if( !r1.intersects(r2) ) {
+                    System.out.println("Entrou: "+elements.get(elements.size()-1)+" <--> "+items[i]);
                     elements.add(new Item(items[i].x, items[i].y, items[i].index));      
+                }
             } else {
                 if( !(elements.get(elements.size()-1).x == items[i].x && elements.get(elements.size()-1).y == items[i].y) )
                     elements.add(new Item(items[i].x, items[i].y, items[i].index));      
@@ -1702,6 +1713,11 @@ public class Util {
             this.x = x;
             this.y = y;
             this.index = index;
+        }
+        
+        @Override
+        public String toString() {
+            return index+": "+x+" * "+y;
         }
     } 
     

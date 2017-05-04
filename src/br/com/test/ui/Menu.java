@@ -26,7 +26,6 @@ import br.com.representative.clustering.hierarchical.HierarchicalClustering;
 import br.com.representative.clustering.hierarchical.SingleLinkageStrategy;
 import br.com.representative.clustering.kmeans.KMeans;
 import br.com.representative.clustering.kmedoid.KMedoid;
-import br.com.datamining.clustering.RandomMedoidApproach;
 import br.com.test.draw.color.GrayScale;
 import br.com.test.draw.color.RainbowScale;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
@@ -1458,13 +1457,13 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < distances.length; ++i ) {
             for( int j = 0; j < distances[0].length; ++j )
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
-            points[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());
+            points[i] = new Point2D.Double(rectangles.get(i).x, rectangles.get(i).y);
         }
         
         RepresentativeFinder ds3 = new DS3(distances, 0.12); // gives the best results 
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
-        selectedRepresentatives = Util.distinct(selectedRepresentatives, points, 0);
+        selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
         hashRepresentative = Util.createIndex(selectedRepresentatives, points);
         
 //        //view.adjustPanel();
