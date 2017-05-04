@@ -8,7 +8,6 @@ package br.com.representative.lowrank;
 
 import Jama.Matrix;
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeFinder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,14 +20,14 @@ import org.ejml.interfaces.decomposition.SingularValueDecomposition;
  *
  * @author wilson
  */
-public class KSvd extends RepresentativeFinder {
-    private final double[][] items;
+public class KSvd extends LowRank {
+    
     private final int dictsize;
     private double[][] D;
     private final double[][] itemsc;
     
     public KSvd(List<? extends List<Double>> items, int dictsize) {
-        this.items = Util.elementMatrix(items);
+        super(items);
         this.itemsc = new double[this.items.length][this.items[0].length];
         this.dictsize = dictsize;
     }

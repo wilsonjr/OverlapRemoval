@@ -5,7 +5,6 @@
  */
 package br.com.representative.clustering;
 
-import br.com.representative.RepresentativeFinder;
 import java.awt.Point;
 import java.util.List;
 
@@ -13,7 +12,7 @@ import java.util.List;
  *
  * @author Windows
  */
-public abstract class Partitioning extends RepresentativeFinder {
+public abstract class Partitioning extends Clustering {
     protected List<List<Integer>> clusters;
     
     public Partitioning(List<Point.Double> items) {

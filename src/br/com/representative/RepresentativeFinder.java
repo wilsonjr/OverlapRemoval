@@ -5,24 +5,12 @@
  */
 package br.com.representative;
 
-import br.com.representative.clustering.Clustering;
-import java.awt.Point;
-import java.util.List;
-
 /**
  *
  * @author Windows
  */
-public abstract class RepresentativeFinder extends Clustering {
+public abstract class RepresentativeFinder {
     protected int[] representatives;
-    
-    public RepresentativeFinder() {
-        super();
-    }
-    
-    public RepresentativeFinder(List<Point.Double> items) {
-        super(items);
-    }
     
     public abstract void execute();
     

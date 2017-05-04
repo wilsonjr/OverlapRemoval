@@ -7,7 +7,7 @@
 package br.com.representative.clustering.hierarchical;
 
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeFinder;
+import br.com.representative.clustering.Clustering;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +20,7 @@ import java.util.PriorityQueue;
  *
  * @author wilson
  */
-public class HierarchicalClustering extends RepresentativeFinder {
+public class HierarchicalClustering extends Clustering {
         
     private List<Cluster> clusters;
     private PriorityQueue<Linkage> linkages;

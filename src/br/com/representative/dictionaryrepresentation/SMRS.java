@@ -21,11 +21,11 @@ import java.util.List;
  *
  * @author Windows
  */
-public class SMRS extends RepresentativeFinder {
-    
+public class SMRS extends SparseRepresentation {
     private final double[][] items;
     
     public SMRS(List<? extends List<Double>> items) {
+        super(5);
         this.items = Util.elementMatrix(items);
     }
     
@@ -33,7 +33,6 @@ public class SMRS extends RepresentativeFinder {
     public void execute() {
        
         // setting up some parameters, using parameters proposed by the author of the technique
-        double alpha = 5;
         int q = 2;
         
         double[] regParam = {alpha, alpha};
@@ -49,8 +48,7 @@ public class SMRS extends RepresentativeFinder {
         
         double[] meanVector = Util.mean(Y, 1);
         // meanVector is treated as a column
-        Y = Util.minus(Y, Util.reapmat(meanVector, N));
-        
+        Y = Util.minus(Y, Util.reapmat(meanVector, N));        
         double[][] C = almLasso(Y, affine, regParam, q, thr, maxIter);
         
         representatives = findRep(C, thrS, q);
@@ -249,14 +247,7 @@ public class SMRS extends RepresentativeFinder {
         }
     }
     
-    private double errorCoef(double[][] Z, double[][] C) {        
-        double error = 0;        
-        for( int i = 0; i < C.length; ++i )
-            for( int j = 0; j < C[0].length; ++j )
-                error += Math.abs(Z[i][j]-C[i][j]);
-        
-        return error/(C.length*C[0].length);
-    }
+    
         
     private class Item {
         public double value;

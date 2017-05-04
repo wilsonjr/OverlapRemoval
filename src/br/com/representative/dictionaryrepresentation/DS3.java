@@ -22,18 +22,17 @@ import java.util.List;
  *
  * @author Windows
  */
-public class DS3 extends RepresentativeFinder {
+public class DS3 extends SparseRepresentation {
     
     private final double[][] D;
-    private double alpha;
     
     public DS3(double[][] D) {
         this(D, 0.12);
     }
     
     public DS3(double[][] D, double alpha) {
+        super(alpha);
         this.D = D;
-        this.alpha = alpha;
     }
        
     @Override
@@ -62,8 +61,7 @@ public class DS3 extends RepresentativeFinder {
     
     }
     
-    private double[][] ds3(double[][] D, int p, double rho, double mu, int maxIter, double[] CFD, double errThr)
-    {
+    private double[][] ds3(double[][] D, int p, double rho, double mu, int maxIter, double[] CFD, double errThr) {
         int nr = D.length, nc = D[0].length;
         boolean terminate = false;
         int k = 1;
@@ -226,16 +224,6 @@ public class DS3 extends RepresentativeFinder {
         return C2;        
     }
     
-    private double errorCoef(double[][] Z, double[][] C) {        
-        double error = 0;        
-        for( int i = 0; i < C.length; ++i )
-            for( int j = 0; j < C[0].length; ++j )
-                error += Math.abs(Z[i][j]-C[i][j]);
-        
-        return error/(C.length*C[0].length);
-    }
-   
-
     private void formRepresentatives(double[][] C) {
         double ratio = 0.1;
         int n = C.length;

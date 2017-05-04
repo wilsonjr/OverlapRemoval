@@ -6,10 +6,8 @@
 
 package br.com.representative.lowrank;
 
-import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeFinder;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.data.Matrix;
 import org.ejml.factory.DecompositionFactory;
@@ -19,23 +17,19 @@ import org.ejml.interfaces.decomposition.SingularValueDecomposition;
  *
  * @author wilson
  */
-public class CSM extends RepresentativeFinder {
-    
-    private final ArrayList<ArrayList<Double>> items;
+public class CSM extends LowRank {
     private int c, k;
     private IndexPI[] columns;
     
-    public CSM(ArrayList<ArrayList<Double>> items, int c, int k) {
-        this.items = items;
+    public CSM(List<? extends List<Double>> items, int c, int k) {
+        super(items);
         this.c = c;    
-       // this.k = Math.min(items.size(), items.get(0).size())/2+1; // k == n give better results
         this.k = k;
     }
     
     @Override
     public void execute() {     
         Matrix vT = decomposeAndGetVt();        
-        System.out.println("size vT: "+vT.getNumRows()+" x "+vT.getNumCols());
         columns = new IndexPI[vT.getNumCols()];
         for( int j = 0; j < vT.getNumCols(); ++j ) { // para cada coluna de vT
             columns[j] = new IndexPI(j, 0);            
@@ -47,10 +41,8 @@ public class CSM extends RepresentativeFinder {
     }
 
     private Matrix decomposeAndGetVt() {
-        double[][] distanceMatrix =  Util.elementMatrix(items);
-        DenseMatrix64F A = new DenseMatrix64F(distanceMatrix);
-        SingularValueDecomposition svd =  DecompositionFactory.svd(distanceMatrix.length,
-                distanceMatrix[0].length, true, true, false);
+        DenseMatrix64F A = new DenseMatrix64F(items);
+        SingularValueDecomposition svd =  DecompositionFactory.svd(items.length, items[0].length, true, true, false);
         
         svd.decompose(A);
         Matrix vT = svd.getV(null, false);
@@ -59,8 +51,7 @@ public class CSM extends RepresentativeFinder {
     }
 
     private void createIndexes() {
-        Arrays.sort(columns);
-        
+        Arrays.sort(columns);        
         representatives = new int[c];
         for( int i = 0; i < c; ++i )
             representatives[i] = columns[i].index;
