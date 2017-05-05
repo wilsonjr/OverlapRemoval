@@ -1696,6 +1696,20 @@ public class Util {
         }
     }
 
+    public static void removeDummyRepresentive(Map<Integer, List<Integer>> map, int minChildren) {
+        
+        List<Integer> toRemove = new ArrayList<>();
+        
+        map.entrySet().stream().filter((entry) -> ( entry.getValue().size() <= minChildren )).forEachOrdered((entry) -> {
+            toRemove.add(entry.getKey());
+        });
+            
+        toRemove.forEach((value) -> { 
+            map.remove(value);
+        });
+        
+    }
+
     
              
     private static class Item {

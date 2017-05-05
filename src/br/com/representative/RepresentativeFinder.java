@@ -13,6 +13,7 @@ public abstract class RepresentativeFinder {
     protected int[] representatives;
     
     public abstract void execute();
+    public abstract void filterData(int[] indexes);
     
     public int[] getRepresentatives() {
         return representatives;
