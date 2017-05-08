@@ -12,6 +12,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -37,8 +39,12 @@ public class ExplorerTree {
     }
     
     public void build() {
+        Logger.getLogger(ExplorerTree.class.getName()).log(Level.INFO, "Creating level one.");
         createLevelOne();
+        Logger.getLogger(ExplorerTree.class.getName()).log(Level.INFO, "Finish creating level one.");
+        Logger.getLogger(ExplorerTree.class.getName()).log(Level.INFO, "Now creating subtrees");
         createSubTree();
+        Logger.getLogger(ExplorerTree.class.getName()).log(Level.INFO, "Finish creating subtrees");
     }
     
         
@@ -56,8 +62,11 @@ public class ExplorerTree {
         levelOneRepresentatives = Util.distinct(levelOneRepresentatives, _projection, _distinctionDistance);
         Map<Integer, List<Integer>> map = Util.createIndex(levelOneRepresentatives, _projection);
         
+        Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives before {0}", map.size());
         // remove representatives which represent only < _minChildren
         Util.removeDummyRepresentive(map, _minChildren);
+        Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives after  {0}", map.size());
+        System.out.println("................................");
         
         // for each representative
         _topNodes = new ArrayList<>();

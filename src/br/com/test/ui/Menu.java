@@ -19,6 +19,7 @@
 package br.com.test.ui;
 
 
+import br.com.explore.explorertree.ExplorerTree;
 import br.com.representative.clustering.partitioning.BisectingKMeans;
 import br.com.representative.clustering.partitioning.Dbscan;
 import br.com.representative.clustering.FarPointsMedoidApproach;
@@ -205,6 +206,7 @@ public class Menu extends javax.swing.JFrame {
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         ds3JMenuItem = new javax.swing.JMenuItem();
         voronoiDiagramJMenuItem = new javax.swing.JMenuItem();
+        testTreeJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -520,6 +522,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu8.add(voronoiDiagramJMenuItem);
+
+        testTreeJMenuItem.setText("Test Tree");
+        testTreeJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                testTreeJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(testTreeJMenuItem);
 
         jMenuBar1.add(jMenu8);
 
@@ -1553,6 +1563,19 @@ public class Menu extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_voronoiDiagramJMenuItemActionPerformed
 
+    private void testTreeJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testTreeJMenuItemActionPerformed
+        double[][] distances = new double[rectangles.size()][rectangles.size()];
+        for( int i = 0; i < distances.length; ++i ) {
+            for( int j = 0; j < distances[0].length; ++j )
+                distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
+        }
+        
+        RepresentativeFinder algorithm = new DS3(distances, 0.12);
+        
+        ExplorerTree et = new ExplorerTree(points, algorithm, RECTSIZE/2, 15);
+        et.build();
+    }//GEN-LAST:event_testTreeJMenuItemActionPerformed
+
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1660,7 +1683,6 @@ public class Menu extends javax.swing.JFrame {
                         nearest = null;
                         if( index != -1 ) {
                             nearest = hashRepresentative.get(index);
-
                         }
                         cleanImage();
                         repaint();  
@@ -2003,6 +2025,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem smrsJMenuItem;
     private javax.swing.JMenuItem sssJMenuItem;
     private javax.swing.JScrollPane telaJScrollPane;
+    private javax.swing.JMenuItem testTreeJMenuItem;
     private javax.swing.JMenuItem viewSelectedJMenuItem;
     private javax.swing.JMenuItem voronoiDiagramJMenuItem;
     private javax.swing.JMenuItem vpscJMenuItem;

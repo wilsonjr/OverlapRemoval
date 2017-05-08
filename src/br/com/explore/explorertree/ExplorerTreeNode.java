@@ -11,6 +11,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -22,7 +24,7 @@ public class ExplorerTreeNode {
     
     private Point2D.Double[] _subprojection;
     
-    private int[] indexes;
+    private int[] _indexes;
     
     private int _distinctionDistance;
     private int _routing;
@@ -35,6 +37,7 @@ public class ExplorerTreeNode {
     // private int[] similar
     
     public ExplorerTreeNode(int minChildren, int distinctionDistance, int routing, Point2D.Double[] subprojection, int[] indexes, RepresentativeFinder representativeAlgorithm) {
+        _indexes = indexes;
         _minChildren = minChildren;
         _routing = routing;
         _subprojection = subprojection;
@@ -45,7 +48,11 @@ public class ExplorerTreeNode {
     public void createSubTree() {
         // in order to apply the representative selection to the subprojection, we need to filter the elements so that the
         // algorithm can be applied on the subprojection
-        _representativeAlgorithm.filterData(indexes);
+        System.out.println("SIZE: "+_indexes.length);
+        for( int i = 0; i < _indexes.length; ++i )
+            System.out.print(_indexes[i]+" ");
+        System.out.println();
+        _representativeAlgorithm.filterData(_indexes);
         
         // execute algorithm and retrieve representative
         _representativeAlgorithm.execute();
@@ -55,8 +62,11 @@ public class ExplorerTreeNode {
         nthLevelRepresentatives = Util.distinct(nthLevelRepresentatives, _subprojection, _distinctionDistance);
         Map<Integer, List<Integer>> map = Util.createIndex(nthLevelRepresentatives, _subprojection);
         
+        Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Routing: {0} - Number of representatives before {1}", new Object[]{_routing, map.size()});
         // remove representatives which represent only < _minChildren
         Util.removeDummyRepresentive(map, _minChildren);
+        Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Routing: {0} - Number of representatives after  {1}", new Object[]{_routing, map.size()});
+        System.out.println("................................");
         
         // for each representative
         _children = new ArrayList<>();
