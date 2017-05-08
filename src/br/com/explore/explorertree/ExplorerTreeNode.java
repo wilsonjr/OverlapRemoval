@@ -89,6 +89,14 @@ public class ExplorerTreeNode {
                     indexesChildren.stream().mapToInt((Integer value)->value).toArray(), _representativeAlgorithm)); 
         });
         
+        _children.stream().forEach(ExplorerTreeNode::createSubTree);
+    }
+
+    public void print(String identation) {
+        System.out.println(identation+"Quantidade de instâncias: "+_subprojection.length);
+        System.out.println(identation+"Quantidade de representativos: "+_children.size());
+        for( int i = 0; i < _children.size(); ++i )
+            _children.get(i).print("\t"+identation);
     }
     
 }

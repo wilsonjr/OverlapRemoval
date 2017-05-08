@@ -88,7 +88,18 @@ public class ExplorerTree {
             // do the same to each subprojection
             _topNodes.add(new ExplorerTreeNode(_distinctionDistance, _minChildren, routing, points,
                     indexes.stream().mapToInt((Integer value)->value).toArray(), _representativeAlgorithm));
-        });
+        });        
+    }
+    
+    public void print() {
+        
+        System.out.println("Quantidade de instâncias: "+_projection.length);
+        System.out.println("Quantidade de representativos: "+_topNodes.size());
+        for( int i = 0; i < _topNodes.size(); ++i )
+            _topNodes.get(i).print("\t");
+        
+        
+        
         
     }
     
