@@ -166,4 +166,5 @@ public class HierarchicalClustering extends Clustering {
         representatives = Util.selectRepresentatives(clusterHierarchy.get(dendogramLevel), items);
         return representatives;
     }
+
 }

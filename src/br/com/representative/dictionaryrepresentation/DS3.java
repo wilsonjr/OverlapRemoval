@@ -13,7 +13,6 @@ package br.com.representative.dictionaryrepresentation;
  */
 
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeFinder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +23,7 @@ import java.util.List;
  */
 public class DS3 extends SparseRepresentation {
     
-    private final double[][] D;
+    private double[][] D;
     
     public DS3(double[][] D) {
         this(D, 0.12);
@@ -248,6 +247,17 @@ public class DS3 extends SparseRepresentation {
         for( int i = 0; i < v.length; ++i )
             representatives[i] = v[i].index;        
     }
+    
+    @Override
+    public void filterData(int[] indexes) {
+        double[][] distances = new double[indexes.length][indexes.length];
+        
+        for( int i = 0; i < indexes.length; ++i )
+            for( int j = 0; j < indexes.length; ++j )
+                distances[i][j] = D[indexes[i]][indexes[j]];
+       
+        D = distances;
+    }    
 
     private class Item {
         public double value;

@@ -24,17 +24,16 @@ public class KSvd extends LowRank {
     
     private final int dictsize;
     private double[][] D;
-    private final double[][] itemsc;
+    private double[][] itemsc;
     
     public KSvd(List<? extends List<Double>> items, int dictsize) {
-        super(items);
-        this.itemsc = new double[this.items.length][this.items[0].length];
+        super(items);        
         this.dictsize = dictsize;
     }
     
     @Override
     public void execute() {
-        
+        this.itemsc = new double[this.items.length][this.items[0].length];
         D = initialDict();        
         int maxiter = 30, n = D.length;
         

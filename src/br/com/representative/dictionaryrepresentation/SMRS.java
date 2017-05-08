@@ -13,7 +13,6 @@ package br.com.representative.dictionaryrepresentation;
  */
 
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeFinder;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,7 +21,7 @@ import java.util.List;
  * @author Windows
  */
 public class SMRS extends SparseRepresentation {
-    private final double[][] items;
+    private double[][] items;
     
     public SMRS(List<? extends List<Double>> items) {
         super(5);
@@ -245,6 +244,18 @@ public class SMRS extends SparseRepresentation {
                     C2[i][j] = aux[i][j]*C1[i][j];
             return C2;
         }
+    }
+    
+    @Override
+    public void filterData(int[] indexes) {
+        double[][] newItems = new double[indexes.length][indexes.length];
+        
+        for( int i = 0; i< indexes.length; ++i )
+            for( int j = 0; j < items.length; ++j )
+                newItems[i][j] = items[i][indexes[j]];
+        
+        
+        items = newItems;    
     }
     
     

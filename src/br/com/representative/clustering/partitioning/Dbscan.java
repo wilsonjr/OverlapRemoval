@@ -24,9 +24,7 @@ public class Dbscan extends Partitioning {
     
     public Dbscan(ArrayList<Point.Double> items, double epsilon, int minPts) {
         super(items);
-        this.points = new ArrayList<>();
-        for( int i = 0; i < this.items.size(); ++i )
-            this.points.add(new DbscanPoint(this.items.get(i)));        
+               
         this.currentCluster = 0;
         this.epsilon = epsilon;
         this.minPts = minPts;
@@ -42,6 +40,10 @@ public class Dbscan extends Partitioning {
     
     @Override
     public void execute() {
+        
+        this.points = new ArrayList<>();
+        for( int i = 0; i < this.items.size(); ++i )
+            this.points.add(new DbscanPoint(this.items.get(i))); 
        
         for( int i = 0; i < points.size(); ++i ) {
 

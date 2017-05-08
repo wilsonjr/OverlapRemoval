@@ -7,6 +7,7 @@ package br.com.representative.clustering;
 
 import br.com.representative.RepresentativeFinder;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,5 +28,15 @@ public abstract class Clustering extends RepresentativeFinder {
     
     public List<Point.Double> getItems() {
         return items;
+    }
+    
+    @Override
+    public void filterData(int[] indexes) {
+        List<Point.Double> temp = new ArrayList<>();
+        items.forEach((p) -> { temp.add(new Point.Double(p.x, p.y)); });
+        items.clear();
+        
+        for( Integer i: indexes )
+            items.add(temp.get(i));        
     }
 }
