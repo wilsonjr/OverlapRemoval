@@ -48,27 +48,39 @@ public class ExplorerTree {
     
     private void createLevelOne() {
         
+        // execute algorithm and retrieve representative
         _representativeAlgorithm.execute();
         int[] levelOneRepresentatives = _representativeAlgorithm.getRepresentatives();
+        
+        // apply distinction algorithm
         levelOneRepresentatives = Util.distinct(levelOneRepresentatives, _projection, _distinctionDistance);
         Map<Integer, List<Integer>> map = Util.createIndex(levelOneRepresentatives, _projection);
+        
+        // remove representatives which represent only < _minChildren
         Util.removeDummyRepresentive(map, _minChildren);
         
+        // for each representative
         _topNodes = new ArrayList<>();
-        for( int i = 0; i < levelOneRepresentatives.length; ++i ) {
-            List<Integer> indexes = map.get(levelOneRepresentatives[i]);
+        
+        map.entrySet().forEach((item) -> {
+            int representative = item.getKey();
+            // get the indexes of the elements that it represents
+            List<Integer> indexes = item.getValue();
             Point2D.Double[] points = new Point2D.Double[indexes.size()];
             int routing = -1;
-
+            
+            // create subprojection 
             for( int j = 0; j < points.length; ++j ) {
-                if( indexes.get(j) == levelOneRepresentatives[i] ) // store the routing index in the 'subprojection'
+                if( indexes.get(j) == representative ) // store the routing index in the 'subprojection'
                     routing = j;
                 points[j] = new Point2D.Double(_projection[indexes.get(j)].x, _projection[indexes.get(j)].y);
             }
-
-            _topNodes.add(new ExplorerTreeNode(_distinctionDistance, _minChildren, routing, points, 
-                    indexes.stream().toArray(Integer[]::new), _representativeAlgorithm));            
-        }
+            
+            // do the same to each subprojection
+            _topNodes.add(new ExplorerTreeNode(_distinctionDistance, _minChildren, routing, points,
+                    indexes.stream().mapToInt((Integer value)->value).toArray(), _representativeAlgorithm));
+        });
+        
     }
     
 }

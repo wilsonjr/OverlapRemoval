@@ -28,5 +28,8 @@ public abstract class SparseRepresentation extends RepresentativeFinder {
         return error/(C.length*C[0].length);
     }
     
+    @Override
+    public abstract void filterData(int[] indexes);
+    
     
 }
