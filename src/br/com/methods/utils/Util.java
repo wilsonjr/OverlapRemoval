@@ -1572,7 +1572,6 @@ public class Util {
         for( int i = 1; i < items.length; ++i ) {
             
             if( radius != 0 ) {
-                System.out.println(items[i]);
                 Rectangle r1 = new Rectangle((int)elements.get(elements.size()-1).x, 
                                              (int)elements.get(elements.size()-1).y, 
                                              2*radius, 2*radius);
@@ -1627,6 +1626,11 @@ public class Util {
             List<Integer> nearest = hash.get(representatives[index]);
             nearest.add(i);
         }
+        
+        // add representatives itself to the neighbors
+        for( int i = 0; i < representatives.length; ++i )
+            hash.get(representatives[i]).add(representatives[i]);
+            
         
         return hash;
     } 
