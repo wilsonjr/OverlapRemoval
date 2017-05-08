@@ -24,7 +24,7 @@ import java.util.List;
 public class DS3 extends SparseRepresentation {
     
     private double[][] D;
-    
+    private double[][] copyD;
     public DS3(double[][] D) {
         this(D, 0.12);
     }
@@ -32,6 +32,10 @@ public class DS3 extends SparseRepresentation {
     public DS3(double[][] D, double alpha) {
         super(alpha);
         this.D = D;
+        copyD = new double[D.length][D.length];
+        for( int i = 0; i < D.length; ++i )
+            for( int j = 0; j < D[0].length; ++j )
+                copyD[i][j] = D[i][j];
     }
        
     @Override
@@ -254,7 +258,7 @@ public class DS3 extends SparseRepresentation {
         
         for( int i = 0; i < indexes.length; ++i )
             for( int j = 0; j < indexes.length; ++j )
-                distances[i][j] = D[indexes[i]][indexes[j]];
+                distances[i][j] = copyD[indexes[i]][indexes[j]];
        
         D = distances;
     }    
