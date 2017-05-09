@@ -264,9 +264,6 @@ public class DS3 extends SparseRepresentation {
                 distances[i][j] = copyD[indexes[i]][indexes[j]];
        
         D = distances;
-        
-        alpha = copyAlpha + 0.2 + ((double)indexes.length/(double)copyD.length) * copyAlpha;
-        System.out.println("Alpha before: "+copyAlpha+", alpha after: "+alpha);
     }    
 
     private class Item {

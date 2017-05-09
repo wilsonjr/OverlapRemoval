@@ -1575,7 +1575,7 @@ public class Menu extends javax.swing.JFrame {
         }
         
         RepresentativeFinder algorithm = new DS3(distances, 0.12);
-        explorerTree = new ExplorerTree(points, algorithm, RECTSIZE/2, 5);
+        explorerTree = new ExplorerTree(points, algorithm, RECTSIZE/2, 7);
         explorerTree.build();
         explorerTree.buildActiveNodes();
         explorerTree.print();
