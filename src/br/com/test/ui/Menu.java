@@ -20,6 +20,7 @@ package br.com.test.ui;
 
 
 import br.com.explore.explorertree.ExplorerTree;
+import br.com.explore.explorertree.ExplorerTreeNode;
 import br.com.representative.clustering.partitioning.BisectingKMeans;
 import br.com.representative.clustering.partitioning.Dbscan;
 import br.com.representative.clustering.FarPointsMedoidApproach;
@@ -1574,11 +1575,15 @@ public class Menu extends javax.swing.JFrame {
         }
         
         RepresentativeFinder algorithm = new DS3(distances, 0.12);
-        
-        explorerTree = new ExplorerTree(points, algorithm, 0, 15);
+        explorerTree = new ExplorerTree(points, algorithm, RECTSIZE/2, 5);
         explorerTree.build();
-        explorerTree.buildMapTree();
-        //explorerTree.print();
+        explorerTree.buildActiveNodes();
+        explorerTree.print();
+                 
+        selectedRepresentatives = explorerTree.topNodes().stream().mapToInt((ExplorerTreeNode node)->node.routing()).toArray();
+        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        
+        voronoiDiagramJMenuItemActionPerformed(evt);
     }//GEN-LAST:event_testTreeJMenuItemActionPerformed
 
     
@@ -1660,8 +1665,33 @@ public class Menu extends javax.swing.JFrame {
                     int index = -1;
                     if( selectedRepresentatives != null && hashRepresentative != null ) {
                         for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-                            
+                            Point2D.Double p = new Point2D.Double(rectangles.get(selectedRepresentatives[i]).getCenterX(),
+                                                                  rectangles.get(selectedRepresentatives[i]).getCenterY());
+                            if( Util.euclideanDistance(e.getX(), e.getY(), p.x, p.y) < RECTSIZE/2 ) {
+                                index = selectedRepresentatives[i];
+                                break;
+                            }
                         }
+                        if( index != -1 ) {                            
+                            
+                            ExplorerTreeNode node = explorerTree.activeNodes().get(index);
+                            if( !node.children().isEmpty() ) {
+                                explorerTree.expandNode(index);
+                                int[] reps = new int[node.children().size()+selectedRepresentatives.length-1];
+
+                                int j = 0;
+                                for( int i = 0; i < selectedRepresentatives.length; ++i )
+                                    if( selectedRepresentatives[i] != index )
+                                        reps[j++] = selectedRepresentatives[i];
+                                for( ExplorerTreeNode n: node.children() )
+                                    reps[j++] = n.routing();
+
+                                selectedRepresentatives = Arrays.copyOf(reps, reps.length);
+                                hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+                                
+                                voronoiDiagramJMenuItemActionPerformed(null);
+                            }
+                        } 
                     }
                      
                 }                 

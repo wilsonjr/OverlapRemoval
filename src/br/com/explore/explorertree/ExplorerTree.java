@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +32,7 @@ public class ExplorerTree {
     private int _distinctionDistance;
     private int _minChildren;
     
-    private Map<Integer, ExplorerTreeNode> _mapTree;
+    private Map<Integer, ExplorerTreeNode> _activeNodes;
     
     public ExplorerTree(Point2D.Double[] projection, RepresentativeFinder representativeAlgorithm, 
                         int distinctionDistance, int minChildren) {
@@ -78,18 +79,16 @@ public class ExplorerTree {
             int representative = item.getKey();
             // get the indexes of the elements that it represents
             List<Integer> indexes = item.getValue();
+            
+            
             Point2D.Double[] points = new Point2D.Double[indexes.size()];
-            int routing = -1;
-            
+
             // create subprojection 
-            for( int j = 0; j < points.length; ++j ) {
-                if( indexes.get(j) == representative ) // store the routing index in the 'subprojection'
-                    routing = j;
-                points[j] = new Point2D.Double(_projection[indexes.get(j)].x, _projection[indexes.get(j)].y);
-            }
-            
+            for( int j = 0; j < points.length; ++j )
+                points[j] = new Point2D.Double(_projection[indexes.get(j)].x, _projection[indexes.get(j)].y);           
+
             // do the same to each subprojection
-            _topNodes.add(new ExplorerTreeNode(_distinctionDistance, _minChildren, routing, points,
+            _topNodes.add(new ExplorerTreeNode(_minChildren, _distinctionDistance, representative, points,
                     indexes.stream().mapToInt((Integer value)->value).toArray(), _representativeAlgorithm));
         });        
     }
@@ -103,14 +102,26 @@ public class ExplorerTree {
         
     }
     
-    public void buildMapTree() {
-        _mapTree = new HashMap<>();
+    public void buildActiveNodes() {
+        _activeNodes = new HashMap<>();
         for( int i = 0; i < _topNodes.size(); ++i )
-            _topNodes.get(i).buildMapTree(_mapTree);
+            _activeNodes.put(_topNodes.get(i).routing(), _topNodes.get(i));
+        
     }
     
-    public Map<Integer, ExplorerTreeNode> mapTree() {
-        return _mapTree;
+    public void expandNode(int index) {
+        ExplorerTreeNode node = _activeNodes.get(index);
+        _activeNodes.remove(index);
+        
+        node.children().stream().forEach((ExplorerTreeNode value) -> { _activeNodes.put(value.routing(), value); });        
+    }
+    
+    public Map<Integer, ExplorerTreeNode> activeNodes() {
+        return _activeNodes;
+    }
+    
+    public List<ExplorerTreeNode> topNodes() {
+        return _topNodes;
     }
     
 }
