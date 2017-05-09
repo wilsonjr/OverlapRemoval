@@ -131,6 +131,9 @@ public class Menu extends javax.swing.JFrame {
     private Point2D.Double[] centerPoints = null;
     private ArrayList<Point2D.Double> items = null;
     private Point2D.Double[] points = null;
+    private ExplorerTree explorerTree;
+    
+    
     /**
      * Creates new form Menu
      */
@@ -1572,9 +1575,10 @@ public class Menu extends javax.swing.JFrame {
         
         RepresentativeFinder algorithm = new DS3(distances, 0.12);
         
-        ExplorerTree explorerTree = new ExplorerTree(points, algorithm, 0, 15);
+        explorerTree = new ExplorerTree(points, algorithm, 0, 15);
         explorerTree.build();
-        explorerTree.print();
+        explorerTree.buildMapTree();
+        //explorerTree.print();
     }//GEN-LAST:event_testTreeJMenuItemActionPerformed
 
     
@@ -1653,17 +1657,14 @@ public class Menu extends javax.swing.JFrame {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    /*iniX = e.getX();
-                    iniY = e.getY();
-                    
-                    //RainbowScale rbS = new RainbowScale();
-                    GrayScale gS = new GrayScale();
-                    rectangles.add(new RetanguloVis(iniX, iniY, RECTSIZE, RECTSIZE, 
-                                                //gS.getColor((globalCounterColor++*10)%255), globalCounter++));   
-                                                gS.getColor(0), globalCounter++));*/
+                    int index = -1;
+                    if( selectedRepresentatives != null && hashRepresentative != null ) {
+                        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+                            
+                        }
+                    }
                      
-                } 
-                
+                }                 
             }); 
             
             addMouseMotionListener(new MouseAdapter() {

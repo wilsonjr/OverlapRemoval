@@ -10,6 +10,7 @@ import br.com.representative.RepresentativeFinder;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -29,6 +30,8 @@ public class ExplorerTree {
     
     private int _distinctionDistance;
     private int _minChildren;
+    
+    private Map<Integer, ExplorerTreeNode> _mapTree;
     
     public ExplorerTree(Point2D.Double[] projection, RepresentativeFinder representativeAlgorithm, 
                         int distinctionDistance, int minChildren) {
@@ -98,9 +101,16 @@ public class ExplorerTree {
         for( int i = 0; i < _topNodes.size(); ++i )
             _topNodes.get(i).print("\t");
         
-        
-        
-        
+    }
+    
+    public void buildMapTree() {
+        _mapTree = new HashMap<>();
+        for( int i = 0; i < _topNodes.size(); ++i )
+            _topNodes.get(i).buildMapTree(_mapTree);
+    }
+    
+    public Map<Integer, ExplorerTreeNode> mapTree() {
+        return _mapTree;
     }
     
 }
