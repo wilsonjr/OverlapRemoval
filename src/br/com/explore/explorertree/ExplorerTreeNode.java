@@ -53,6 +53,10 @@ public class ExplorerTreeNode {
     }
     
     public void createSubTree() {
+        
+        if( _indexes.length < 2*_minChildren ) // this node can represent its set of instances
+            return;
+        
         // in order to apply the representative selection to the subprojection, we need to filter the elements so that the
         // algorithm can be applied on the subprojection
         _representativeAlgorithm.filterData(_indexes);
@@ -60,11 +64,15 @@ public class ExplorerTreeNode {
         // execute algorithm and retrieve representative
         _representativeAlgorithm.execute();
         int[] nthLevelRepresentatives = _representativeAlgorithm.getRepresentatives();
-        if( nthLevelRepresentatives.length != 0 ) {
+        if( nthLevelRepresentatives.length >= 0 ) {
         
             System.out.println("Number of instances: "+_indexes.length+", number of representatives: "+nthLevelRepresentatives.length);
             // apply distinction algorithm
             nthLevelRepresentatives = Util.distinct(nthLevelRepresentatives, _subprojection, _distinctionDistance);
+            if( nthLevelRepresentatives.length <= 1 )
+                return;
+            
+            
             Map<Integer, List<Integer>> map = Util.createIndex(nthLevelRepresentatives, _subprojection);
             
             
@@ -84,7 +92,7 @@ public class ExplorerTreeNode {
             Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Routing: {0} - Number of representatives after  {1}", new Object[]{_routing, map.size()});
             if( map.size() == 0 ) {
                 System.out.println("---------------------------------------MAP1-----------------------------------------");
-                Map<Integer, List<Integer>> map2 = agglomerateRepresentative(copyMap);
+                
                 for( Map.Entry<Integer, List<Integer>> v: copyMap.entrySet() ) {
 
                     System.out.print(v.getKey()+":  ");
@@ -93,19 +101,45 @@ public class ExplorerTreeNode {
                     System.out.println();
                 }            
 
-                System.out.println("\n*****************************************");
-                for( Map.Entry<Integer, List<Integer>> v: map2.entrySet() ) {
-                    System.out.print(v.getKey()+":  ");
-                    for( Integer e: v.getValue() )
-                        System.out.print(e+" ");
-                    System.out.println();
-                }            
-
-                System.out.println("---------------------------------------MAP2-----------------------------------------");
+//                System.out.println("\n*****************************************");
+//                for( Map.Entry<Integer, List<Integer>> v: map2.entrySet() ) {
+//                    System.out.print(v.getKey()+":  ");
+//                    for( Integer e: v.getValue() )
+//                        System.out.print(e+" ");
+//                    System.out.println();
+//                }            
+//
+//                System.out.println("---------------------------------------MAP2-----------------------------------------");
             }
             
             System.out.println("................................");
 
+            
+           
+            
+            if( map.size() == 0 ) {
+                   System.out.println("\n*****************************************");
+                   Map<Integer, List<Integer>> map2 = agglomerateRepresentative(copyMap);
+                   
+                    Map<Integer, Integer> mapIndexes2 = new HashMap<>();
+
+            map2.values().stream().forEach((values) -> {
+
+                values.stream().forEach((value)-> {
+                    mapIndexes2.put(value, _indexes[value]);
+                });
+            });
+                for( Map.Entry<Integer, List<Integer>> v: map2.entrySet() ) {
+                    System.out.print(v.getKey()+"("+mapIndexes2.get(v.getKey())+"):  ");
+                    for( Integer e: v.getValue() )
+                        System.out.print(e+" ");
+                    System.out.println();
+                }            
+                map = map2;
+                System.out.println("---------------------------------------MAP2-----------------------------------------");
+            }
+            
+            
             Map<Integer, Integer> mapIndexes = new HashMap<>();
 
             map.values().stream().forEach((values) -> {
@@ -114,7 +148,10 @@ public class ExplorerTreeNode {
                     mapIndexes.put(value, _indexes[value]);
                 });
             });
-
+            
+            
+            
+            
 
             // for each representative
             
@@ -122,20 +159,19 @@ public class ExplorerTreeNode {
                 int representative = item.getKey();
                 // get the indexes of the elements that it represents
                 List<Integer> indexesChildren = item.getValue();
-                if( indexesChildren.size() >= _minChildren ) {
+               
+                Point2D.Double[] points = new Point2D.Double[indexesChildren.size()];
 
-                    Point2D.Double[] points = new Point2D.Double[indexesChildren.size()];
+                // create subprojection 
+                for( int j = 0; j < points.length; ++j )
+                    points[j] = new Point2D.Double(_subprojection[indexesChildren.get(j)].x, _subprojection[indexesChildren.get(j)].y);
 
-                    // create subprojection 
-                    for( int j = 0; j < points.length; ++j )
-                        points[j] = new Point2D.Double(_subprojection[indexesChildren.get(j)].x, _subprojection[indexesChildren.get(j)].y);
-
-                    // continue to the further children, we must always pass original indexes
-                    _children.add(new ExplorerTreeNode(_minChildren, _distinctionDistance, mapIndexes.get(representative), points, 
-                            //indexesChildren.stream().mapToInt((Integer value)->value).toArray(), 
-                            indexesChildren.stream().mapToInt((Integer i)->mapIndexes.get(i)).toArray(),
-                            _representativeAlgorithm)); 
-                }
+                // continue to the further children, we must always pass original indexes
+                _children.add(new ExplorerTreeNode(_minChildren, _distinctionDistance, mapIndexes.get(representative), points, 
+                        //indexesChildren.stream().mapToInt((Integer value)->value).toArray(), 
+                        indexesChildren.stream().mapToInt((Integer i)->mapIndexes.get(i)).toArray(),
+                        _representativeAlgorithm)); 
+               
             });
 
             _children.stream().forEach(ExplorerTreeNode::createSubTree);
