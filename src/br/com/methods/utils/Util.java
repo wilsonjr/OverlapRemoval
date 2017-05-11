@@ -1539,6 +1539,7 @@ public class Util {
             if( diagrams[i] != null ) {
                 for( int j = 0; j < diagrams[i].xpoints.length; ++j )
                     p2.addVertex(new math.geom2d.Point2D(diagrams[i].xpoints[j], diagrams[i].ypoints[j]));
+                
                 SimplePolygon2D p = (SimplePolygon2D) Polygons2D.intersection(p1, p2);
                 intersects[i] = new Polygon();
                 for( math.geom2d.Point2D point: p.vertices() )
@@ -1546,8 +1547,15 @@ public class Util {
             } else
                 System.out.println("diagrams[i] null!");
         }
-        
-        
+
+        for( int i = 0; i < intersects.length; ++i ) {
+            Polygon poly = new Polygon();
+            for( int j = 0; j < intersects[i].xpoints.length; ++j ) {                
+                if( intersects[i].xpoints[j] != 0 && intersects[i].ypoints[j] != 0 )
+                    poly.addPoint(intersects[i].xpoints[j], intersects[i].ypoints[j]);                
+            }
+            intersects[i] = new Polygon(poly.xpoints, poly.ypoints, poly.npoints);
+        }        
         return intersects;
     }
 
