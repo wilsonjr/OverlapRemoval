@@ -7,9 +7,12 @@ package br.com.explore.explorertree;
 
 import br.com.methods.utils.Util;
 import br.com.representative.RepresentativeFinder;
+import br.com.representative.clustering.FarPointsMedoidApproach;
+import br.com.representative.clustering.partitioning.KMeans;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,10 +82,6 @@ public class ExplorerTreeNode {
                 copyMap.put(v.getKey(), v.getValue());
             }
             
-            
-            
-            
-            
 
             Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Routing: {0} - Number of representatives before {1}", new Object[]{_routing, map.size()});
             // remove representatives which represent only < _minChildren
@@ -105,7 +104,7 @@ public class ExplorerTreeNode {
             
            
             
-            if( map.isEmpty() ) {
+            if( map.isEmpty() || map.size() == 1  ) {
                 System.out.println("\n*****************************************");
                 Map<Integer, List<Integer>> agglomerateMap = agglomerateRepresentative(copyMap);
                 Map<Integer, Integer> mapIndexes2 = new HashMap<>();
@@ -118,7 +117,7 @@ public class ExplorerTreeNode {
                 
                 
                 for( Map.Entry<Integer, List<Integer>> v: agglomerateMap.entrySet() ) {
-                    System.out.print(v.getKey()+"("+mapIndexes2.get(v.getKey())+"):  ");
+                    System.out.print("Rounting: "+_routing+" // "+v.getKey()+"("+mapIndexes2.get(v.getKey())+"):  ");
                     for( Integer e: v.getValue() )
                         System.out.print(e+" ");
                     System.out.println();
@@ -142,20 +141,21 @@ public class ExplorerTreeNode {
                System.out.print(nthLevelRepresentatives[i]+" ");
             System.out.println("****************************************************");
             System.out.println("MAP2");
-            map = Util.createIndex(nthLevelRepresentatives, _subprojection);  
-            for( Map.Entry<Integer, List<Integer>> v: map.entrySet() ) {
-                System.out.print(v.getKey()+":  ");
-                for( Integer e: v.getValue() )
-                    System.out.print(e+" ");
-                System.out.println();
-            }  
-            
+            map = Util.createIndex(nthLevelRepresentatives, _subprojection); 
             Map<Integer, Integer> mapIndexes = new HashMap<>();
             map.values().stream().forEach((values) -> {
                 values.stream().forEach((value)-> {
                     mapIndexes.put(value, _indexes[value]);                    
                 });
             });
+            for( Map.Entry<Integer, List<Integer>> v: map.entrySet() ) {
+                System.out.print(v.getKey()+"("+mapIndexes.get(v.getKey())+"):  ");
+                for( Integer e: v.getValue() )
+                    System.out.print(e+" ");
+                System.out.println();
+            }  
+            
+            
             
             // for each representative
             
@@ -204,10 +204,98 @@ public class ExplorerTreeNode {
     
     
     private Map<Integer, List<Integer>> agglomerateRepresentative(Map<Integer, List<Integer>> map) {
+        Map<Integer, List<Integer>> newMap = new HashMap<>();
+        
+        
+//        KMeans kmeans = new KMeans(Arrays.asList(_subprojection), new FarPointsMedoidApproach(), _indexes.length/_minChildren);        
+//        kmeans.execute();
+//        int[] representative = kmeans.getRepresentatives();
+//        
+//        List<Representative> reps = new ArrayList<>();
+//        for( int i = 0; i < representative.length; ++i ) {
+//            //newMap.put(representative[i], kmeans.getClusters().get(i));
+//            reps.add(new Representative(representative[i], String.valueOf(representative[i]), kmeans.getClusters().get(i)));   
+//            System.out.println("Representative: "+representative[i]+", qtd: "+kmeans.getClusters().get(i).size());
+//        }
+//        
+//        
+//        while( true && reps.size() != 1 ) {
+//            reps.sort((Representative o1, Representative o2) -> new Integer(o1.list.size()).compareTo(o2.list.size()));
+//            
+//            System.out.println("**************************"+reps.get(0).list.size()+" < "+_minChildren+"************************");
+//            if( reps.get(0).list.size() < _minChildren ) {
+//                
+//                double dist = Double.MAX_VALUE;
+//                int index = -1;
+//                int u = reps.get(0).idx;
+//                
+//                for( int i = 1; i < reps.size(); ++i ) {
+//                    int v = reps.get(i).idx;
+//                    double d = Util.euclideanDistance(_subprojection[u].x, _subprojection[u].y, _subprojection[v].x, _subprojection[v].y);
+//                    if( d < dist ) {
+//                        dist = d;
+//                        index = i;
+//                    }
+//                }
+//                index = 1;
+//                List<Integer> list = new ArrayList<>();
+//                
+//                reps.get(0).list.stream().forEach((v)->list.add(v));
+//                reps.get(index).list.stream().forEach((v)->list.add(v));             
+//                
+//                Point2D.Double p = new Point2D.Double(0, 0);
+//                list.stream().forEach((e)->{
+//                    p.x += _subprojection[e].x;
+//                    p.y += _subprojection[e].y;
+//                });
+//
+//                p.x /= (double)list.size();
+//                p.y /= (double)list.size();
+//
+//                int index2 = -1;
+//                double distance = Double.MAX_VALUE;
+//                for( int i = 0; i < list.size(); ++i ) {
+//                    double d = Util.euclideanDistance(p.x, p.y, _subprojection[list.get(i)].x, _subprojection[list.get(i)].y);
+//                    
+//                    if( distance > d ) {
+//                        distance = d;
+//                        index2 = list.get(i);
+//                    }
+//                }
+//                if( index2 == 15 ) 
+//                    System.out.println(p.x+" - "+p.y);
+//                System.out.println("Fundindo "+reps.get(0).idx+" ("+reps.get(0).list.size()+ ") e "+reps.get(index).idx+" ("+reps.get(index).list.size()+ ")");
+//                
+//                
+//                //reps.add(new Representative(index2, String.valueOf(index2), list));    
+//                   
+//                
+//                List<Representative> temp = new ArrayList<>();
+//                for( int i = 1; i < reps.size(); ++i )
+//                    if( i != index  )
+//                        temp.add(reps.get(i));
+//                temp.add(new Representative(index2, String.valueOf(index2), list));
+//                
+//                //reps.remove(0);     
+//                //reps.remove(index);
+//                
+//                reps = temp;
+//                System.out.println("REPS SIZE: "+reps.size());
+//            } else
+//                break;
+//            
+//            
+//        }
+//        
+//        reps.stream().forEach((v)->newMap.put(v.idx, v.list));
+        
+        
+        
+        
+        
     
         Map<String, LinkageRepresentative> linkageMap = new HashMap<>();
-        PriorityQueue<LinkageRepresentative> queue = new PriorityQueue<>();
-        Map<Integer, List<Integer>> newMap = new HashMap<>();
+        PriorityQueue<LinkageRepresentative> queue = new PriorityQueue<>();        
         
         // create "clusters"
         List<Representative> reps = new ArrayList<>();
@@ -220,8 +308,8 @@ public class ExplorerTreeNode {
                 p.y += _subprojection[e].y;
             });
             
-            p.x /= (double)_subprojection.length;
-            p.y /= (double)_subprojection.length;
+            p.x /= (double)value.getValue().size();
+            p.y /= (double)value.getValue().size();
                         
             int index = -1;
             double distance = Double.MAX_VALUE;
@@ -261,8 +349,8 @@ public class ExplorerTreeNode {
                 p.y += _subprojection[e].y;
             });
             
-            p.x /= (double)_subprojection.length;
-            p.y /= (double)_subprojection.length;
+            p.x /= (double)neighbors.size();
+            p.y /= (double)neighbors.size();
                         
             int index = -1;
             double distance = Double.MAX_VALUE;
@@ -339,8 +427,8 @@ public class ExplorerTreeNode {
                 p.y += _subprojection[e].y;
             });
 
-            p.x /= (double)_subprojection.length;
-            p.y /= (double)_subprojection.length;
+            p.x /= (double)neighbors.size();
+            p.y /= (double)neighbors.size();
 
             int index = -1;
             double distance = Double.MAX_VALUE;
@@ -355,11 +443,83 @@ public class ExplorerTreeNode {
             newMap.put(index, neighbors);
         }
         
+        List<Representative> reps2 = new ArrayList<>();
+        for( Map.Entry<Integer, List<Integer>> value: newMap.entrySet() ) 
+            reps2.add(new Representative(value.getKey(), String.valueOf(value.getKey()), value.getValue()));
+                
+        
+        
+        while( true && reps2.size() != 1 ) {
+            reps2.sort((Representative o1, Representative o2) -> new Integer(o1.list.size()).compareTo(o2.list.size()));
+            
+            System.out.println("**************************"+reps2.get(0).list.size()+" < "+_minChildren+"************************");
+            if( reps2.get(0).list.size() < _minChildren ) {
+                
+                double dist = Double.MAX_VALUE;
+                int index = -1;
+                int u = reps2.get(0).idx;
+                
+                for( int i = 1; i < reps2.size(); ++i ) {
+                    int v = reps2.get(i).idx;
+                    double d = Util.euclideanDistance(_subprojection[u].x, _subprojection[u].y, _subprojection[v].x, _subprojection[v].y);
+                    if( d < dist ) {
+                        dist = d;
+                        index = i;
+                    }
+                }
+                index = 1;
+                List<Integer> list = new ArrayList<>();
+                
+                reps2.get(0).list.stream().forEach((v)->list.add(v));
+                reps2.get(index).list.stream().forEach((v)->list.add(v));             
+                
+                Point2D.Double p = new Point2D.Double(0, 0);
+                list.stream().forEach((e)->{
+                    p.x += _subprojection[e].x;
+                    p.y += _subprojection[e].y;
+                });
+
+                p.x /= (double)list.size();
+                p.y /= (double)list.size();
+
+                int index2 = -1;
+                double distance = Double.MAX_VALUE;
+                for( int i = 0; i < list.size(); ++i ) {
+                    double d = Util.euclideanDistance(p.x, p.y, _subprojection[list.get(i)].x, _subprojection[list.get(i)].y);
+                    
+                    if( distance > d ) {
+                        distance = d;
+                        index2 = list.get(i);
+                    }
+                }
+                System.out.println("Fundindo "+reps2.get(0).idx+" ("+reps2.get(0).list.size()+ ") e "+reps2.get(index).idx+" ("+reps2.get(index).list.size()+ ")");
+                
+                
+                //reps.add(new Representative(index2, String.valueOf(index2), list));    
+                   
+                
+                List<Representative> temp = new ArrayList<>();
+                for( int i = 1; i < reps2.size(); ++i )
+                    if( i != index  )
+                        temp.add(reps2.get(i));
+                temp.add(new Representative(index2, String.valueOf(index2), list));
+                
+                //reps.remove(0);     
+                //reps.remove(index);
+                
+                reps2 = temp;
+                System.out.println("REPS SIZE: "+reps2.size());
+            } else
+                break;
+            
+            
+        }
+        Map<Integer, List<Integer>> newMap2 =new HashMap<>();
+        reps.stream().forEach((v)->newMap2.put(v.idx, v.list));
         
         
         
-        
-        return newMap;
+        return newMap2;
     }
     
     private LinkageRepresentative findLink(Map<String, LinkageRepresentative> linkageMap, Representative c, Representative u) {
@@ -401,6 +561,7 @@ public class ExplorerTreeNode {
         @Override
         public int compareTo(Object o) {
             LinkageRepresentative or = (LinkageRepresentative)o;
+            //return new Integer(u.list.size()+v.list.size()).compareTo(or.u.list.size()+or.v.list.size());
             return new Double(distance).compareTo(or.distance);            
         }
         

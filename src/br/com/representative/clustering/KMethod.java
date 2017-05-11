@@ -6,7 +6,7 @@
 package br.com.representative.clustering;
 
 import java.awt.Point;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -19,7 +19,7 @@ public abstract class KMethod extends Partitioning {
     protected Point.Double[] centroids;    
     protected InitialMedoidApproach initialGuessApproach;    
         
-    public KMethod(ArrayList<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
+    public KMethod(List<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
         super(items);
         this.initialGuessApproach = initialGuessApproach;
         this.K = k;

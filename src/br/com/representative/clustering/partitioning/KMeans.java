@@ -20,7 +20,7 @@ import java.util.List;
 public class KMeans extends KMethod {
     
     
-    public KMeans(ArrayList<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
+    public KMeans(List<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
         super(items, initialGuessApproach, k);
     }
     

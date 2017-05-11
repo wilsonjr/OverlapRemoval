@@ -1608,13 +1608,13 @@ public class Menu extends javax.swing.JFrame {
 
         System.out.println("initial index: "+indexNewRepresentatives);
         System.out.println("quantidade real: "+selectedRepresentatives.length);
+        
         Point2D.Double[] points = new Point2D.Double[selectedRepresentatives.length-indexNewRepresentatives];
         System.out.println("SIZE: "+points.length);
         for( int i = 0; i < points.length; ++i ) {
             int index = selectedRepresentatives[i+indexNewRepresentatives];
             points[i] = new Point2D.Double(rectangles.get(index).getCenterX(), rectangles.get(index).getCenterY());
         }
-        
         
         Point2D.Double[] pointsClickedPolygon = new Point2D.Double[clickedPolygon.npoints];
         for( int i = 0; i < clickedPolygon.npoints; ++i )
@@ -1626,8 +1626,6 @@ public class Menu extends javax.swing.JFrame {
         List<Polygon> polys = Arrays.asList(intersects2);
         System.out.println("Size: "+polys.size());
         intersectsPolygon.add(polys);
-        clickedPolygon = polys.get(1);
-        System.out.println(clickedPolygon);
         
     }
     
@@ -1957,19 +1955,7 @@ public class Menu extends javax.swing.JFrame {
                     } catch( IOException e ) {
                         System.out.println(e.getMessage());
                     } 
-                }
-                
-//                if( diagrams != null ) {                    
-//                    g2Buffer.setColor(Color.RED);                            
-//                    
-//                    for( int i = 0; i < diagrams.length; ++i ) 
-//                        g2Buffer.drawPolygon(diagrams[i]);                    
-//                }
-                
-//                if( hullPolygon != null ) {
-//                    g2Buffer.setColor(Color.BLUE);
-//                    g2Buffer.drawPolygon(hullPolygon);
-//                }
+                }                
                 
                 for( List<Polygon> polygonVoronoi: intersectsPolygon ) {
                     g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
@@ -2021,16 +2007,10 @@ public class Menu extends javax.swing.JFrame {
                 
                 if( clickedPolygon != null ) {
                     g2Buffer.setColor(Color.BLACK);
-                    System.out.println("Iniciando o desenho dos pontos do polígono.");
-                    for( int i = 0; i < clickedPolygon.xpoints.length; ++i ) {
-                        g2Buffer.fillOval(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i], 5, 5);
-                        System.out.println("filling the point: ("+clickedPolygon.xpoints[i]+","+
-                                clickedPolygon.ypoints[i]+")");
-                    }
-                    System.out.println("--------------------------------------------");
-                    
+                    for( int i = 0; i < clickedPolygon.xpoints.length; ++i )
+                        g2Buffer.fillOval(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i], 5, 5); 
                 }
-                                
+                
                 g2Buffer.dispose();
                 
             } 
