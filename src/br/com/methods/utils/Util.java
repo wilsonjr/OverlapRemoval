@@ -1532,7 +1532,6 @@ public class Util {
         for( int i = 0; i < pts.length; ++i ) {
             p1.addVertex(new math.geom2d.Point2D(pts[i].x, pts[i].y));
         }
-       
         
         Polygon[] intersects = new Polygon[diagrams.length];
         for( int i = 0; i < diagrams.length; ++i ) {

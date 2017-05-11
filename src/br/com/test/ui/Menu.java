@@ -94,6 +94,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import math.geom2d.polygon.SimplePolygon2D;
 
 /**
  *
@@ -125,6 +126,8 @@ public class Menu extends javax.swing.JFrame {
     private Polygon hullPolygon = null;
     private Polygon[] intersects = null;
     
+    private List<List<Polygon>> intersectsPolygon = new ArrayList<>();
+    
     private Map<Integer, List<Integer>> hashRepresentative = null;
     private List<Integer> nearest = null;
     private int[][] heatmap = null;
@@ -133,6 +136,10 @@ public class Menu extends javax.swing.JFrame {
     private ArrayList<Point2D.Double> items = null;
     private Point2D.Double[] points = null;
     private ExplorerTree explorerTree;
+    
+    private Polygon clickedPolygon = null;
+    private int indexNewRepresentatives = -1;
+    
     
     
     /**
@@ -1562,6 +1569,8 @@ public class Menu extends javax.swing.JFrame {
             diagrams = Util.voronoiDiagram(window, points);            
             intersects = Util.clipBounds(diagrams, hull);
             
+            intersectsPolygon.add(Arrays.asList(intersects));
+            
             view.cleanImage();
             view.repaint();
         }
@@ -1585,7 +1594,40 @@ public class Menu extends javax.swing.JFrame {
         
         voronoiDiagramJMenuItemActionPerformed(evt);
     }//GEN-LAST:event_testTreeJMenuItemActionPerformed
+    
+    
+    public void updateDiagram() {
+        
+        Polygon window = new Polygon();
+        int width = view.getSize().width;
+        int height = view.getSize().height;
+        window.addPoint(0, 0);
+        window.addPoint(width, 0);
+        window.addPoint(width, height);
+        window.addPoint(0, height);
 
+        System.out.println("initial index: "+indexNewRepresentatives);
+        System.out.println("quantidade real: "+selectedRepresentatives.length);
+        Point2D.Double[] points = new Point2D.Double[selectedRepresentatives.length-indexNewRepresentatives];
+        System.out.println("SIZE: "+points.length);
+        for( int i = 0; i < points.length; ++i ) {
+            int index = selectedRepresentatives[i+indexNewRepresentatives];
+            points[i] = new Point2D.Double(rectangles.get(index).getCenterX(), rectangles.get(index).getCenterY());
+        }
+        
+        
+        Point2D.Double[] pointsClickedPolygon = new Point2D.Double[clickedPolygon.npoints];
+        for( int i = 0; i < clickedPolygon.npoints; ++i )
+            pointsClickedPolygon[i] = new Point2D.Double(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i]);           
+        
+        Polygon[] diagrams2 = Util.voronoiDiagram(window, points);            
+        Polygon[] intersects2 = Util.clipBounds(diagrams2, pointsClickedPolygon);
+        intersectsPolygon.add(Arrays.asList(intersects2));
+        
+        System.out.println(clickedPolygon);
+        
+    }
+    
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1676,20 +1718,33 @@ public class Menu extends javax.swing.JFrame {
                             
                             ExplorerTreeNode node = explorerTree.activeNodes().get(index);
                             if( !node.children().isEmpty() ) {
+                               
                                 explorerTree.expandNode(index);
-                                int[] reps = new int[node.children().size()+selectedRepresentatives.length-1];
+                                int[] reps = new int[node.children().size() + selectedRepresentatives.length-1];
 
                                 int j = 0;
                                 for( int i = 0; i < selectedRepresentatives.length; ++i )
                                     if( selectedRepresentatives[i] != index )
                                         reps[j++] = selectedRepresentatives[i];
+                                 indexNewRepresentatives = j;
                                 for( ExplorerTreeNode n: node.children() )
                                     reps[j++] = n.routing();
 
                                 selectedRepresentatives = Arrays.copyOf(reps, reps.length);
                                 hashRepresentative = Util.createIndex(selectedRepresentatives, points);
                                 
-                                voronoiDiagramJMenuItemActionPerformed(null);
+                                for( List<Polygon> voronoiPolygon: intersectsPolygon )
+                                    for( Polygon p: voronoiPolygon ) {
+                                        SimplePolygon2D sp = new SimplePolygon2D();
+                                        for( int i = 0; i < p.xpoints.length; ++i )
+                                            sp.addVertex(new math.geom2d.Point2D(p.xpoints[i], p.ypoints[i]));
+                                        
+                                        if( sp.contains(e.getX(), e.getY()) )
+                                            clickedPolygon = p;
+                                    }
+                                updateDiagram();
+                                //intersectsPolygon.clear();
+                                //voronoiDiagramJMenuItemActionPerformed(null);
                             }
                         } 
                     }
@@ -1808,11 +1863,11 @@ public class Menu extends javax.swing.JFrame {
                             }
                         }
 
-                        if( !r.isPivot() && hideShowNumbers ) {
-                            g2Buffer.setColor(Color.RED);
-                            g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                            g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
-                        }
+//                        if( !r.isPivot() && hideShowNumbers ) {
+//                            g2Buffer.setColor(Color.RED);
+//                            g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+//                            g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);                           
+//                        }
                     }
                      
                    
@@ -1908,11 +1963,13 @@ public class Menu extends javax.swing.JFrame {
 //                    g2Buffer.drawPolygon(hullPolygon);
 //                }
                 
-                if( intersects != null ) {
-                    g2Buffer.setColor(Color.BLUE);
+                for( List<Polygon> polygonVoronoi: intersectsPolygon ) {
+                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
+                    g2Buffer.setColor(Color.GREEN);
                     
-                    for( int i = 0; i < intersects.length; ++i )  
-                        g2Buffer.drawPolygon(intersects[i]);
+                    for( Polygon p: polygonVoronoi )
+                        g2Buffer.drawPolygon(p);
+                    
                 }
                 
                 if( selectedRepresentatives != null ) {
