@@ -1621,13 +1621,15 @@ public class Menu extends javax.swing.JFrame {
             pointsClickedPolygon[i] = new Point2D.Double(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i]);           
         
         Polygon[] diagrams2 = Util.voronoiDiagram(window, points);            
-        Polygon[] intersects2 = Util.clipBounds(diagrams2, pointsClickedPolygon);
-        intersectsPolygon.add(Arrays.asList(intersects2));
+        Polygon[] intersects2 = Util.clipBounds(diagrams2, pointsClickedPolygon);        
         
+        List<Polygon> polys = Arrays.asList(intersects2);
+        System.out.println("Size: "+polys.size());
+        intersectsPolygon.add(polys);
+        clickedPolygon = polys.get(1);
         System.out.println(clickedPolygon);
         
     }
-    
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -1638,7 +1640,6 @@ public class Menu extends javax.swing.JFrame {
                                                      rectangles.get(j).getCenterX(), rectangles.get(j).getCenterY());
                 d = Math.max(d, dd);
             }
-                
         
         return d;
     }
@@ -1731,7 +1732,14 @@ public class Menu extends javax.swing.JFrame {
                                     reps[j++] = n.routing();
 
                                 selectedRepresentatives = Arrays.copyOf(reps, reps.length);
-                                hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+                                
+                                
+                                for( ExplorerTreeNode n: node.children() ) {
+                                    List<Integer> nearest = new ArrayList<>();
+                                    Arrays.stream(n.indexes()).forEach((i)->nearest.add(i));                                    
+                                    hashRepresentative.put(n.routing(), nearest);
+                                }
+                                //hashRepresentative = Util.createIndex(selectedRepresentatives, points);
                                 
                                 for( List<Polygon> voronoiPolygon: intersectsPolygon )
                                     for( Polygon p: voronoiPolygon ) {
@@ -1972,6 +1980,8 @@ public class Menu extends javax.swing.JFrame {
                     
                 }
                 
+                
+                
                 if( selectedRepresentatives != null ) {
 
                     if(  hashRepresentative != null ) {
@@ -2007,6 +2017,18 @@ public class Menu extends javax.swing.JFrame {
                             }
                         }
                     }
+                }
+                
+                if( clickedPolygon != null ) {
+                    g2Buffer.setColor(Color.BLACK);
+                    System.out.println("Iniciando o desenho dos pontos do polígono.");
+                    for( int i = 0; i < clickedPolygon.xpoints.length; ++i ) {
+                        g2Buffer.fillOval(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i], 5, 5);
+                        System.out.println("filling the point: ("+clickedPolygon.xpoints[i]+","+
+                                clickedPolygon.ypoints[i]+")");
+                    }
+                    System.out.println("--------------------------------------------");
+                    
                 }
                                 
                 g2Buffer.dispose();
