@@ -1861,7 +1861,7 @@ public class Menu extends javax.swing.JFrame {
                                     g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
                                     g2Buffer.setColor(r.cor);
                                     g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                                } else if( selectedRepresentatives == null || hashRepresentative == null ) {
+                                } else {
                                     g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
                                     g2Buffer.setColor(Color.BLUE);
                                     g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
@@ -1882,7 +1882,7 @@ public class Menu extends javax.swing.JFrame {
                         for( int i = 0; i < nearest.size(); ++i ) {
                             RetanguloVis r = rectangles.get(nearest.get(i));
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
-                            g2Buffer.setColor(Color.BLUE);
+                            g2Buffer.setColor(Color.RED);
                             g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1f));
                             
