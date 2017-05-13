@@ -1885,6 +1885,14 @@ public class Menu extends javax.swing.JFrame {
                             g2Buffer.setColor(Color.BLUE);
                             g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1f));
+                            
+                            
+                            if( hideShowNumbers ) {
+                                g2Buffer.setColor(Color.BLACK);
+                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));
+                                g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);
+                            }
+                            
                         }
                     }
                 }
