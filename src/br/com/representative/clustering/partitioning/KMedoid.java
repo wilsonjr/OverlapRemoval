@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class KMedoid extends KMethod {
     
-    public KMedoid(ArrayList<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
+    public KMedoid(List<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
         super(items, initialGuessApproach, k);
     }
     
