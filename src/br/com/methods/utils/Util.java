@@ -1365,12 +1365,8 @@ public class Util {
         for( int i = 0; i < m.length; ++i ) {
             
             System.out.printf("%.4f", m[i][0]);
-            if( m[i][0] == 0 && i != 0  )
-                    System.out.printf(" >>(%d,%d) tem zero << ", i,0);
             for( int j = 1; j < m[i].length; ++j ) {
                 System.out.printf(";%.4f",m[i][j]);
-                if( m[i][j] == 0 && i != j )
-                    System.out.printf(" >>(%d,%d) tem zero << ", i,j);
             }
             System.out.println();
         }
@@ -1559,44 +1555,43 @@ public class Util {
         return intersects;
     }
 
-    public static int[] distinct(int[] selectedRepresentatives, Point2D.Double[] points, int radius) {
+    public static int[] distinct(int[] indexes, Point2D.Double[] points, int radius) {
         
-        Item[] items = new Item[selectedRepresentatives.length];
-        for( int i = 0; i < items.length; ++i )
-            items[i] = new Item(points[selectedRepresentatives[i]].x, points[selectedRepresentatives[i]].y, selectedRepresentatives[i]);
+        boolean valid[] = new boolean[indexes.length];
+        Arrays.fill(valid, true);
         
-        Arrays.sort(items, (Item a, Item b) -> {
-            int c = new Double(a.x).compareTo(b.x);
-            if( c == 0 )
-                new Double(a.y).compareTo(b.y);                
-            return c;
+        List<DistancePoint> list = new ArrayList<>();
+        for( int i = 0; i < indexes.length; ++i )
+            for( int j = i+1; j < indexes.length; ++j )
+                list.add(new DistancePoint(Util.euclideanDistance(points[indexes[i]].x, points[indexes[i]].y, 
+                                                                  points[indexes[j]].x, points[indexes[j]].y), i, j));
+        
+        Collections.sort(list, (DistancePoint a, DistancePoint b)->{
+            return new Double(a.distance).compareTo(b.distance);
         });
         
-        List<Item> elements = new ArrayList<>();               
-        elements.add(new Item(items[0].x, items[0].y, items[0].index));
-        
-        for( int i = 1; i < items.length; ++i ) {
+        for( int i = 0; i < list.size(); ++i ) {
             
-            if( radius != 0 ) {
-                Rectangle r1 = new Rectangle((int)elements.get(elements.size()-1).x, 
-                                             (int)elements.get(elements.size()-1).y, 
-                                             2*radius, 2*radius);
-                Rectangle r2 = new Rectangle((int)items[i].x, (int)items[i].y, 2*radius, 2*radius);
-                
-                if( !r1.intersects(r2) )
-                    elements.add(new Item(items[i].x, items[i].y, items[i].index));    
-            } else {
-                if( !(elements.get(elements.size()-1).x == items[i].x && elements.get(elements.size()-1).y == items[i].y) )
-                    elements.add(new Item(items[i].x, items[i].y, items[i].index));      
-            }
+            if( !valid[list.get(i).i] || !valid[list.get(i).j] )
+                continue;
+            
+            Rectangle r1 = new Rectangle((int)points[indexes[list.get(i).i]].x, (int)points[indexes[list.get(i).i]].y, 
+                                         2*radius, 2*radius);
+            Rectangle r2 = new Rectangle((int)points[indexes[list.get(i).j]].x, (int)points[indexes[list.get(i).j]].y, 
+                                         2*radius, 2*radius);
+            
+            if( r1.intersects(r2) )
+                valid[list.get(i).j] = false;
+            else
+                break; // it is ordered by distance, so that the remaining pairs have no intersection            
         }
         
-        int[] distinctPoints = new int[elements.size()];
-        for( int i = 0; i < distinctPoints.length; ++i )
-            distinctPoints[i] = elements.get(i).index;
+        List<Integer> distinctIndexes = new ArrayList<>();
+        for( int i = 0; i < valid.length; ++i )
+            if( valid[i] )
+                distinctIndexes.add(indexes[i]);
         
-        
-        return distinctPoints;
+        return distinctIndexes.stream().mapToInt((e)->e).toArray();
     }
     
     public static Map<Integer, List<Integer>> createIndex(int[] representatives, Point2D.Double[] points) {
@@ -1723,9 +1718,9 @@ public class Util {
     
              
     private static class Item {
-        public double x;
-        public double y;
-        public int index;
+        private double x;
+        private double y;
+        private int index;
         
         public Item(double x, double y, int index) {
             this.x = x;
@@ -1738,5 +1733,18 @@ public class Util {
             return index+": "+x+" * "+y;
         }
     } 
+    
+    private static class DistancePoint {
+        private double distance;
+        private int i, j;
+        
+        public DistancePoint(double distance, int i, int j) {
+            this.distance = distance;
+            this.i = i;
+            this.j = j;
+        }
+        
+        
+    }
     
 }
