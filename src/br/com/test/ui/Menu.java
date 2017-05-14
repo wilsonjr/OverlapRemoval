@@ -1495,10 +1495,10 @@ public class Menu extends javax.swing.JFrame {
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
         }
         
-        RepresentativeFinder ds3 = new DS3(distances, 0.12); // gives the best results 
+        RepresentativeFinder ds3 = new DS3(distances, 0.005); // gives the best results 
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
-        selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+        //selectedRepresentatives = Util.distinct(selectedRepresentatives, points, RECTSIZE/2);
         hashRepresentative = Util.createIndex(selectedRepresentatives, points);
         
 //        //view.adjustPanel();
