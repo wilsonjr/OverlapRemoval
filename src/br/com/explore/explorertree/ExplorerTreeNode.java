@@ -78,6 +78,35 @@ public class ExplorerTreeNode {
         
             System.out.println("Number of instances: "+_indexes.length+", number of representatives: "+nthLevelRepresentatives.length);
             
+            int[] temp = new int[nthLevelRepresentatives.length];
+            Map<Integer, List<Integer>> mapTemp = Util.createIndex(nthLevelRepresentatives, _subprojection);
+            int tempIdx = 0;
+            for( Map.Entry<Integer, List<Integer>> v: mapTemp.entrySet() ) {
+                
+                List<Integer> list = v.getValue();
+                Point2D.Double p = new Point2D.Double(0,0);
+                for( int i = 0; i < list.size(); ++i ) {
+                    p.x += _subprojection[list.get(i)].x;
+                    p.y += _subprojection[list.get(i)].y;
+                }
+                
+                p.x /= list.size();
+                p.y /= list.size();
+                
+                int idx = list.get(0);
+                double dist = Double.MAX_VALUE;
+                for( int i = 0; i < list.size(); ++i ) {
+                    double d = Util.euclideanDistance(p.x, p.y, _subprojection[list.get(i)].x, _subprojection[list.get(i)].y);
+                    if( d < dist ) {
+                        dist = d;
+                        idx = list.get(i);
+                    }
+                }
+                
+                temp[tempIdx++] = idx;
+            }
+            
+            nthLevelRepresentatives = temp;
             
             // apply distinction algorithm
             nthLevelRepresentatives = Util.distinct(nthLevelRepresentatives, _subprojection, _distinctionDistance);
