@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class BisectingKMeans extends KMethod {
     
-    public BisectingKMeans(ArrayList<Point.Double> items, InitialMedoidApproach initialGuess, int k) {
+    public BisectingKMeans(List<Point.Double> items, InitialMedoidApproach initialGuess, int k) {
         super(items, initialGuess, k);
     }
     
