@@ -221,30 +221,15 @@ public class DS3 extends SparseRepresentation {
 
         double[][] sumAux = Util.sum(powered, 1);
         
-        System.out.println("sumAux: ");
-        Util.print(sumAux);
-        System.out.println();
-        
-        System.out.println("LAMBDA: ");
-        for( int i = 0; i < r.length; ++i ) {
+        for( int i = 0; i < r.length; ++i )
             r[i] = Math.max(Math.sqrt(sumAux[i][0])-lambda[i], 0);        
-            System.out.print(lambda[i]+" ");
-        }
-        System.out.println();
-        System.out.println("R: ");
-        for( int i = 0; i < r.length; ++i ) {
-            System.out.print("("+r[i]+")");
+        
+        for( int i = 0; i < r.length; ++i ) 
             r[i] = r[i]/(r[i]+lambda[i]);
-            System.out.print(r[i]+" ");
-        }
-        System.out.println();
+        
                
         double[][] aux = Util.reapmat(r, n);
-        
-        System.out.println("AUX: ");
-        Util.print(aux);
-        System.out.println();
-        
+                
         double[][] C2 = new double[C1.length][C1[0].length];
         for( int i = 0; i < C1.length; ++i )
             for( int j = 0; j < C1[0].length; ++j )
