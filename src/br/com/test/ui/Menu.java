@@ -1495,28 +1495,47 @@ public class Menu extends javax.swing.JFrame {
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
         }
         
-        RepresentativeFinder ds3 = new DS3(distances, 0.005); // gives the best results 
+        RepresentativeFinder ds3 = new DS3(distances, 0.1); // gives the best results 
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
-        //selectedRepresentatives = Util.distinct(selectedRepresentatives, points, RECTSIZE/2);
-        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
         
-//        //view.adjustPanel();
-//        int width = view.getSize().width;
-//        int height = view.getSize().height;
-//        heatmap = new int[width][height];
-//        System.out.println(">> "+width+", "+height);
-//        
-//        //for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-//            int radius = hashRepresentative.get(selectedRepresentatives[0]).size()*3;
-//            Point2D.Double p = points[selectedRepresentatives[0]];
-//            System.out.println("RADIUS: "+radius);
-//            System.out.println("x: "+p.x+", y: "+p.y);
+        
+        
+        int[] temp = new int[selectedRepresentatives.length];
+        Map<Integer, List<Integer>> mapTemp = Util.createIndex(selectedRepresentatives, points);
+        int tempIdx = 0;
+        for( Map.Entry<Integer, List<Integer>> v: mapTemp.entrySet() ) {
+            System.out.println(tempIdx+": Estou aqui: "+v.getKey());
+            List<Integer> list = v.getValue();
+            Point2D.Double p = new Point2D.Double(0,0);
+            for( int i = 0; i < list.size(); ++i ) {
+                p.x += points[list.get(i)].x;
+                p.y += points[list.get(i)].y;
+            }
+
+            p.x /= list.size();
+            p.y /= list.size();
+
+            int idx = list.get(0);
+            double dist = Double.MAX_VALUE;
+            for( int i = 0; i < list.size(); ++i ) {
+                double d = Util.euclideanDistance(p.x, p.y, points[list.get(i)].x, points[list.get(i)].y);
+                if( d < dist ) {
+                    dist = d;
+                    idx = list.get(i);
+                }
+            }
+
+            temp[tempIdx++] = idx;
+            System.out.println("novo: "+idx);
+        }
 //
-//            heatmap = Util.fillSphere(radius, heatmap, (int)p.x, (int)p.y, hashRepresentative.get(selectedRepresentatives[0]).size());
-//        //}
-    
+        selectedRepresentatives = temp;
         
+        
+        selectedRepresentatives = Util.distinct(selectedRepresentatives, points, RECTSIZE/2);
+        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+    
         if( view != null ) {
             view.cleanImage();
             view.repaint();
@@ -1583,7 +1602,7 @@ public class Menu extends javax.swing.JFrame {
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
         }
         
-        RepresentativeFinder algorithm = new DS3(distances, 0.12);
+        RepresentativeFinder algorithm = new DS3(distances, 0.1);
         explorerTree = new ExplorerTree(points, algorithm, RECTSIZE/2, 7);
         explorerTree.build();
         explorerTree.buildActiveNodes();
