@@ -83,13 +83,14 @@ public class DS3 extends SparseRepresentation {
     
         double[][] Lambda = Util.createMatrix(nr, nc, 0);
         
-        for( int i = 0; i < CFD.length; ++i )
-            CFD[i] = (rho/mu)*CFD[i];
+        for( int i = 0; i < CFD.length; ++i ) {
+            CFD[i] = (rho/mu)*CFD[i];        
+        }
         
         double[][] C2 = null;
         while( !terminate ) {
             
-            double[][] Z = shrinkL1Lq(Util.minus(C1, Util.multiply(1.0/mu, Util.sum(Lambda, D))), CFD, p);
+            double[][] Z = shrinkL1Lq(Util.minus(C1, Util.multiply(1.0/mu, Util.sum(Lambda, D))), CFD, p);            
             C2 = bclsSolver(Util.sum(Z, Util.multiply(1.0/mu, Lambda)));
             
             Lambda = Util.sum(Lambda, Util.multiply(mu, Util.minus(Z, C2)));
@@ -100,13 +101,13 @@ public class DS3 extends SparseRepresentation {
             if( k >= maxIter || (err1 <= errThr && err2 <= errThr) ) {
                 terminate = true;
                 formRepresentatives(C2);
-                System.err.println("Finishing: ||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");
+                System.out.println("Finishing: ||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");
             } else {
                 k++;
-                /*if( k%100 == 0 ) {
-                    formRepresentatives(C2);
-                    System.err.println("||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");       
-                }*/
+                if( k%10 == 0 ) {
+                    //formRepresentatives(C2);
+                    //System.out.println("||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");       
+                }
             }
             
             C1 = C2;
@@ -164,7 +165,7 @@ public class DS3 extends SparseRepresentation {
     
     // we will use q == 2 since it's faster and produce acceptable results
     private double[] computeRegularizer(double[][] D, int q) {
-        
+                
         int nr = D.length, nc = D[0].length;
         double[][] s = Util.sum(D, 1);
         int idx = 0;
@@ -180,11 +181,17 @@ public class DS3 extends SparseRepresentation {
         double[] v = new double[D[0].length];
         double sqrtNr = Math.sqrt(nr);
         for( int i = 0; i < idxC.length; ++i ) {            
-            for( int j = 0; j < v.length; ++j )
-                v[j] = D[idxC[i]][j] - D[idx][j];           
+           
+            for( int j = 0; j < v.length; ++j ) 
+                v[j] = D[idxC[i]][j] - D[idx][j];            
+            
+            double sum = 2*Arrays.stream(v).sum(); 
+            if( sum == 0.0 ) // avoid NaN comparison
+                continue;
+            
             double p = sqrtNr*(Util.norm(v)*Util.norm(v)) / (2*Arrays.stream(v).sum());
             rhoMax = Math.max(rhoMax, p);            
-        }
+        }        
         
         if( nr == nc ) {
             double value = Math.pow(10, 10);
@@ -195,7 +202,7 @@ public class DS3 extends SparseRepresentation {
                 D[i][i] = 0;
         } else 
             rhoMin = Util.min(D);
-        
+                
         double[] minAndMaxRho = {rhoMin, rhoMax};
         return minAndMaxRho;
     }
@@ -214,13 +221,29 @@ public class DS3 extends SparseRepresentation {
 
         double[][] sumAux = Util.sum(powered, 1);
         
-        for( int i = 0; i < r.length; ++i )
+        System.out.println("sumAux: ");
+        Util.print(sumAux);
+        System.out.println();
+        
+        System.out.println("LAMBDA: ");
+        for( int i = 0; i < r.length; ++i ) {
             r[i] = Math.max(Math.sqrt(sumAux[i][0])-lambda[i], 0);        
-        
-        for( int i = 0; i < r.length; ++i )
+            System.out.print(lambda[i]+" ");
+        }
+        System.out.println();
+        System.out.println("R: ");
+        for( int i = 0; i < r.length; ++i ) {
+            System.out.print("("+r[i]+")");
             r[i] = r[i]/(r[i]+lambda[i]);
-        
+            System.out.print(r[i]+" ");
+        }
+        System.out.println();
+               
         double[][] aux = Util.reapmat(r, n);
+        
+        System.out.println("AUX: ");
+        Util.print(aux);
+        System.out.println();
         
         double[][] C2 = new double[C1.length][C1[0].length];
         for( int i = 0; i < C1.length; ++i )
