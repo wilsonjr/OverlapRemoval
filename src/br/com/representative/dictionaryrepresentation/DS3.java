@@ -105,10 +105,9 @@ public class DS3 extends SparseRepresentation {
             } else {
                 k++;
                // if( k%10 == 0 ) {
-                    formRepresentatives(C2);
-                    System.out.println("||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");       
+                    //formRepresentatives(C2);
+                    //System.out.println("||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");       
                // }
-                  
             }
             
             C1 = C2;
@@ -275,26 +274,6 @@ public class DS3 extends SparseRepresentation {
         D = distances;
     }    
     
-    public void mapInternal(double min, double max) {
-        
-        
-        
-        double r = (20. - 150.)*(max-min)/(1.0-150.) + 150.;
-        System.out.println("max   (1): "+max);
-        System.out.println("min (150): "+min);
-        System.out.println("med: "+r);
-    }
-    
-    public static double map(double valueCoord1,
-        double startCoord1, double endCoord1,
-        double startCoord2, double endCoord2) {
-
-        double offset = startCoord2;
-        double ratio = (endCoord2 - startCoord2) / (endCoord1 - startCoord1);
-        
-        System.out.println("med2: "+(ratio * (valueCoord1 - startCoord1) + offset));
-        return ratio * (valueCoord1 - startCoord1) + offset;
-    }
 
     private class Item {
         public double value;

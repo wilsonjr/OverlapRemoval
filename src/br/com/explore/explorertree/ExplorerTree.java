@@ -62,8 +62,10 @@ public class ExplorerTree {
         _representativeAlgorithm.execute();
         int[] levelOneRepresentatives = _representativeAlgorithm.getRepresentatives();
         
+        
         // apply distinction algorithm
         levelOneRepresentatives = Util.distinct(levelOneRepresentatives, _projection, _distinctionDistance);
+        //levelOneRepresentatives = selectMedoid(levelOneRepresentatives);
         Map<Integer, List<Integer>> map = Util.createIndex(levelOneRepresentatives, _projection);
         
         Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives before {0}", map.size());
@@ -122,6 +124,39 @@ public class ExplorerTree {
     
     public List<ExplorerTreeNode> topNodes() {
         return _topNodes;
+    }
+    
+    private int[] selectMedoid(int[] indexes) {
+        int[] temp = new int[indexes.length];
+        Map<Integer, List<Integer>> mapTemp = Util.createIndex(indexes, _projection);
+        int k = 0;
+        
+        for( Map.Entry<Integer, List<Integer>> v: mapTemp.entrySet() ) {
+            
+            List<Integer> list = v.getValue();
+            Point2D.Double p = new Point2D.Double(0,0);
+            for( int i = 0; i < list.size(); ++i ) {
+                p.x += _projection[list.get(i)].x;
+                p.y += _projection[list.get(i)].y;
+            }
+            
+            p.x /= list.size();
+            p.y /= list.size();
+            
+            int medoid = list.get(0);
+            double dist = Double.MAX_VALUE;
+            for( int i = 0; i < list.size(); ++i ) {
+                double d = Util.euclideanDistance(p.x, p.y, _projection[list.get(i)].x, _projection[list.get(i)].y);
+                if( d < dist ) {
+                    dist = d;
+                    medoid = list.get(i);
+                }
+            }
+            
+            temp[k++] = medoid;
+        }
+        
+        return temp;
     }
     
 }
