@@ -1463,8 +1463,18 @@ public class Util {
             centroid[0].x /= (double) clusters.get(i).size();
             centroid[0].y /= (double) clusters.get(i).size();
             
-            int[] index = Util.selectRepresentatives(centroid, itemsInCluster);
-            indexes[i] = map.get(index[0]);
+            int medoid = 0;
+            double d = Double.MAX_VALUE;
+            for( int j = 0; j < clusters.get(i).size(); ++j ) {
+                double dd = Util.euclideanDistance(centroid[0].x, centroid[0].y, 
+                                                   items.get(clusters.get(i).get(j)).x, items.get(clusters.get(i).get(j)).y);
+                if( dd < d ) {
+                    d = dd;
+                    medoid = clusters.get(i).get(j);
+                }
+            }
+            
+            indexes[i] = medoid;
         }
         
         return indexes;
