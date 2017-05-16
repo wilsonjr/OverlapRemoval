@@ -1307,7 +1307,7 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             elems.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
         
-        RepresentativeFinder dbscan = new Dbscan(elems, 100, 10);
+        RepresentativeFinder dbscan = new Dbscan(elems,100, (int)(60.0/100.0)*7);
         dbscan.execute();
         currentCluster = ((Dbscan)dbscan).getClusters();
         selectedRepresentatives = dbscan.getRepresentatives();
@@ -1342,7 +1342,7 @@ public class Menu extends javax.swing.JFrame {
                     
                 }
                 
-                CSM csm = new CSM(attrs, (int) ((int) attrs.size()*0.2), attrs.size());
+                CSM csm = new CSM(attrs, (int) ((int) attrs.size()*0.10), attrs.size());
                 csm.execute();
 
                 selectedRepresentatives = csm.getRepresentatives();
@@ -1602,16 +1602,58 @@ public class Menu extends javax.swing.JFrame {
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
         }
         
-        RepresentativeFinder algorithm = new DS3(distances, 0.1);
-        explorerTree = new ExplorerTree(points, algorithm, RECTSIZE/2, 7);
-        explorerTree.build();
-        explorerTree.buildActiveNodes();
-        explorerTree.print();
-                 
-        selectedRepresentatives = explorerTree.topNodes().stream().mapToInt((ExplorerTreeNode node)->node.routing()).toArray();
-        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        JFileChooser jFileChooser = new JFileChooser();
+        int result = jFileChooser.showOpenDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            try {                 
+                File file = jFileChooser.getSelectedFile();
+                Scanner scn = new Scanner(file);
+                scn.nextLine();
+                scn.nextLine();
+                scn.nextLine();
+                scn.nextLine();
+                ArrayList<ArrayList<Double>> attrs = new ArrayList<>();
+                while( scn.hasNext() ) {
+                    
+                    attrs.add(new ArrayList<>());
+                    String[] linhas = scn.nextLine().split(";");
+                    for( int i = 1; i < linhas.length-1; ++i ) 
+                        attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                        
+                    
+                }
+                
+                // clustering techniques
+                RepresentativeFinder kmeans = new KMeans(Arrays.asList(points), new FarPointsMedoidApproach(), (int)(points.length*0.1));
+                RepresentativeFinder kmedoid = new KMedoid(Arrays.asList(points), new FarPointsMedoidApproach(), (int)(points.length*0.1));
+                RepresentativeFinder bisectingKMeans = new BisectingKMeans(Arrays.asList(points), new FarPointsMedoidApproach(), (int) (points.length*0.1));
+                RepresentativeFinder dbscan = new Dbscan(Arrays.asList(points), 100, (int)(60.0/100.0)*7);
+                
+                // singular value decomposition techniques
+                RepresentativeFinder csm = new CSM(attrs, (int)(attrs.size()*0.2), attrs.size());
+                RepresentativeFinder ksvd = new KSvd(attrs, (int)(attrs.size()*0.1));
+                
+                
+                // dictionary representation
+                RepresentativeFinder ds3 = new DS3(distances, 0.1);
+                RepresentativeFinder smrs = new SMRS(attrs);
+                
+                explorerTree = new ExplorerTree(points, dbscan, RECTSIZE/2, 7);
+                explorerTree.build();
+                explorerTree.buildActiveNodes();
+                explorerTree.print();
+
+                selectedRepresentatives = explorerTree.topNodes().stream().mapToInt((ExplorerTreeNode node)->node.routing()).toArray();
+                hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+
+                voronoiDiagramJMenuItemActionPerformed(evt);
+                
+                
+            } catch( IOException e ) {
+                
+            }
+        }
         
-        voronoiDiagramJMenuItemActionPerformed(evt);
+       
     }//GEN-LAST:event_testTreeJMenuItemActionPerformed
     
     
