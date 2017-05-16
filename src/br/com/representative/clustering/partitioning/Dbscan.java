@@ -10,6 +10,7 @@ import br.com.methods.utils.Util;
 import br.com.representative.clustering.Partitioning;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -22,7 +23,7 @@ public class Dbscan extends Partitioning {
     private double epsilon;
     private int minPts;
     
-    public Dbscan(ArrayList<Point.Double> items, double epsilon, int minPts) {
+    public Dbscan(List<Point.Double> items, double epsilon, int minPts) {
         super(items);
                
         this.currentCluster = 0;

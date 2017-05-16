@@ -16,15 +16,18 @@ import java.util.List;
  */
 public abstract class Clustering extends RepresentativeFinder {
     protected List<Point.Double> items;
+    protected final List<Point.Double> itemsFinal;
     
     public Clustering(List<Point.Double> items) {
         super();
         if( items == null )
             throw new NullPointerException("Data cannot be null");
-        this.items = items;
+        
+        this.itemsFinal = new ArrayList<>(items);
+        this.items = new ArrayList<>();
+        this.itemsFinal.stream().forEach((e)->this.items.add(e));
     }
 
-    public Clustering() {}
     
     public List<Point.Double> getItems() {
         return items;
@@ -32,11 +35,9 @@ public abstract class Clustering extends RepresentativeFinder {
     
     @Override
     public void filterData(int[] indexes) {
-        List<Point.Double> temp = new ArrayList<>();
-        items.forEach((p) -> { temp.add(new Point.Double(p.x, p.y)); });
         items.clear();
         
         for( Integer i: indexes )
-            items.add(temp.get(i));        
+            items.add(itemsFinal.get(i));        
     }
 }

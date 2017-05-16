@@ -19,10 +19,6 @@ public abstract class Partitioning extends Clustering {
         super(items);
     }
     
-    public Partitioning() {
-        super();
-    }    
-    
     public List<List<Integer>> getClusters() {
         return clusters;
     }
