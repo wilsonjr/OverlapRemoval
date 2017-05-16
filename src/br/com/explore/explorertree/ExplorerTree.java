@@ -73,6 +73,11 @@ public class ExplorerTree {
         Util.removeDummyRepresentive(map, _minChildren);
         Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives after  {0}", map.size());
         System.out.println("................................");
+       
+        levelOneRepresentatives = map.entrySet().stream().mapToInt((value)->value.getKey()).toArray();
+        levelOneRepresentatives = selectMedoid(levelOneRepresentatives);
+        map = Util.createIndex(levelOneRepresentatives, _projection);
+        
         
         // for each representative
         _topNodes = new ArrayList<>();
@@ -81,6 +86,7 @@ public class ExplorerTree {
             int representative = item.getKey();
             // get the indexes of the elements that it represents
             List<Integer> indexes = item.getValue();
+            System.out.println(representative+" >> "+indexes.size());
             
             
             Point2D.Double[] points = new Point2D.Double[indexes.size()];
