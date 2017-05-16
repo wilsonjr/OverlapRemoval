@@ -22,13 +22,16 @@ import org.ejml.interfaces.decomposition.SingularValueDecomposition;
  */
 public class KSvd extends LowRank {
     
-    private final int dictsize;
+    private int dictsize;
     private double[][] D;
     private double[][] itemsc;
     
     public KSvd(List<? extends List<Double>> items, int dictsize) {
         super(items);        
         this.dictsize = dictsize;
+        if( dictsize > items.size() )
+            throw new RuntimeException("Number of representative greater than number of instances.");
+        
     }
     
     @Override
@@ -261,6 +264,16 @@ public class KSvd extends LowRank {
                 error += m[i][j]*m[i][j];
         return Math.sqrt(error);
     }
+    
+    @Override
+    public void filterData(int[] indexes) {
+        super.filterData(indexes);
+        dictsize = (int) (indexes.length*0.1);
+        if( dictsize == 0 )
+            dictsize = 1;
+    }
+    
+    
     
          
 }

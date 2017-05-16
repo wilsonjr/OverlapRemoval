@@ -15,18 +15,21 @@ import java.util.List;
  */
 public abstract class LowRank extends RepresentativeFinder {
     
-    protected final double[][] items;
+    protected double[][] items;
+    protected final double[][] itemsFinal;
     
     public LowRank(List<? extends List<Double>> items) {
         super();
-        this.items = Util.elementMatrix(items);
+        this.itemsFinal = Util.elementMatrix(items);
+        this.items = itemsFinal;
     }
     
     @Override
     public void filterData(int[] indexes) {
-        double[][] newItems = new double[items.length][indexes.length];
+        double[][] newItems = new double[itemsFinal.length][indexes.length];
         for( int j = 0; j < indexes.length; ++j )
-            for( int i = 0; i < items.length; ++i ) 
-                newItems[i][j] = items[i][indexes[j]];
+            for( int i = 0; i < itemsFinal.length; ++i ) 
+                newItems[i][j] = itemsFinal[i][indexes[j]];
+        items = newItems;        
     }
 }

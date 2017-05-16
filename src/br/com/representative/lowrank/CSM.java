@@ -23,6 +23,8 @@ public class CSM extends LowRank {
     
     public CSM(List<? extends List<Double>> items, int c, int k) {
         super(items);
+        if( c > items.size() )
+            throw new RuntimeException("Number of representative greater than number of instances.");
         this.c = c;    
         this.k = k;
     }
@@ -46,6 +48,8 @@ public class CSM extends LowRank {
         
         svd.decompose(A);
         Matrix vT = svd.getV(null, false);
+        
+        System.out.println("Vt: "+vT.getNumRows()+", "+vT.getNumCols());
             
         return vT;
     }
@@ -55,6 +59,15 @@ public class CSM extends LowRank {
         representatives = new int[c];
         for( int i = 0; i < c; ++i )
             representatives[i] = columns[i].index;
+    }
+    
+    @Override
+    public void filterData(int[] indexes) {
+        super.filterData(indexes);
+        c = (int) (indexes.length*0.1);
+        if( c == 0 )
+            c = 1;
+        k = indexes.length;        
     }
     
     private class IndexPI implements Comparable<IndexPI> {
