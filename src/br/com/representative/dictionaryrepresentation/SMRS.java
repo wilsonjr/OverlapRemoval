@@ -22,10 +22,12 @@ import java.util.List;
  */
 public class SMRS extends SparseRepresentation {
     private double[][] items;
+    private final double[][] itemsFinal;
     
     public SMRS(List<? extends List<Double>> items) {
-        super(5);
-        this.items = Util.elementMatrix(items);
+        super(10);
+        this.itemsFinal = Util.elementMatrix(items);
+        this.items = this.itemsFinal;
     }
     
     @Override
@@ -248,14 +250,11 @@ public class SMRS extends SparseRepresentation {
     
     @Override
     public void filterData(int[] indexes) {
-        double[][] newItems = new double[indexes.length][indexes.length];
-        
-        for( int i = 0; i< indexes.length; ++i )
-            for( int j = 0; j < items.length; ++j )
-                newItems[i][j] = items[i][indexes[j]];
-        
-        
-        items = newItems;    
+        double[][] newItems = new double[itemsFinal.length][indexes.length];
+        for( int j = 0; j < indexes.length; ++j )
+            for( int i = 0; i < itemsFinal.length; ++i ) 
+                newItems[i][j] = itemsFinal[i][indexes[j]];
+        items = newItems;  
     }
     
     
