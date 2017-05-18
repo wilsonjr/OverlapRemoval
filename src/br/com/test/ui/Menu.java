@@ -126,7 +126,7 @@ public class Menu extends javax.swing.JFrame {
     private Polygon hullPolygon = null;
     private Polygon[] intersects = null;
     
-    private List<List<Polygon>> intersectsPolygon = new ArrayList<>();
+    private List<Polygon> intersectsPolygon = new ArrayList<>();
     
     private Map<Integer, List<Integer>> hashRepresentative = null;
     private List<Integer> nearest = null;
@@ -1588,7 +1588,7 @@ public class Menu extends javax.swing.JFrame {
             diagrams = Util.voronoiDiagram(window, points);            
             intersects = Util.clipBounds(diagrams, hull);
             
-            intersectsPolygon.add(Arrays.asList(intersects));
+            intersectsPolygon.addAll(new ArrayList<>(Arrays.asList(intersects)));
             
             view.cleanImage();
             view.repaint();
@@ -1606,6 +1606,8 @@ public class Menu extends javax.swing.JFrame {
         int result = jFileChooser.showOpenDialog(this);
         if( result == JFileChooser.APPROVE_OPTION ) {
             try {                 
+                
+                
                 File file = jFileChooser.getSelectedFile();
                 Scanner scn = new Scanner(file);
                 scn.nextLine();
@@ -1684,9 +1686,9 @@ public class Menu extends javax.swing.JFrame {
         Polygon[] diagrams2 = Util.voronoiDiagram(window, points);            
         Polygon[] intersects2 = Util.clipBounds(diagrams2, pointsClickedPolygon);        
         
-        List<Polygon> polys = Arrays.asList(intersects2);
+        List<Polygon> polys = new ArrayList<>(Arrays.asList(intersects2));
         System.out.println("Size: "+polys.size());
-        intersectsPolygon.add(polys);
+        intersectsPolygon.addAll(polys);
         
     }
     
@@ -1705,15 +1707,14 @@ public class Menu extends javax.swing.JFrame {
     
     public Polygon getPolygon(int x, int y) {
         Polygon polygon = null;
-        for( List<Polygon> voronoiPolygon: intersectsPolygon )
-            for( Polygon p: voronoiPolygon ) {
-                SimplePolygon2D sp = new SimplePolygon2D();
-                for( int i = 0; i < p.xpoints.length; ++i )
-                    sp.addVertex(new math.geom2d.Point2D(p.xpoints[i], p.ypoints[i]));
+        for( Polygon p: intersectsPolygon ) {
+            SimplePolygon2D sp = new SimplePolygon2D();
+            for( int i = 0; i < p.xpoints.length; ++i )
+                sp.addVertex(new math.geom2d.Point2D(p.xpoints[i], p.ypoints[i]));
 
-                if( sp.contains(x, y) )
-                    polygon = p;
-            }
+            if( sp.contains(x, y) )
+                polygon = p;
+        }
         
         
         return polygon;
@@ -1780,6 +1781,7 @@ public class Menu extends javax.swing.JFrame {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
+                                        
                     int index = -1;
                     if( selectedRepresentatives != null && hashRepresentative != null ) {
                         for( int i = 0; i < selectedRepresentatives.length; ++i ) {
@@ -1794,9 +1796,55 @@ public class Menu extends javax.swing.JFrame {
                         if( index != -1 ) {                            
                             
                             ExplorerTreeNode node = explorerTree.activeNodes().get(index);
-                            if( !node.children().isEmpty() ) {
-                               
-                                explorerTree.expandNode(index);
+                            
+                            if( e.isControlDown() && node.parent() != null ) {
+                                ExplorerTreeNode parent = node.parent();
+                                
+                                List<Integer> indexes = explorerTree.filterNodes(parent);
+                                List<Polygon> toRemove = new ArrayList<>();
+                                for( Integer v: indexes ) {
+                                    
+                                    for( Polygon p: intersectsPolygon ) {
+                                        SimplePolygon2D sp = new SimplePolygon2D();
+                                        for( int i = 0; i < p.xpoints.length; ++i )
+                                            sp.addVertex(new math.geom2d.Point2D(p.xpoints[i], p.ypoints[i]));
+                                        double x = points[v].x;
+                                        double y = points[v].y;
+                                        if( sp.contains(x, y) )  {
+                                            ///voronoiPolygon.remove(p);
+                                            toRemove.add(p);
+                                        }
+                                    }                                    
+                                }
+                                
+                                for( int i = 0; i < toRemove.size(); ++i ) 
+                                    for( int j = 0; j < intersectsPolygon.size(); ++j )
+                                        intersectsPolygon.remove(toRemove.get(i));
+                                
+                                int[] reps = new int[(selectedRepresentatives.length-indexes.size())+1];
+                                int j = 0;
+                                for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+                                    if( !indexes.contains(selectedRepresentatives[i]) )
+                                        reps[j++] = selectedRepresentatives[i];
+                                }
+                                reps[j] = parent.routing();
+                                
+                                selectedRepresentatives = Arrays.copyOf(reps, reps.length);
+                                
+                                intersectsPolygon.add(parent.polygon());
+                            
+                            } else if( !node.children().isEmpty() ) {                                
+                                
+                                for( Polygon p: intersectsPolygon ) {
+                                    SimplePolygon2D sp = new SimplePolygon2D();
+                                    for( int i = 0; i < p.xpoints.length; ++i )
+                                        sp.addVertex(new math.geom2d.Point2D(p.xpoints[i], p.ypoints[i]));
+
+                                    if( sp.contains(e.getX(), e.getY()) )
+                                        clickedPolygon = p;
+                                }
+                                
+                                explorerTree.expandNode(index, clickedPolygon);
                                 int[] reps = new int[node.children().size() + selectedRepresentatives.length-1];
 
                                 int j = 0;
@@ -1817,15 +1865,7 @@ public class Menu extends javax.swing.JFrame {
                                 }
                                 //hashRepresentative = Util.createIndex(selectedRepresentatives, points);
                                 
-                                for( List<Polygon> voronoiPolygon: intersectsPolygon )
-                                    for( Polygon p: voronoiPolygon ) {
-                                        SimplePolygon2D sp = new SimplePolygon2D();
-                                        for( int i = 0; i < p.xpoints.length; ++i )
-                                            sp.addVertex(new math.geom2d.Point2D(p.xpoints[i], p.ypoints[i]));
-                                        
-                                        if( sp.contains(e.getX(), e.getY()) )
-                                            clickedPolygon = p;
-                                    }
+                                
                                 updateDiagram();
                                 //intersectsPolygon.clear();
                                 //voronoiDiagramJMenuItemActionPerformed(null);
@@ -2043,16 +2083,11 @@ public class Menu extends javax.swing.JFrame {
                     } 
                 }                
                 
-                for( List<Polygon> polygonVoronoi: intersectsPolygon ) {
+                for( Polygon p: intersectsPolygon ) {
                     g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
                     g2Buffer.setColor(Color.GREEN);
-                    
-                    for( Polygon p: polygonVoronoi )
-                        g2Buffer.drawPolygon(p);
-                    
+                    g2Buffer.drawPolygon(p);                    
                 }
-                
-                
                 
                 if( selectedRepresentatives != null ) {
 
@@ -2065,11 +2100,11 @@ public class Menu extends javax.swing.JFrame {
                           
                             RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
                             Polygon poly = getPolygon((int)r.getCenterX(), (int)r.getCenterY());
-                            
-                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, alpha));
-                            g2Buffer.setColor(Color.RED);
-                            g2Buffer.fillPolygon(poly);
-                            
+                            if( poly != null ) {
+                                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, alpha));
+                                g2Buffer.setColor(Color.RED);
+                                g2Buffer.fillPolygon(poly);
+                            }
                             
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
                             g2Buffer.setColor(Color.RED);
@@ -2077,7 +2112,7 @@ public class Menu extends javax.swing.JFrame {
                             g2Buffer.setColor(Color.BLACK);
                             g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             if( hideShowNumbers ) {
-                                g2Buffer.setColor(Color.RED);
+                                g2Buffer.setColor(Color.YELLOW);
                                 g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
                                 g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
                             }
