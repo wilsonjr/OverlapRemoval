@@ -169,7 +169,7 @@ public class ExplorerTree {
     public List<Integer> filterNodes(ExplorerTreeNode parent) {
         
        List<Integer> toRemove = new ArrayList<>();
-       _activeNodes.entrySet().stream().filter((value) -> ( value.getValue().parent() == parent )).forEachOrdered((value) -> {
+       _activeNodes.entrySet().stream().filter((value) -> ( value.getValue().isChildren(parent) )).forEachOrdered((value) -> {
            toRemove.add(value.getKey());
         });
        

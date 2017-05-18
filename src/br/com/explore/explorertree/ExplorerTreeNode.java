@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.stream.Stream;
 
 /**
  *
@@ -509,9 +510,25 @@ public class ExplorerTreeNode {
     public ExplorerTreeNode parent() {
         return _parent;
     }
+    
+    public Polygon polygon() {
+        return _polygon;
+    }
 
     public void setPolygon(Polygon polygon) {
         _polygon = polygon;
+    }
+
+    public boolean isChildren(ExplorerTreeNode parent) {
+        ExplorerTreeNode node = _parent;
+        
+        while( node != null ) {            
+            if( parent == node )
+                return true;
+            node = node.parent();
+        }
+        
+        return false;
     }
     
     private class Representative {
