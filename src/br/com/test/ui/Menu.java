@@ -1817,10 +1817,15 @@ public class Menu extends javax.swing.JFrame {
                                     }                                    
                                 }
                                 
+                                System.out.println("Quantidade de polígonos a serem removidos: "+toRemove.size());
                                 for( int i = 0; i < toRemove.size(); ++i ) 
-                                    for( int j = 0; j < intersectsPolygon.size(); ++j )
-                                        intersectsPolygon.remove(toRemove.get(i));
-                                
+                                    for( int j = 0; j < intersectsPolygon.size(); ++j ) {
+                                        if(  intersectsPolygon.remove(toRemove.get(i)) )
+                                            System.out.println("Consegui remover...");
+                                        else 
+                                            System.out.println("Não consegui remover...");
+                                        
+                                    }
                                 int[] reps = new int[(selectedRepresentatives.length-indexes.size())+1];
                                 int j = 0;
                                 for( int i = 0; i < selectedRepresentatives.length; ++i ) {
@@ -1865,7 +1870,7 @@ public class Menu extends javax.swing.JFrame {
                                 }
                                 //hashRepresentative = Util.createIndex(selectedRepresentatives, points);
                                 
-                                
+                                intersectsPolygon.remove(clickedPolygon);
                                 updateDiagram();
                                 //intersectsPolygon.clear();
                                 //voronoiDiagramJMenuItemActionPerformed(null);
