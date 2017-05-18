@@ -1637,7 +1637,7 @@ public class Menu extends javax.swing.JFrame {
                 RepresentativeFinder ds3 = new DS3(distances, 0.1);
                 RepresentativeFinder smrs = new SMRS(attrs);
                 
-                explorerTree = new ExplorerTree(points, dbscan, RECTSIZE/2, 7);
+                explorerTree = new ExplorerTree(points, ds3, RECTSIZE/2, 7);
                 explorerTree.build();
                 explorerTree.buildActiveNodes();
                 explorerTree.print();
@@ -1701,6 +1701,22 @@ public class Menu extends javax.swing.JFrame {
             }
         
         return d;
+    }
+    
+    public Polygon getPolygon(int x, int y) {
+        Polygon polygon = null;
+        for( List<Polygon> voronoiPolygon: intersectsPolygon )
+            for( Polygon p: voronoiPolygon ) {
+                SimplePolygon2D sp = new SimplePolygon2D();
+                for( int i = 0; i < p.xpoints.length; ++i )
+                    sp.addVertex(new math.geom2d.Point2D(p.xpoints[i], p.ypoints[i]));
+
+                if( sp.contains(x, y) )
+                    polygon = p;
+            }
+        
+        
+        return polygon;
     }
     
     /**
@@ -1774,6 +1790,7 @@ public class Menu extends javax.swing.JFrame {
                                 break;
                             }
                         }
+                        
                         if( index != -1 ) {                            
                             
                             ExplorerTreeNode node = explorerTree.activeNodes().get(index);
@@ -2041,17 +2058,26 @@ public class Menu extends javax.swing.JFrame {
 
                     if(  hashRepresentative != null ) {
 
-                        Util.paintSphere(centerPoints, selectedRepresentatives, hashRepresentative, g2Buffer);
-
+                     //  Util.paintSphere(centerPoints, selectedRepresentatives, hashRepresentative, g2Buffer);
+                        
                         for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+                            float alpha = (float)hashRepresentative.get(selectedRepresentatives[i]).size()/(float)points.length;
+                          
                             RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
+                            Polygon poly = getPolygon((int)r.getCenterX(), (int)r.getCenterY());
+                            
+                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, alpha));
+                            g2Buffer.setColor(Color.RED);
+                            g2Buffer.fillPolygon(poly);
+                            
+                            
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
                             g2Buffer.setColor(Color.RED);
                             g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             g2Buffer.setColor(Color.BLACK);
                             g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             if( hideShowNumbers ) {
-                                g2Buffer.setColor(Color.GREEN);
+                                g2Buffer.setColor(Color.RED);
                                 g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
                                 g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
                             }
