@@ -9,6 +9,7 @@ import br.com.methods.utils.Util;
 import br.com.representative.RepresentativeFinder;
 import br.com.representative.clustering.FarPointsMedoidApproach;
 import br.com.representative.clustering.partitioning.KMedoid;
+import java.awt.Polygon;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +26,8 @@ public class ExplorerTreeNode {
     
     public static int nodeCount = 0;
     
+    private final ExplorerTreeNode _parent;
+    
     private final List<ExplorerTreeNode> _children;
     
     private final Point2D.Double[] _subprojection;
@@ -39,12 +42,14 @@ public class ExplorerTreeNode {
    
     private final RepresentativeFinder _representativeAlgorithm;
     
+    private Polygon _polygon;
+    
     // to implement further
     // private int[] dissimilar
     // private int[] similar
     
     public ExplorerTreeNode(int minChildren, int distinctionDistance, int routing, Point2D.Double[] subprojection, 
-                            int[] indexes, RepresentativeFinder representativeAlgorithm) {
+                            int[] indexes, RepresentativeFinder representativeAlgorithm, ExplorerTreeNode parent) {
         _indexes = indexes;
         _minChildren = minChildren;
         _routing = routing;
@@ -52,6 +57,8 @@ public class ExplorerTreeNode {
         _distinctionDistance = distinctionDistance;
         _representativeAlgorithm = representativeAlgorithm;
         _children = new ArrayList<>();
+        _parent = parent;
+        _polygon = null;
     }
     
     public void createSubTree() {
@@ -124,7 +131,7 @@ public class ExplorerTreeNode {
                 // continue to the further children, we must always pass original indexes
                 _children.add(new ExplorerTreeNode(_minChildren, _distinctionDistance, _indexes[representative], points, 
                         indexesChildren.stream().mapToInt((Integer i)->_indexes[i]).toArray(),
-                        _representativeAlgorithm)); 
+                        _representativeAlgorithm, this)); 
                
             });
             
@@ -497,6 +504,14 @@ public class ExplorerTreeNode {
             }
         
         return distances.stream().min(Double::compareTo).get();
+    }
+
+    public ExplorerTreeNode parent() {
+        return _parent;
+    }
+
+    public void setPolygon(Polygon polygon) {
+        _polygon = polygon;
     }
     
     private class Representative {

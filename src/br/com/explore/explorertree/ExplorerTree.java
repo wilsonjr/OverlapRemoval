@@ -97,7 +97,7 @@ public class ExplorerTree {
 
             // do the same to each subprojection
             _topNodes.add(new ExplorerTreeNode(_minChildren, _distinctionDistance, representative, points,
-                    indexes.stream().mapToInt((Integer value)->value).toArray(), _representativeAlgorithm));
+                    indexes.stream().mapToInt((Integer value)->value).toArray(), _representativeAlgorithm, null));
         });        
     }
     
@@ -117,8 +117,9 @@ public class ExplorerTree {
         
     }
     
-    public void expandNode(int index) {
+    public void expandNode(int index, Polygon polygon) {
         ExplorerTreeNode node = _activeNodes.get(index);
+        node.setPolygon(polygon);
         _activeNodes.remove(index);
         
         node.children().stream().forEach((ExplorerTreeNode value) -> { _activeNodes.put(value.routing(), value); });        
@@ -163,6 +164,20 @@ public class ExplorerTree {
         }
         
         return temp;
+    }
+
+    public List<Integer> filterNodes(ExplorerTreeNode parent) {
+        
+       List<Integer> toRemove = new ArrayList<>();
+       _activeNodes.entrySet().stream().filter((value) -> ( value.getValue().parent() == parent )).forEachOrdered((value) -> {
+           toRemove.add(value.getKey());
+        });
+       
+       toRemove.stream().forEach((Integer value)->_activeNodes.remove(value));
+        
+       _activeNodes.put(parent.routing(), parent);
+       
+       return toRemove;
     }
     
 }
