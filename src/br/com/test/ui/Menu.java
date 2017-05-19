@@ -82,6 +82,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -140,7 +141,7 @@ public class Menu extends javax.swing.JFrame {
     private Polygon clickedPolygon = null;
     private int indexNewRepresentatives = -1;
     
-    
+    private Map<Point2D.Double, Polygon> mapPointPolygon = new HashMap<>();
     
     /**
      * Creates new form Menu
@@ -1585,8 +1586,9 @@ public class Menu extends javax.swing.JFrame {
                 pointsHull[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());           
             Point2D.Double[] hull = Util.convexHull(pointsHull);
             
-            diagrams = Util.voronoiDiagram(window, points);            
-            intersects = Util.clipBounds(diagrams, hull);
+            List<Point2D.Double> pVoronoi = new ArrayList<>();
+            diagrams = Util.voronoiDiagram(window, points, pVoronoi);            
+            intersects = Util.clipBounds(diagrams, hull, mapPointPolygon, pVoronoi);
             
             intersectsPolygon.addAll(new ArrayList<>(Arrays.asList(intersects)));
             
@@ -1683,11 +1685,23 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < clickedPolygon.npoints; ++i )
             pointsClickedPolygon[i] = new Point2D.Double(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i]);           
         
-        Polygon[] diagrams2 = Util.voronoiDiagram(window, points);            
-        Polygon[] intersects2 = Util.clipBounds(diagrams2, pointsClickedPolygon);        
+        
+        List<Point2D.Double> pVoronoi = new ArrayList<>();
+        
+        Polygon[] diagrams2 = Util.voronoiDiagram(window, points, pVoronoi);            
+        Polygon[] intersects2 = Util.clipBounds(diagrams2, pointsClickedPolygon, mapPointPolygon, pVoronoi);        
         
         List<Polygon> polys = new ArrayList<>(Arrays.asList(intersects2));
+        
+        
         System.out.println("Size: "+polys.size());
+        
+        for( Polygon p: polys ) {
+            for( int i = 0; i < p.xpoints.length; ++i ) {
+                System.out.println(p.xpoints[i]+", "+p.ypoints[i]);
+            }
+            System.out.println();
+        }
         intersectsPolygon.addAll(polys);
         
     }
@@ -1798,34 +1812,72 @@ public class Menu extends javax.swing.JFrame {
                             ExplorerTreeNode node = explorerTree.activeNodes().get(index);
                             
                             if( e.isControlDown() && node.parent() != null ) {
+                                
+                                System.out.println("OLHA O SIZE ANTES: "+intersectsPolygon.size());
                                 ExplorerTreeNode parent = node.parent();
                                 
                                 List<Integer> indexes = explorerTree.filterNodes(parent);
                                 List<Polygon> toRemove = new ArrayList<>();
                                 for( Integer v: indexes ) {
                                     
-                                    for( Polygon p: intersectsPolygon ) {
-                                        SimplePolygon2D sp = new SimplePolygon2D();
-                                        for( int i = 0; i < p.xpoints.length; ++i )
-                                            sp.addVertex(new math.geom2d.Point2D(p.xpoints[i], p.ypoints[i]));
-                                        double x = points[v].x;
-                                        double y = points[v].y;
-                                        if( sp.contains(x, y) )  {
-                                            ///voronoiPolygon.remove(p);
-                                            toRemove.add(p);
-                                        }
-                                    }                                    
+                                    System.out.println("Element: "+v);                                    
+                                    Polygon pol = mapPointPolygon.get(new Point2D.Double(rectangles.get(v).getCenterX(),
+                                                                                             rectangles.get(v).getCenterY()));
+                                    
+                                    
+                                    toRemove.add(pol);
+                                    
+//                                    for( Polygon p: intersectsPolygon ) {
+//                                        SimplePolygon2D sp = new SimplePolygon2D();
+//                                        for( int i = 0; i < p.xpoints.length; ++i )
+//                                            sp.addVertex(new math.geom2d.Point2D(p.xpoints[i], p.ypoints[i]));
+//                                        
+//                                        if( sp.contains(x, y) )  {
+//                                            ///voronoiPolygon.remove(p);
+//                                            System.out.println("Adicionei: "+x+",  "+y);
+//                                            
+//                                            for( int k = 0; k < p.xpoints.length; ++k ) {
+//                                                System.out.println(p.xpoints[k]+", "+p.ypoints[k]);
+//                                            }
+//                                            System.out.println();
+//                                            
+//                                            toRemove.add(p);
+//                                        }
+//                                        
+//                                        Polygon pol = mapPointPolygon.get(new Point2D.Double(rectangles.get(v).getCenterX(),
+//                                                                                             rectangles.get(v).getCenterY()));
+//                                        if( pol != null ) {
+//                                            System.out.println("Pol nao nulo");
+//                                            for( int k = 0; k < pol.xpoints.length; ++k ) {
+//                                                System.out.println(pol.xpoints[k]+", "+pol.ypoints[k]);
+//                                            }
+//                                            System.out.println();
+//                                        } else
+//                                            System.out.println("Pol nulo");
+//                                        
+//                                        
+//                                    }       
+//                                    
+//                                    System.out.println();
                                 }
                                 
                                 System.out.println("Quantidade de polígonos a serem removidos: "+toRemove.size());
                                 for( int i = 0; i < toRemove.size(); ++i ) 
                                     for( int j = 0; j < intersectsPolygon.size(); ++j ) {
-                                        if(  intersectsPolygon.remove(toRemove.get(i)) )
+                                        if(  intersectsPolygon.remove(toRemove.get(i)) ) {
                                             System.out.println("Consegui remover...");
+                                            Polygon p = toRemove.get(i);
+                                            for( int k = 0; k < p.xpoints.length; ++k ) {
+                                                System.out.println(p.xpoints[k]+", "+p.ypoints[k]);
+                                            }
+                                            System.out.println();
+                                            
+                                        }
                                         else 
                                             System.out.println("Não consegui remover...");
                                         
                                     }
+                                
                                 int[] reps = new int[(selectedRepresentatives.length-indexes.size())+1];
                                 int j = 0;
                                 for( int i = 0; i < selectedRepresentatives.length; ++i ) {
@@ -1837,6 +1889,8 @@ public class Menu extends javax.swing.JFrame {
                                 selectedRepresentatives = Arrays.copyOf(reps, reps.length);
                                 
                                 intersectsPolygon.add(parent.polygon());
+                                
+                                System.out.println("OLHA O SIZE DEPOIS: "+intersectsPolygon.size());
                             
                             } else if( !node.children().isEmpty() ) {                                
                                 
@@ -2117,7 +2171,7 @@ public class Menu extends javax.swing.JFrame {
                             g2Buffer.setColor(Color.BLACK);
                             g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                             if( hideShowNumbers ) {
-                                g2Buffer.setColor(Color.YELLOW);
+                                g2Buffer.setColor(Color.BLUE);
                                 g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
                                 g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
                             }

@@ -1480,37 +1480,43 @@ public class Util {
         return indexes;
     }
     
-    public static Polygon[] voronoiDiagram(Polygon window, Point2D.Double[] points) {
+    public static Polygon[] voronoiDiagram(Polygon window, Point2D.Double[] points, List<Point2D.Double> pointsVoronoi ) {
         
         PowerDiagram diagram = new PowerDiagram();
         OpenList sites = new OpenList();
 
         PolygonSimple rootPolygon = new PolygonSimple();
-        for( int i = 0; i < window.xpoints.length; ++i )
+        for( int i = 0; i < window.xpoints.length; ++i ) {
             rootPolygon.add(window.xpoints[i], window.ypoints[i]);
+            
+        }
 
-
+        System.out.println("POINTS");
         for( int i = 0; i < points.length; ++i ) {
             Site site = new Site(points[i].x, points[i].y);
            /// if( i == 0 )
            ///     site.setWeight(30);
             sites.add(site);
+            System.out.println(points[i].x+" - "+points[i].y);
         }
 
         diagram.setSites(sites);
         diagram.setClipPoly(rootPolygon);
         diagram.computeDiagram();
-
+        
         Polygon[] polygons = new Polygon[points.length];
         for( int i = 0; i < sites.size; ++i ) {
 
             PolygonSimple polygon = sites.array[i].getPolygon();
+            System.out.println(sites.array[i].x+" - "+sites.array[i].y+" - "+sites.array[i].z);
             if( polygon != null ) {
                 Polygon poly = new Polygon(polygon.getXpointsClosed(), polygon.getYpointsClosed(), polygon.getXpointsClosed().length);
                 polygons[i] = poly;
+                pointsVoronoi.add(new Point2D.Double(sites.array[i].x, sites.array[i].y));
             }
 
         }
+        
         
         return polygons;
     }
@@ -1532,7 +1538,8 @@ public class Util {
         return hull;
     }
 
-    public static Polygon[] clipBounds(Polygon[] diagrams, Point2D.Double[] pts) {
+    public static Polygon[] clipBounds(Polygon[] diagrams, Point2D.Double[] pts, 
+            Map<Point2D.Double, Polygon> map, List<Point2D.Double> pVoronoi) {
         
         SimplePolygon2D p1 = new SimplePolygon2D();
         for( int i = 0; i < pts.length; ++i ) {
@@ -1561,6 +1568,8 @@ public class Util {
                     poly.addPoint(intersects[i].xpoints[j], intersects[i].ypoints[j]);                
             }
             intersects[i] = new Polygon(poly.xpoints, poly.ypoints, poly.npoints);
+            map.put(pVoronoi.get(i), intersects[i]);
+            
         }        
         return intersects;
     }
