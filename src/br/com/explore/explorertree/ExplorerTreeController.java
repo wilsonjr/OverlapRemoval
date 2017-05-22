@@ -172,7 +172,30 @@ public class ExplorerTreeController {
         return indexNewRepresentative;
     }
     
-    
+    public void agglomerateNode(int index) {
+        
+        ExplorerTreeNode node = _explorerTree.activeNodes().get(index);
+        ExplorerTreeNode parent = node.parent();
+        
+        List<Integer> indexes = _explorerTree.filterNodes(parent);
+        for( Integer v: indexes ) {
+            Polygon associatedPolygon = _pointPolygon.get(new Point2D.Double(_projection[v].x+_sizeInstances/2, 
+                                                                             _projection[v].y+_sizeInstances/2));
+            _polygons.remove(associatedPolygon);
+        }
+        
+        int[] reps = new int[(_representative.length-indexes.size())+1];
+        int j = 0;
+        for( int i = 0; i < _representative.length; ++i ) {
+            if( !indexes.contains(_representative[i]) )
+                reps[j++] = _representative[i];
+        }
+        reps[j] = parent.routing();
+        
+        _representative = Arrays.copyOf(reps, reps.length);
+        _polygons.add(parent.polygon());
+                
+    }
     
     
     
