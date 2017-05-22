@@ -144,6 +144,35 @@ public class ExplorerTreeController {
         return clickedPolygon;
     }
     
+    public int expandNode(int index, Polygon clickedPolygon) {
+        ExplorerTreeNode node = _explorerTree.activeNodes().get(index);
+        
+        _explorerTree.expandNode(index, clickedPolygon);
+        int[] reps = new int[node.children().size() + _representative.length-1];
+        
+        int j = 0;
+        for( int i = 0; i < _representative.length; ++i )
+            if( _representative[i] != index )
+                reps[j++] = _representative[i];
+        
+        int indexNewRepresentative = j;
+        
+        for( ExplorerTreeNode n: node.children() )
+            reps[j++] = n.routing();
+        
+        _representative = Arrays.copyOf(reps, reps.length);
+        
+        for( ExplorerTreeNode n: node.children() ) {
+            List<Integer> nearest = new ArrayList<>();
+            Arrays.stream(n.indexes()).forEach((i)->nearest.add(i));
+            _nearest.put(n.routing(), nearest);
+        }
+        
+        _polygons.remove(clickedPolygon);
+        return indexNewRepresentative;
+    }
+    
+    
     
     
     
