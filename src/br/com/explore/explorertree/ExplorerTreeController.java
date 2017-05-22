@@ -111,6 +111,39 @@ public class ExplorerTreeController {
     }
     
     
+    public int indexRepresentative(double x, double y) {
+        int index = -1;
+        
+        for( int i = 0; i < _representative.length; ++i ) {
+            double cx = _projection[_representative[i]].x + _sizeInstances/2;
+            double cy = _projection[_representative[i]].y + _sizeInstances/2;
+            if( Util.euclideanDistance(x, y, cx, cy) < _sizeInstances/2 ) {
+                index = _representative[i];
+                break;
+            }
+        }
+        
+        return index;
+    }
+    
+    public ExplorerTreeNode getNode(int index) {
+        return _explorerTree.activeNodes().get(index);
+    }
+    
+    public Polygon clickedPolygon(double x, double y) {
+        Polygon clickedPolygon = null;
+        
+        for( Polygon p: _polygons ) {
+            SimplePolygon2D sp = new SimplePolygon2D();
+            for( int i = 0; i < p.xpoints.length; ++i )
+                sp.addVertex(new math.geom2d.Point2D(p.xpoints[i], p.ypoints[i]));
+            if( sp.contains(x, y) )
+                clickedPolygon = p;
+        }
+        
+        return clickedPolygon;
+    }
+    
     
     
     
