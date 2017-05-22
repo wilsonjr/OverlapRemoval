@@ -27,6 +27,7 @@ public class ExplorerTreeController {
     private final RepresentativeFinder _representativeSelection;
     private final int _sizeInstances;
     private final Point2D.Double[] _projection;
+    private final Point2D.Double[] _projectionCenter;
     
     private int[] _representative;
     private Map<Integer, List<Integer>> _nearest;
@@ -36,8 +37,11 @@ public class ExplorerTreeController {
     private Map<Point2D.Double, Polygon> _pointPolygon = new HashMap<>();
     
     
-    public ExplorerTreeController(Point2D.Double[] projection, RepresentativeFinder representativeSelection, 
+    public ExplorerTreeController(Point2D.Double[] projection, Point2D.Double[] projectionCenter, 
+                                  RepresentativeFinder representativeSelection, 
                                   int minInstances, int sizeIntances, int distinctionDistance) {
+        
+        _projectionCenter = projectionCenter;
         _projection = projection;
         _representativeSelection = representativeSelection;
         _minInstances = minInstances;
@@ -74,7 +78,7 @@ public class ExplorerTreeController {
         Point2D.Double[] points = new Point2D.Double[_representative.length-indexNewRepresentative];
         for( int i = 0; i < points.length; ++i ) {
             int index = _representative[i+indexNewRepresentative];
-            points[i] = new Point2D.Double(_projection[index].x + _sizeInstances/2, _projection[index].y + _sizeInstances/2);
+            points[i] = new Point2D.Double(_projectionCenter[index].x, _projectionCenter[index].y);
         }
         
         int n = (int) Arrays.stream(points).distinct().count();
@@ -88,11 +92,9 @@ public class ExplorerTreeController {
         Point2D.Double[] involvePolygon = null;
         
         if( clickedPolygon == null ) {
-            
             Point2D.Double[] pointsPolygon = new Point2D.Double[_projection.length];
             for( int i = 0; i < _projection.length; ++i )
-                pointsPolygon[i] = new Point2D.Double(_projection[_representative[i]].x + _sizeInstances/2, 
-                                                   _projection[_representative[i]].y + _sizeInstances/2);        
+                pointsPolygon[i] = new Point2D.Double(_projectionCenter[i].x, _projectionCenter[i].y);        
             involvePolygon = Util.convexHull(pointsPolygon);
             
         } else {
@@ -115,8 +117,8 @@ public class ExplorerTreeController {
         int index = -1;
         
         for( int i = 0; i < _representative.length; ++i ) {
-            double cx = _projection[_representative[i]].x + _sizeInstances/2;
-            double cy = _projection[_representative[i]].y + _sizeInstances/2;
+            double cx = _projectionCenter[_representative[i]].x;
+            double cy = _projectionCenter[_representative[i]].y;
             if( Util.euclideanDistance(x, y, cx, cy) < _sizeInstances/2 ) {
                 index = _representative[i];
                 break;
@@ -179,8 +181,7 @@ public class ExplorerTreeController {
         
         List<Integer> indexes = _explorerTree.filterNodes(parent);
         for( Integer v: indexes ) {
-            Polygon associatedPolygon = _pointPolygon.get(new Point2D.Double(_projection[v].x+_sizeInstances/2, 
-                                                                             _projection[v].y+_sizeInstances/2));
+            Polygon associatedPolygon = _pointPolygon.get(new Point2D.Double(_projectionCenter[v].x, _projectionCenter[v].y));
             _polygons.remove(associatedPolygon);
         }
         
@@ -197,7 +198,25 @@ public class ExplorerTreeController {
                 
     }
     
+    public int[] representative() {
+        return _representative;
+    }
     
+    public Map<Integer, List<Integer>> nearest() {
+        return _nearest;
+    }
+    
+    public Point2D.Double[] projectionCenter() {
+        return _projectionCenter;
+    }
+    
+    public Point2D.Double[] projection() {
+        return _projection;
+    }
+    
+    public Polygon polygon(int index) {
+        return _pointPolygon.get(_projectionCenter[index]);
+    }
     
     
 }
