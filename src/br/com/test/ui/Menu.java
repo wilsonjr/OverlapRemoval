@@ -1896,20 +1896,20 @@ public class Menu extends javax.swing.JFrame {
                 @Override
                 public void mouseMoved(MouseEvent e) {
                     int index = -1;
-                    if( selectedRepresentatives != null && hashRepresentative != null ) {
-                        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-                            Point2D.Double p = new Point2D.Double(rectangles.get(selectedRepresentatives[i]).getCenterX(), 
-                                               rectangles.get(selectedRepresentatives[i]).getCenterY());
+                    if( controller != null && controller.representative() != null && controller.nearest() != null ) {
+                        for( int i = 0; i < controller.representative().length; ++i ) {
+                            Point2D.Double p = new Point2D.Double(controller.projectionCenter()[controller.representative()[i]].x, 
+                                               controller.projectionCenter()[controller.representative()[i]].y);
                             if( Util.euclideanDistance(e.getX(), e.getY(), p.x, p.y) < RECTSIZE/2 ) {
-                                index = selectedRepresentatives[i];
+                                index = controller.representative()[i];
                                 break;
                             }
                         }
 
                         nearest = null;
-                        if( index != -1 ) {
-                            nearest = hashRepresentative.get(index);
-                        }
+                        if( index != -1 )
+                            nearest = controller.nearest().get(index);
+                        
                         cleanImage();
                         repaint();  
                     }
