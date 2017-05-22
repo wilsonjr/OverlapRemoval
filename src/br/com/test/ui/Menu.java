@@ -2104,7 +2104,7 @@ public class Menu extends javax.swing.JFrame {
                     g2Buffer.drawPolygon(p);                    
                 }
                 
-                if( controller.representative() != null ) {
+                if( controller !=  null && controller.representative() != null ) {
 
                     if( controller.nearest() != null ) {
 
@@ -2119,11 +2119,14 @@ public class Menu extends javax.swing.JFrame {
                           
                             Point2D.Double r = projectionCenter[representative[i]];
                             
-                            Polygon poly = getPolygon((int)r.x, (int)r.y);
+                            Polygon poly = controller.polygon(representative[i]);//getPolygon((int)r.x, (int)r.y);
                             if( poly != null ) {
                                 g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, alpha));
                                 g2Buffer.setColor(Color.RED);
                                 g2Buffer.fillPolygon(poly);
+                                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                                g2Buffer.setColor(Color.RED);
+                                g2Buffer.drawPolygon(poly);                                
                             }
                             
                             Point2D.Double p = projection[representative[i]];
