@@ -217,6 +217,12 @@ public class ExplorerTreeController {
     public Polygon polygon(int index) {
         return _pointPolygon.get(_projectionCenter[index]);
     }
+
+    public void expandNode(int index, int x, int y, int width, int height) {
+        Polygon polygon = clickedPolygon(x, y);
+        int indexNew = expandNode(index, polygon);
+        updateDiagram(width, height, indexNew, polygon);
+    }
     
     
 }
