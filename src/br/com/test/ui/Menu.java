@@ -1809,81 +1809,69 @@ public class Menu extends javax.swing.JFrame {
                 @Override
                 public void mousePressed(MouseEvent e) {
                                         
-                    int index = -1;
-                    if( selectedRepresentatives != null && hashRepresentative != null ) {
-                        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-                            Point2D.Double p = new Point2D.Double(rectangles.get(selectedRepresentatives[i]).getCenterX(),
-                                                                  rectangles.get(selectedRepresentatives[i]).getCenterY());
-                            if( Util.euclideanDistance(e.getX(), e.getY(), p.x, p.y) < RECTSIZE/2 ) {
-                                index = selectedRepresentatives[i];
-                                break;
-                            }
-                        }
+                    
+                    if( controller != null && controller.representative() != null && controller.nearest() != null ) {
+                        int index = controller.indexRepresentative(e.getX(), e.getY());
                         
                         if( index != -1 ) {                            
-                            
-                            ExplorerTreeNode node = explorerTree.activeNodes().get(index);
+                            ExplorerTreeNode node = controller.getNode(index);
                             
                             if( e.isControlDown() && node.parent() != null ) {
                                 
-                                ExplorerTreeNode parent = node.parent();
+                                controller.agglomerateNode(index);
                                 
-                                List<Integer> indexes = explorerTree.filterNodes(parent);
-                                for( Integer v: indexes ) {                                
-                                    Polygon pol = mapPointPolygon.get(new Point2D.Double(rectangles.get(v).getCenterX(),
-                                                                                             rectangles.get(v).getCenterY()));     
-                                    intersectsPolygon.remove(pol);
-                                }
-                                
-                                int[] reps = new int[(selectedRepresentatives.length-indexes.size())+1];
-                                int j = 0;
-                                for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-                                    if( !indexes.contains(selectedRepresentatives[i]) )
-                                        reps[j++] = selectedRepresentatives[i];
-                                }
-                                reps[j] = parent.routing();
-                                
-                                selectedRepresentatives = Arrays.copyOf(reps, reps.length);                                
-                                intersectsPolygon.add(parent.polygon());
+//                                ExplorerTreeNode parent = node.parent();
+//                                
+//                                List<Integer> indexes = explorerTree.filterNodes(parent);
+//                                for( Integer v: indexes ) {                                
+//                                    Polygon pol = mapPointPolygon.get(new Point2D.Double(rectangles.get(v).getCenterX(),
+//                                                                                             rectangles.get(v).getCenterY()));     
+//                                    intersectsPolygon.remove(pol);
+//                                }
+//                                
+//                                int[] reps = new int[(selectedRepresentatives.length-indexes.size())+1];
+//                                int j = 0;
+//                                for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+//                                    if( !indexes.contains(selectedRepresentatives[i]) )
+//                                        reps[j++] = selectedRepresentatives[i];
+//                                }
+//                                reps[j] = parent.routing();
+//                                
+//                                selectedRepresentatives = Arrays.copyOf(reps, reps.length);                                
+//                                intersectsPolygon.add(parent.polygon());
                             
-                            } else if( !node.children().isEmpty() ) {                                
-                                /*
-                                for( Polygon p: intersectsPolygon ) {
-                                    SimplePolygon2D sp = new SimplePolygon2D();
-                                    for( int i = 0; i < p.xpoints.length; ++i )
-                                        sp.addVertex(new math.geom2d.Point2D(p.xpoints[i], p.ypoints[i]));
-
-                                    if( sp.contains(e.getX(), e.getY()) )
-                                        clickedPolygon = p;
-                                }*/
+                            } else if( !node.children().isEmpty() ) {    
                                 
-                                clickedPolygon = mapPointPolygon.get(new Point2D.Double(rectangles.get(index).getCenterX(),
-                                                                                             rectangles.get(index).getCenterY()));
-                                
-                                explorerTree.expandNode(index, clickedPolygon);
-                                int[] reps = new int[node.children().size() + selectedRepresentatives.length-1];
-
-                                int j = 0;
-                                for( int i = 0; i < selectedRepresentatives.length; ++i )
-                                    if( selectedRepresentatives[i] != index )
-                                        reps[j++] = selectedRepresentatives[i];
-                                 indexNewRepresentatives = j;
-                                 
-                                for( ExplorerTreeNode n: node.children() )
-                                    reps[j++] = n.routing();
-                                
-                                selectedRepresentatives = Arrays.copyOf(reps, reps.length);                                
-                                
-                                for( ExplorerTreeNode n: node.children() ) {
-                                    List<Integer> nearest = new ArrayList<>();
-                                    Arrays.stream(n.indexes()).forEach((i)->nearest.add(i));                                    
-                                    hashRepresentative.put(n.routing(), nearest);
-                                }
-                                
-                                intersectsPolygon.remove(clickedPolygon);
+                                controller.expandNode(index, e.getX(), e.getY(), getSize().width, getSize().height);
                                 
                                 
-                                updateDiagram();
+//                                clickedPolygon = mapPointPolygon.get(new Point2D.Double(rectangles.get(index).getCenterX(),
+//                                                                                             rectangles.get(index).getCenterY()));
+//                                
+//                                explorerTree.expandNode(index, clickedPolygon);
+//                                int[] reps = new int[node.children().size() + selectedRepresentatives.length-1];
+//
+//                                int j = 0;
+//                                for( int i = 0; i < selectedRepresentatives.length; ++i )
+//                                    if( selectedRepresentatives[i] != index )
+//                                        reps[j++] = selectedRepresentatives[i];
+//                                 indexNewRepresentatives = j;
+//                                 
+//                                for( ExplorerTreeNode n: node.children() )
+//                                    reps[j++] = n.routing();
+//                                
+//                                selectedRepresentatives = Arrays.copyOf(reps, reps.length);                                
+//                                
+//                                for( ExplorerTreeNode n: node.children() ) {
+//                                    List<Integer> nearest = new ArrayList<>();
+//                                    Arrays.stream(n.indexes()).forEach((i)->nearest.add(i));                                    
+//                                    hashRepresentative.put(n.routing(), nearest);
+//                                }
+//                                
+//                                intersectsPolygon.remove(clickedPolygon);
+                                
+                                
+//                                updateDiagram();
                             }
                         } 
                     }
@@ -1895,16 +1883,8 @@ public class Menu extends javax.swing.JFrame {
 
                 @Override
                 public void mouseMoved(MouseEvent e) {
-                    int index = -1;
                     if( controller != null && controller.representative() != null && controller.nearest() != null ) {
-                        for( int i = 0; i < controller.representative().length; ++i ) {
-                            Point2D.Double p = new Point2D.Double(controller.projectionCenter()[controller.representative()[i]].x, 
-                                               controller.projectionCenter()[controller.representative()[i]].y);
-                            if( Util.euclideanDistance(e.getX(), e.getY(), p.x, p.y) < RECTSIZE/2 ) {
-                                index = controller.representative()[i];
-                                break;
-                            }
-                        }
+                        int index = controller.indexRepresentative(e.getX(), e.getY());
 
                         nearest = null;
                         if( index != -1 )
