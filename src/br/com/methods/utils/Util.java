@@ -1751,6 +1751,20 @@ public class Util {
         
     }
 
+    public static void toRectangleVis(ArrayList<RetanguloVis> cluster, ArrayList<OverlapRect> rects, List<Integer> indexes) {
+        
+        
+        for( int i = 0; i < rects.size(); ++i ) {    
+            RetanguloVis r = new RetanguloVis(rects.get(i).x, rects.get(i).y, rects.get(i).getWidth(), rects.get(i).getHeight(), 
+                    Color.red, rects.get(i).getId());
+            r.setPivot(rects.get(i).isPivot());
+            r.setLevel(rects.get(i).getLevel());
+            r.setHealth(rects.get(i).getHealth());
+            cluster.add(r);
+        }   
+    
+    }
+
     
              
     private static class Item {

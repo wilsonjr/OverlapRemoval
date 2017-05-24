@@ -1807,6 +1807,18 @@ public class Menu extends javax.swing.JFrame {
 
         if( applySeamCarving )
             addSeamCarvingResult(projectedValues);
+        ArrayList<RetanguloVis> cluster = new ArrayList<>();
+         Util.toRectangleVis(cluster, projectedValues, indexes);
+        
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        OverlapPanel panel = new OverlapPanel(cluster);
+        frame.add(panel);
+        panel.cleanImage();
+        panel.repaint();
+        
+        
+        frame.setVisible(true);
         
     
      /*   Util.toRectangleVis(rectangles, projectedValues);
@@ -1818,6 +1830,94 @@ public class Menu extends javax.swing.JFrame {
     
     public class OverlapPanel extends JPanel {
         
+        private BufferedImage imageBuffer;
+        
+        public ArrayList<RetanguloVis> rects;
+        
+        public OverlapPanel(ArrayList<RetanguloVis> rects) {
+            setLayout(new FlowLayout(FlowLayout.LEFT));
+            this.rects = rects;
+        }
+        
+        
+        @Override
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+            g2.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+            
+            if( imageBuffer == null ) {
+                adjustPanel();
+                setPreferredSize(getSize());
+                this.imageBuffer = new BufferedImage(getSize().width, getSize().height, BufferedImage.TYPE_INT_ARGB);
+                
+                java.awt.Graphics2D g2Buffer = this.imageBuffer.createGraphics();
+                g2Buffer.setColor(this.getBackground());
+                g2Buffer.fillRect(0, 0, 5000, 5000);
+
+                g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                if( afterSeamCarving.isEmpty() )
+                {                
+                    for( RetanguloVis r: rects ) {                    
+                        g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
+                        g2Buffer.setColor(Color.BLUE);
+                        g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+
+                    }
+                }
+                
+                
+                g2Buffer.dispose();
+                
+            } 
+            if( imageBuffer != null )  {
+                g2.drawImage(this.imageBuffer, 0, 0, null);                  
+            }
+            
+        }
+        
+        public void cleanImage() {
+            this.imageBuffer = null;
+        }
+        
+         public void adjustPanel() {
+            if( rects == null || rects.isEmpty() )
+                return;
+            
+            double iniX = rects.get(0).getCenterX();
+            double iniY = rects.get(0).getCenterY();
+            double max_x = iniX, max_y = iniX;
+            double min_x = iniY, min_y = iniY;
+            int zero = 100;//graph.getVertex().get(0).getRay() * 5 + 10;
+
+            for( int i = 1; i < rects.size(); i++ ) {
+                double x = rects.get(i).getCenterX();
+                if (max_x < x)
+                    max_x = x;
+                else if (min_x > x)
+                    min_x = x;
+                
+                double y = rects.get(i).getCenterY();
+                if (max_y < y)
+                    max_y = y;
+                else if (min_y > y)
+                    min_y = y;
+                
+            }
+
+            Dimension d = this.getSize();
+            d.width = (int) max_x + zero;
+            d.height = (int) max_y + zero;
+            this.setSize(d);
+            this.setPreferredSize(d);
+        }
     }
     
     
