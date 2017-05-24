@@ -237,7 +237,7 @@ public class OverlapRect extends Rectangle2D.Double implements Pivot {
     
     @Override
     public String toString() {
-        return "<"+this.x+", "+lx+", "+this.y+", "+ly+">";
+        return "("+id+")"+"<"+this.x+", "+lx+", "+this.y+", "+ly+">";
     }
 
     @Override

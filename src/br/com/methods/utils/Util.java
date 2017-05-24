@@ -70,11 +70,28 @@ public class Util {
     public static ArrayList<OverlapRect> toRectangle(ArrayList<RetanguloVis> rects) {
         ArrayList<OverlapRect> rs = new ArrayList<>();
         rects.forEach(r-> {
-            rs.add(new OverlapRect(r.getUX(), r.getUY(), r.getWidth(), r.getHeight(), r.isPivot(), r.getLevel(), r.getCluster(), r.getHealth(), r.numero));
+            rs.add(new OverlapRect(r.getUX(), r.getUY(), r.getWidth(), r.getHeight(), 
+                                   r.isPivot(), r.getLevel(), r.getCluster(), r.getHealth(), r.numero));
         });
         
         return rs;
     }
+    
+    public static ArrayList<OverlapRect> toRectangle(ArrayList<RetanguloVis> rects, List<Integer> indexes) {
+        ArrayList<OverlapRect> rs = new ArrayList<>();
+        
+        for( int i = 0; i < indexes.size(); ++i ) {
+            RetanguloVis r = rects.get(indexes.get(i));
+            rs.add(new OverlapRect(r.getUX(), r.getUY(), r.getWidth(), r.getHeight(),
+                                   r.isPivot(), r.getLevel(), r.getCluster(), r.getHealth(), r.numero));
+        }
+        
+        return rs;
+    }
+    
+    
+    
+    
         
     /**
      * Converte uma lista de objetos OverlapRect em uma lista de RetanguloVis.

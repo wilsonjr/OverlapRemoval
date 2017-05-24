@@ -57,6 +57,7 @@ import br.com.representative.lowrank.CSM;
 import br.com.representative.dictionaryrepresentation.DS3;
 import br.com.representative.dictionaryrepresentation.SMRS;
 import br.com.representative.lowrank.KSvd;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -64,6 +65,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
@@ -801,6 +803,7 @@ public class Menu extends javax.swing.JFrame {
         PRISM prism = new PRISM(algo);
         Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
         ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
+        
         double[] center1 = Util.getCenter(projectedValues);
         
         double ammountX = center0[0]-center1[0];
@@ -1651,16 +1654,6 @@ public class Menu extends javax.swing.JFrame {
                 controller.build();                
                 controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
                 
-                
-//                explorerTree = new ExplorerTree(points, ds3, RECTSIZE/2, 7);
-//                explorerTree.build();
-//                explorerTree.buildActiveNodes();
-//                explorerTree.print();
-//
-//                selectedRepresentatives = explorerTree.topNodes().stream().mapToInt((ExplorerTreeNode node)->node.routing()).toArray();
-//                hashRepresentative = Util.createIndex(selectedRepresentatives, points);
-//
-                //voronoiDiagramJMenuItemActionPerformed(evt);
                 view.cleanImage();
                 view.repaint();
                 
@@ -1788,7 +1781,44 @@ public class Menu extends javax.swing.JFrame {
             view.repaint();            
         }
     }
+    
+    private void removeSubsetOverlap(List<Integer> indexes) {
+        int algo = 1;//Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
+        boolean applySeamCarving = false;//Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles, indexes);
 
+        double[] center0 = Util.getCenter(rects);
+        PRISM prism = new PRISM(algo);
+        Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
+        
+        
+        ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
+        projected.entrySet().stream().forEach((v)->{
+            System.out.println(v.getKey().toString()+" --> "+v.getValue().toString());
+        });
+        
+        
+        double[] center1 = Util.getCenter(projectedValues);
+
+        double ammountX = center0[0]-center1[0];
+        double ammountY = center0[1]-center1[1];
+        Util.translate(projectedValues, ammountX, ammountY);        
+        Util.normalize(projectedValues);
+
+        if( applySeamCarving )
+            addSeamCarvingResult(projectedValues);
+        
+    
+     /*   Util.toRectangleVis(rectangles, projectedValues);
+
+        view.cleanImage();
+        view.repaint();*/
+    }
+    
+    
+    public class OverlapPanel extends JPanel {
+        
+    }
     
     
     
@@ -1814,65 +1844,18 @@ public class Menu extends javax.swing.JFrame {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
                         
                         if( index != -1 ) {                            
-                            ExplorerTreeNode node = controller.getNode(index);
                             
-                            if( e.isControlDown() && node.parent() != null ) {
-                                
-                                controller.agglomerateNode(index);
-                                
-//                                ExplorerTreeNode parent = node.parent();
-//                                
-//                                List<Integer> indexes = explorerTree.filterNodes(parent);
-//                                for( Integer v: indexes ) {                                
-//                                    Polygon pol = mapPointPolygon.get(new Point2D.Double(rectangles.get(v).getCenterX(),
-//                                                                                             rectangles.get(v).getCenterY()));     
-//                                    intersectsPolygon.remove(pol);
-//                                }
-//                                
-//                                int[] reps = new int[(selectedRepresentatives.length-indexes.size())+1];
-//                                int j = 0;
-//                                for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-//                                    if( !indexes.contains(selectedRepresentatives[i]) )
-//                                        reps[j++] = selectedRepresentatives[i];
-//                                }
-//                                reps[j] = parent.routing();
-//                                
-//                                selectedRepresentatives = Arrays.copyOf(reps, reps.length);                                
-//                                intersectsPolygon.add(parent.polygon());
-                            
-                            } else if( !node.children().isEmpty() ) {    
-                                
+                            ExplorerTreeNode node = controller.getNode(index);                            
+                            if( e.isControlDown() && node.parent() != null )                               
+                                controller.agglomerateNode(index);                                
+                            else if( !node.children().isEmpty() )                           
                                 controller.expandNode(index, e.getX(), e.getY(), getSize().width, getSize().height);
+                            else if( node.children().isEmpty() ) {
                                 
+                                removeSubsetOverlap(controller.nearest().get(index));
                                 
-//                                clickedPolygon = mapPointPolygon.get(new Point2D.Double(rectangles.get(index).getCenterX(),
-//                                                                                             rectangles.get(index).getCenterY()));
-//                                
-//                                explorerTree.expandNode(index, clickedPolygon);
-//                                int[] reps = new int[node.children().size() + selectedRepresentatives.length-1];
-//
-//                                int j = 0;
-//                                for( int i = 0; i < selectedRepresentatives.length; ++i )
-//                                    if( selectedRepresentatives[i] != index )
-//                                        reps[j++] = selectedRepresentatives[i];
-//                                 indexNewRepresentatives = j;
-//                                 
-//                                for( ExplorerTreeNode n: node.children() )
-//                                    reps[j++] = n.routing();
-//                                
-//                                selectedRepresentatives = Arrays.copyOf(reps, reps.length);                                
-//                                
-//                                for( ExplorerTreeNode n: node.children() ) {
-//                                    List<Integer> nearest = new ArrayList<>();
-//                                    Arrays.stream(n.indexes()).forEach((i)->nearest.add(i));                                    
-//                                    hashRepresentative.put(n.routing(), nearest);
-//                                }
-//                                
-//                                intersectsPolygon.remove(clickedPolygon);
-                                
-                                
-//                                updateDiagram();
                             }
+                                
                         } 
                     }
                      
@@ -1967,9 +1950,6 @@ public class Menu extends javax.swing.JFrame {
                             if( r.isPivot() ) {
                                 pivots.add(r);
                             } else {
-                                //g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                                //g2Buffer.setColor(Color.BLACK);
-                               // g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                                 if( currentCluster != null ) {
                                     g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
                                     g2Buffer.setColor(r.cor);
