@@ -1790,14 +1790,7 @@ public class Menu extends javax.swing.JFrame {
         double[] center0 = Util.getCenter(rects);
         PRISM prism = new PRISM(algo);
         Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
-        
-        
         ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
-        projected.entrySet().stream().forEach((v)->{
-            System.out.println(v.getKey().toString()+" --> "+v.getValue().toString());
-        });
-        
-        
         double[] center1 = Util.getCenter(projectedValues);
 
         double ammountX = center0[0]-center1[0];
@@ -1808,11 +1801,11 @@ public class Menu extends javax.swing.JFrame {
         if( applySeamCarving )
             addSeamCarvingResult(projectedValues);
         ArrayList<RetanguloVis> cluster = new ArrayList<>();
-         Util.toRectangleVis(cluster, projectedValues, indexes);
+       Util.toRectangleVis(cluster, projectedValues, indexes);
         
         JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        OverlapPanel panel = new OverlapPanel(cluster);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        OverlapPanel panel = new OverlapPanel(projected, cluster);
         frame.add(panel);
         panel.cleanImage();
         panel.repaint();
@@ -1833,10 +1826,24 @@ public class Menu extends javax.swing.JFrame {
         private BufferedImage imageBuffer;
         
         public ArrayList<RetanguloVis> rects;
+        public Map<OverlapRect, OverlapRect> projected;
+        public Timer timer;
+        public int INITIAL_DELAY = 0;
+        public int PERIOD_INTERVAL = 100;
         
-        public OverlapPanel(ArrayList<RetanguloVis> rects) {
+        public OverlapPanel(Map<OverlapRect, OverlapRect> projected, ArrayList<RetanguloVis> rects) {
             setLayout(new FlowLayout(FlowLayout.LEFT));
             this.rects = rects;
+            this.projected = projected;
+            
+            this.timer = new Timer();            
+            
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    timer.schedule(new ScheduleTask(), INITIAL_DELAY, PERIOD_INTERVAL);  
+                }                 
+            }); 
         }
         
         
@@ -1863,8 +1870,7 @@ public class Menu extends javax.swing.JFrame {
 
                 g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
-                if( afterSeamCarving.isEmpty() )
-                {                
+                if( afterSeamCarving.isEmpty() ) {                
                     for( RetanguloVis r: rects ) {                    
                         g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
                         g2Buffer.setColor(Color.BLUE);
@@ -1887,7 +1893,7 @@ public class Menu extends javax.swing.JFrame {
             this.imageBuffer = null;
         }
         
-         public void adjustPanel() {
+        public void adjustPanel() {
             if( rects == null || rects.isEmpty() )
                 return;
             
@@ -1918,6 +1924,31 @@ public class Menu extends javax.swing.JFrame {
             this.setSize(d);
             this.setPreferredSize(d);
         }
+         
+        public class ScheduleTask extends TimerTask {
+            private double i = 0;
+           
+            @Override
+            public void run() {
+                int idx = 0;
+                
+                for( Map.Entry<OverlapRect, OverlapRect> v: projected.entrySet() ) {
+                    double x = (1.0-i)*v.getKey().x + i*v.getValue().x;
+                    double y = (1.0-i)*v.getKey().y + i*v.getValue().y;
+                    
+                    rects.get(idx).setUX(x);
+                    rects.get(idx++).setUY(y);
+                    cleanImage();
+                    repaint();
+                
+                    i += 0.01;
+                    if( i >= 1.0 )
+                        cancel(); 
+                }               
+            }
+            
+        } 
+        
     }
     
     
