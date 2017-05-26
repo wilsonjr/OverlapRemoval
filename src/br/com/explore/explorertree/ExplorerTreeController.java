@@ -34,7 +34,7 @@ public class ExplorerTreeController {
     
     private List<Polygon> _polygons;
     
-    private Map<Point2D.Double, Polygon> _pointPolygon = new HashMap<>();
+    private Map<ExplorerTreeNode, Polygon> _pointPolygon = new HashMap<>();
     
     
     public ExplorerTreeController(Point2D.Double[] projection, Point2D.Double[] projectionCenter, 
@@ -59,6 +59,9 @@ public class ExplorerTreeController {
         
         _representative = _explorerTree.topNodes().stream().mapToInt((node)->node.routing()).toArray();
         
+        for( int i = 0; i < _representative.length; ++i )
+            System.out.println("** "+_representative[i]);
+        
         _explorerTree.topNodes().stream().forEach((node)->{            
             List<Integer> nearest = new ArrayList<>();
             Arrays.stream(node.indexes()).forEach((v)->nearest.add(v));
@@ -76,9 +79,12 @@ public class ExplorerTreeController {
         window.addPoint(0, height);
         
         Point2D.Double[] points = new Point2D.Double[_representative.length-indexNewRepresentative];
+        
+        Map<Point2D.Double, Integer> pointIndex = new HashMap<>();
         for( int i = 0; i < points.length; ++i ) {
             int index = _representative[i+indexNewRepresentative];
             points[i] = new Point2D.Double(_projectionCenter[index].x, _projectionCenter[index].y);
+            pointIndex.put(points[i], index);
         }
         
         int n = (int) Arrays.stream(points).distinct().count();
@@ -89,7 +95,7 @@ public class ExplorerTreeController {
             points[k++] = iterator.next();
         }
         
-        Point2D.Double[] involvePolygon = null;
+        Point2D.Double[] involvePolygon;
         
         if( clickedPolygon == null ) {
             Point2D.Double[] pointsPolygon = new Point2D.Double[_projection.length];
@@ -108,7 +114,8 @@ public class ExplorerTreeController {
                 
         List<Point2D.Double> pVoronoi = new ArrayList<>();
         Polygon[] diagrams = Util.voronoiDiagram(window, points, pVoronoi);
-        _polygons.addAll(new ArrayList<>(Arrays.asList(Util.clipBounds(diagrams, involvePolygon, _pointPolygon, pVoronoi))));
+        _polygons.addAll(new ArrayList<>(Arrays.asList(Util.clipBounds(diagrams, involvePolygon, _pointPolygon, 
+                                                                       pVoronoi, this, pointIndex))));
         
     }
     
@@ -181,7 +188,8 @@ public class ExplorerTreeController {
         
         List<Integer> indexes = _explorerTree.filterNodes(parent);
         for( Integer v: indexes ) {
-            Polygon associatedPolygon = _pointPolygon.get(new Point2D.Double(_projectionCenter[v].x, _projectionCenter[v].y));
+            //Polygon associatedPolygon = _pointPolygon.get(new Point2D.Double(_projectionCenter[v].x, _projectionCenter[v].y));
+            Polygon associatedPolygon = _pointPolygon.get(getNode(v));
             _polygons.remove(associatedPolygon);
         }
         
@@ -215,7 +223,7 @@ public class ExplorerTreeController {
     }
     
     public Polygon polygon(int index) {
-        return _pointPolygon.get(_projectionCenter[index]);
+        return _pointPolygon.get(getNode(index));
     }
 
     public void expandNode(int index, int x, int y, int width, int height) {

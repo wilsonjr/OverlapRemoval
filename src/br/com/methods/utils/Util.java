@@ -1,6 +1,8 @@
 package br.com.methods.utils;
 
 import Jama.Matrix;
+import br.com.explore.explorertree.ExplorerTreeController;
+import br.com.explore.explorertree.ExplorerTreeNode;
 import br.com.methods.overlap.prism.PRISMEdge;
 import br.com.methods.overlap.prism.PRISMPoint;
 import br.com.methods.overlap.prism.SetPoint;
@@ -1514,9 +1516,9 @@ public class Util {
            /// if( i == 0 )
            ///     site.setWeight(30);
             sites.add(site);
-            System.out.println(points[i].x+" - "+points[i].y);
         }
 
+        
         diagram.setSites(sites);
         diagram.setClipPoly(rootPolygon);
         diagram.computeDiagram();
@@ -1525,7 +1527,6 @@ public class Util {
         for( int i = 0; i < sites.size; ++i ) {
 
             PolygonSimple polygon = sites.array[i].getPolygon();
-            System.out.println(sites.array[i].x+" - "+sites.array[i].y+" - "+sites.array[i].z);
             if( polygon != null ) {
                 Polygon poly = new Polygon(polygon.getXpointsClosed(), polygon.getYpointsClosed(), polygon.getXpointsClosed().length);
                 polygons[i] = poly;
@@ -1556,7 +1557,8 @@ public class Util {
     }
 
     public static Polygon[] clipBounds(Polygon[] diagrams, Point2D.Double[] pts, 
-            Map<Point2D.Double, Polygon> map, List<Point2D.Double> pVoronoi) {
+            Map<ExplorerTreeNode, Polygon> map, List<Point2D.Double> pVoronoi, 
+            ExplorerTreeController controller, Map<Point2D.Double, Integer> indexes) {
         
         SimplePolygon2D p1 = new SimplePolygon2D();
         for( int i = 0; i < pts.length; ++i ) {
@@ -1585,9 +1587,12 @@ public class Util {
                     poly.addPoint(intersects[i].xpoints[j], intersects[i].ypoints[j]);                
             }
             intersects[i] = new Polygon(poly.xpoints, poly.ypoints, poly.npoints);
-            map.put(pVoronoi.get(i), intersects[i]);
             
-        }        
+            int index = indexes.get(pVoronoi.get(i));
+            System.out.println(">> node index: "+index+" "+controller.getNode(index).routing());
+            map.put(controller.getNode(index), intersects[i]);
+            
+        }  
         return intersects;
     }
 

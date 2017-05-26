@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.stream.Stream;
 
 /**
  *
@@ -529,6 +528,11 @@ public class ExplorerTreeNode {
         }
         
         return false;
+    }
+    
+
+    public Point2D.Double routingPoint() {        
+        return _subprojection[_routing];
     }
     
     private class Representative {

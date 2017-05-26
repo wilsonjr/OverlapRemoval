@@ -1610,7 +1610,7 @@ public class Menu extends javax.swing.JFrame {
             
             List<Point2D.Double> pVoronoi = new ArrayList<>();
             diagrams = Util.voronoiDiagram(window, points, pVoronoi);            
-            intersects = Util.clipBounds(diagrams, hull, mapPointPolygon, pVoronoi);
+//            intersects = Util.clipBounds(diagrams, hull, mapPointPolygon, pVoronoi);
             
             intersectsPolygon.addAll(new ArrayList<>(Arrays.asList(intersects)));
             
@@ -1711,7 +1711,7 @@ public class Menu extends javax.swing.JFrame {
         List<Point2D.Double> pVoronoi = new ArrayList<>();
         
         Polygon[] diagrams2 = Util.voronoiDiagram(window, points, pVoronoi);            
-        Polygon[] intersects2 = Util.clipBounds(diagrams2, pointsClickedPolygon, mapPointPolygon, pVoronoi);        
+        Polygon[] intersects2 = Util.clipBounds(diagrams2, pointsClickedPolygon, null, pVoronoi, null, null);        
         
         List<Polygon> polys = new ArrayList<>(Arrays.asList(intersects2));
         
