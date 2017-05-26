@@ -1506,18 +1506,13 @@ public class Util {
 
         PolygonSimple rootPolygon = new PolygonSimple();
         for( int i = 0; i < window.xpoints.length; ++i ) {
-            rootPolygon.add(window.xpoints[i], window.ypoints[i]);
-            
+            rootPolygon.add(window.xpoints[i], window.ypoints[i]);            
         }
 
-        System.out.println("POINTS");
         for( int i = 0; i < points.length; ++i ) {
             Site site = new Site(points[i].x, points[i].y);
-           /// if( i == 0 )
-           ///     site.setWeight(30);
             sites.add(site);
         }
-
         
         diagram.setSites(sites);
         diagram.setClipPoly(rootPolygon);
@@ -1589,7 +1584,6 @@ public class Util {
             intersects[i] = new Polygon(poly.xpoints, poly.ypoints, poly.npoints);
             
             int index = indexes.get(pVoronoi.get(i));
-            System.out.println(">> node index: "+index+" "+controller.getNode(index).routing());
             map.put(controller.getNode(index), intersects[i]);
             
         }  

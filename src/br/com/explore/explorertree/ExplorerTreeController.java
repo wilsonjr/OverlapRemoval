@@ -59,9 +59,6 @@ public class ExplorerTreeController {
         
         _representative = _explorerTree.topNodes().stream().mapToInt((node)->node.routing()).toArray();
         
-        for( int i = 0; i < _representative.length; ++i )
-            System.out.println("** "+_representative[i]);
-        
         _explorerTree.topNodes().stream().forEach((node)->{            
             List<Integer> nearest = new ArrayList<>();
             Arrays.stream(node.indexes()).forEach((v)->nearest.add(v));

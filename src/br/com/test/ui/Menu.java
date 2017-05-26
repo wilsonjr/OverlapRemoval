@@ -73,7 +73,6 @@ import br.com.representative.lowrank.CSM;
 import br.com.representative.dictionaryrepresentation.DS3;
 import br.com.representative.dictionaryrepresentation.SMRS;
 import br.com.representative.lowrank.KSvd;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -81,7 +80,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
@@ -1825,15 +1823,10 @@ public class Menu extends javax.swing.JFrame {
         frame.add(panel);
         panel.cleanImage();
         panel.repaint();
-        
-        
+        panel.adjustPanel();        
+        frame.setSize(panel.getSize().width, panel.getSize().height);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-        
-    
-     /*   Util.toRectangleVis(rectangles, projectedValues);
-
-        view.cleanImage();
-        view.repaint();*/
     }
     
     
@@ -1846,6 +1839,7 @@ public class Menu extends javax.swing.JFrame {
         public Timer timer;
         public int INITIAL_DELAY = 0;
         public int PERIOD_INTERVAL = 100;
+        public int RECT_SIZE = 30;
         
         public OverlapPanel(Map<OverlapRect, OverlapRect> projected, ArrayList<RectangleVis> rects) {
             setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -1860,6 +1854,31 @@ public class Menu extends javax.swing.JFrame {
                     timer.schedule(new ScheduleTask(), INITIAL_DELAY, PERIOD_INTERVAL);  
                 }                 
             }); 
+            
+            
+            double minx = Double.MAX_VALUE;
+            double miny = Double.MAX_VALUE;
+            for( int i = 0; i < rects.size(); ++i ) {
+                if( minx > rects.get(i).x )
+                    minx = rects.get(i).x;
+                if( miny > rects.get(i).y )
+                    miny = rects.get(i).y;
+            }
+            
+            for( Map.Entry<OverlapRect, OverlapRect> p: projected.entrySet() ) {
+                p.getKey().x = p.getKey().x - (minx-RECT_SIZE);
+                p.getKey().y = p.getKey().y - (miny-RECT_SIZE);
+                
+                p.getValue().x = p.getValue().x - (minx-RECT_SIZE);
+                p.getValue().y = p.getValue().y - (miny-RECT_SIZE);
+            }
+            
+            
+            for( int i = 0; i < rects.size(); ++i ) {
+                rects.get(i).x = rects.get(i).x - (minx-RECT_SIZE);
+                rects.get(i).y = rects.get(i).y - (miny-RECT_SIZE);
+            }
+            
         }
         
         
@@ -1917,7 +1936,7 @@ public class Menu extends javax.swing.JFrame {
             double iniY = rects.get(0).getCenterY();
             double max_x = iniX, max_y = iniX;
             double min_x = iniY, min_y = iniY;
-            int zero = 100;//graph.getVertex().get(0).getRay() * 5 + 10;
+            int zero = 50;//graph.getVertex().get(0).getRay() * 5 + 10;
 
             for( int i = 1; i < rects.size(); i++ ) {
                 double x = rects.get(i).getCenterX();
@@ -1949,8 +1968,8 @@ public class Menu extends javax.swing.JFrame {
                 int idx = 0;
                 
                 for( Map.Entry<OverlapRect, OverlapRect> v: projected.entrySet() ) {
-                    double x = (1.0-i)*v.getKey().x + i*v.getValue().x;
-                    double y = (1.0-i)*v.getKey().y + i*v.getValue().y;
+                    double x = (1.0-i)*v.getKey().getUX() + i*v.getValue().getUX();
+                    double y = (1.0-i)*v.getKey().getUY() + i*v.getValue().getUY();
                     
                     rects.get(idx).setUX(x);
                     rects.get(idx++).setUY(y);
@@ -1958,8 +1977,12 @@ public class Menu extends javax.swing.JFrame {
                     repaint();
                 
                     i += 0.01;
-                    if( i >= 1.0 )
+                    if( i >= 1.0 ) {
+                        rects.get(idx-1).setUX(v.getValue().getUX());
+                        rects.get(idx-1).setUY(v.getValue().getUY());
                         cancel(); 
+                        
+                    }
                 }               
             }
             
