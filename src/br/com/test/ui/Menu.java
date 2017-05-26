@@ -73,6 +73,7 @@ import br.com.representative.lowrank.CSM;
 import br.com.representative.dictionaryrepresentation.DS3;
 import br.com.representative.dictionaryrepresentation.SMRS;
 import br.com.representative.lowrank.KSvd;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -112,6 +113,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import math.geom2d.polygon.SimplePolygon2D;
 
 /**
@@ -1815,22 +1820,31 @@ public class Menu extends javax.swing.JFrame {
         if( applySeamCarving )
             addSeamCarvingResult(projectedValues);
         ArrayList<RectangleVis> cluster = new ArrayList<>();
-       Util.toRectangleVis(cluster, projectedValues, indexes);
+        Util.toRectangleVis(cluster, projectedValues, indexes);
         
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         OverlapPanel panel = new OverlapPanel(projected, cluster);
-        frame.add(panel);
+        
+        JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);        
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        
+        slider.addChangeListener(panel);
+        
+        
+        frame.add(panel, BorderLayout.CENTER);
+        frame.add(slider, BorderLayout.SOUTH);
         panel.cleanImage();
         panel.repaint();
         panel.adjustPanel();        
-        frame.setSize(panel.getSize().width, panel.getSize().height);
+        frame.setSize(panel.getSize().width, panel.getSize().height+100);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
     
     
-    public class OverlapPanel extends JPanel {
+    public class OverlapPanel extends JPanel implements ChangeListener {
         
         private BufferedImage imageBuffer;
         
@@ -1958,6 +1972,27 @@ public class Menu extends javax.swing.JFrame {
             d.height = (int) max_y + zero;
             this.setSize(d);
             this.setPreferredSize(d);
+        }
+
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            JSlider source = (JSlider) e.getSource();
+            int value = (int) source.getValue();
+
+            double i = (double)value/source.getMaximum();
+
+            int idx = 0;
+            for( Map.Entry<OverlapRect, OverlapRect> v: projected.entrySet() ) {
+                double x = (1.0-i)*v.getKey().getUX() + i*v.getValue().getUX();
+                double y = (1.0-i)*v.getKey().getUY() + i*v.getValue().getUY();
+                
+                rects.get(idx).setUX(x);
+                rects.get(idx++).setUY(y);
+                
+                cleanImage();
+                repaint();
+            }
+            
         }
          
         public class ScheduleTask extends TimerTask {
