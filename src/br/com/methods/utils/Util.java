@@ -1583,9 +1583,7 @@ public class Util {
             }
             intersects[i] = new Polygon(poly.xpoints, poly.ypoints, poly.npoints);
             
-            int index = indexes.get(pVoronoi.get(i));
-            map.put(controller.getNode(index), intersects[i]);
-            
+            map.put(controller.getNode(indexes.get(pVoronoi.get(i))), intersects[i]);            
         }  
         return intersects;
     }
