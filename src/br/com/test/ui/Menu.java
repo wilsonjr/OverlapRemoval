@@ -1778,8 +1778,6 @@ public class Menu extends javax.swing.JFrame {
         Rectangle2D.Double[] r2ds = new Rectangle2D.Double[projected.size()];
         for( int i = 0; i < r2ds.length; ++i ) {
             r2ds[i] = new Rectangle2D.Double(projected.get(i).getUX(), projected.get(i).getUY(), projected.get(i).width, projected.get(i).height);
-            
-            System.out.println("addSeamCarvingResult: "+projected.get(i).getId());
         }
         ArrayList<OverlapRect> returned = new ArrayList<>();
         
@@ -1811,7 +1809,7 @@ public class Menu extends javax.swing.JFrame {
     
     private void removeSubsetOverlap(List<Integer> indexes) {
         int algo = 1;//Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
-        boolean applySeamCarving = true;//Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
+        boolean applySeamCarving = false;//Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles, indexes);
         
         indexes.stream().forEach((e)->System.out.println("indexes: "+e));
@@ -1876,7 +1874,37 @@ public class Menu extends javax.swing.JFrame {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    timer.schedule(new ScheduleTask(), INITIAL_DELAY, PERIOD_INTERVAL);  
+                    
+                    if( e.isControlDown() ) {
+                        
+                        Rectangle2D.Double[] r2ds = new Rectangle2D.Double[projected.size()];
+                        int i = 0;
+                        for( Map.Entry<OverlapRect, OverlapRect> v: projected.entrySet() ) {
+                            r2ds[i++] = new Rectangle2D.Double(v.getValue().getUX(), v.getValue().getUY(), v.getValue().width, v.getValue().height);
+                        }
+                        
+                        ArrayList<OverlapRect> returned = new ArrayList<>();
+
+                        SeamCarving sc = new SeamCarving(r2ds);
+                        OverlapRect[] array = projected.entrySet().stream().map((v)->v.getValue()).toArray(OverlapRect[]::new);
+                        Map<Rectangle2D.Double, Rectangle2D.Double> mapSeamCarving = sc.reduceSpace(array);
+                        
+                        //ContextPreserving cp = new ContextPreserving(r2ds);
+                        //Map<Rectangle2D.Double, Rectangle2D.Double> mapContextPreserving = cp.reduceSpace(array);
+
+                        mapSeamCarving.entrySet().forEach((element)->{
+                            int idx = ((OverlapRect)element.getKey()).getId();
+                            returned.add(new OverlapRect(element.getValue().getMinX(), element.getValue().getMinY(), RECTSIZE, RECTSIZE, idx));
+                        });
+                        
+                        for( int j = 0; j < returned.size(); ++j ) {
+                            rects.get(j).x = returned.get(j).x;
+                            rects.get(j).y = returned.get(j).y;
+                        }
+                        cleanImage();
+                        repaint();
+                    } else 
+                        timer.schedule(new ScheduleTask(), INITIAL_DELAY, PERIOD_INTERVAL);  
                 }                 
             }); 
             
