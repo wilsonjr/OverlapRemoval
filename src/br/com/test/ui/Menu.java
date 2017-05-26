@@ -14,6 +14,22 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package br.com.test.ui;
@@ -48,7 +64,7 @@ import br.com.methods.pivot.SSS;
 import br.com.methods.utils.ChangeRetangulo;
 import br.com.methods.utils.Pair;
 import br.com.methods.utils.OverlapRect;
-import br.com.methods.utils.RetanguloVis;
+import br.com.methods.utils.RectangleVis;
 import br.com.methods.utils.Util;
 import br.com.projection.spacereduction.ContextPreserving;
 import br.com.representative.Dijsktra;
@@ -106,7 +122,7 @@ import math.geom2d.polygon.SimplePolygon2D;
  */
 public class Menu extends javax.swing.JFrame {
     private ViewPanel view;
-    private ArrayList<RetanguloVis> rectangles, afterSeamCarving;
+    private ArrayList<RectangleVis> rectangles, afterSeamCarving;
     private double alpha = 0;
     private int globalCounter = 0;
     private int globalCounterColor = 0;
@@ -590,7 +606,7 @@ public class Menu extends javax.swing.JFrame {
                     double y = Double.parseDouble(linha[2]);
                     int grupo = id;//Integer.parseInt(linha[3]);
 
-                    rectangles.add(new RetanguloVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo*10)%255), id++));   
+                    rectangles.add(new RectangleVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo*10)%255), id++));   
                     items.add(new Point2D.Double(x, y));
                 }
                 
@@ -836,13 +852,13 @@ public class Menu extends javax.swing.JFrame {
 //        mapSeamCarving.entrySet().forEach((element)->{
 //            int idx = ((OverlapRect)element.getKey()).getId();
 //            
-//            afterSeamCarving.add(new RetanguloVis(element.getValue().getMinX(), element.getValue().getMinY(),
+//            afterSeamCarving.add(new RectangleVis(element.getValue().getMinX(), element.getValue().getMinY(),
 //                    RECTSIZE, RECTSIZE, rectangles.get(idx).cor, rectangles.get(idx).numero));
 //        });
         mapContextPreserving.entrySet().forEach((element)->{
             int idx = ((OverlapRect)element.getKey()).getId();
             
-            afterSeamCarving.add(new RetanguloVis(element.getValue().getMinX(), element.getValue().getMinY(), 
+            afterSeamCarving.add(new RectangleVis(element.getValue().getMinX(), element.getValue().getMinY(), 
                 RECTSIZE, RECTSIZE, rectangles.get(idx).cor, rectangles.get(idx).numero));
         
         });
@@ -920,7 +936,7 @@ public class Menu extends javax.swing.JFrame {
                 int xmin = Math.abs(executor.getMinCol());
                 RainbowScale rbS = new RainbowScale();
                 for( PointItem d: executor.getItems() ) {
-                    rectangles.add(new RetanguloVis(30*(d.getCol()+xmin), 30*(d.getRow()+ymin), 
+                    rectangles.add(new RectangleVis(30*(d.getCol()+xmin), 30*(d.getRow()+ymin), 
                                                     30, 30, rbS.getColor((d.getGrupo()*10)%255), 
                                                     d.getId()));
                 }
@@ -994,7 +1010,7 @@ public class Menu extends javax.swing.JFrame {
                     int centerHexY = (3*HEXBOARD_SIZE/2)*(z + Math.abs(zMIN))+HEXBOARD_SIZE;
                     int distancia = (Math.abs(q.getRow()-d.getRow())+Math.abs(q.getCol()-d.getCol()))*a + xmin;
 
-                    rectangles.add(new RetanguloVis(distancia-(HEXBOARD_SIZE/2), centerHexY-(HEXBOARD_SIZE/2), HEXBOARD_SIZE, HEXBOARD_SIZE, 
+                    rectangles.add(new RectangleVis(distancia-(HEXBOARD_SIZE/2), centerHexY-(HEXBOARD_SIZE/2), HEXBOARD_SIZE, HEXBOARD_SIZE, 
                             d.getGrupo() == 1 ? rbS.getColor(5) : d.getGrupo() == 2 ? rbS.getColor(120) : rbS.getColor(200),
                             d.getId()));
                     rectangles.get(rectangles.size()-1).setP(new Point(distancia, centerHexY));
@@ -1145,7 +1161,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_salvarImagemJMenuItemActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        view.r3 = new RetanguloVis(view.r1.getUX(), view.r1.getUY(), 30, 30, Color.red, 3);
+        view.r3 = new RectangleVis(view.r1.getUX(), view.r1.getUY(), 30, 30, Color.red, 3);
         
         double d = Math.sqrt(Math.pow(view.r2.getUX()-view.r1.getUX(), 2)
                                         +
@@ -1800,7 +1816,7 @@ public class Menu extends javax.swing.JFrame {
 
         if( applySeamCarving )
             addSeamCarvingResult(projectedValues);
-        ArrayList<RetanguloVis> cluster = new ArrayList<>();
+        ArrayList<RectangleVis> cluster = new ArrayList<>();
        Util.toRectangleVis(cluster, projectedValues, indexes);
         
         JFrame frame = new JFrame();
@@ -1825,13 +1841,13 @@ public class Menu extends javax.swing.JFrame {
         
         private BufferedImage imageBuffer;
         
-        public ArrayList<RetanguloVis> rects;
+        public ArrayList<RectangleVis> rects;
         public Map<OverlapRect, OverlapRect> projected;
         public Timer timer;
         public int INITIAL_DELAY = 0;
         public int PERIOD_INTERVAL = 100;
         
-        public OverlapPanel(Map<OverlapRect, OverlapRect> projected, ArrayList<RetanguloVis> rects) {
+        public OverlapPanel(Map<OverlapRect, OverlapRect> projected, ArrayList<RectangleVis> rects) {
             setLayout(new FlowLayout(FlowLayout.LEFT));
             this.rects = rects;
             this.projected = projected;
@@ -1871,7 +1887,7 @@ public class Menu extends javax.swing.JFrame {
                 g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
                 if( afterSeamCarving.isEmpty() ) {                
-                    for( RetanguloVis r: rects ) {                    
+                    for( RectangleVis r: rects ) {                    
                         g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
                         g2Buffer.setColor(Color.BLUE);
                         g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
@@ -1957,7 +1973,7 @@ public class Menu extends javax.swing.JFrame {
         private Color color = Color.RED;
         
         private double iniX, iniY, fimX, fimY;
-        public RetanguloVis r1 = null, r2 = null, r3 = null;
+        public RectangleVis r1 = null, r2 = null, r3 = null;
         private BufferedImage imageBuffer;
         
         public ViewPanel() {
@@ -2041,7 +2057,7 @@ public class Menu extends javax.swing.JFrame {
                 g2Buffer.fillRect(0, 0, 5000, 5000);
 
                 g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                ArrayList<RetanguloVis> pivots = new ArrayList<>();
+                ArrayList<RectangleVis> pivots = new ArrayList<>();
                 if( afterSeamCarving.isEmpty() )
                 {                
                     if( currentCluster != null && !rectangles.isEmpty() ) {
@@ -2059,7 +2075,7 @@ public class Menu extends javax.swing.JFrame {
                     }
                     
                     
-                    for( RetanguloVis r: rectangles ) {                    
+                    for( RectangleVis r: rectangles ) {                    
                         ///g2Buffer.setColor(r.cor);
                         int cinza = (int) (((double)(r.getHealth()-menor)/(double)(maior-menor))*255.0);
                         g2Buffer.setColor(r.cor);
@@ -2104,7 +2120,7 @@ public class Menu extends javax.swing.JFrame {
                     
                     if( nearest != null ) {                        
                         for( int i = 0; i < nearest.size(); ++i ) {
-                            RetanguloVis r = rectangles.get(nearest.get(i));
+                            RectangleVis r = rectangles.get(nearest.get(i));
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
                             g2Buffer.setColor(Color.RED);
                             g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
@@ -2147,7 +2163,7 @@ public class Menu extends javax.swing.JFrame {
                     g2Buffer.fillRect((int)r3.getUX(), (int)r3.getUY(), 20, 20);
                 }
                                 
-                for( RetanguloVis r: pivots ) {
+                for( RectangleVis r: pivots ) {
                     g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
                     g2Buffer.setColor(Color.RED);                    
                     g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());      
@@ -2236,7 +2252,7 @@ public class Menu extends javax.swing.JFrame {
                         }
                     } else {
                         for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-                            RetanguloVis r = rectangles.get(selectedRepresentatives[i]);
+                            RectangleVis r = rectangles.get(selectedRepresentatives[i]);
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
                             g2Buffer.setColor(Color.RED);
                             g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());

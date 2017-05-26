@@ -6,6 +6,14 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package br.com.methods.utils;
@@ -17,7 +25,7 @@ import java.awt.Point;
  * Classe para teste. Guarda informações para visualização dos retângulos após aplicação dos métodos.
  * @author wilson
  */
-public class RetanguloVis extends OverlapRect {
+public class RectangleVis extends OverlapRect {
     public Color cor;
     public int numero;
     public boolean isHexBoard;
@@ -32,7 +40,7 @@ public class RetanguloVis extends OverlapRect {
      * @param cor Cor do retângulo
      * @param numero Número de identificação
      */
-    public RetanguloVis(double xMin, double yMin, double width, double height, Color cor, int numero) {
+    public RectangleVis(double xMin, double yMin, double width, double height, Color cor, int numero) {
         super(xMin, yMin, width, height);
         this.cor = cor;
         this.numero = numero;

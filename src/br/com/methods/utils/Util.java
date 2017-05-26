@@ -63,11 +63,11 @@ public class Util {
     }
     
     /**
-     * Converte uma lista de objetos RetanguloVis em uma lista de OverlapRect.
+     * Converte uma lista de objetos RectangleVis em uma lista de OverlapRect.
      * @param rects RetangulosVis a ser convertido
      * @return Lista de Retângulos
      */
-    public static ArrayList<OverlapRect> toRectangle(ArrayList<RetanguloVis> rects) {
+    public static ArrayList<OverlapRect> toRectangle(ArrayList<RectangleVis> rects) {
         ArrayList<OverlapRect> rs = new ArrayList<>();
         rects.forEach(r-> {
             rs.add(new OverlapRect(r.getUX(), r.getUY(), r.getWidth(), r.getHeight(), 
@@ -77,11 +77,11 @@ public class Util {
         return rs;
     }
     
-    public static ArrayList<OverlapRect> toRectangle(ArrayList<RetanguloVis> rects, List<Integer> indexes) {
+    public static ArrayList<OverlapRect> toRectangle(ArrayList<RectangleVis> rects, List<Integer> indexes) {
         ArrayList<OverlapRect> rs = new ArrayList<>();
         
         for( int i = 0; i < indexes.size(); ++i ) {
-            RetanguloVis r = rects.get(indexes.get(i));
+            RectangleVis r = rects.get(indexes.get(i));
             rs.add(new OverlapRect(r.getUX(), r.getUY(), r.getWidth(), r.getHeight(),
                                    r.isPivot(), r.getLevel(), r.getCluster(), r.getHealth(), r.numero));
         }
@@ -94,11 +94,11 @@ public class Util {
     
         
     /**
-     * Converte uma lista de objetos OverlapRect em uma lista de RetanguloVis.
-     * @param ori Lista de RetanguloVis original
+     * Converte uma lista de objetos OverlapRect em uma lista de RectangleVis.
+     * @param ori Lista de RectangleVis original
      * @param rects Lista de OverlapRect com as novas coordenadas
      */
-    public static void toRectangleVis(ArrayList<RetanguloVis> ori, ArrayList<OverlapRect> rects) {
+    public static void toRectangleVis(ArrayList<RectangleVis> ori, ArrayList<OverlapRect> rects) {
         
         for( int i = 0; i < rects.size(); ++i ) {    
             ori.get(i).setUX(rects.get(i).getUX());
@@ -1751,11 +1751,11 @@ public class Util {
         
     }
 
-    public static void toRectangleVis(ArrayList<RetanguloVis> cluster, ArrayList<OverlapRect> rects, List<Integer> indexes) {
+    public static void toRectangleVis(ArrayList<RectangleVis> cluster, ArrayList<OverlapRect> rects, List<Integer> indexes) {
         
         
         for( int i = 0; i < rects.size(); ++i ) {    
-            RetanguloVis r = new RetanguloVis(rects.get(i).x, rects.get(i).y, rects.get(i).getWidth(), rects.get(i).getHeight(), 
+            RectangleVis r = new RectangleVis(rects.get(i).x, rects.get(i).y, rects.get(i).getWidth(), rects.get(i).getHeight(), 
                     Color.red, rects.get(i).getId());
             r.setPivot(rects.get(i).isPivot());
             r.setLevel(rects.get(i).getLevel());
