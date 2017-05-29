@@ -66,10 +66,10 @@ import br.com.methods.utils.Pair;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.RectangleVis;
 import br.com.methods.utils.Util;
-import br.com.projection.spacereduction.ContextPreserving;
 import br.com.projection.spacereduction.SeamCarving;
 import br.com.representative.Dijsktra;
 import br.com.representative.RepresentativeFinder;
+import br.com.representative.clustering.affinitypropagation.AffinityPropagation;
 import br.com.representative.lowrank.CSM;
 import br.com.representative.dictionaryrepresentation.DS3;
 import br.com.representative.dictionaryrepresentation.SMRS;
@@ -88,6 +88,7 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -239,6 +240,7 @@ public class Menu extends javax.swing.JFrame {
         ksvdJMenuItem = new javax.swing.JMenuItem();
         smrsJMenuItem = new javax.swing.JMenuItem();
         runDs3JMenuItem = new javax.swing.JMenuItem();
+        affinityPropagationJMenuItem = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         ds3JMenuItem = new javax.swing.JMenuItem();
         voronoiDiagramJMenuItem = new javax.swing.JMenuItem();
@@ -541,6 +543,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu8.add(runDs3JMenuItem);
+
+        affinityPropagationJMenuItem.setText("Affinity Propagation");
+        affinityPropagationJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                affinityPropagationJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(affinityPropagationJMenuItem);
         jMenu8.add(jSeparator2);
 
         ds3JMenuItem.setText("Test DS3");
@@ -1657,6 +1667,23 @@ public class Menu extends javax.swing.JFrame {
         
        
     }//GEN-LAST:event_testTreeJMenuItemActionPerformed
+
+    private void affinityPropagationJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_affinityPropagationJMenuItemActionPerformed
+        if( rectangles == null )
+            loadDataJMenuItemActionPerformed(null);
+        
+        RepresentativeFinder affinityPropagation = new AffinityPropagation(Arrays.asList(points));
+        System.out.println("Init Affinity Propagation execution");
+        affinityPropagation.execute();
+        System.out.println("Finished Affinity Propagation execution");
+        selectedRepresentatives = affinityPropagation.getRepresentatives();
+        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+    
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
+    }//GEN-LAST:event_affinityPropagationJMenuItemActionPerformed
     
     
     public void updateDiagram() {
@@ -1811,11 +1838,9 @@ public class Menu extends javax.swing.JFrame {
     
     private void removeSubsetOverlap(List<Integer> indexes) {
         int algo = 1;//Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
-        boolean applySeamCarving = true;//Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
+        boolean applySeamCarving = false;//Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles, indexes);
         
-        indexes.stream().forEach((e)->System.out.println("indexes: "+e));
-
         double[] center0 = Util.getCenter(rects);
         PRISM prism = new PRISM(algo);
         Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
@@ -2051,6 +2076,37 @@ public class Menu extends javax.swing.JFrame {
             rectangles = new ArrayList<>();
             afterSeamCarving = new ArrayList<>();
             
+            addMouseWheelListener(new MouseAdapter() {
+                @Override
+                public void mouseWheelMoved(MouseWheelEvent e) {
+                    
+                    int notches = e.getWheelRotation();                    
+                    if( controller != null && controller.representative() != null && controller.nearest() != null ) {
+                        int index = controller.indexRepresentative(e.getX(), e.getY());
+                        
+                        if( index != -1 ) {                            
+                            
+                            ExplorerTreeNode node = controller.getNode(index);                            
+                            if( notches > 0 && node.parent() != null )                               
+                                controller.agglomerateNode(index);                                
+                            else if( notches < 0 && !node.children().isEmpty() )                           
+                                controller.expandNode(index, e.getX(), e.getY(), getSize().width, getSize().height);
+                            else if( notches < 0 && node.children().isEmpty() ) {
+                                
+                                removeSubsetOverlap(controller.nearest().get(index));
+                                
+                            }
+                                
+                        } 
+                    }
+                    
+                    cleanImage();
+                    repaint();
+                    
+                    
+                }
+            });
+            
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -2280,9 +2336,9 @@ public class Menu extends javax.swing.JFrame {
                     g2Buffer.drawPolygon(p);                    
                 }
                 
-                if( controller !=  null && controller.representative() != null ) {
+                if( selectedRepresentatives != null || controller !=  null && controller.representative() != null ) {
 
-                    if( controller.nearest() != null ) {
+                    if( controller != null && controller.nearest() != null ) {
 
                      //  Util.paintSphere(centerPoints, selectedRepresentatives, hashRepresentative, g2Buffer);
                         int[] representative = controller.representative();
@@ -2400,6 +2456,7 @@ public class Menu extends javax.swing.JFrame {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem affinityPropagationJMenuItem;
     private javax.swing.JMenuItem bisectingKMeansJMenuItem;
     private javax.swing.JMenuItem csmJMenuItem;
     private javax.swing.JMenuItem dbscanJMenuItem;
