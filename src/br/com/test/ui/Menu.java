@@ -87,6 +87,8 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -108,7 +110,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Timer;
 import java.util.TimerTask;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
@@ -117,6 +118,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import math.geom2d.polygon.SimplePolygon2D;
@@ -1170,25 +1172,31 @@ public class Menu extends javax.swing.JFrame {
         view.repaint();
         
         
-        Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            private double i = 0.0;
+        Timer t = new Timer(menor, new ActionListener() {
+            
             @Override
-            public void run() {
-                System.out.println("Ola: "+i);
-                
-                double x = (1.0-i)*view.r1.getUX() + i*view.r2.getUX();
-                double y = (1.0-i)*view.r1.getUY() + i*view.r2.getUY();
-                view.r3.setUX(x);
-                view.r3.setUY(y);
-                view.cleanImage();
-                view.repaint();
-                i += 0.05;
-                if( i >= 1.0 )
-                    cancel();
+            public void actionPerformed(ActionEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
-        }, 0, 100);
-        
+        });
+//        t.schedule(new TimerTask() {
+//            private double i = 0.0;
+//            @Override
+//            public void run() {
+//                System.out.println("Ola: "+i);
+//                
+//                double x = (1.0-i)*view.r1.getUX() + i*view.r2.getUX();
+//                double y = (1.0-i)*view.r1.getUY() + i*view.r2.getUY();
+//                view.r3.setUX(x);
+//                view.r3.setUY(y);
+//                view.cleanImage();
+//                view.repaint();
+//                i += 0.05;
+//                if( i >= 1.0 )
+//                    cancel();
+//            }
+//        }, 0, 100);
+//        
         //Timer t = new Timer();
        // t.schedule(null, WIDTH, WIDTH);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
@@ -1487,23 +1495,23 @@ public class Menu extends javax.swing.JFrame {
             for( int j = 0; j < distances[0].length; ++j )
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
         
-        Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            private double i = 0.0;
-            @Override
-            public void run() {
-                iImage = i; 
-                DS3 ds3 = new DS3(distances, i);
-                ds3.execute();
-                selectedRepresentatives = ds3.getRepresentatives();
-                
-                view.cleanImage();
-                view.repaint();
-                i += 0.01;
-                if( i > 0.5 )
-                    cancel();
-            }
-        }, 0, 1000);        
+//        Timer t = new Timer();
+//        t.schedule(new TimerTask() {
+//            private double i = 0.0;
+//            @Override
+//            public void run() {
+//                iImage = i; 
+//                DS3 ds3 = new DS3(distances, i);
+//                ds3.execute();
+//                selectedRepresentatives = ds3.getRepresentatives();
+//                
+//                view.cleanImage();
+//                view.repaint();
+//                i += 0.01;
+//                if( i > 0.5 )
+//                    cancel();
+//            }
+//        }, 0, 1000);        
         
     }//GEN-LAST:event_ds3JMenuItemActionPerformed
 
@@ -1926,12 +1934,43 @@ public class Menu extends javax.swing.JFrame {
             this.rects = rects;
             this.projected = projected;
             
-            this.timer = new Timer();            
+            timer = new Timer(PERIOD_INTERVAL, new ActionListener() {
+                private double i = 0;
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    
+                    int idx = 0;
+
+                    for( Map.Entry<OverlapRect, OverlapRect> v: projected.entrySet() ) {
+                        double x = (1.0-i)*v.getKey().getUX() + i*v.getValue().getUX();
+                        double y = (1.0-i)*v.getKey().getUY() + i*v.getValue().getUY();
+
+                        rects.get(idx).setUX(x);
+                        rects.get(idx++).setUY(y);
+
+                        i += 0.01;
+                        if( i >= 1.0 ) {
+                            rects.get(idx-1).setUX(v.getValue().getUX());
+                            rects.get(idx-1).setUY(v.getValue().getUY());
+
+                            cleanImage();
+                            repaint();
+                            timer.stop();
+
+                        }
+                    }        
+
+                    cleanImage();
+                    repaint();
+                }
+            });
             
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    timer.schedule(new ScheduleTask(), INITIAL_DELAY, PERIOD_INTERVAL);  
+                    timer.setDelay(PERIOD_INTERVAL);
+                    timer.setRepeats(true);
+                    timer.start();
                 }                 
             }); 
             
@@ -2107,7 +2146,7 @@ public class Menu extends javax.swing.JFrame {
         
         private boolean semaphore = false;
         
-        
+        private Timer timer = null;
         public ViewPanel() {
             setBackground(Color.WHITE);
             setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -2127,21 +2166,53 @@ public class Menu extends javax.swing.JFrame {
                             ExplorerTreeNode node = controller.getNode(index);                            
                             if( notches > 0 && node.parent() != null ) {
                                 semaphore = false;
-                              
+                             //   toDraw.clear();
                                 movingIndexes = controller.agglomerateNode(index);
-                                cleanImage();
-                                repaint();
+//                                int parentIdx = node.parent().routing();
+//                                Timer timer = new Timer();                                
+//                                timer.schedule(new TimerTask() {
+//                                    private double i = 0;
+//                                    
+//                                    @Override
+//                                    public void run() {
+//                                        if( !semaphore ) {
+//                                            semaphore = true;
+//                                            
+//                                            for( int j = 0; j < movingIndexes.size(); ++j) {
+//                                                int v = movingIndexes.get(j);
+//                                                double x = (1.0-i)*controller.projection()[v].x + i*controller.projection()[parentIdx].x;
+//                                                double y = (1.0-i)*controller.projection()[v].y + i*controller.projection()[parentIdx].y;
+//
+//                                                toDraw.add(new Point2D.Double(x, y));
+//
+//                                                i += 0.01;
+//                                                if( i >= 1.0 ) {
+//                                                    movingIndexes.clear();
+//                                                    toDraw.clear();
+//                                                    cleanImage();
+//                                                    repaint();
+//                                                    cancel();
+//                                                }
+//                                            }
+//
+//                                            cleanImage();
+//                                            repaint();
+//                                            
+//                                            semaphore = false;
+//                                        }
+//                                        
+//                                    }
+//                                },0, 20);
                                 
                             } else if( notches < 0 && !node.children().isEmpty() ) {                          
                                 semaphore = false;
                                 movingIndexes = controller.expandNode(index, e.getX(), e.getY(), getSize().width, getSize().height);
-                                
-                                Timer timer = new Timer();                                
-                                timer.schedule(new TimerTask() {
+                             //   toDraw.clear();
+                                timer = new Timer(0, new ActionListener() {
                                     private double i = 0;
                                     
                                     @Override
-                                    public void run() {
+                                    public void actionPerformed(ActionEvent e) {
                                         if( !semaphore ) {
                                             semaphore = true;
                                             
@@ -2158,7 +2229,7 @@ public class Menu extends javax.swing.JFrame {
                                                     toDraw.clear();
                                                     cleanImage();
                                                     repaint();
-                                                    cancel();
+                                                    timer.stop();
                                                 }
                                             }
 
@@ -2167,9 +2238,12 @@ public class Menu extends javax.swing.JFrame {
                                             
                                             semaphore = false;
                                         }
-                                        
                                     }
-                                },20, 20);
+                                });
+                                
+                                timer.setDelay(50);
+                                timer.setRepeats(true);
+                                timer.start();
                                 
                                 
                             } else if( notches < 0 && node.children().isEmpty() ) {
@@ -2195,14 +2269,95 @@ public class Menu extends javax.swing.JFrame {
                         if( index != -1 ) {                            
                             
                             ExplorerTreeNode node = controller.getNode(index);                            
-                            if( e.isControlDown() && node.parent() != null )                               
-                                controller.agglomerateNode(index);                                
-                            else if( !node.children().isEmpty() )                           
+                            if( e.isControlDown() && node.parent() != null ) {
+                                controller.agglomerateNode(index);
+                                cleanImage();
+                                repaint();
+//                                int parentIdx = node.parent().routing();
+//                                Timer timer = new Timer();                                
+//                                timer.schedule(new TimerTask() {
+//                                    private double i = 0;
+//                                    
+//                                    @Override
+//                                    public void run() {
+//                                        if( !semaphore ) {
+//                                            semaphore = true;
+//                                            
+//                                            for( int j = 0; j < movingIndexes.size(); ++j) {
+//                                                int v = movingIndexes.get(j);
+//                                                double x = (1.0-i)*controller.projection()[v].x + i*controller.projection()[parentIdx].x;
+//                                                double y = (1.0-i)*controller.projection()[v].y + i*controller.projection()[parentIdx].y;
+//
+//                                                toDraw.add(new Point2D.Double(x, y));
+//
+//                                                i += 0.01;
+//                                                if( i >= 1.0 ) {
+//                                                    movingIndexes.clear();
+//                                                    toDraw.clear();
+//                                                    cleanImage();
+//                                                    repaint();
+//                                                    cancel();
+//                                                }
+//                                            }
+//
+//                                            cleanImage();
+//                                            repaint();
+//                                            
+//                                            semaphore = false;
+//                                        }
+//                                        
+//                                    }
+//                                },0, 20);
+                                
+                            }                                
+                            else if( !node.children().isEmpty() ) {                           
+                                semaphore = false;
                                 controller.expandNode(index, e.getX(), e.getY(), getSize().width, getSize().height);
-                            else if( node.children().isEmpty() ) {
+                                cleanImage();
+                                repaint();
+                                System.out.println("Entrei");
+                             //   toDraw.clear();
+//                                Timer timer = new Timer();                                
+//                                timer.schedule(new TimerTask() {
+//                                    private double i = 0;
+//                                    
+//                                    @Override
+//                                    public void run() {
+//                                        if( !semaphore ) {
+//                                            semaphore = true;
+//                                            
+//                                            for( int j = 0; j < movingIndexes.size(); ++j) {
+//                                                int v = movingIndexes.get(j);
+//                                                double x = (1.0-i)*controller.projection()[index].x + i*controller.projection()[v].x;
+//                                                double y = (1.0-i)*controller.projection()[index].y + i*controller.projection()[v].y;
+//
+//                                                toDraw.add(new Point2D.Double(x, y));
+//                                                   
+//                                                i += 0.01;
+//                                                if( i >= 1.0 ) {
+//                                                    movingIndexes.clear();
+//                                                    toDraw.clear();
+//                                                    cleanImage();
+//                                                    repaint();
+//                                                    cancel();
+//                                                }
+//                                            }
+//
+//                                           
+//                                            
+//                                            semaphore = false;
+//                                        }
+//                                          cleanImage();
+//                                            repaint();
+//                                        
+//                                    }
+//                                },0, 20);
+                                
+                            } else if( node.children().isEmpty() ) {
                                 
                                 removeSubsetOverlap(controller.nearest().get(index));
-                                
+                                cleanImage();
+                                repaint();
                             }
                                 
                         } 
