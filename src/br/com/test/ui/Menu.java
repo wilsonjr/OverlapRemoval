@@ -169,6 +169,9 @@ public class Menu extends javax.swing.JFrame {
     
     private ExplorerTreeController controller = null;
     
+    private List<Integer> movingIndexes = new ArrayList<>();
+    private List<Point2D.Double> toDraw = new ArrayList<>();
+    
     /**
      * Creates new form Menu
      */
@@ -2052,9 +2055,10 @@ public class Menu extends javax.swing.JFrame {
                 rects.get(idx).setUX(x);
                 rects.get(idx++).setUY(y);
                 
-                cleanImage();
-                repaint();
+                
             }
+            cleanImage();
+            repaint();
             
         }
          
@@ -2071,17 +2075,21 @@ public class Menu extends javax.swing.JFrame {
                     
                     rects.get(idx).setUX(x);
                     rects.get(idx++).setUY(y);
-                    cleanImage();
-                    repaint();
                 
                     i += 0.01;
                     if( i >= 1.0 ) {
                         rects.get(idx-1).setUX(v.getValue().getUX());
                         rects.get(idx-1).setUY(v.getValue().getUY());
+                        
+                        cleanImage();
+                        repaint();
                         cancel(); 
                         
                     }
-                }               
+                }        
+                
+                cleanImage();
+                repaint();
             }
             
         } 
@@ -2096,6 +2104,9 @@ public class Menu extends javax.swing.JFrame {
         private double iniX, iniY, fimX, fimY;
         public RectangleVis r1 = null, r2 = null, r3 = null;
         private BufferedImage imageBuffer;
+        
+        private boolean semaphore = false;
+        
         
         public ViewPanel() {
             setBackground(Color.WHITE);
@@ -2114,22 +2125,61 @@ public class Menu extends javax.swing.JFrame {
                         if( index != -1 ) {                            
                             
                             ExplorerTreeNode node = controller.getNode(index);                            
-                            if( notches > 0 && node.parent() != null )                               
-                                controller.agglomerateNode(index);                                
-                            else if( notches < 0 && !node.children().isEmpty() )                           
-                                controller.expandNode(index, e.getX(), e.getY(), getSize().width, getSize().height);
-                            else if( notches < 0 && node.children().isEmpty() ) {
+                            if( notches > 0 && node.parent() != null ) {
+                                semaphore = false;
+                              
+                                movingIndexes = controller.agglomerateNode(index);
+                                cleanImage();
+                                repaint();
+                                
+                            } else if( notches < 0 && !node.children().isEmpty() ) {                          
+                                semaphore = false;
+                                movingIndexes = controller.expandNode(index, e.getX(), e.getY(), getSize().width, getSize().height);
+                                
+                                Timer timer = new Timer();                                
+                                timer.schedule(new TimerTask() {
+                                    private double i = 0;
+                                    
+                                    @Override
+                                    public void run() {
+                                        if( !semaphore ) {
+                                            semaphore = true;
+                                            
+                                            for( int j = 0; j < movingIndexes.size(); ++j) {
+                                                int v = movingIndexes.get(j);
+                                                double x = (1.0-i)*controller.projection()[index].x + i*controller.projection()[v].x;
+                                                double y = (1.0-i)*controller.projection()[index].y + i*controller.projection()[v].y;
+
+                                                toDraw.add(new Point2D.Double(x, y));
+
+                                                i += 0.01;
+                                                if( i >= 1.0 ) {
+                                                    movingIndexes.clear();
+                                                    toDraw.clear();
+                                                    cleanImage();
+                                                    repaint();
+                                                    cancel();
+                                                }
+                                            }
+
+                                            cleanImage();
+                                            repaint();
+                                            
+                                            semaphore = false;
+                                        }
+                                        
+                                    }
+                                },20, 20);
+                                
+                                
+                            } else if( notches < 0 && node.children().isEmpty() ) {
                                 
                                 removeSubsetOverlap(controller.nearest().get(index));
-                                
-                            }
-                                
+                                cleanImage();
+                                repaint();
+                            }                                
                         } 
                     }
-                    
-                    cleanImage();
-                    repaint();
-                    
                     
                 }
             });
@@ -2165,16 +2215,17 @@ public class Menu extends javax.swing.JFrame {
 
                 @Override
                 public void mouseMoved(MouseEvent e) {
-                    if( controller != null && controller.representative() != null && controller.nearest() != null ) {
-                        int index = controller.indexRepresentative(e.getX(), e.getY());
-
-                        nearest = null;
-                        if( index != -1 )
-                            nearest = controller.nearest().get(index);
-                        
-                        cleanImage();
-                        repaint();  
-                    }
+//                    if( controller != null && controller.representative() != null && controller.nearest() != null ) {
+//                        int index = controller.indexRepresentative(e.getX(), e.getY());
+//
+//                        nearest = null;
+//                        if( index != -1 ) {
+//                            nearest = controller.nearest().get(index);
+//                            cleanImage();
+//                            repaint();  
+//                        }
+//                        
+//                    }
                 }
             
             
@@ -2206,7 +2257,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 java.awt.Graphics2D g2Buffer = this.imageBuffer.createGraphics();
                 g2Buffer.setColor(this.getBackground());
-                g2Buffer.fillRect(0, 0, 5000, 5000);
+                g2Buffer.fillRect(0, 0, getSize().width, getSize().height);
 
                 g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 ArrayList<RectangleVis> pivots = new ArrayList<>();
@@ -2374,10 +2425,9 @@ public class Menu extends javax.swing.JFrame {
                         Point2D.Double[] projection = controller.projection();
                                 
                         for( int i = 0; i < representative.length; ++i ) {
+                            
                             float alpha = (float)map.get(representative[i]).size()/(float)points.length;
                           
-                            Point2D.Double r = projectionCenter[representative[i]];
-                            
                             Polygon poly = controller.polygon(representative[i]);//getPolygon((int)r.x, (int)r.y);
                             if( poly != null ) {
                                 g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, alpha));
@@ -2387,6 +2437,9 @@ public class Menu extends javax.swing.JFrame {
                                 g2Buffer.setColor(Color.RED);
                                 g2Buffer.drawPolygon(poly);                                
                             }
+                            
+                            if( movingIndexes.contains(representative[i]) )
+                                continue;
                             
                             Point2D.Double p = projection[representative[i]];
                             
@@ -2418,6 +2471,20 @@ public class Menu extends javax.swing.JFrame {
                             }
                         }
                     }
+                    
+                    if( !toDraw.isEmpty() ) {
+                        for( int i = toDraw.size()-1; i >= (toDraw.size()-movingIndexes.size()); --i ) {
+                            Point2D.Double p = toDraw.get(i);
+                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                            g2Buffer.setColor(Color.RED);
+                            g2Buffer.fillOval((int)p.x, (int)p.y, (int)RECTSIZE, (int)RECTSIZE);
+                            g2Buffer.setColor(Color.BLACK);
+                            g2Buffer.drawOval((int)p.x, (int)p.y, (int)RECTSIZE, (int)RECTSIZE);
+                        }
+                        System.out.println("Terminei");
+                    }
+                    
+                    
                 }
                 
                 /*if( clickedPolygon != null ) {

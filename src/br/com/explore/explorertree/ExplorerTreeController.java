@@ -67,7 +67,8 @@ public class ExplorerTreeController {
         
     }
     
-    public void updateDiagram(int width, int height, int indexNewRepresentative, Polygon clickedPolygon) {
+    public List<Integer> updateDiagram(int width, int height, int indexNewRepresentative, Polygon clickedPolygon) {
+        List<Integer> addedIndexes = new ArrayList<>();
         
         Polygon window = new Polygon();
         window.addPoint(0, 0);
@@ -80,6 +81,7 @@ public class ExplorerTreeController {
         Map<Point2D.Double, Integer> pointIndex = new HashMap<>();
         for( int i = 0; i < points.length; ++i ) {
             int index = _representative[i+indexNewRepresentative];
+            addedIndexes.add(index);
             points[i] = new Point2D.Double(_projectionCenter[index].x, _projectionCenter[index].y);
             pointIndex.put(points[i], index);
         }
@@ -114,6 +116,7 @@ public class ExplorerTreeController {
         _polygons.addAll(new ArrayList<>(Arrays.asList(Util.clipBounds(diagrams, involvePolygon, _pointPolygon, 
                                                                        pVoronoi, this, pointIndex))));
         
+        return addedIndexes;
     }
     
     
@@ -178,7 +181,7 @@ public class ExplorerTreeController {
         return indexNewRepresentative;
     }
     
-    public void agglomerateNode(int index) {
+    public List<Integer> agglomerateNode(int index) {
         
         ExplorerTreeNode node = _explorerTree.activeNodes().get(index);
         ExplorerTreeNode parent = node.parent();
@@ -200,7 +203,8 @@ public class ExplorerTreeController {
         
         _representative = Arrays.copyOf(reps, reps.length);
         _polygons.add(parent.polygon());
-                
+        
+        return indexes;                
     }
     
     public int[] representative() {
@@ -223,10 +227,10 @@ public class ExplorerTreeController {
         return _pointPolygon.get(getNode(index));
     }
 
-    public void expandNode(int index, int x, int y, int width, int height) {
+    public List<Integer> expandNode(int index, int x, int y, int width, int height) {
         Polygon polygon = clickedPolygon(x, y);
         int indexNew = expandNode(index, polygon);
-        updateDiagram(width, height, indexNew, polygon);
+        return updateDiagram(width, height, indexNew, polygon);
     }
     
     
