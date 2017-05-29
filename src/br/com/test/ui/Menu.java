@@ -70,6 +70,7 @@ import br.com.projection.spacereduction.SeamCarving;
 import br.com.representative.Dijsktra;
 import br.com.representative.RepresentativeFinder;
 import br.com.representative.clustering.affinitypropagation.AffinityPropagation;
+import br.com.representative.clustering.furs.FURS;
 import br.com.representative.lowrank.CSM;
 import br.com.representative.dictionaryrepresentation.DS3;
 import br.com.representative.dictionaryrepresentation.SMRS;
@@ -245,6 +246,7 @@ public class Menu extends javax.swing.JFrame {
         ds3JMenuItem = new javax.swing.JMenuItem();
         voronoiDiagramJMenuItem = new javax.swing.JMenuItem();
         testTreeJMenuItem = new javax.swing.JMenuItem();
+        fursJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -576,6 +578,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu8.add(testTreeJMenuItem);
+
+        fursJMenuItem.setText("FURS");
+        fursJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fursJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(fursJMenuItem);
 
         jMenuBar1.add(jMenu8);
 
@@ -1684,6 +1694,23 @@ public class Menu extends javax.swing.JFrame {
             view.repaint();
         }
     }//GEN-LAST:event_affinityPropagationJMenuItemActionPerformed
+
+    private void fursJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fursJMenuItemActionPerformed
+        if( rectangles == null )
+            loadDataJMenuItemActionPerformed(null);
+        
+        RepresentativeFinder furs = new FURS(Arrays.asList(points), (int)(0.2*points.length), 15);
+        System.out.println("Init FURS");
+        furs.execute();
+        System.out.println("Finished FURS");
+        selectedRepresentatives =  furs.getRepresentatives();
+        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
+    }//GEN-LAST:event_fursJMenuItemActionPerformed
     
     
     public void updateDiagram() {
@@ -2464,6 +2491,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem dijsktraRepresentativeJMenuItem;
     private javax.swing.JMenuItem ds3JMenuItem;
     private javax.swing.JMenuItem extractParametersJMenuItem;
+    private javax.swing.JMenuItem fursJMenuItem;
     private javax.swing.JMenuItem gnatJMenuItem;
     private javax.swing.JMenuItem hexBoardJMenuItem;
     private javax.swing.JMenuItem hierarchicalClusteringJMenuItem;
