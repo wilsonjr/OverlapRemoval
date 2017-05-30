@@ -2186,7 +2186,9 @@ public class Menu extends javax.swing.JFrame {
             addMouseWheelListener(new MouseAdapter() {
                 @Override
                 public void mouseWheelMoved(MouseWheelEvent e) {
-                    
+                    if( semaphore )
+                        return;                        
+                        
                     int notches = e.getWheelRotation();                    
                     if( controller != null && controller.representative() != null && controller.nearest() != null ) {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
@@ -2294,7 +2296,8 @@ public class Menu extends javax.swing.JFrame {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
-                                        
+                    if( semaphore )
+                        return;
                     
                     if( controller != null && controller.representative() != null && controller.nearest() != null ) {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
