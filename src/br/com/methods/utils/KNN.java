@@ -7,7 +7,7 @@
 package br.com.methods.utils;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,12 +21,12 @@ public class KNN {
         this.nrNeighbors = nrNeighbors;
     }
     
-    public Pair[][] execute(ArrayList<OverlapRect> rects) throws IOException {
+    public Pair[][] execute(List<OverlapRect> rects) {
         long start = System.currentTimeMillis();
         Pair[][] neighbors = null;
 
         if (this.nrNeighbors > rects.size() - 1) {
-            throw new IOException("Number of neighbors bigger than the number of " +
+            throw new RuntimeException("Number of neighbors bigger than the number of " +
                     "elements minus one (an element is not computed as a neighbor " +
                     "of itself)!");
         }
@@ -73,6 +73,8 @@ public class KNN {
 
         return neighbors;
     }
+    
+    
     
     
 
