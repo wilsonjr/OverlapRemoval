@@ -1059,21 +1059,21 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_saveDataCoordJMenuItemActionPerformed
 
     private void sssJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sssJMenuItemActionPerformed
-        double a = Double.parseDouble(JOptionPane.showInputDialog("Insira o valor de alpha: "));
-        
-        SSS sss = new SSS();
-        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        
-        sss.selectPivots(rects, a, getMaxDistance());
-        int i = 0;
-        for( OverlapRect r: rects ) {
-                r.setId(i++); 
-                r.setLevel(1);
-        }
-        Util.toRectangleVis(rectangles, rects);
-        System.out.println("OK SSS!");
-        view.cleanImage();
-        view.repaint();
+//        double a = Double.parseDouble(JOptionPane.showInputDialog("Insira o valor de alpha: "));
+//        
+//        SSS sss = new SSS();
+//        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+//        
+//        sss.selectPivots(rects, a, getMaxDistance());
+//        int i = 0;
+//        for( OverlapRect r: rects ) {
+//                r.setId(i++); 
+//                r.setLevel(1);
+//        }
+//        Util.toRectangleVis(rectangles, rects);
+//        System.out.println("OK SSS!");
+//        view.cleanImage();
+//        view.repaint();
     }//GEN-LAST:event_sssJMenuItemActionPerformed
 
     private void gnatJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gnatJMenuItemActionPerformed

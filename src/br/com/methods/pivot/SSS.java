@@ -10,32 +10,43 @@
 
 package br.com.methods.pivot;
 
-import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
+import br.com.representative.RepresentativeFinder;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author wilson
  */
-public class SSS {   
+public class SSS extends RepresentativeFinder {   
+    private List<Point2D.Double> finalItems;
+    private List<Point2D.Double> items;
+    private double alpha;
+    private double maxDistance;
     
-    public void selectPivots(ArrayList<OverlapRect> conjunto, double alpha, double maxDistance) {
-        
-        if( conjunto.isEmpty() )
+    public SSS(List<Point2D.Double> items, double alpha, double maxDistance) {
+        this.finalItems = items;
+        this.items = items;
+        this.alpha = alpha;
+        this.maxDistance = maxDistance;
+    }
+
+    @Override
+    public void execute() {
+        if( items.isEmpty() )
             throw new IllegalArgumentException("É necessário um conjunto com ao menos um elemento.");
         
-        ArrayList<OverlapRect> pivots = new ArrayList<>();
+        List<Integer> pivots = new ArrayList<>();
+        pivots.add(0);
         
-        conjunto.get(0).setPivot(true);
-        pivots.add(conjunto.get(0));
         
-        for( int i = 1; i < conjunto.size(); ++i ) {
+        for( int i = 1; i < items.size(); ++i ) {
             boolean pivot = true;
             
-            for( OverlapRect r: pivots ) {
-                double d = Util.euclideanDistance(r.getCenterX(), r.getCenterY(), 
-                                                    conjunto.get(i).getCenterX(), conjunto.get(i).getCenterY());
+            for( Integer p: pivots ) {
+                double d = Util.euclideanDistance(items.get(p).x, items.get(p).y, items.get(i).x, items.get(i).y);
                 if( d < maxDistance*alpha ) {
                     pivot = false;
                     break;
@@ -43,11 +54,19 @@ public class SSS {
             }
             
             if( pivot ) {
-                conjunto.get(i).setPivot(true);
-                pivots.add(conjunto.get(i));                        
+                pivots.add(i);                       
             }
         }
         
+        representatives = pivots.stream().mapToInt((e)->e).toArray();
+    }
+
+    @Override
+    public void filterData(int[] indexes) {
+        items.clear();
+        
+        for( Integer i: indexes )
+            items.add(finalItems.get(i));   
     }
     
 }
