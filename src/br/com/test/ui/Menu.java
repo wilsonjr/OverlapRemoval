@@ -35,6 +35,8 @@
 package br.com.test.ui;
 
 
+import Test.Test;
+import View.Frame;
 import br.com.explore.explorertree.ExplorerTree;
 import br.com.explore.explorertree.ExplorerTreeController;
 import br.com.explore.explorertree.ExplorerTreeNode;
@@ -122,6 +124,9 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import math.geom2d.polygon.SimplePolygon2D;
+import nmap.BoundingBox;
+import nmap.Element;
+import nmap.NMap;
 
 /**
  *
@@ -1913,6 +1918,31 @@ public class Menu extends javax.swing.JFrame {
         frame.setSize(panel.getSize().width, panel.getSize().height+100);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        
+        /**
+         * Testing NMap representation
+         */
+        
+        List<Element> data = new ArrayList<>();
+        
+        for( int i = 0; i < projectedValues.size(); ++i )
+            data.add(new Element(projectedValues.get(i).getId(), (float)projectedValues.get(i).x, (float)projectedValues.get(i).y, 1.0f));
+        
+        int visualSpaceWidth = 800;
+        int visualSpaceHeight = 600;
+        
+        NMap nmap = new NMap(visualSpaceWidth, visualSpaceHeight);
+        
+        // We can use this when weights are different        
+        //List<BoundingBox> ac = nmap.alternateCut(data);
+        //Frame frameAlternateCut = new Frame(visualSpaceWidth, visualSpaceHeight, ac, "NMap Alternate Cut");
+        //frameAlternateCut.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        //frameAlternateCut.setVisible(true);
+        
+        List<BoundingBox> ew = nmap.equalWeight(data);
+        Frame frameEqualWeight = new Frame(visualSpaceWidth, visualSpaceHeight, ew, "NMAP Equal Weight");
+        frameEqualWeight.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameEqualWeight.setVisible(true);       
     }
     
     
