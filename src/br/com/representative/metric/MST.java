@@ -8,9 +8,9 @@
  * and open the template in the editor.
  */
 
-package br.com.methods.pivot;
+package br.com.representative.metric;
 
-import br.com.methods.pivot.MST.Kruskal.EDGE;
+import br.com.representative.metric.MST.Kruskal.EDGE;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
 import java.util.ArrayList;

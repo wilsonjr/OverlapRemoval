@@ -8,7 +8,7 @@
  * and open the template in the editor.
  */
 
-package br.com.methods.pivot;
+package br.com.representative.metric;
 
 import br.com.methods.utils.Util;
 import br.com.representative.RepresentativeFinder;
@@ -27,6 +27,9 @@ public class SSS extends RepresentativeFinder {
     private double maxDistance;
     
     public SSS(List<Point2D.Double> items, double alpha, double maxDistance) {
+        if( items.isEmpty() )
+            throw new IllegalArgumentException("The set must not be empty.");
+        
         this.finalItems = items;
         this.items = items;
         this.alpha = alpha;
@@ -35,8 +38,7 @@ public class SSS extends RepresentativeFinder {
 
     @Override
     public void execute() {
-        if( items.isEmpty() )
-            throw new IllegalArgumentException("É necessário um conjunto com ao menos um elemento.");
+        
         
         List<Integer> pivots = new ArrayList<>();
         pivots.add(0);

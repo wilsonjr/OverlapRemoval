@@ -59,10 +59,9 @@ import br.com.methods.overlap.projsnippet.Vertex;
 import br.com.methods.overlap.rwordle.RWordleC;
 import br.com.methods.overlap.rwordle.RWordleL;
 import br.com.methods.overlap.vpsc.VPSC;
-import br.com.methods.pivot.GNAT;
-import br.com.methods.pivot.MST;
-import br.com.methods.pivot.OMNI;
-import br.com.methods.pivot.SSS;
+import br.com.representative.metric.GNAT;
+import br.com.representative.metric.MST;
+import br.com.representative.metric.SSS;
 import br.com.methods.utils.ChangeRetangulo;
 import br.com.methods.utils.Pair;
 import br.com.methods.utils.OverlapRect;
@@ -229,7 +228,6 @@ public class Menu extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         sssJMenuItem = new javax.swing.JMenuItem();
         gnatJMenuItem = new javax.swing.JMenuItem();
-        omniJMenuItem = new javax.swing.JMenuItem();
         mstJMenuItem = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         extractParametersJMenuItem = new javax.swing.JMenuItem();
@@ -402,14 +400,6 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu3.add(gnatJMenuItem);
-
-        omniJMenuItem.setText("OMNI");
-        omniJMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                omniJMenuItemActionPerformed(evt);
-            }
-        });
-        jMenu3.add(omniJMenuItem);
 
         mstJMenuItem.setText("MST");
         mstJMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1077,43 +1067,24 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_sssJMenuItemActionPerformed
 
     private void gnatJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gnatJMenuItemActionPerformed
-        
-        
-        GNAT gnat = new GNAT();
-        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        
-        int k = 5*rects.size()/100; //Integer.parseInt(JOptionPane.showInputDialog("Insira o número de pivôs: "));
-        
-        gnat.selectPivots(rects, k);
-        int i = 0;
-        for( OverlapRect r: rects ) {
-            r.setId(i++);
-            r.setLevel(1);
-        }
-        Util.toRectangleVis(rectangles, rects);
-        System.out.println("OK GNAT!");
-        view.cleanImage();
-        view.repaint();
+//        
+//        
+//        GNAT gnat = new GNAT();
+//        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+//        
+//        int k = 5*rects.size()/100; //Integer.parseInt(JOptionPane.showInputDialog("Insira o número de pivôs: "));
+//        
+//        gnat.selectPivots(rects, k);
+//        int i = 0;
+//        for( OverlapRect r: rects ) {
+//            r.setId(i++);
+//            r.setLevel(1);
+//        }
+//        Util.toRectangleVis(rectangles, rects);
+//        System.out.println("OK GNAT!");
+//        view.cleanImage();
+//        view.repaint();
     }//GEN-LAST:event_gnatJMenuItemActionPerformed
-
-    private void omniJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_omniJMenuItemActionPerformed
-        int card = Integer.parseInt(JOptionPane.showInputDialog("Insira a número de focos: "));
-        
-        OMNI omni = new OMNI();
-        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        
-        omni.selectPivots(rects, card);
-        int i = 0;
-        for( OverlapRect r: rects ) {
-            r.setId(i++);
-            r.setLevel(1);
-        }
-        
-        Util.toRectangleVis(rectangles, rects);
-        System.out.println("OK OMNI!");
-        view.cleanImage();
-        view.repaint();
-    }//GEN-LAST:event_omniJMenuItemActionPerformed
 
     private void mstJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mstJMenuItemActionPerformed
         
@@ -2737,7 +2708,6 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem loadDataJMenuItem;
     private javax.swing.JMenuItem mstJMenuItem;
     private javax.swing.JMenuItem nextDendogramJMenuItem;
-    private javax.swing.JMenuItem omniJMenuItem;
     private javax.swing.JMenuItem prismJMenuItem;
     private javax.swing.JMenuItem projSnippetJMenuItem;
     private javax.swing.JMenuItem runDs3JMenuItem;
