@@ -28,21 +28,16 @@ import java.util.Queue;
  *
  * @author wilson
  */
-public class MST extends RepresentativeFinder {
+public class MST extends Metric {
     
     private PriorityQueue<SlimTreeNode> nodes;
-    
-    private List<Point2D.Double> finalItems;
-    private List<Point2D.Double> items;
-    
     private List<SlimTreeNode> clusters;
     
     private int k;
     
     
     public MST(List<Point2D.Double> items, int k) {
-        this.finalItems = items;
-        this.items = items;
+        super(items);
         this.k = k;
     }
     
@@ -80,10 +75,7 @@ public class MST extends RepresentativeFinder {
 
     @Override
     public void filterData(int[] indexes) {
-        items.clear();
-        
-        for( Integer i: indexes )
-            items.add(finalItems.get(i));   
+        super.filterData(indexes);
         
         k = (int)(indexes.length*0.1);
         if( k == 0 )

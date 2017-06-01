@@ -11,7 +11,6 @@
 package br.com.representative.metric;
 
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeFinder;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +20,12 @@ import java.util.Random;
  *
  * @author wilson
  */
-public class GNAT extends RepresentativeFinder {
-    private List<Point2D.Double> finalItems;
-    private List<Point2D.Double> items;
+public class GNAT extends Metric {
     private int k;
     
     public GNAT(List<Point2D.Double> items, int k) {
+        super(items);
+        
         if( items.isEmpty() )
             throw new IllegalArgumentException("The set must not be empty.");
         
@@ -88,10 +87,10 @@ public class GNAT extends RepresentativeFinder {
 
     @Override
     public void filterData(int[] indexes) {
-        items.clear();
-        
-        for( Integer i: indexes )
-            items.add(finalItems.get(i));   
+        super.filterData(indexes);   
+        k = (int)(indexes.length*0.1);
+        if( k == 0 )
+            k = 1;
     }
     
 }

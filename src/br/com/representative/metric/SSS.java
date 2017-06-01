@@ -11,7 +11,6 @@
 package br.com.representative.metric;
 
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeFinder;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,18 +19,16 @@ import java.util.List;
  *
  * @author wilson
  */
-public class SSS extends RepresentativeFinder {   
-    private List<Point2D.Double> finalItems;
-    private List<Point2D.Double> items;
+public class SSS extends Metric {   
     private double alpha;
     private double maxDistance;
     
     public SSS(List<Point2D.Double> items, double alpha, double maxDistance) {
+        super(items);
+        
         if( items.isEmpty() )
             throw new IllegalArgumentException("The set must not be empty.");
         
-        this.finalItems = items;
-        this.items = items;
         this.alpha = alpha;
         this.maxDistance = maxDistance;
     }
@@ -65,10 +62,15 @@ public class SSS extends RepresentativeFinder {
 
     @Override
     public void filterData(int[] indexes) {
-        items.clear();
+        super.filterData(indexes);
         
-        for( Integer i: indexes )
-            items.add(finalItems.get(i));   
+        double distance = -1;
+        for( int i = 0; i < items.size(); ++i )
+            for( int j = i+1; j < items.size(); ++j ) {
+                double d = Util.euclideanDistance(items.get(i).x, items.get(i).y, items.get(j).x, items.get(j).y);
+                if( distance < d ) 
+                    distance = d;
+            }
     }
     
 }
