@@ -1085,18 +1085,18 @@ public class Menu extends javax.swing.JFrame {
 
     private void mstJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mstJMenuItemActionPerformed
         
-        MST mst = new MST();
-        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        
-        int i = 0;
-        for( OverlapRect r: rects ) 
-            r.setId(i++);
-        mst.selectPivots(rects, 20);
-        
-        Util.toRectangleVis(rectangles, rects);
-        System.out.println("OK MST!");
-        view.cleanImage();
-        view.repaint();
+//        MST mst = new MST();
+//        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+//        
+//        int i = 0;
+//        for( OverlapRect r: rects ) 
+//            r.setId(i++);
+//        mst.selectPivots(rects, 20);
+//        
+//        Util.toRectangleVis(rectangles, rects);
+//        System.out.println("OK MST!");
+//        view.cleanImage();
+//        view.repaint();
     }//GEN-LAST:event_mstJMenuItemActionPerformed
 
     private void extractParametersJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractParametersJMenuItemActionPerformed
