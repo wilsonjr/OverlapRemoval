@@ -35,7 +35,6 @@
 package br.com.test.ui;
 
 
-import Test.Test;
 import View.Frame;
 import br.com.explore.explorertree.ExplorerTree;
 import br.com.explore.explorertree.ExplorerTreeController;
@@ -59,9 +58,7 @@ import br.com.methods.overlap.projsnippet.Vertex;
 import br.com.methods.overlap.rwordle.RWordleC;
 import br.com.methods.overlap.rwordle.RWordleL;
 import br.com.methods.overlap.vpsc.VPSC;
-import br.com.representative.metric.GNAT;
 import br.com.representative.metric.MST;
-import br.com.representative.metric.SSS;
 import br.com.methods.utils.ChangeRetangulo;
 import br.com.methods.utils.Pair;
 import br.com.methods.utils.OverlapRect;
