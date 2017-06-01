@@ -1084,7 +1084,21 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_gnatJMenuItemActionPerformed
 
     private void mstJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mstJMenuItemActionPerformed
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+        ArrayList<Point.Double> elems = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i )
+            elems.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
         
+        RepresentativeFinder mst = new MST(elems, 15);
+        mst.execute();
+        selectedRepresentatives = mst.getRepresentatives();
+        //selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
 //        MST mst = new MST();
 //        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
 //        
@@ -2423,6 +2437,9 @@ public class Menu extends javax.swing.JFrame {
                                     g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
                                     g2Buffer.setColor(Color.BLUE);
                                     g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+//                                    g2Buffer.setColor(Color.RED);
+//                                    g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+//                                    g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10); 
                                 }
                             }
                         }
