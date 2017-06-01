@@ -28,7 +28,7 @@ import java.util.Queue;
  *
  * @author wilson
  */
-public class MST extends Metric {
+public class MST extends AccessMetric {
     
     private PriorityQueue<SlimTreeNode> nodes;
     private List<SlimTreeNode> clusters;

@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author wilson
  */
-public class SSS extends Metric {   
+public class SSS extends AccessMetric {   
     private double alpha;
     private double maxDistance;
     

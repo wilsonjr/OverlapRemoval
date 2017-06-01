@@ -13,11 +13,11 @@ import java.util.List;
  *
  * @author Windows
  */
-public abstract class Metric extends RepresentativeFinder {
+public abstract class AccessMetric extends RepresentativeFinder {
     protected List<Point2D.Double> finalItems;
     protected List<Point2D.Double> items;
     
-    public Metric(List<Point2D.Double> items) {
+    public AccessMetric(List<Point2D.Double> items) {
         this.finalItems = items;
         this.items = items;
     }

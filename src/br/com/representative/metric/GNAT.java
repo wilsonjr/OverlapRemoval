@@ -20,7 +20,7 @@ import java.util.Random;
  *
  * @author wilson
  */
-public class GNAT extends Metric {
+public class GNAT extends AccessMetric {
     private int k;
     
     public GNAT(List<Point2D.Double> items, int k) {
