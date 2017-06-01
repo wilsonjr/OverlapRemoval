@@ -107,8 +107,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -1907,8 +1909,11 @@ public class Menu extends javax.swing.JFrame {
         
         List<Element> data = new ArrayList<>();
         
-        for( int i = 0; i < projectedValues.size(); ++i )
-            data.add(new Element(projectedValues.get(i).getId(), (float)projectedValues.get(i).x, (float)projectedValues.get(i).y, 1.0f));
+        List<OverlapRect> proj2 = projected.entrySet().stream().map((v)->v.getValue()).collect(Collectors.toList());
+        Random rand = new Random();
+        
+        for( int i = 0; i < proj2.size(); ++i )
+            data.add(new Element(proj2.get(i).getId(), (float)proj2.get(i).x, (float)proj2.get(i).y, rand.nextInt(10)+1, i+1));
         
         int visualSpaceWidth = 800;
         int visualSpaceHeight = 600;
@@ -1925,6 +1930,18 @@ public class Menu extends javax.swing.JFrame {
         Frame frameEqualWeight = new Frame(visualSpaceWidth, visualSpaceHeight, ew, "NMAP Equal Weight");
         frameEqualWeight.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frameEqualWeight.setVisible(true);       
+        
+        List<OverlapRect> proj = projected.entrySet().stream().map((v)->v.getKey()).collect(Collectors.toList());
+        
+        List<Element> data2 = new ArrayList<>();
+        for( int i = 0; i < proj.size(); ++i )
+            data2.add(new Element(proj.get(i).getId(), (float)proj.get(i).x, (float)proj.get(i).y, 1.0f, 1.0f));
+        
+        List<BoundingBox> ew2 = nmap.equalWeight(data2);
+        Frame frameEqualWeight2 = new Frame(visualSpaceWidth, visualSpaceHeight, ew2, "NMAP Equal Weight 2");
+        frameEqualWeight2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameEqualWeight2.setVisible(true);
+        
     }
     
     
