@@ -38,7 +38,7 @@ public class SlimTreeNode implements Comparable<SlimTreeNode> {
 
     @Override
     public int compareTo(SlimTreeNode o) {
-        return Integer.compare(size(), o.size());
+        return Integer.compare(o.size(), size());
     }
 
     public Point2D.Double get(int i) {

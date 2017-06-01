@@ -16,6 +16,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,24 +53,24 @@ public class MST extends RepresentativeFinder {
         SlimTreeNode node = new SlimTreeNode(items);
         nodes = new PriorityQueue<>();
         nodes.add(node);
+        int instancesInNode = items.size()/k;
         
         while( !nodes.isEmpty() ) {
             
             SlimTreeNode u = nodes.peek();
-            if( u.size() <= k )
+            if( u.size() <= instancesInNode )
                 break;
             
             nodes.poll();
             List<SlimTreeNode> splitted = applyMST(u);
+                        
             nodes.add(splitted.get(0));
             nodes.add(splitted.get(1));
             
         }
-        
         clusters = new ArrayList<>();
         for( SlimTreeNode n: nodes )
             clusters.add(n);
-        
         
         representatives = new int[clusters.size()];
         for( int i = 0; i < representatives.length; ++i )
@@ -83,17 +84,21 @@ public class MST extends RepresentativeFinder {
         
         for( Integer i: indexes )
             items.add(finalItems.get(i));   
+        
+        k = (int)(indexes.length*0.1);
+        if( k == 0 )
+            k = 1;
     }
     
     private List<SlimTreeNode> applyMST(SlimTreeNode u) {
         
         List<Vertice> vertices = new ArrayList<>();
         for( int i = 0; i < u.size(); ++i )
-            vertices.add(new Vertice(u.get(i), i));
+            vertices.add(new Vertice(u.get(i),i));
         
         List<Edge> edges = new ArrayList<>();
         for( int i = 0; i < vertices.size(); ++i )
-            for( int j = i+1; i < vertices.size(); ++j ) {
+            for( int j = i+1; j < vertices.size(); ++j ) {
                 double d = Util.euclideanDistance(vertices.get(i).point().x, vertices.get(i).point().y,
                                                   vertices.get(j).point().x, vertices.get(j).point().y);
                 edges.add(new Edge(vertices.get(i), vertices.get(j), d));
@@ -106,7 +111,14 @@ public class MST extends RepresentativeFinder {
         for( int i = 0; i < vertices.size(); ++i )
             sets.add(new DisjointSet<>(vertices.get(i)));
         
-        Collections.sort(edges);
+        Collections.sort(edges, new Comparator<Edge>() {
+            @Override
+            public int compare(Edge o1, Edge o2) {
+                return Double.compare(o1.distance(), o2.distance());
+            }
+        });       
+        
+        
         Map<Integer, List<Integer>> map = new HashMap<>();
         
         for( int i = 0; i < edges.size(); ++i )  {
@@ -115,9 +127,9 @@ public class MST extends RepresentativeFinder {
                 mst.add(edges.get(i));
                 sets.get(edges.get(i).u().id()).union(sets.get(edges.get(i).v().id()));
                 
-                if( map.get(edges.get(i).v().id()) != null )
+                if( map.get(edges.get(i).v().id()) == null )
                     map.put(edges.get(i).v().id(), new ArrayList<>());
-                if( map.get(edges.get(i).u().id()) != null )
+                if( map.get(edges.get(i).u().id()) == null )
                     map.put(edges.get(i).u().id(), new ArrayList<>());
                 
                 map.get(edges.get(i).v().id()).add(edges.get(i).u().id());
@@ -126,10 +138,13 @@ public class MST extends RepresentativeFinder {
             }            
         }
         
-        Collections.sort(mst);
+        Collections.sort(mst);  
         
         int unode = mst.get(0).u().id();
         int vnode = mst.get(0).v().id();
+        
+        vertices.get(unode).setVisited(true);
+        vertices.get(vnode).setVisited(true);
         
         Queue<Integer> queue = new LinkedList<>();
         SlimTreeNode firstNode = new SlimTreeNode();
@@ -140,7 +155,7 @@ public class MST extends RepresentativeFinder {
             int top = queue.poll();
             vertices.get(top).setVisited(true);
             
-            firstNode.add(vertices.get(top).point(), vertices.get(top).id());
+            firstNode.add(vertices.get(top).point(), u.index(vertices.get(top).id()));
             
             List<Integer> adj = map.get(top);
             for( int i = 0; i < adj.size(); ++i )
@@ -153,7 +168,7 @@ public class MST extends RepresentativeFinder {
             int top = queue.poll();
             vertices.get(top).setVisited(true);
             
-            secondNode.add(vertices.get(top).point(), vertices.get(top).id());
+            secondNode.add(vertices.get(top).point(), u.index(vertices.get(top).id()));
             
             List<Integer> adj = map.get(top);
             for( int i = 0; i < adj.size(); ++i )

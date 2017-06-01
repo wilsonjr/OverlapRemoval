@@ -15,12 +15,12 @@ public class Edge implements Comparable<Edge> {
     private Vertice _u;
     private Vertice _v;
     
-    private double distance;
+    private double _distance;
         
     public Edge(Vertice u, Vertice v, double distance) {
         this._u = u;
         this._v = v;
-        this.distance = distance;
+        this._distance = distance;
     }
     
     public Vertice u() {
@@ -30,10 +30,14 @@ public class Edge implements Comparable<Edge> {
     public Vertice v() {
         return _v;
     }
+    
+    public double distance() {
+        return _distance;
+    }
 
     @Override
     public int compareTo(Edge o) {
-        return Double.compare(distance, o.distance);
+        return Double.compare(o._distance, _distance);
     }
     
     
