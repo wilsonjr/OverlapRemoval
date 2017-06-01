@@ -66,10 +66,15 @@ public class MST extends RepresentativeFinder {
             
         }
         
-        
         clusters = new ArrayList<>();
         for( SlimTreeNode n: nodes )
             clusters.add(n);
+        
+        
+        representatives = new int[clusters.size()];
+        for( int i = 0; i < representatives.length; ++i )
+            representatives[i] = clusters.get(i).medoid();
+        
     }
 
     @Override
@@ -135,7 +140,7 @@ public class MST extends RepresentativeFinder {
             int top = queue.poll();
             vertices.get(top).setVisited(true);
             
-            firstNode.add(vertices.get(top).point());
+            firstNode.add(vertices.get(top).point(), vertices.get(top).id());
             
             List<Integer> adj = map.get(top);
             for( int i = 0; i < adj.size(); ++i )
@@ -148,7 +153,7 @@ public class MST extends RepresentativeFinder {
             int top = queue.poll();
             vertices.get(top).setVisited(true);
             
-            secondNode.add(vertices.get(top).point());
+            secondNode.add(vertices.get(top).point(), vertices.get(top).id());
             
             List<Integer> adj = map.get(top);
             for( int i = 0; i < adj.size(); ++i )
