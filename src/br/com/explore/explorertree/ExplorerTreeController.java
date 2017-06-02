@@ -119,6 +119,11 @@ public class ExplorerTreeController {
         return addedIndexes;
     }
     
+    public int sizeRepresentative(int size) {
+        // return _sizeIntances/2;
+        return (int)(5.0*Math.sqrt(size));
+    }
+    
     
     public int indexRepresentative(double x, double y) {
         int index = -1;
@@ -126,7 +131,7 @@ public class ExplorerTreeController {
         for( int i = 0; i < _representative.length; ++i ) {
             double cx = _projectionCenter[_representative[i]].x;
             double cy = _projectionCenter[_representative[i]].y;
-            if( Util.euclideanDistance(x, y, cx, cy) < _sizeInstances/2 ) {
+            if( Util.euclideanDistance(x, y, cx, cy) < sizeRepresentative(nearest().get(_representative[i]).size()) ) {
                 index = _representative[i];
                 break;
             }

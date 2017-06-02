@@ -35,10 +35,10 @@
 package br.com.test.ui;
 
 
-import View.Frame;
 import br.com.explore.explorertree.ExplorerTree;
 import br.com.explore.explorertree.ExplorerTreeController;
 import br.com.explore.explorertree.ExplorerTreeNode;
+import br.com.explore.explorertree.Tooltip;
 import br.com.representative.clustering.partitioning.BisectingKMeans;
 import br.com.representative.clustering.partitioning.Dbscan;
 import br.com.representative.clustering.FarPointsMedoidApproach;
@@ -122,7 +122,6 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import math.geom2d.polygon.SimplePolygon2D;
-import nmap.BoundingBox;
 import nmap.Element;
 import nmap.NMap;
 
@@ -176,7 +175,9 @@ public class Menu extends javax.swing.JFrame {
     
     private List<Integer> movingIndexes = new ArrayList<>();
     private List<Point2D.Double> toDraw = new ArrayList<>();
+    private Tooltip tooltip = null;
     
+    private Point2D.Double lastClicked = null;
     /**
      * Creates new form Menu
      */
@@ -1861,6 +1862,29 @@ public class Menu extends javax.swing.JFrame {
         return returned;
     }
     
+    private List<OverlapRect> removeOverlap(List<Integer> indexes) {
+        int algo = 1;//Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
+        boolean applySeamCarving = false;//Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles, indexes);
+        
+        double[] center0 = Util.getCenter(rects);
+        PRISM prism = new PRISM(algo);
+        Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
+        ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
+        double[] center1 = Util.getCenter(projectedValues);
+
+        double ammountX = center0[0]-center1[0];
+        double ammountY = center0[1]-center1[1];
+        Util.translate(projectedValues, ammountX, ammountY);        
+        Util.normalize(projectedValues);
+
+        if( applySeamCarving )
+            projectedValues = addSeamCarvingResult(projectedValues);
+                
+        return projectedValues;
+    }
+    
+    
     private void removeSubsetOverlap(List<Integer> indexes) {
         int algo = 1;//Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
         boolean applySeamCarving = false;//Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
@@ -1896,11 +1920,15 @@ public class Menu extends javax.swing.JFrame {
         
         frame.add(panel, BorderLayout.CENTER);
         frame.add(slider, BorderLayout.SOUTH);
+        panel.setLocation((int)lastClicked.x, (int)lastClicked.y);
+        
         panel.cleanImage();
         panel.repaint();
-        panel.adjustPanel();        
+        panel.adjustPanel();  
+        panel.setVisible(true);
         frame.setSize(panel.getSize().width, panel.getSize().height+100);
-        frame.setLocationRelativeTo(null);
+        frame.setLocationRelativeTo(this);
+        frame.setUndecorated(true);
         frame.setVisible(true);
         
         /**
@@ -1926,21 +1954,21 @@ public class Menu extends javax.swing.JFrame {
         //frameAlternateCut.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         //frameAlternateCut.setVisible(true);
         
-        List<BoundingBox> ew = nmap.equalWeight(data);
-        Frame frameEqualWeight = new Frame(visualSpaceWidth, visualSpaceHeight, ew, "NMAP Equal Weight");
-        frameEqualWeight.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frameEqualWeight.setVisible(true);       
-        
-        List<OverlapRect> proj = projected.entrySet().stream().map((v)->v.getKey()).collect(Collectors.toList());
-        
-        List<Element> data2 = new ArrayList<>();
-        for( int i = 0; i < proj.size(); ++i )
-            data2.add(new Element(proj.get(i).getId(), (float)proj.get(i).x, (float)proj.get(i).y, 1.0f, 1.0f));
-        
-        List<BoundingBox> ew2 = nmap.equalWeight(data2);
-        Frame frameEqualWeight2 = new Frame(visualSpaceWidth, visualSpaceHeight, ew2, "NMAP Equal Weight 2");
-        frameEqualWeight2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frameEqualWeight2.setVisible(true);
+//        List<BoundingBox> ew = nmap.equalWeight(data);
+//        Frame frameEqualWeight = new Frame(visualSpaceWidth, visualSpaceHeight, ew, "NMAP Equal Weight");
+//        frameEqualWeight.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//        frameEqualWeight.setVisible(true);       
+//        
+//        List<OverlapRect> proj = projected.entrySet().stream().map((v)->v.getKey()).collect(Collectors.toList());
+//        
+//        List<Element> data2 = new ArrayList<>();
+//        for( int i = 0; i < proj.size(); ++i )
+//            data2.add(new Element(proj.get(i).getId(), (float)proj.get(i).x, (float)proj.get(i).y, 1.0f, 1.0f));
+//        
+//        List<BoundingBox> ew2 = nmap.equalWeight(data2);
+//        Frame frameEqualWeight2 = new Frame(visualSpaceWidth, visualSpaceHeight, ew2, "NMAP Equal Weight 2");
+//        frameEqualWeight2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//        frameEqualWeight2.setVisible(true);
         
     }
     
@@ -1957,6 +1985,7 @@ public class Menu extends javax.swing.JFrame {
         public int RECT_SIZE = 30;
         
         public OverlapPanel(Map<OverlapRect, OverlapRect> projected, ArrayList<RectangleVis> rects) {
+            setBackground(Color.WHITE);
             setLayout(new FlowLayout(FlowLayout.LEFT));
             this.rects = rects;
             this.projected = projected;
@@ -2247,7 +2276,7 @@ public class Menu extends javax.swing.JFrame {
                     
                     if( controller != null && controller.representative() != null && controller.nearest() != null ) {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
-                        
+                        lastClicked = new Point2D.Double(e.getX(), e.getY());
                         if( index != -1 ) {        
                             ExplorerTreeNode node = controller.getNode(index);                            
                             if( e.isControlDown() && node.parent() != null )
@@ -2261,28 +2290,39 @@ public class Menu extends javax.swing.JFrame {
                             }
                                 
                         } 
-                    }
-                     
-                }                 
-
-                
+                    }                     
+                }    
             }); 
             
             addMouseMotionListener(new MouseAdapter() {
 
                 @Override
                 public void mouseMoved(MouseEvent e) {
-//                    if( controller != null && controller.representative() != null && controller.nearest() != null ) {
-//                        int index = controller.indexRepresentative(e.getX(), e.getY());
-//
-//                        nearest = null;
-//                        if( index != -1 ) {
-//                            nearest = controller.nearest().get(index);
-//                            cleanImage();
-//                            repaint();  
-//                        }
-//                        
-//                    }
+                    if( controller != null && controller.representative() != null && controller.nearest() != null ) {
+                        int index = controller.indexRepresentative(e.getX(), e.getY());
+
+                       // nearest = null;
+                        if( index != -1 ) {
+                      //      nearest = controller.nearest().get(index);
+                            ExplorerTreeNode node = controller.getNode(index);                            
+                            if( node.children().isEmpty() ) {                                
+                                List<OverlapRect> projection = removeOverlap(controller.nearest().get(index));
+                                tooltip = new Tooltip(new Point2D.Double(e.getX(), e.getY()), projection);
+                                cleanImage();
+                                repaint();
+                            } else if( tooltip != null ) { 
+                                tooltip = null;
+                                cleanImage();
+                                repaint();
+                            }
+                              
+                        } else if( tooltip != null ) {
+                            tooltip = null;
+                            cleanImage();
+                            repaint();
+                        }
+                        
+                    }
                 }
             
             
@@ -2399,11 +2439,11 @@ public class Menu extends javax.swing.JFrame {
             if( imageBuffer == null ) {
                 adjustPanel();
                 setPreferredSize(getSize());
-                this.imageBuffer = new BufferedImage(getSize().width, getSize().height, BufferedImage.TYPE_INT_ARGB);
+                this.imageBuffer = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
                 
                 java.awt.Graphics2D g2Buffer = this.imageBuffer.createGraphics();
                 g2Buffer.setColor(this.getBackground());
-                g2Buffer.fillRect(0, 0, getSize().width, getSize().height);
+                g2Buffer.fillRect(0, 0, 1000, 1000);
 
                 g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 ArrayList<RectangleVis> pivots = new ArrayList<>();
@@ -2451,9 +2491,11 @@ public class Menu extends javax.swing.JFrame {
                                     g2Buffer.setColor(r.cor);
                                     g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                                 } else {
-                                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
-                                    g2Buffer.setColor(Color.BLUE);
-                                    g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                    if( controller == null ) {
+                                        g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
+                                        g2Buffer.setColor(Color.BLUE);
+                                        g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                    }
 //                                    g2Buffer.setColor(Color.RED);
 //                                    g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
 //                                    g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10); 
@@ -2590,13 +2632,15 @@ public class Menu extends javax.swing.JFrame {
                             if( movingRepresentative(representative[i]) )
                                 continue;
                             
+                            int size = controller.sizeRepresentative(map.get(representative[i]).size());
+                            
                             Point2D.Double p = projection[representative[i]];
                             
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
                             g2Buffer.setColor(Color.RED);
-                            g2Buffer.fillOval((int)p.x, (int)p.y, (int)RECTSIZE, (int)RECTSIZE);
+                            g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
                             g2Buffer.setColor(Color.BLACK);
-                            g2Buffer.drawOval((int)p.x, (int)p.y, (int)RECTSIZE, (int)RECTSIZE);
+                            g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
                             if( hideShowNumbers ) {
                                 g2Buffer.setColor(Color.BLUE);
                                 g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
@@ -2622,13 +2666,16 @@ public class Menu extends javax.swing.JFrame {
                     }
                     
                     if( !toDraw.isEmpty() ) {
+                        int j = movingIndexes.size()-1;
                         for( int i = toDraw.size()-1; i >= (toDraw.size()-movingIndexes.size()); --i ) {
                             Point2D.Double p = toDraw.get(i);
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                            int index = movingIndexes.get(j--);
+                            int size = controller.sizeRepresentative(controller.nearest().get(index).size());
                             g2Buffer.setColor(Color.RED);
-                            g2Buffer.fillOval((int)p.x, (int)p.y, (int)RECTSIZE, (int)RECTSIZE);
+                            g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
                             g2Buffer.setColor(Color.BLACK);
-                            g2Buffer.drawOval((int)p.x, (int)p.y, (int)RECTSIZE, (int)RECTSIZE);
+                            g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
                         }
                     }
                     
@@ -2640,6 +2687,10 @@ public class Menu extends javax.swing.JFrame {
                     for( int i = 0; i < clickedPolygon.xpoints.length; ++i )
                         g2Buffer.fillOval(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i], 5, 5); 
                 }*/
+                
+                if( tooltip != null ) {
+                    tooltip.draw(g2Buffer);
+                }
                 
                 g2Buffer.dispose();
                 
