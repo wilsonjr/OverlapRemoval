@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import kn.uni.voronoitreemap.datastructure.OpenList;
@@ -1511,6 +1512,7 @@ public class Util {
 
         for( int i = 0; i < points.length; ++i ) {
             Site site = new Site(points[i].x, points[i].y);
+            //site.setWeight(30);
             sites.add(site);
         }
         
