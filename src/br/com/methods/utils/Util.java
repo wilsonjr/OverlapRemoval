@@ -1502,19 +1502,22 @@ public class Util {
     
     public static Polygon[] voronoiDiagram(Polygon window, Point2D.Double[] points, List<Point2D.Double> pointsVoronoi ) {
         
+        
         PowerDiagram diagram = new PowerDiagram();
         OpenList sites = new OpenList();
-
+        
         PolygonSimple rootPolygon = new PolygonSimple();
         for( int i = 0; i < window.xpoints.length; ++i ) {
             rootPolygon.add(window.xpoints[i], window.ypoints[i]);            
         }
 
         for( int i = 0; i < points.length; ++i ) {
+            
             Site site = new Site(points[i].x, points[i].y);
-            //site.setWeight(30);
             sites.add(site);
         }
+        
+        
         
         diagram.setSites(sites);
         diagram.setClipPoly(rootPolygon);
@@ -1522,7 +1525,7 @@ public class Util {
         
         Polygon[] polygons = new Polygon[points.length];
         for( int i = 0; i < sites.size; ++i ) {
-
+            
             PolygonSimple polygon = sites.array[i].getPolygon();
             if( polygon != null ) {
                 Polygon poly = new Polygon(polygon.getXpointsClosed(), polygon.getYpointsClosed(), polygon.getXpointsClosed().length);
