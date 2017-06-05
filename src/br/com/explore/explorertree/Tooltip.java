@@ -23,6 +23,7 @@ public class Tooltip {
     private Rectangle2D rect;
     private Point2D.Double point;
     private int ammountx, ammounty;
+    private float opacity;
     
     public Tooltip(Point2D.Double point, List<OverlapRect> projected) {
         this.point = point;
@@ -32,9 +33,10 @@ public class Tooltip {
     
     public void draw(Graphics2D g2) {
         
+        g2.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, opacity));
         g2.setColor(Color.WHITE);
         g2.fill(rect);
-        g2.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
+       // g2.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
         g2.setColor(Color.BLACK);
         g2.draw(rect);
         g2.setColor(Color.BLUE);
@@ -49,6 +51,9 @@ public class Tooltip {
         });
         
         
+    }
+    public void setOpacity(float opacity) {
+        this.opacity = opacity;
     }
     
     private void adjustPanel() {

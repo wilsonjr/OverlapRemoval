@@ -1658,7 +1658,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 // dictionary representation
                 // must test with alpha = 0.3
-                RepresentativeFinder ds3 = new DS3(distances, 0.03);
+                RepresentativeFinder ds3 = new DS3(distances, 0.1);
                 RepresentativeFinder smrs = new SMRS(attrs);
                 
                 controller = new ExplorerTreeController(points, 
@@ -1930,6 +1930,7 @@ public class Menu extends javax.swing.JFrame {
         frame.setSize(panel.getSize().width, panel.getSize().height+100);
         frame.setLocationRelativeTo(this);
         frame.setUndecorated(true);
+        frame.setOpacity(0.4f);
         frame.setVisible(true);
         
         /**
@@ -2230,8 +2231,10 @@ public class Menu extends javax.swing.JFrame {
         private boolean semaphore = false;
         private int parentMoving = -1;
         
-        
         private Timer timer = null;
+        private Timer timerTooltip = null;
+        
+        
         public ViewPanel() {
             setBackground(Color.WHITE);
             setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -2254,7 +2257,8 @@ public class Menu extends javax.swing.JFrame {
                                 agglomerateAnimation(index, node);
                             else if( notches < 0 && !node.children().isEmpty() )
                                 expandAnimation(index, e);
-                            else if( notches < 0 && node.children().isEmpty() ) {                                
+                            else if( notches < 0 && node.children().isEmpty() ) {
+                                semaphore = false;                                
                                 removeSubsetOverlap(controller.nearest().get(index));
                                 cleanImage();
                                 repaint();
@@ -2274,7 +2278,7 @@ public class Menu extends javax.swing.JFrame {
                 public void mousePressed(MouseEvent e) {
                     if( semaphore )
                         return;
-                    
+                    System.out.println("Estou aqui");
                     if( controller != null && controller.representative() != null && controller.nearest() != null ) {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
                         lastClicked = new Point2D.Double(e.getX(), e.getY());
@@ -2284,7 +2288,8 @@ public class Menu extends javax.swing.JFrame {
                                 agglomerateAnimation(index, node);                                      
                             else if( !node.children().isEmpty() )
                                 expandAnimation(index, e);
-                            else if( node.children().isEmpty() ) {                                
+                            else if( node.children().isEmpty() ) {    
+                                semaphore = false;
                                 removeSubsetOverlap(controller.nearest().get(index));
                                 cleanImage();
                                 repaint();
@@ -2299,19 +2304,44 @@ public class Menu extends javax.swing.JFrame {
 
                 @Override
                 public void mouseMoved(MouseEvent e) {
+                    if( semaphore )
+                        return;
+                    
                     if( controller != null && controller.representative() != null && controller.nearest() != null ) {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
-
-                       // nearest = null;
                         if( index != -1 ) {
-                      //      nearest = controller.nearest().get(index);
+                            
+                            if( tooltip != null )
+                                return;
                             ExplorerTreeNode node = controller.getNode(index);                            
-                            if( node.children().isEmpty() ) {                                
+                            if( node.children().isEmpty() ) {      
+                                semaphore = true;
                                 List<OverlapRect> projection = removeOverlap(controller.nearest().get(index));
                                 tooltip = new Tooltip(new Point2D.Double(e.getX(), e.getY()), projection);
-                                cleanImage();
-                                repaint();
-                            } else if( tooltip != null ) { 
+                                timerTooltip = new Timer(menor, new ActionListener() {
+                                    private float opacity = 0;
+
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        if( opacity > 1.0 )
+                                            opacity = 1.0f;
+                                        tooltip.setOpacity(opacity);
+                                        opacity += 0.01f;
+                                        if( opacity >= 1.0f ) {
+                                            cleanImage();
+                                            repaint();
+                                            timerTooltip.stop();
+                                            semaphore = false;
+                                        }
+                                        cleanImage();
+                                        repaint();
+                                    }                                    
+                                });
+                                
+                                timerTooltip.setDelay(10);
+                                timerTooltip.setRepeats(true);
+                                timerTooltip.start();
+                            } else if( tooltip != null ) {
                                 tooltip = null;
                                 cleanImage();
                                 repaint();
@@ -2332,10 +2362,8 @@ public class Menu extends javax.swing.JFrame {
         }
         
         private void agglomerateAnimation(int index, ExplorerTreeNode node) {
-            if( semaphore )
-                return; 
             
-            semaphore = false;
+            semaphore = true;
             movingIndexes = controller.agglomerateNode(index);
             parentMoving = node.parent().routing();
             timer = new Timer(0, new ActionListener() {
@@ -2343,9 +2371,7 @@ public class Menu extends javax.swing.JFrame {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if( !semaphore ) {
-                        semaphore = true;
-
+                    
                         for( int j = 0; j < movingIndexes.size(); ++j) {
                             int v = movingIndexes.get(j);
                             double x = (1.0-i)*controller.projection()[v].x +
@@ -2363,14 +2389,15 @@ public class Menu extends javax.swing.JFrame {
                                 cleanImage();
                                 repaint();
                                 timer.stop();
+                                semaphore = false;
                             }
                         }
 
                         cleanImage();
                         repaint();
 
-                        semaphore = false;
-                    }
+                        
+                    
                 }
             });
 
@@ -2380,16 +2407,14 @@ public class Menu extends javax.swing.JFrame {
         }
         
         private void expandAnimation(int index, MouseEvent e) {
-            semaphore = false;
+            semaphore = true;
             movingIndexes = controller.expandNode(index, e.getX(), e.getY(), getSize().width, getSize().height);
             timer = new Timer(0, new ActionListener() {
                 private double i = 0;
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if( !semaphore ) {
-                        semaphore = true;
-
+                   
                         for( int j = 0; j < movingIndexes.size(); ++j) {
                             int v = movingIndexes.get(j);
                             double x = (1.0-i)*controller.projection()[index].x + i*controller.projection()[v].x;
@@ -2404,14 +2429,15 @@ public class Menu extends javax.swing.JFrame {
                                 cleanImage();
                                 repaint();
                                 timer.stop();
+                                semaphore = false;
                             }
                         }
 
                         cleanImage();
                         repaint();
 
-                        semaphore = false;
-                    }
+                        
+                    
                 }
             });
 
