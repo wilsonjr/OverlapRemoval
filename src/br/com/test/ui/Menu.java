@@ -2278,7 +2278,6 @@ public class Menu extends javax.swing.JFrame {
                 public void mousePressed(MouseEvent e) {
                     if( semaphore )
                         return;
-                    System.out.println("Estou aqui");
                     if( controller != null && controller.representative() != null && controller.nearest() != null ) {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
                         lastClicked = new Point2D.Double(e.getX(), e.getY());
@@ -2348,7 +2347,6 @@ public class Menu extends javax.swing.JFrame {
                             }
                               
                         } else if( tooltip != null ) {
-                            System.out.println("ttoltip: "+tooltip);
                             semaphore = true;
                             timerTooltip = new Timer(0, new ActionListener() {
                                 private float opacity = tooltip.getOpacity();
