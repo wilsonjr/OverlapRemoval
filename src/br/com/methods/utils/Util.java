@@ -1512,8 +1512,9 @@ public class Util {
         }
 
         for( int i = 0; i < points.length; ++i ) {
-            
-            Site site = new Site(points[i].x, points[i].y);
+            int weight = new Random().nextInt(100)+1;
+            Site site = new Site(points[i].x, points[i].y, weight);
+            //Site site = new Site(points[i].x, points[i].y);
             sites.add(site);
         }
         

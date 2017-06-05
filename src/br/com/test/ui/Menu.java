@@ -1657,7 +1657,8 @@ public class Menu extends javax.swing.JFrame {
                 
                 
                 // dictionary representation
-                RepresentativeFinder ds3 = new DS3(distances, 0.1);
+                // must test with alpha = 0.3
+                RepresentativeFinder ds3 = new DS3(distances, 0.03);
                 RepresentativeFinder smrs = new SMRS(attrs);
                 
                 controller = new ExplorerTreeController(points, 
