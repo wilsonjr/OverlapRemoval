@@ -86,5 +86,9 @@ public class Tooltip {
         d.height = (int) (max_y-min_y) + zero;
         rect = new Rectangle2D.Double(point.x, point.y, d.width, d.height);
     }
+
+    public float getOpacity() {
+        return opacity;
+    }
     
 }

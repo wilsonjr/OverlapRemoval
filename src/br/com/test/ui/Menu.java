@@ -2318,12 +2318,12 @@ public class Menu extends javax.swing.JFrame {
                                 semaphore = true;
                                 List<OverlapRect> projection = removeOverlap(controller.nearest().get(index));
                                 tooltip = new Tooltip(new Point2D.Double(e.getX(), e.getY()), projection);
-                                timerTooltip = new Timer(menor, new ActionListener() {
+                                timerTooltip = new Timer(0, new ActionListener() {
                                     private float opacity = 0;
 
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
-                                        if( opacity > 1.0 )
+                                        if( opacity > 1.0f )
                                             opacity = 1.0f;
                                         tooltip.setOpacity(opacity);
                                         opacity += 0.01f;
@@ -2348,9 +2348,32 @@ public class Menu extends javax.swing.JFrame {
                             }
                               
                         } else if( tooltip != null ) {
-                            tooltip = null;
-                            cleanImage();
-                            repaint();
+                            System.out.println("ttoltip: "+tooltip);
+                            semaphore = true;
+                            timerTooltip = new Timer(0, new ActionListener() {
+                                private float opacity = tooltip.getOpacity();
+
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    if( opacity < 0.0f )
+                                        opacity = 0.0f;
+                                    tooltip.setOpacity(opacity);
+                                    opacity -= 0.01f;
+                                    if( opacity <= 0.0f ) {
+                                        cleanImage();
+                                        repaint();
+                                        timerTooltip.stop();
+                                        semaphore = false;
+                                        tooltip = null;
+                                    }
+                                    cleanImage();
+                                    repaint();
+                                }                                    
+                            });
+
+                            timerTooltip.setDelay(10);
+                            timerTooltip.setRepeats(true);
+                            timerTooltip.start();
                         }
                         
                     }
