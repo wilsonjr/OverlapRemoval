@@ -1154,10 +1154,13 @@ public class Util {
     
     public static ArrayList<OverlapRect> getProjectedValues(Map<OverlapRect, OverlapRect> projected) {
         ArrayList<OverlapRect> projectedValues = new ArrayList<>();
-        projected.entrySet().forEach((element)->{            
+        System.out.println("********************");
+        projected.entrySet().forEach((element)->{   
+            System.out.println(element.getKey().x+", "+element.getKey().y);
             projectedValues.add(element.getValue());
             projectedValues.get(projectedValues.size()-1).setId(element.getKey().getId());
         });
+        System.out.println("********************");
         return projectedValues;
     }
     

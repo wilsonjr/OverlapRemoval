@@ -35,6 +35,7 @@
 package br.com.test.ui;
 
 
+import View.Frame;
 import br.com.explore.explorertree.ExplorerTree;
 import br.com.explore.explorertree.ExplorerTreeController;
 import br.com.explore.explorertree.ExplorerTreeNode;
@@ -122,6 +123,7 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import math.geom2d.polygon.SimplePolygon2D;
+import nmap.BoundingBox;
 import nmap.Element;
 import nmap.NMap;
 
@@ -1886,11 +1888,28 @@ public class Menu extends javax.swing.JFrame {
     }
     
     
-    private void removeSubsetOverlap(List<Integer> indexes) {
+    private void removeSubsetOverlap(List<Integer> indexes, int representative) {
         int algo = 1;//Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
         boolean applySeamCarving = false;//Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles, indexes);
         
+        System.out.println("-------------------");
+        for( int i = 0; i < rects.size(); ++i ) {
+            System.out.println(rects.get(i).x+", "+rects.get(i).y);
+        }
+        System.out.println("-------------------");
+            
+        
+        double maxDistance = -1;
+        for( int i = 0; i < indexes.size(); ++i ) {
+            RectangleVis p1 = rectangles.get(representative);
+            RectangleVis p2 = rectangles.get(indexes.get(i));
+            
+            double d = Util.euclideanDistance(p1.x, p1.y, p2.x, p2.y);            
+            if( d > maxDistance )
+                maxDistance = d;
+                
+        }
         double[] center0 = Util.getCenter(rects);
         PRISM prism = new PRISM(algo);
         Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
@@ -1907,31 +1926,28 @@ public class Menu extends javax.swing.JFrame {
         
         ArrayList<RectangleVis> cluster = new ArrayList<>();
         Util.toRectangleVis(cluster, projectedValues, indexes);
-        
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        OverlapPanel panel = new OverlapPanel(projected, cluster);
-        
-        JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);        
-        slider.setPaintTicks(true);
-        slider.setPaintLabels(true);
-        
-        slider.addChangeListener(panel);
-        
-        
-        frame.add(panel, BorderLayout.CENTER);
-        frame.add(slider, BorderLayout.SOUTH);
-        panel.setLocation((int)lastClicked.x, (int)lastClicked.y);
-        
-        panel.cleanImage();
-        panel.repaint();
-        panel.adjustPanel();  
-        panel.setVisible(true);
-        frame.setSize(panel.getSize().width, panel.getSize().height+100);
-        frame.setLocationRelativeTo(this);
-        frame.setUndecorated(true);
-        frame.setOpacity(0.4f);
-        frame.setVisible(true);
+//        
+//        JFrame frame = new JFrame();
+//        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//        OverlapPanel panel = new OverlapPanel(projected, cluster);
+//        
+//        JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);        
+//        slider.setPaintTicks(true);
+//        slider.setPaintLabels(true);
+//        
+//        slider.addChangeListener(panel);
+//        
+//        
+//        frame.add(panel, BorderLayout.CENTER);
+//        frame.add(slider, BorderLayout.SOUTH);
+//        panel.setLocation((int)lastClicked.x, (int)lastClicked.y);
+//        
+//        panel.cleanImage();
+//        panel.repaint();
+//        panel.adjustPanel();  
+//        frame.setSize(panel.getSize().width, panel.getSize().height+100);
+//        frame.setLocationRelativeTo(this);
+        //frame.setVisible(true);
         
         /**
          * Testing NMap representation
@@ -1939,38 +1955,49 @@ public class Menu extends javax.swing.JFrame {
         
         List<Element> data = new ArrayList<>();
         
+        List<OverlapRect> proj1 = projected.entrySet().stream().map((v)->v.getKey()).collect(Collectors.toList());
         List<OverlapRect> proj2 = projected.entrySet().stream().map((v)->v.getValue()).collect(Collectors.toList());
         Random rand = new Random();
         
-        for( int i = 0; i < proj2.size(); ++i )
-            data.add(new Element(proj2.get(i).getId(), (float)proj2.get(i).x, (float)proj2.get(i).y, rand.nextInt(10)+1, i+1));
-        
+        for( int i = 0; i < proj2.size(); ++i ) {
+            
+            
+            double distance =  Util.euclideanDistance(rectangles.get(representative).x, rectangles.get(representative).y, 
+                                                      proj1.get(i).x, proj1.get(i).y);
+            
+            double weight = controller.calculateWeight(1, maxDistance, distance);
+            System.out.print(">> weight: "+weight+" ");
+            System.out.println(rectangles.get(representative).x+", "+rectangles.get(representative).y+" -- "+
+                                proj1.get(i).x+", "+proj1.get(i).y);
+            
+            data.add(new Element(proj2.get(i).getId(), (float)proj2.get(i).x, (float)proj2.get(i).y, (float) weight, 1));
+        }
         int visualSpaceWidth = 800;
         int visualSpaceHeight = 600;
         
         NMap nmap = new NMap(visualSpaceWidth, visualSpaceHeight);
         
         // We can use this when weights are different        
-        //List<BoundingBox> ac = nmap.alternateCut(data);
-        //Frame frameAlternateCut = new Frame(visualSpaceWidth, visualSpaceHeight, ac, "NMap Alternate Cut");
-        //frameAlternateCut.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        //frameAlternateCut.setVisible(true);
-        
+        List<BoundingBox> ac = nmap.alternateCut(data);
+        Frame frameAlternateCut = new Frame(visualSpaceWidth, visualSpaceHeight, ac, "NMap Alternate Cut");
+        frameAlternateCut.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameAlternateCut.setVisible(true);
+//        
 //        List<BoundingBox> ew = nmap.equalWeight(data);
 //        Frame frameEqualWeight = new Frame(visualSpaceWidth, visualSpaceHeight, ew, "NMAP Equal Weight");
 //        frameEqualWeight.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 //        frameEqualWeight.setVisible(true);       
 //        
-//        List<OverlapRect> proj = projected.entrySet().stream().map((v)->v.getKey()).collect(Collectors.toList());
-//        
-//        List<Element> data2 = new ArrayList<>();
-//        for( int i = 0; i < proj.size(); ++i )
-//            data2.add(new Element(proj.get(i).getId(), (float)proj.get(i).x, (float)proj.get(i).y, 1.0f, 1.0f));
-//        
-//        List<BoundingBox> ew2 = nmap.equalWeight(data2);
-//        Frame frameEqualWeight2 = new Frame(visualSpaceWidth, visualSpaceHeight, ew2, "NMAP Equal Weight 2");
-//        frameEqualWeight2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//        frameEqualWeight2.setVisible(true);
+        List<OverlapRect> proj = projected.entrySet().stream().map((v)->v.getKey()).collect(Collectors.toList());
+        
+        List<Element> data2 = new ArrayList<>();
+        for( int i = 0; i < proj.size(); ++i )
+            data2.add(new Element(proj.get(i).getId(), (float)proj.get(i).x, (float)proj.get(i).y, 1.0f, 1.0f));
+        
+        List<BoundingBox> ew2 = nmap.equalWeight(data2);
+        Frame frameEqualWeight2 = new Frame(visualSpaceWidth, visualSpaceHeight, ew2, "NMAP Equal Weight 2");
+        frameEqualWeight2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameEqualWeight2.setVisible(true);
         
     }
     
@@ -2259,7 +2286,7 @@ public class Menu extends javax.swing.JFrame {
                                 expandAnimation(index, e);
                             else if( notches < 0 && node.children().isEmpty() ) {
                                 semaphore = false;                                
-                                removeSubsetOverlap(controller.nearest().get(index));
+                                removeSubsetOverlap(controller.nearest().get(index), index);
                                 cleanImage();
                                 repaint();
                             }                                
@@ -2289,7 +2316,7 @@ public class Menu extends javax.swing.JFrame {
                                 expandAnimation(index, e);
                             else if( node.children().isEmpty() ) {    
                                 semaphore = false;
-                                removeSubsetOverlap(controller.nearest().get(index));
+                                removeSubsetOverlap(controller.nearest().get(index), index);
                                 cleanImage();
                                 repaint();
                             }

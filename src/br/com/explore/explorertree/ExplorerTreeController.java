@@ -238,5 +238,16 @@ public class ExplorerTreeController {
         return updateDiagram(width, height, indexNew, polygon);
     }
     
+    // returns weights in [0.5, 1]
+    public double calculateWeight(double maxWeight, double maxDistance, double distance) {
+        
+        double a = maxWeight/4.0;  // half of half of amplitude
+        double q = (maxWeight)/2.0 + a; 
+        double k = maxDistance;
+        double period = (2.0*Math.PI)/k;
+        
+        return a*Math.cos(period*distance) + q;
+    }
+    
     
 }
