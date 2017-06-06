@@ -239,10 +239,10 @@ public class ExplorerTreeController {
     }
     
     // returns weights in [0.5, 1]
-    public double calculateWeight(double maxWeight, double maxDistance, double distance) {
+    public double calculateWeight(double maxWeight, double minWeight, double maxDistance, double distance) {
         
-        double a = maxWeight/4.0;  // half of half of amplitude
-        double q = (maxWeight)/2.0 + a; 
+        double a = (maxWeight - minWeight)/2.0;  // half of half of amplitude
+        double q = (maxWeight + minWeight)/2.0; 
         double k = maxDistance;
         double period = (2.0*Math.PI)/k;
         

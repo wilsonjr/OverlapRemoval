@@ -1965,7 +1965,7 @@ public class Menu extends javax.swing.JFrame {
             double distance =  Util.euclideanDistance(rectangles.get(representative).x, rectangles.get(representative).y, 
                                                       proj1.get(i).x, proj1.get(i).y);
             
-            double weight = controller.calculateWeight(1, maxDistance, distance);
+            double weight = controller.calculateWeight(10, 0.2*10, maxDistance, distance);
             System.out.print(">> weight: "+weight+" ");
             System.out.println(rectangles.get(representative).x+", "+rectangles.get(representative).y+" -- "+
                                 proj1.get(i).x+", "+proj1.get(i).y);
@@ -1997,7 +1997,7 @@ public class Menu extends javax.swing.JFrame {
         List<BoundingBox> ew2 = nmap.equalWeight(data2);
         Frame frameEqualWeight2 = new Frame(visualSpaceWidth, visualSpaceHeight, ew2, "NMAP Equal Weight 2");
         frameEqualWeight2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frameEqualWeight2.setVisible(true);
+//        frameEqualWeight2.setVisible(true);
         
     }
     
