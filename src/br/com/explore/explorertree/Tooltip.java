@@ -24,6 +24,7 @@ public class Tooltip {
     private Point2D.Double point;
     private int ammountx, ammounty;
     private float opacity;
+    private int space = 30;
     
     public Tooltip(Point2D.Double point, List<OverlapRect> projected) {
         this.point = point;
@@ -43,10 +44,10 @@ public class Tooltip {
         
         projected.stream().forEach((p)-> {
             
-            int x = (int) p.getUX()+ammountx;
-            int y = (int) p.getUY()+ammounty;
+            int x = (int) ((p.getUX()+ammountx) - rect.getWidth()/2);
+            int y = (int) p.getUY()+ammounty+space/2;
             
-            g2.fillOval(x+15, y+15, (int)p.getWidth(), (int)p.getHeight());
+            g2.fillOval(x, y, (int)p.getWidth(), (int)p.getHeight());
         
         });
         
@@ -62,7 +63,7 @@ public class Tooltip {
 
         double max_x = -1, max_y = -1;
         double min_x = Double.MAX_VALUE, min_y = Double.MAX_VALUE;
-        int zero = 30;
+        
 
         for( int i = 0; i < projected.size(); i++ ) {
             double x = projected.get(i).getCenterX();
@@ -82,9 +83,9 @@ public class Tooltip {
         ammounty = (int) (point.y-min_y);
         
         Dimension d = new Dimension();
-        d.width = (int) (max_x-min_x) + zero;
-        d.height = (int) (max_y-min_y) + zero;
-        rect = new Rectangle2D.Double(point.x, point.y, d.width, d.height);
+        d.width = (int) (max_x-min_x) + space;
+        d.height = (int) (max_y-min_y) + space;
+        rect = new Rectangle2D.Double(point.x - (d.width/2 + space/2), point.y, d.width, d.height);
     }
 
     public float getOpacity() {

@@ -2325,7 +2325,7 @@ public class Menu extends javax.swing.JFrame {
                                         if( opacity > 1.0f )
                                             opacity = 1.0f;
                                         tooltip.setOpacity(opacity);
-                                        opacity += 0.01f;
+                                        opacity += 0.1f;
                                         if( opacity >= 1.0f ) {
                                             cleanImage();
                                             repaint();
@@ -2337,7 +2337,7 @@ public class Menu extends javax.swing.JFrame {
                                     }                                    
                                 });
                                 
-                                timerTooltip.setDelay(10);
+                                timerTooltip.setDelay(5);
                                 timerTooltip.setRepeats(true);
                                 timerTooltip.start();
                             } else if( tooltip != null ) {
@@ -2356,7 +2356,7 @@ public class Menu extends javax.swing.JFrame {
                                     if( opacity < 0.0f )
                                         opacity = 0.0f;
                                     tooltip.setOpacity(opacity);
-                                    opacity -= 0.01f;
+                                    opacity -= 0.1f;
                                     if( opacity <= 0.0f ) {
                                         cleanImage();
                                         repaint();
@@ -2369,7 +2369,7 @@ public class Menu extends javax.swing.JFrame {
                                 }                                    
                             });
 
-                            timerTooltip.setDelay(10);
+                            timerTooltip.setDelay(5);
                             timerTooltip.setRepeats(true);
                             timerTooltip.start();
                         }
