@@ -35,10 +35,10 @@
 package br.com.test.ui;
 
 
-import View.Frame;
 import br.com.explore.explorertree.ExplorerTree;
 import br.com.explore.explorertree.ExplorerTreeController;
 import br.com.explore.explorertree.ExplorerTreeNode;
+import br.com.explore.explorertree.ForceLayout;
 import br.com.explore.explorertree.Tooltip;
 import br.com.representative.clustering.partitioning.BisectingKMeans;
 import br.com.representative.clustering.partitioning.Dbscan;
@@ -123,9 +123,6 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import math.geom2d.polygon.SimplePolygon2D;
-import nmap.BoundingBox;
-import nmap.Element;
-import nmap.NMap;
 
 /**
  *
@@ -1887,119 +1884,6 @@ public class Menu extends javax.swing.JFrame {
         return projectedValues;
     }
     
-    public double repulsive(double x, double k) {
-        return k*k/x;
-    }
-    
-    protected Point2D computeForceIJ(Rectangle2D.Double rectI, Rectangle2D.Double rectJ) {
-        double KR = 20;//new Random().nextInt(20)+1;
-        System.out.println("KR: "+KR);
-        double hix = Math.min(rectI.getMaxX(), rectJ.getMaxX());
-        double lox = Math.max(rectI.getMinX(), rectJ.getMinX());
-        double hiy = Math.min(rectI.getMaxY(), rectJ.getMaxY());
-        double loy = Math.max(rectI.getMinY(), rectJ.getMinY());
-        
-        double dx = (hix-lox) * 1.1;
-        double dy = (hiy-loy) * 1.1;
-        
-        // f(a,b) = kr*min{dx, dy}
-        double f = KR*Math.min(dx, dy);
-        Point2D dir = new Point2D.Double(rectJ.getCenterX()-rectI.getCenterX(), rectJ.getCenterY()-rectI.getCenterY());
-        double distanceToOrigin = Util.euclideanDistance(dir.getX(), dir.getY(), 0, 0);
-        if( distanceToOrigin < 1e-5 ) {
-            Random rand = new Random(2);
-            dir = new Point2D.Double(-1 + 2*rand.nextDouble(), -1 + 2*rand.nextDouble());
-        } else
-            dir.setLocation(dir.getX()*(1.0/distanceToOrigin), dir.getY()*(1.0/distanceToOrigin));
-            
-        dir.setLocation(dir.getX()*f, dir.getY()*f);
-        
-        return dir;       
-    }
-    
-    public List<OverlapRect> forceLayout(List<OverlapRect> elems, int rep) {
-        
-        List<OverlapRect> after = new ArrayList<>();
-        double meanMass = 10;
-        for( int i = 0; i < elems.size(); ++i ) {
-            Point2D dxy = new Point2D.Double();
-                double cnt = 0;
-            if( rep == i ) 
-                continue;
-            System.out.println(rep+" to "+i);
-            Point2D dir = computeForceIJ(elems.get(rep), elems.get(i));
-            dxy.setLocation(dxy.getX()-dir.getX(), dxy.getY()-dir.getY());
-            cnt++;
-            
-            dxy.setLocation(dxy.getX()*(1.0/cnt), dxy.getY()*(1.0/cnt));
-            double x = elems.get(i).getX() + dxy.getX();
-            double y = elems.get(i).getY() + dxy.getY();
-            after.add(new OverlapRect(x, y, elems.get(i).width, elems.get(i).height, elems.get(i).getId()));
-            
-        }
-        after.add(new OverlapRect(elems.get(rep).x, elems.get(rep).y, elems.get(rep).width, elems.get(rep).height, elems.get(rep).getId()));
-        return after;
-    }
-    
-    public List<OverlapRect> forceLayout2(List<OverlapRect> elems, int rep) {
-        
-        List<OverlapRect> after = new ArrayList<>();
-        
-        for( int i = 0; i < elems.size(); ++i ) {
-            if( rep == i ) 
-                continue;
-            
-            double dx = elems.get(rep).x-elems.get(i).x;
-            double dy = elems.get(rep).y-elems.get(i).y;
-            if( dx == 0 && dy == 0 ) 
-                dx = dy = 0.0001f;
-            double mag = Math.sqrt(dx*dx + dy*dy);
-            double meanMass = 50;//elems.get(i).width;
-            double f = repulsive(mag, meanMass);
-            
-            after.add(new OverlapRect(elems.get(i).x + (dx/mag*f), elems.get(i).y+(dy/mag*f), elems.get(i).width, elems.get(i).height, elems.get(i).getId()));
-        }
-        after.add(new OverlapRect(elems.get(rep).x, elems.get(rep).y, elems.get(rep).width, elems.get(rep).height, elems.get(rep).getId()));
-        return after;
-    }
-    
-    
-    public List<OverlapRect> forceLayout3(List<OverlapRect> elems, int rep, double maxDistance) {
-        
-        List<OverlapRect> after = new ArrayList<>();
-        
-        maxDistance = -1;
-        for( int i = 0; i < elems.size(); ++i ) {
-            if( i == rep )
-                continue;
-            double d = Util.euclideanDistance(elems.get(i).x, elems.get(i).y, elems.get(rep).x, elems.get(rep).y);
-            if( d > maxDistance )
-                maxDistance = d;
-        }
-        
-        for( int i = 0; i < elems.size(); ++i ) {
-            if( rep == i ) 
-                continue;
-            
-            double ax = elems.get(rep).x;
-            double ay = elems.get(rep).y;
-            double bx = elems.get(i).x;
-            double by = elems.get(i).y;
-            
-            double lenAB = Util.euclideanDistance(ax, ay, bx, by);
-            double weight = controller.calculateWeight(100, 10, maxDistance, lenAB);
-            System.out.println(">> weight: "+weight);
-            
-            double cx = bx + (bx-ax)/lenAB * weight;
-            double cy = by + (by-ay)/lenAB * weight;
-                        
-            after.add(new OverlapRect(cx, cy, elems.get(i).width, elems.get(i).height, elems.get(i).getId()));
-        }
-        after.add(new OverlapRect(elems.get(rep).x, elems.get(rep).y, elems.get(rep).width, elems.get(rep).height, elems.get(rep).getId()));
-        return after;
-    }
-    
-    
     private void removeSubsetOverlap(List<Integer> indexes, int representative) {
         int algo = 1;//Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
         boolean applySeamCarving = false;//Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
@@ -2079,7 +1963,7 @@ public class Menu extends javax.swing.JFrame {
         
         
         
-        List<OverlapRect> after = forceLayout3(toforce, rep, maxDistance);
+        List<OverlapRect> after = new ForceLayout().repulsive(toforce, rep, 1, 5);
         
         ArrayList<RectangleVis> rectanglesforce = new ArrayList<>();
         for( OverlapRect o: after ) {
