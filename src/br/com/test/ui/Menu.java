@@ -35,6 +35,7 @@
 package br.com.test.ui;
 
 
+import View.Frame;
 import br.com.explore.explorertree.ExplorerTree;
 import br.com.explore.explorertree.ExplorerTreeController;
 import br.com.explore.explorertree.ExplorerTreeNode;
@@ -123,6 +124,9 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import math.geom2d.polygon.SimplePolygon2D;
+import nmap.BoundingBox;
+import nmap.Element;
+import nmap.NMap;
 
 /**
  *
@@ -1992,56 +1996,56 @@ public class Menu extends javax.swing.JFrame {
         frame2.setLocationRelativeTo(this);
         frame2.setVisible(true);
 //        
+        
+        /**
+         * Testing NMap representation
+         */
+        
+        List<Element> data = new ArrayList<>();
+        
+        List<OverlapRect> proj1 = projected.entrySet().stream().map((v)->v.getKey()).collect(Collectors.toList());
+        List<OverlapRect> proj2 = projected.entrySet().stream().map((v)->v.getValue()).collect(Collectors.toList());
+        Random rand = new Random();
+        
+        for( int i = 0; i < proj2.size(); ++i ) {
+            
+            
+            double distance =  Util.euclideanDistance(rectangles.get(representative).x, rectangles.get(representative).y, 
+                                                      proj1.get(i).x, proj1.get(i).y);
+            
+            double weight = controller.calculateWeight(10, 0.2*10, maxDistance, distance);
+            System.out.print(">> weight: "+weight+" ");
+            System.out.println(rectangles.get(representative).x+", "+rectangles.get(representative).y+" -- "+
+                                proj1.get(i).x+", "+proj1.get(i).y);
+            
+            data.add(new Element(proj2.get(i).getId(), (float)proj2.get(i).x, (float)proj2.get(i).y, (float) weight, 1));
+        }
+        int visualSpaceWidth = 800;
+        int visualSpaceHeight = 600;
+        
+        NMap nmap = new NMap(visualSpaceWidth, visualSpaceHeight);
+        
+        // We can use this when weights are different        
+        List<BoundingBox> ac = nmap.alternateCut(data);
+        Frame frameAlternateCut = new Frame(visualSpaceWidth, visualSpaceHeight, ac, "NMap Alternate Cut");
+        frameAlternateCut.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameAlternateCut.setVisible(true);
 //        
-//        /**
-//         * Testing NMap representation
-//         */
+//        List<BoundingBox> ew = nmap.equalWeight(data);
+//        Frame frameEqualWeight = new Frame(visualSpaceWidth, visualSpaceHeight, ew, "NMAP Equal Weight");
+//        frameEqualWeight.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//        frameEqualWeight.setVisible(true);       
 //        
-//        List<Element> data = new ArrayList<>();
-//        
-//        List<OverlapRect> proj1 = projected.entrySet().stream().map((v)->v.getKey()).collect(Collectors.toList());
-//        List<OverlapRect> proj2 = projected.entrySet().stream().map((v)->v.getValue()).collect(Collectors.toList());
-//        Random rand = new Random();
-//        
-//        for( int i = 0; i < proj2.size(); ++i ) {
-//            
-//            
-//            double distance =  Util.euclideanDistance(rectangles.get(representative).x, rectangles.get(representative).y, 
-//                                                      proj1.get(i).x, proj1.get(i).y);
-//            
-//            double weight = controller.calculateWeight(10, 0.2*10, maxDistance, distance);
-//            System.out.print(">> weight: "+weight+" ");
-//            System.out.println(rectangles.get(representative).x+", "+rectangles.get(representative).y+" -- "+
-//                                proj1.get(i).x+", "+proj1.get(i).y);
-//            
-//            data.add(new Element(proj2.get(i).getId(), (float)proj2.get(i).x, (float)proj2.get(i).y, (float) weight, 1));
-//        }
-//        int visualSpaceWidth = 800;
-//        int visualSpaceHeight = 600;
-//        
-//        NMap nmap = new NMap(visualSpaceWidth, visualSpaceHeight);
-//        
-//        // We can use this when weights are different        
-//        List<BoundingBox> ac = nmap.alternateCut(data);
-//        Frame frameAlternateCut = new Frame(visualSpaceWidth, visualSpaceHeight, ac, "NMap Alternate Cut");
-//        frameAlternateCut.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//        frameAlternateCut.setVisible(true);
-////        
-////        List<BoundingBox> ew = nmap.equalWeight(data);
-////        Frame frameEqualWeight = new Frame(visualSpaceWidth, visualSpaceHeight, ew, "NMAP Equal Weight");
-////        frameEqualWeight.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-////        frameEqualWeight.setVisible(true);       
-////        
-//        List<OverlapRect> proj = projected.entrySet().stream().map((v)->v.getKey()).collect(Collectors.toList());
-//        
-//        List<Element> data2 = new ArrayList<>();
-//        for( int i = 0; i < proj.size(); ++i )
-//            data2.add(new Element(proj.get(i).getId(), (float)proj.get(i).x, (float)proj.get(i).y, 1.0f, 1.0f));
-//        
-//        List<BoundingBox> ew2 = nmap.equalWeight(data2);
-//        Frame frameEqualWeight2 = new Frame(visualSpaceWidth, visualSpaceHeight, ew2, "NMAP Equal Weight 2");
-//        frameEqualWeight2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//        frameEqualWeight2.setVisible(true);
+        List<OverlapRect> proj = projected.entrySet().stream().map((v)->v.getKey()).collect(Collectors.toList());
+        
+        List<Element> data2 = new ArrayList<>();
+        for( int i = 0; i < proj.size(); ++i )
+            data2.add(new Element(proj.get(i).getId(), (float)proj.get(i).x, (float)proj.get(i).y, 1.0f, 1.0f));
+        
+        List<BoundingBox> ew2 = nmap.equalWeight(data2);
+        Frame frameEqualWeight2 = new Frame(visualSpaceWidth, visualSpaceHeight, ew2, "NMAP Equal Weight 2");
+        frameEqualWeight2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameEqualWeight2.setVisible(true);
         
     }
     
