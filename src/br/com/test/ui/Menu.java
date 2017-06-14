@@ -1995,7 +1995,7 @@ public class Menu extends javax.swing.JFrame {
         frame2.setSize(panel2.getSize().width, panel2.getSize().height+100);
         frame2.setLocationRelativeTo(this);
         frame2.setVisible(true);
-//        
+        
         
         /**
          * Testing NMap representation
@@ -2014,11 +2014,10 @@ public class Menu extends javax.swing.JFrame {
                                                       proj1.get(i).x, proj1.get(i).y);
             
             double weight = controller.calculateWeight(10, 0.2*10, maxDistance, distance);
-            System.out.print(">> weight: "+weight+" ");
-            System.out.println(rectangles.get(representative).x+", "+rectangles.get(representative).y+" -- "+
-                                proj1.get(i).x+", "+proj1.get(i).y);
-            
             data.add(new Element(proj2.get(i).getId(), (float)proj2.get(i).x, (float)proj2.get(i).y, (float) weight, 1));
+            
+            System.out.println("id: "+proj2.get(i).getId()+" x: "+proj2.get(i).x+" -- y: "+proj2.get(i).y);
+            
         }
         int visualSpaceWidth = 800;
         int visualSpaceHeight = 600;
@@ -2027,25 +2026,67 @@ public class Menu extends javax.swing.JFrame {
         
         // We can use this when weights are different        
         List<BoundingBox> ac = nmap.alternateCut(data);
-        Frame frameAlternateCut = new Frame(visualSpaceWidth, visualSpaceHeight, ac, "NMap Alternate Cut");
-        frameAlternateCut.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frameAlternateCut.setVisible(true);
+//        Frame frameAlternateCut = new Frame(visualSpaceWidth, visualSpaceHeight, ac, "NMap Alternate Cut");
+//        frameAlternateCut.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//        frameAlternateCut.setVisible(true);
+////        
+////        List<BoundingBox> ew = nmap.equalWeight(data);
+////        Frame frameEqualWeight = new Frame(visualSpaceWidth, visualSpaceHeight, ew, "NMAP Equal Weight");
+////        frameEqualWeight.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+////        frameEqualWeight.setVisible(true);       
+////        
+//        List<OverlapRect> proj = projected.entrySet().stream().map((v)->v.getKey()).collect(Collectors.toList());
 //        
-//        List<BoundingBox> ew = nmap.equalWeight(data);
-//        Frame frameEqualWeight = new Frame(visualSpaceWidth, visualSpaceHeight, ew, "NMAP Equal Weight");
-//        frameEqualWeight.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//        frameEqualWeight.setVisible(true);       
+//        List<Element> data2 = new ArrayList<>();
+//        for( int i = 0; i < proj.size(); ++i )
+//            data2.add(new Element(proj.get(i).getId(), (float)proj.get(i).x, (float)proj.get(i).y, 1.0f, 1.0f));
 //        
-        List<OverlapRect> proj = projected.entrySet().stream().map((v)->v.getKey()).collect(Collectors.toList());
+//        List<BoundingBox> ew2 = nmap.equalWeight(data2);
+//        Frame frameEqualWeight2 = new Frame(visualSpaceWidth, visualSpaceHeight, ew2, "NMAP Equal Weight 2");
+//        frameEqualWeight2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//        frameEqualWeight2.setVisible(true);
+//        
+//        
+        List<OverlapRect> after2 = new ArrayList<>();
+        for( BoundingBox bb: ac ) {
+            Element e = bb.getElement();
+            System.out.println("id: "+e.getId()+" x: "+e.x+" -- y: "+e.y);
+            after2.add(new OverlapRect(e.x, e.y, RECTSIZE, RECTSIZE, e.getId()));
+        }
         
-        List<Element> data2 = new ArrayList<>();
-        for( int i = 0; i < proj.size(); ++i )
-            data2.add(new Element(proj.get(i).getId(), (float)proj.get(i).x, (float)proj.get(i).y, 1.0f, 1.0f));
         
-        List<BoundingBox> ew2 = nmap.equalWeight(data2);
-        Frame frameEqualWeight2 = new Frame(visualSpaceWidth, visualSpaceHeight, ew2, "NMAP Equal Weight 2");
-        frameEqualWeight2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frameEqualWeight2.setVisible(true);
+        
+        
+        
+        ArrayList<RectangleVis> rectanglesforce2 = new ArrayList<>();
+        for( OverlapRect o: after2 ) {
+            RectangleVis rec = new RectangleVis(o.getUX(), o.getUY(), o.width, o.height, Color.BLUE, o.getId());
+            rectanglesforce2.add(rec);
+        }
+        JFrame frame3 = new JFrame();
+        frame3.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        OverlapPanel panel3 = new OverlapPanel(projected, rectanglesforce2);
+        
+        JSlider slider3 = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);        
+        slider3.setPaintTicks(true);
+        slider3.setPaintLabels(true);
+        
+        slider3.addChangeListener(panel3);
+        
+        
+        frame3.add(panel3, BorderLayout.CENTER);
+        frame3.add(slider3, BorderLayout.SOUTH);
+        panel3.setLocation((int)lastClicked.x, (int)lastClicked.y);
+        
+        panel3.cleanImage();
+        panel3.repaint();
+        panel3.adjustPanel();  
+        frame3.setSize(panel3.getSize().width, panel3.getSize().height+100);
+        frame3.setLocationRelativeTo(this);
+        frame3.setVisible(true);
+        
+        
+        
         
     }
     
