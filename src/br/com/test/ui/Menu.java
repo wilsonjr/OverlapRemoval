@@ -35,11 +35,11 @@
 package br.com.test.ui;
 
 
-import View.Frame;
 import br.com.explore.explorertree.ExplorerTree;
 import br.com.explore.explorertree.ExplorerTreeController;
 import br.com.explore.explorertree.ExplorerTreeNode;
 import br.com.explore.explorertree.ForceLayout;
+import br.com.explore.explorertree.ForceNMAP;
 import br.com.explore.explorertree.Tooltip;
 import br.com.representative.clustering.partitioning.BisectingKMeans;
 import br.com.representative.clustering.partitioning.Dbscan;
@@ -1937,7 +1937,7 @@ public class Menu extends javax.swing.JFrame {
             System.out.println(">> distance: "+d);
             if( d == 0 ) {
                 rep = i;
-                System.out.println("INDEX REPRESENTATIVE: "+i);
+                System.out.println("INDEX REPRESENTATIVE: "+i+" ID: "+entryset.get(i).getValue().getId());
                 
             }
             toforce.add(entryset.get(i).getValue());
@@ -2013,7 +2013,7 @@ public class Menu extends javax.swing.JFrame {
             double distance =  Util.euclideanDistance(rectangles.get(representative).x, rectangles.get(representative).y, 
                                                       proj1.get(i).x, proj1.get(i).y);
             
-            double weight = controller.calculateWeight(10, 0.2*10, maxDistance, distance);
+            double weight = ExplorerTreeController.calculateWeight(10, 0.2*10, maxDistance, distance);
             data.add(new Element(proj2.get(i).getId(), (float)proj2.get(i).x, (float)proj2.get(i).y, (float) weight, 1));
             
             System.out.println("id: "+proj2.get(i).getId()+" x: "+proj2.get(i).x+" -- y: "+proj2.get(i).y);
@@ -2047,12 +2047,13 @@ public class Menu extends javax.swing.JFrame {
 //        frameEqualWeight2.setVisible(true);
 //        
 //        
-        List<OverlapRect> after2 = new ArrayList<>();
-        for( BoundingBox bb: ac ) {
-            Element e = bb.getElement();
-            System.out.println("id: "+e.getId()+" x: "+e.x+" -- y: "+e.y);
-            after2.add(new OverlapRect(e.x, e.y, RECTSIZE, RECTSIZE, e.getId()));
-        }
+        List<OverlapRect> after2 = new ForceNMAP(800, 600).repulsive(toforce, rep, 0.2*10, 10);
+//        List<OverlapRect> after2 = new ArrayList<>();
+//        for( BoundingBox bb: ac ) {
+//            Element e = bb.getElement();
+//            System.out.println("id: "+e.getId()+" x: "+e.x+" -- y: "+e.y);
+//            after2.add(new OverlapRect(e.x, e.y, RECTSIZE, RECTSIZE, e.getId()));
+//        }
         
         
         

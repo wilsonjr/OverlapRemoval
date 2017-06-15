@@ -24,13 +24,7 @@ public class ForceLayout implements RepulsiveNode {
     public List<OverlapRect> repulsive(List<OverlapRect> elems, int representative, double minWeight, double maxWeight) {
         
         List<OverlapRect> after = new ArrayList<>();
-        double maxDistance = -1;
-        for( int i = 0; i < elems.size(); ++i ) {
-            double d = Util.euclideanDistance(elems.get(i).x, elems.get(i).y, 
-                                              elems.get(representative).x, elems.get(representative).y);
-            if( d > maxDistance )
-                maxDistance = d;
-        }
+        double maxDist = maxDistance(elems, representative);
         
         for( int i = 0; i < elems.size(); ++i ) {
             Point2D dxy = new Point2D.Double();
@@ -48,7 +42,7 @@ public class ForceLayout implements RepulsiveNode {
             double by = elems.get(i).y;
             double lenAB = Util.euclideanDistance(ax, ay, bx, by);
             
-            double weight = ExplorerTreeController.calculateWeight(maxWeight, minWeight, maxDistance, lenAB);
+            double weight = ExplorerTreeController.calculateWeight(maxWeight, minWeight, maxDist, lenAB);
             
             Point2D dir = computeForceIJ(elems.get(representative), elems.get(i), weight);
             dxy.setLocation(dxy.getX()-dir.getX(), dxy.getY()-dir.getY());

@@ -21,13 +21,7 @@ public class ForceSegment implements RepulsiveNode {
     public List<OverlapRect> repulsive(List<OverlapRect> elems, int representative, double minWeight, double maxWeight) {
         List<OverlapRect> after = new ArrayList<>();
         
-        double maxDistance = -1;
-        for( int i = 0; i < elems.size(); ++i ) {
-            double d = Util.euclideanDistance(elems.get(i).x, elems.get(i).y, 
-                                              elems.get(representative).x, elems.get(representative).y);
-            if( d > maxDistance )
-                maxDistance = d;
-        }
+        double maxDist = maxDistance(elems, representative);
         
         for( int i = 0; i < elems.size(); ++i ) {
             if( representative == i ) { 
@@ -42,7 +36,7 @@ public class ForceSegment implements RepulsiveNode {
             double by = elems.get(i).y;
             
             double lenAB = Util.euclideanDistance(ax, ay, bx, by);
-            double weight = ExplorerTreeController.calculateWeight(maxWeight, minWeight, maxDistance, lenAB);
+            double weight = ExplorerTreeController.calculateWeight(maxWeight, minWeight, maxDist, lenAB);
             
             double cx = bx + (bx-ax)/lenAB * weight;
             double cy = by + (by-ay)/lenAB * weight;
