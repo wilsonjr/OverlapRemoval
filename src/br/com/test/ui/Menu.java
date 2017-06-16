@@ -41,15 +41,6 @@ import br.com.explore.explorertree.ExplorerTreeNode;
 import br.com.explore.explorertree.ForceLayout;
 import br.com.explore.explorertree.ForceNMAP;
 import br.com.explore.explorertree.Tooltip;
-import br.com.representative.clustering.partitioning.BisectingKMeans;
-import br.com.representative.clustering.partitioning.Dbscan;
-import br.com.representative.clustering.FarPointsMedoidApproach;
-import br.com.representative.clustering.hierarchical.HierarchicalClustering;
-import br.com.representative.clustering.hierarchical.SingleLinkageStrategy;
-import br.com.representative.clustering.partitioning.KMeans;
-import br.com.representative.clustering.partitioning.KMedoid;
-import br.com.test.draw.color.GrayScale;
-import br.com.test.draw.color.RainbowScale;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
 import br.com.methods.overlap.incboard.IncBoardExecutor;
 import br.com.methods.overlap.incboard.PointItem;
@@ -60,21 +51,30 @@ import br.com.methods.overlap.projsnippet.Vertex;
 import br.com.methods.overlap.rwordle.RWordleC;
 import br.com.methods.overlap.rwordle.RWordleL;
 import br.com.methods.overlap.vpsc.VPSC;
-import br.com.representative.metric.MST;
 import br.com.methods.utils.ChangeRetangulo;
-import br.com.methods.utils.Pair;
 import br.com.methods.utils.OverlapRect;
+import br.com.methods.utils.Pair;
 import br.com.methods.utils.RectangleVis;
 import br.com.methods.utils.Util;
 import br.com.projection.spacereduction.SeamCarving;
 import br.com.representative.Dijsktra;
 import br.com.representative.RepresentativeFinder;
+import br.com.representative.clustering.FarPointsMedoidApproach;
 import br.com.representative.clustering.affinitypropagation.AffinityPropagation;
 import br.com.representative.clustering.furs.FURS;
-import br.com.representative.lowrank.CSM;
+import br.com.representative.clustering.hierarchical.HierarchicalClustering;
+import br.com.representative.clustering.hierarchical.SingleLinkageStrategy;
+import br.com.representative.clustering.partitioning.BisectingKMeans;
+import br.com.representative.clustering.partitioning.Dbscan;
+import br.com.representative.clustering.partitioning.KMeans;
+import br.com.representative.clustering.partitioning.KMedoid;
 import br.com.representative.dictionaryrepresentation.DS3;
 import br.com.representative.dictionaryrepresentation.SMRS;
+import br.com.representative.lowrank.CSM;
 import br.com.representative.lowrank.KSvd;
+import br.com.representative.metric.MST;
+import br.com.test.draw.color.GrayScale;
+import br.com.test.draw.color.RainbowScale;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -85,6 +85,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -194,6 +195,38 @@ public class Menu extends javax.swing.JFrame {
         Image iconeTitulo = Toolkit.getDefaultToolkit().getImage(url);
         setIconImage(iconeTitulo);
         
+    }
+    
+    public static boolean LineIntersectsRect(Point p1, Point p2, Rectangle r)
+    {
+        return LineIntersectsLine(p1, p2, new Point(r.x, r.y), new Point(r.x + r.width, r.y)) ||
+               LineIntersectsLine(p1, p2, new Point(r.x + r.width, r.y), new Point(r.x + r.width, r.y + r.height)) ||
+               LineIntersectsLine(p1, p2, new Point(r.x + r.width, r.y + r.height), new Point(r.x, r.y + r.height)) ||
+               LineIntersectsLine(p1, p2, new Point(r.x, r.y + r.height), new Point(r.x, r.y)) ||
+               (r.contains(p1) && r.contains(p2));
+    }
+
+    private static boolean LineIntersectsLine(Point l1p1, Point l1p2, Point l2p1, Point l2p2)
+    {
+        float q = (l1p1.y - l2p1.y) * (l2p2.x - l2p1.x) - (l1p1.x - l2p1.x) * (l2p2.y - l2p1.y);
+        float d = (l1p2.x - l1p1.x) * (l2p2.y - l2p1.y) - (l1p2.y - l1p1.y) * (l2p2.x - l2p1.x);
+
+        if( d == 0 )
+        {
+            return false;
+        }
+
+        float r = q / d;
+
+        q = (l1p1.y - l2p1.y) * (l1p2.x - l1p1.x) - (l1p1.x - l2p1.x) * (l1p2.y - l1p1.y);
+        float s = q / d;
+
+        if( r < 0 || r > 1 || s < 0 || s > 1 )
+        {
+            return false;
+        }
+
+        return true;
     }
     
     /**
@@ -1477,16 +1510,28 @@ public class Menu extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_smrsJMenuItemActionPerformed
-
+    
     private void ds3JMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ds3JMenuItemActionPerformed
         
-        if( rectangles == null )
-            loadDataJMenuItemActionPerformed(null);
+        Point p1 = new Point(0, 4);
+        Point p2 = new Point(6, 4);       
+        Rectangle r = new Rectangle(3, 0, 3, 3);
         
-        double[][] distances = new double[rectangles.size()][rectangles.size()];
-        for( int i = 0; i < distances.length; ++i )
-            for( int j = 0; j < distances[0].length; ++j )
-                distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
+        
+        boolean returned = LineIntersectsRect(p1, p2, r);
+        if( returned )
+            System.out.println("This line intersects the rectangle");
+        else
+            System.out.println("This line doesn't intersect the rectangle");
+        
+        
+//        if( rectangles == null )
+//            loadDataJMenuItemActionPerformed(null);
+//        
+//        double[][] distances = new double[rectangles.size()][rectangles.size()];
+//        for( int i = 0; i < distances.length; ++i )
+//            for( int j = 0; j < distances[0].length; ++j )
+//                distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
         
 //        Timer t = new Timer();
 //        t.schedule(new TimerTask() {
@@ -1888,6 +1933,131 @@ public class Menu extends javax.swing.JFrame {
         return projectedValues;
     }
     
+    public double intersection(OverlapRect u, OverlapRect v) {
+        return Math.max(
+            Math.min(
+               (u.getWidth()/2. + v.getWidth()/2.)/Math.abs(u.getCenterX() - v.getCenterX()), 
+               (u.getHeight()/2. + v.getHeight()/2.)/Math.abs(u.getCenterY() - v.getCenterY())
+            ), 1);
+    }
+    
+    
+    private List<OverlapRect> removeOverlap(List<OverlapRect> rect, int rep) {
+        
+        
+        List<OverlapRect> rects = new ArrayList<>();
+        for( int i = 0; i < rect.size(); ++i ) {
+            rects.add(new OverlapRect(rect.get(i).x, rect.get(i).y, rect.get(i).width, rect.get(i).height, rect.get(i).getId()));
+        }
+        
+        Collections.sort(rects, (a, b) -> {
+            return Double.compare(Util.euclideanDistance(b.x, b.y, rect.get(rep).x, rect.get(rep).y), 
+                                  Util.euclideanDistance(a.x, a.y, rect.get(rep).x, rect.get(rep).y));
+        });
+        
+        for( int i = 0; i < rects.size(); ++i ) {
+            double d = Util.euclideanDistance(rects.get(i).x, rects.get(i).y, rect.get(rep).x, rect.get(rep).y);
+            System.out.println("Distance: "+d);
+        }
+        
+        System.out.println("Representative "+rect.get(rep).getId());
+        
+        
+        for( int i = 0; i < rects.size(); ++i ) {
+            OverlapRect r1 = rects.get(i);
+            for( int j = i+1; j < rects.size(); ++j ) {
+                OverlapRect r2 = rects.get(j);
+                if( r1.intersects(r2) ) {
+                    System.out.println("Removendo sobreposição de "+r1.getId()+" e "+r2.getId());
+                    double inter = intersection(r1, r2);
+                    
+                    double ax = rect.get(rep).x;
+                    double ay = rect.get(rep).y;
+                    double bx = r1.x;
+                    double by = r1.y;
+
+                    double lenAB = Util.euclideanDistance(ax, ay, bx, by);
+
+                    System.out.println("len: "+lenAB+" --  inter: "+inter);
+                    double ammountx = (bx-ax)/lenAB * (inter*lenAB);
+                    double ammounty = (by-ay)/lenAB * (inter*lenAB);
+                    
+                    r1.x = bx+ammountx;
+                    r1.y = by+ammounty;
+//                    
+//                    if( i-1 >= 0 ) {
+//                        OverlapRect r3 = rects.get(i-1);
+//                        if( r1.intersects(r3) ) {
+//                            
+//                            inter = RECTSIZE;//intersection(r1, r3);
+//                            ax = r1.x;
+//                            ay = r1.y;
+//                            bx = r3.x;
+//                            by = r3.y;
+//
+//                            lenAB = Util.euclideanDistance(ax, ay, bx, by);
+//                            ammountx = (bx-ax)/lenAB * inter;
+//                            ammounty = (by-ay)/lenAB * inter;
+//                            
+//                            for( int k = i-1; k >= 0; --k ) {
+//                                r3 = rects.get(k);
+//                                System.out.println("Atualizando posições");
+//                                inter = RECTSIZE;//intersection(r1, r3);
+//                                ax = r1.x;
+//                                ay = r1.y;
+//                                bx = r3.x;
+//                                by = r3.y;
+////
+//                                lenAB = Util.euclideanDistance(ax, ay, bx, by);
+//
+//
+//                                ammountx = (bx-ax)/lenAB * inter;
+//                                ammounty = (by-ay)/lenAB * inter;
+//
+//                                r3.x = bx + ammountx;
+//                                r3.y = by + ammounty;
+//                            }
+//                        }
+//                        
+//                    }
+                    
+                    OverlapRect p = r1;
+                    
+                    for( int k = i-1; k >= 0; --k ) {
+                        OverlapRect r3 = rects.get(k);
+                        //if( p.intersects(r3) ) {
+                            System.out.println("Atualizando posições");
+                            //inter = intersection(r1, r3);
+                            ax = rect.get(rep).x;
+                            ay = rect.get(rep).y;
+                            bx = r3.x;
+                            by = r3.y;
+
+                            lenAB = Util.euclideanDistance(ax, ay, bx, by);
+
+                            ammountx = (bx-ax)/lenAB * inter;
+                            ammounty = (by-ay)/lenAB * inter;
+                            
+                            r3.x = bx + ammountx;
+                            r3.y = by + ammounty;
+                        //}
+                       // p = r3;
+                    }
+                    
+                }
+            }
+            
+        }
+        
+        
+        
+        return rects;
+        
+    }
+    
+    
+    
+    
     private void removeSubsetOverlap(List<Integer> indexes, int representative) {
         int algo = 1;//Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
         boolean applySeamCarving = false;//Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
@@ -1930,6 +2100,7 @@ public class Menu extends javax.swing.JFrame {
 
         int rep = -1;
         List<OverlapRect> toforce = new ArrayList<>();
+        List<OverlapRect> overlaps = new ArrayList<>();
         List<Map.Entry<OverlapRect, OverlapRect>> entryset = projected.entrySet().stream().collect(Collectors.toList());
         for( int i = 0; i < entryset.size(); ++i ) {
             double d = Util.euclideanDistance(entryset.get(i).getKey().x, entryset.get(i).getKey().y, 
@@ -1940,6 +2111,7 @@ public class Menu extends javax.swing.JFrame {
                 System.out.println("INDEX REPRESENTATIVE: "+i+" ID: "+entryset.get(i).getValue().getId());
                 
             }
+            overlaps.add(entryset.get(i).getKey());
             toforce.add(entryset.get(i).getValue());
         }
 
@@ -1957,14 +2129,14 @@ public class Menu extends javax.swing.JFrame {
         frame.add(panel, BorderLayout.CENTER);
         frame.add(slider, BorderLayout.SOUTH);
         panel.setLocation((int)lastClicked.x, (int)lastClicked.y);
-        
+//        
         panel.cleanImage();
         panel.repaint();
         panel.adjustPanel();  
         frame.setSize(panel.getSize().width, panel.getSize().height+100);
         frame.setLocationRelativeTo(this);
         frame.setVisible(true);
-        
+//        
         
         
         List<OverlapRect> after = new ForceLayout().repulsive(toforce, rep, 1, 5);
@@ -1989,12 +2161,12 @@ public class Menu extends javax.swing.JFrame {
         frame2.add(slider2, BorderLayout.SOUTH);
         panel2.setLocation((int)lastClicked.x, (int)lastClicked.y);
         
-        panel2.cleanImage();
-        panel2.repaint();
-        panel2.adjustPanel();  
-        frame2.setSize(panel2.getSize().width, panel2.getSize().height+100);
-        frame2.setLocationRelativeTo(this);
-        frame2.setVisible(true);
+//        panel2.cleanImage();
+//        panel2.repaint();
+//        panel2.adjustPanel();  
+//        frame2.setSize(panel2.getSize().width, panel2.getSize().height+100);
+//        frame2.setLocationRelativeTo(this);
+//        frame2.setVisible(true);
         
         
         /**
@@ -2047,7 +2219,7 @@ public class Menu extends javax.swing.JFrame {
 //        frameEqualWeight2.setVisible(true);
 //        
 //        
-        List<OverlapRect> after2 = new ForceNMAP(800, 600).repulsive(toforce, rep, 0.2*10, 10);
+        List<OverlapRect> after2 = removeOverlap(overlaps, rep);//new ForceNMAP(800, 600).repulsive(toforce, rep, 0.2*10, 10);
 //        List<OverlapRect> after2 = new ArrayList<>();
 //        for( BoundingBox bb: ac ) {
 //            Element e = bb.getElement();
