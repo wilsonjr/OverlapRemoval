@@ -1950,6 +1950,7 @@ public class Menu extends javax.swing.JFrame {
             rects.add(new OverlapRect(rect.get(i).x, rect.get(i).y, rect.get(i).width, rect.get(i).height, rect.get(i).getId()));
         }
         
+        
         Collections.sort(rects, (a, b) -> {
             return Double.compare(Util.euclideanDistance(b.x, b.y, rect.get(rep).x, rect.get(rep).y), 
                                   Util.euclideanDistance(a.x, a.y, rect.get(rep).x, rect.get(rep).y));
@@ -1962,7 +1963,7 @@ public class Menu extends javax.swing.JFrame {
         
         System.out.println("Representative "+rect.get(rep).getId());
         
-        
+                
         for( int i = 0; i < rects.size(); ++i ) {
             OverlapRect r1 = rects.get(i);
             for( int j = i+1; j < rects.size(); ++j ) {
@@ -1971,83 +1972,166 @@ public class Menu extends javax.swing.JFrame {
                     System.out.println("Removendo sobreposição de "+r1.getId()+" e "+r2.getId());
                     double inter = intersection(r1, r2);
                     
-                    double ax = rect.get(rep).x;
-                    double ay = rect.get(rep).y;
+                    double ax = r2.x;
+                    double ay = r2.y;
                     double bx = r1.x;
                     double by = r1.y;
 
                     double lenAB = Util.euclideanDistance(ax, ay, bx, by);
+                    
+                    if( lenAB == 0.0 ) {
+                        ax += 0.5;
+                        //ay += 0.;
+                        lenAB = Util.euclideanDistance(ax, ay, bx, by);
+                        inter = intersection(r1, new OverlapRect(ax, ay, r2.width, r2.height));
+                    }
 
                     System.out.println("len: "+lenAB+" --  inter: "+inter);
-                    double ammountx = (bx-ax)/lenAB * (inter*lenAB);
-                    double ammounty = (by-ay)/lenAB * (inter*lenAB);
+                    double ammountx = (bx-ax)/lenAB * (inter*lenAB - lenAB);
+                    double ammounty = (by-ay)/lenAB * (inter*lenAB - lenAB);
                     
                     r1.x = bx+ammountx;
                     r1.y = by+ammounty;
-//                    
-//                    if( i-1 >= 0 ) {
-//                        OverlapRect r3 = rects.get(i-1);
-//                        if( r1.intersects(r3) ) {
-//                            
-//                            inter = RECTSIZE;//intersection(r1, r3);
-//                            ax = r1.x;
-//                            ay = r1.y;
+                    
+                    
+                    for( int o = i; o >= 0; --o ) {                    
+                        OverlapRect p = rects.get(o);
+
+                        List<OverlapRect> first = new ArrayList<>();
+
+                        for( int k = o-1; k >= 0; --k ) {
+                            first.add(rects.get(k));
+                        }
+
+                        if( !first.isEmpty() ) {
+
+                            Collections.sort(first, (a, b) -> {
+                                return Double.compare(Util.euclideanDistance(a.x, a.y, p.x, p.y), 
+                                                      Util.euclideanDistance(b.x, b.y, p.x, p.y));
+                            });
+
+
+                            for( int k = 0; k < first.size(); ++k ) {
+                                OverlapRect r3 = first.get(k);
+                                if( p.intersects(r3) ) {
+                                    System.out.println("Atualizando posições: "+r3.getId());
+                                    inter = intersection(p, r3);
+                                    ax = p.x;
+                                    ay = p.y;
+                                    bx = r3.x;
+                                    by = r3.y;
+
+                                    lenAB = Util.euclideanDistance(ax, ay, bx, by);
+
+                                    ammountx = (bx-ax)/lenAB * (inter*lenAB - lenAB);
+                                    ammounty = (by-ay)/lenAB * (inter*lenAB - lenAB);
+
+                                    r3.x = bx + ammountx;
+                                    r3.y = by + ammounty;
+                                }
+                            }
+
+                        }
+                    }
+                    
+                    
+                    
+                    
+//                    OverlapRect p = r1;
+//                    for( int k = i-1; k >= 0; --k ) {
+//                        OverlapRect r3 = rects.get(k);
+//                 //       if( p.intersects(r3) ) {
+//                            System.out.println("Atualizando posições");
+//                            //inter = intersection(r1, r3);
+//                            ax = p.x;
+//                            ay = p.y;
 //                            bx = r3.x;
 //                            by = r3.y;
 //
 //                            lenAB = Util.euclideanDistance(ax, ay, bx, by);
-//                            ammountx = (bx-ax)/lenAB * inter;
-//                            ammounty = (by-ay)/lenAB * inter;
+//
+//                            ammountx = (bx-ax)/lenAB * inter;//(inter*lenAB - lenAB);
+//                            ammounty = (by-ay)/lenAB * inter;//(inter*lenAB - lenAB);
 //                            
-//                            for( int k = i-1; k >= 0; --k ) {
-//                                r3 = rects.get(k);
-//                                System.out.println("Atualizando posições");
-//                                inter = RECTSIZE;//intersection(r1, r3);
-//                                ax = r1.x;
-//                                ay = r1.y;
-//                                bx = r3.x;
-//                                by = r3.y;
-////
-//                                lenAB = Util.euclideanDistance(ax, ay, bx, by);
-//
-//
-//                                ammountx = (bx-ax)/lenAB * inter;
-//                                ammounty = (by-ay)/lenAB * inter;
-//
-//                                r3.x = bx + ammountx;
-//                                r3.y = by + ammounty;
-//                            }
-//                        }
-//                        
+//                            r3.x = bx + ammountx;
+//                            r3.y = by + ammounty;
+//                   //     }
+//                        p = r3;
 //                    }
-                    
-                    OverlapRect p = r1;
-                    
-                    for( int k = i-1; k >= 0; --k ) {
-                        OverlapRect r3 = rects.get(k);
-                        //if( p.intersects(r3) ) {
-                            System.out.println("Atualizando posições");
-                            //inter = intersection(r1, r3);
-                            ax = rect.get(rep).x;
-                            ay = rect.get(rep).y;
-                            bx = r3.x;
-                            by = r3.y;
-
-                            lenAB = Util.euclideanDistance(ax, ay, bx, by);
-
-                            ammountx = (bx-ax)/lenAB * inter;
-                            ammounty = (by-ay)/lenAB * inter;
-                            
-                            r3.x = bx + ammountx;
-                            r3.y = by + ammounty;
-                        //}
-                       // p = r3;
-                    }
                     
                 }
             }
             
         }
+        
+//        
+//        for( int i = 0; i < rects.size(); ++i ) {
+//            OverlapRect r1 = rects.get(i);
+//            for( int j = i+1; j < rects.size(); ++j ) {
+//                OverlapRect r2 = rects.get(j);
+//                if( r1.intersects(r2) ) {
+//                    System.out.println("Removendo sobreposição de "+r1.getId()+" e "+r2.getId());
+//                    double inter = RECTSIZE;//intersection(r1, r2);
+//                    
+//                    double ax =r2.x;
+//                    double ay = r2.y;
+//                    double bx = r1.x;
+//                    double by = r1.y;
+//
+//                    double lenAB = Util.euclideanDistance(ax, ay, bx, by);
+//                    
+//                    double interammount = inter;//(inter*lenAB - lenAB);
+//
+//                    System.out.println("len: "+lenAB+" --  inter: "+inter);
+//                    double ammountx = (bx-ax)/lenAB * interammount;
+//                    double ammounty = (by-ay)/lenAB * interammount;
+//                    System.out.println("AUMENTANDO: "+interammount);
+//                    r1.x = bx+ammountx;
+//                    r1.y = by+ammounty;
+//                    
+//                    
+//                    OverlapRect p = r1;
+//                    if( i-1 >= 0 && p.intersects(rects.get(i-1)) ) {
+//                        
+//                        //inter = intersection(p, rects.get(i-1));
+//                        for( int k = i-1; k >= 0; --k ) {
+//                            
+//                            
+//                            OverlapRect r3 = rects.get(k);
+//                            
+//                            
+//                            if( !p.intersects(r3) ) {
+//                                p = r3;
+//                                continue;
+//                            }
+//                            System.out.println("Atualizando posições de "+r3.getId());
+//                            
+//                            double ax2 = p.x;
+//                            double ay2 = p.y;
+//                            double bx2 = r3.x;
+//                            double by2 = r3.y;
+//
+//                            double lenAB2 = Util.euclideanDistance(ax, ay, bx, by);
+//                            //interammount = (inter*lenAB2 - lenAB2);
+//                            double ammountx2 = (bx2-ax2)/lenAB2 * interammount;
+//                            double ammounty2 = (by2-ay2)/lenAB2 * interammount;//(inter*lenAB - lenAB);
+//                            //System.out.println("AUMENTANDO 2: "+(inter*lenAB - lenAB));
+//
+//                            r3.x = bx2 + ammountx2;
+//                            r3.y = by2 + ammounty2;
+//                            p = r3;
+//                        }
+//                        
+//                    
+//                    }
+//                    
+//                }
+//            }
+//            
+//        }
+//        
+        
+        
         
         
         
