@@ -52,6 +52,10 @@ public class ExplorerTreeController {
         _polygons = new ArrayList<>();        
     }
     
+    public ExplorerTree explorerTree() {
+        return _explorerTree;
+    }
+    
     public void build() {
         
         _explorerTree.build();
@@ -248,6 +252,15 @@ public class ExplorerTreeController {
         
         return a*Math.cos(period*distance) + q;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
 }

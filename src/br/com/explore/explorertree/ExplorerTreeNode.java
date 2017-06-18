@@ -2,6 +2,10 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package br.com.explore.explorertree;
 
@@ -518,7 +522,7 @@ public class ExplorerTreeNode {
         _polygon = polygon;
     }
 
-    public boolean isChildren(ExplorerTreeNode parent) {
+    public boolean isChild(ExplorerTreeNode parent) {
         ExplorerTreeNode node = _parent;
         
         while( node != null ) {            
@@ -530,9 +534,17 @@ public class ExplorerTreeNode {
         return false;
     }
     
+    public boolean isChild() {
+        return _children.isEmpty();
+    }
+    
 
     public Point2D.Double routingPoint() {        
         return _subprojection[_routing];
+    }
+
+    public Point2D.Double[] subprojection() {
+        return _subprojection;
     }
     
     private class Representative {
