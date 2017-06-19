@@ -88,12 +88,14 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -1847,7 +1849,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         ds3, 3, RECTSIZE, RECTSIZE/2);
+                         ds3, 7, RECTSIZE, RECTSIZE/2);
                 
                 controller.build();                
                 controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
@@ -1887,6 +1889,12 @@ public class Menu extends javax.swing.JFrame {
         
         view.cleanImage();
         view.repaint();
+        
+        
+        Shape a = new Polygon();
+        Area area = new Area();
+        
+        
     }//GEN-LAST:event_jMenuItem2ActionPerformed
     
     

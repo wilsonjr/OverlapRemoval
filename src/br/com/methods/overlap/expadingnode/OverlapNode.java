@@ -8,9 +8,15 @@ package br.com.methods.overlap.expadingnode;
 
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
+import java.awt.Polygon;
+import java.awt.geom.Area;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import math.geom2d.polygon.Polygon2D;
+import math.geom2d.polygon.Polygons2D;
+import math.geom2d.polygon.SimplePolygon2D;
 
 /**
  *
@@ -111,9 +117,55 @@ public class OverlapNode {
             OverlapNode r1 = subset.get(i);
             for( int j = i+1; j < subset.size(); ++j ) {
                 OverlapNode r2 = subset.get(j);
+                
+                Point2D.Double[] r1Points = Util.convexHull(getPoints(r1));
+                Point2D.Double[] r2Points = Util.convexHull(getPoints(r2));
+                
+                Polygon polyR1Points = createPolygon(r1Points);
+                Polygon polyR2Points = createPolygon(r2Points);
+                
+                Area area1 = new Area(polyR1Points);
+                Area area2 = new Area(polyR2Points);
+                area1.intersect(area2);
+                double area = 0, inter = 0;
+                if( area1.isEmpty() ) {
+                    System.out.println("ATENÇÃO: NÃO EXISTE SOBREPOSIÇÃO ENTRE OS CONVEXHULLS");
+                    continue;
+                } else {
+                    
+                    // create point p1
+                    double[] xpoints = new double[r1Points.length];
+                    double[] ypoints = new double[r1Points.length];
+
+                    for( int k = 0; k < r1Points.length; ++k ) {
+                        xpoints[k] = (double) r1Points[k].x;
+                        ypoints[k] = (double) r1Points[k].y;
+                    }
+                    math.geom2d.polygon.SimplePolygon2D p1 = new SimplePolygon2D(xpoints, ypoints);
+                    
+                    // create point p2
+                    xpoints = new double[r2Points.length];
+                    ypoints = new double[r2Points.length];
+
+                    for( int k = 0; k < r2Points.length; ++k ) {
+                        xpoints[k] = (double) r2Points[k].x;
+                        ypoints[k] = (double) r2Points[k].y;
+                    }
+                    math.geom2d.polygon.SimplePolygon2D p2 = new SimplePolygon2D(xpoints, ypoints);
+                    
+                    
+                    Polygon2D intersection = Polygons2D.intersection(p1, p2);
+                    area = Polygons2D.computeArea(intersection);
+                    area = Math.max(area1.getBounds().width, area1.getBounds().height);
+//                    inter = intersection(new OverlapRect(area1.getBounds().x, area1.getBounds().y, area1.getBounds().width, area1.getBounds().height), 
+//                                         new OverlapRect(area1.getBounds().x, area1.getBounds().y, area1.getBounds().width, area1.getBounds().height));
+                    System.out.println("ATENÇÃO: EXISTE SOBREPOSIÇÃO ENTRE OS CONVEXHULLS");
+                }
+                
+                
                 if( r1.boundingBox.intersects(r2.boundingBox) ) {
                     System.out.println("Removendo sobrepresentativeosição de "+r1.boundingBox.getId()+" e "+r2.boundingBox.getId());
-                    double inter = intersection(r1.boundingBox, r2.boundingBox);
+                    inter = intersection(r1.boundingBox, r2.boundingBox);
                     
                     double ax = r2.boundingBox.x;
                     double ay = r2.boundingBox.y;
@@ -159,6 +211,53 @@ public class OverlapNode {
 
                             for( int k = 0; k < first.size(); ++k ) {
                                 OverlapNode r3 = first.get(k);
+                                
+                                r1Points = Util.convexHull(getPoints(p));
+                                r2Points = Util.convexHull(getPoints(r3));
+
+                                polyR1Points = createPolygon(r1Points);
+                                polyR2Points = createPolygon(r2Points);
+
+                                area1 = new Area(polyR1Points);
+                                area2 = new Area(polyR2Points);
+                                area1.intersect(area2);
+
+                                if( area1.isEmpty() ) {
+                                    System.out.println("2 ATENÇÃO: NÃO EXISTE SOBREPOSIÇÃO ENTRE OS CONVEXHULLS");
+                                    continue;
+                                } else {
+                                    
+                                     // create point p1
+                                    double[] xpoints = new double[r1Points.length];
+                                    double[] ypoints = new double[r1Points.length];
+
+                                    for( int t = 0; t < r1Points.length; ++t ) {
+                                        xpoints[t] = (double) r1Points[t].x;
+                                        ypoints[t] = (double) r1Points[t].y;
+                                    }
+                                    math.geom2d.polygon.SimplePolygon2D p1 = new SimplePolygon2D(xpoints, ypoints);
+
+                                    // create point p2
+                                    xpoints = new double[r2Points.length];
+                                    ypoints = new double[r2Points.length];
+
+                                    for( int t = 0; t < r2Points.length; ++t ) {
+                                        xpoints[t] = (double) r2Points[t].x;
+                                        ypoints[t] = (double) r2Points[t].y;
+                                    }
+                                    math.geom2d.polygon.SimplePolygon2D p2 = new SimplePolygon2D(xpoints, ypoints);
+
+
+                                    Polygon2D intersection = Polygons2D.intersection(p1, p2);
+                                    area = Polygons2D.computeArea(intersection);
+                                    area = Math.max(area1.getBounds().width, area1.getBounds().height);
+//                                    inter = intersection(new OverlapRect(area1.getBounds().x, area1.getBounds().y, area1.getBounds().width, area1.getBounds().height), 
+//                                         new OverlapRect(area1.getBounds().x, area1.getBounds().y, area1.getBounds().width, area1.getBounds().height));
+                                    System.out.println("2 ATENÇÃO: EXISTE SOBREPOSIÇÃO ENTRE OS CONVEXHULLS");
+                                }
+                                
+                                
+                                
                                 if( p.boundingBox.intersects(r3.boundingBox) ) {
                                     System.out.println("Atualizando posições: "+r3.boundingBox.getId());
                                     inter = intersection(p.boundingBox, r3.boundingBox);
@@ -169,8 +268,8 @@ public class OverlapNode {
 
                                     lenAB = Util.euclideanDistance(ax, ay, bx, by);
 
-                                    ammountx = (bx-ax)/lenAB * (inter*lenAB - lenAB);
-                                    ammounty = (by-ay)/lenAB * (inter*lenAB - lenAB);
+                                    ammountx = (bx-ax)/lenAB *(inter*lenAB - lenAB);
+                                    ammounty = (by-ay)/lenAB *(inter*lenAB - lenAB);
 
                                     r3.boundingBox.x = bx + ammountx;
                                     r3.boundingBox.y = by + ammounty;
@@ -182,8 +281,7 @@ public class OverlapNode {
                     
                     
                 } 
-            }
-            
+            }            
         }
         System.out.println("------------------------------------------------------");
         instances = subset;
@@ -215,7 +313,6 @@ public class OverlapNode {
         
         calculateBoundingBox();
         
-        
     }
 
     public void updateInstances() {
@@ -240,6 +337,57 @@ public class OverlapNode {
 
     public void setRepresentative(int medoid) {
         representative = medoid;
+    }
+
+    private Point2D.Double[] getPoints(OverlapNode node) {
+        
+        
+        if( node.getInstances() == null || node.getInstances().isEmpty() ) {
+            
+            double x1 = node.boundingBox.x;            
+            double x2 = node.boundingBox.x+node.boundingBox.width;
+            double y1 = node.boundingBox.y;
+            double y2 = node.boundingBox.y+node.boundingBox.height;
+            
+            Point2D.Double p1 = new Point2D.Double(x1, y1);
+            Point2D.Double p2 = new Point2D.Double(x2, y1);
+            Point2D.Double p3 = new Point2D.Double(x2, y2);
+            Point2D.Double p4 = new Point2D.Double(x1, y2);
+            
+            return new Point2D.Double[]{p1, p2, p3, p4};
+            
+        } else {
+            
+            List<Point2D.Double> pts = new ArrayList<>();
+            for( int i = 0; i < node.instances.size(); ++i ) {
+                
+                OverlapNode n = node.instances.get(i);
+                double x1 = n.boundingBox.x;            
+                double x2 = n.boundingBox.x+n.boundingBox.width;
+                double y1 = n.boundingBox.y;
+                double y2 = n.boundingBox.y+n.boundingBox.height;
+
+                pts.add(new Point2D.Double(x1, y1));
+                pts.add(new Point2D.Double(x2, y1));
+                pts.add(new Point2D.Double(x2, y2));
+                pts.add(new Point2D.Double(x1, y2));
+            }
+            
+            return pts.stream().toArray(Point2D.Double[]::new);            
+        }
+    }
+
+    private Polygon createPolygon(Point2D.Double[] points) {
+        
+        int[] xpoints = new int[points.length];
+        int[] ypoints = new int[points.length];
+        
+        for( int i = 0; i < points.length; ++i ) {
+            xpoints[i] = (int) points[i].x;
+            ypoints[i] = (int) points[i].y;
+        }
+        
+        return new Polygon(xpoints, ypoints, points.length);        
     }
     
     
