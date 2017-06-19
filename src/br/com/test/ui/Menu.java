@@ -41,6 +41,7 @@ import br.com.explore.explorertree.ExplorerTreeNode;
 import br.com.explore.explorertree.ForceLayout;
 import br.com.explore.explorertree.ForceNMAP;
 import br.com.explore.explorertree.Tooltip;
+import br.com.methods.overlap.expadingnode.OverlapTree;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
 import br.com.methods.overlap.incboard.IncBoardExecutor;
 import br.com.methods.overlap.incboard.PointItem;
@@ -261,6 +262,9 @@ public class Menu extends javax.swing.JFrame {
         jSeparator11 = new javax.swing.JPopupMenu.Separator();
         incBoardJMenuItem = new javax.swing.JMenuItem();
         hexBoardJMenuItem = new javax.swing.JMenuItem();
+        jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        overlapTreeJMenuItem = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         sssJMenuItem = new javax.swing.JMenuItem();
         gnatJMenuItem = new javax.swing.JMenuItem();
@@ -416,6 +420,23 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu2.add(hexBoardJMenuItem);
+        jMenu2.add(jSeparator4);
+
+        overlapTreeJMenuItem.setText("OverlapTree");
+        overlapTreeJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                overlapTreeJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu2.add(overlapTreeJMenuItem);
+
+        jMenuItem2.setText("jMenuItem2");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem2);
 
         jMenuBar1.add(jMenu2);
 
@@ -673,7 +694,14 @@ public class Menu extends javax.swing.JFrame {
                 centerPoints = new Point2D.Double[rectangles.size()];
                 for( int i = 0; i < centerPoints.length; ++i )
                     centerPoints[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());               
-
+                
+            
+//                int id = 0;
+//                rectangles.add(new RectangleVis(30, 20, 20, 30, Color.BLUE, id++));
+//                rectangles.add(new RectangleVis(40, 35, 20, 40, Color.BLUE, id++));
+//                rectangles.add(new RectangleVis(55, 20, 20, 35, Color.BLUE, id++));
+//                rectangles.add(new RectangleVis(55, 65, 10, 15, Color.BLUE, id++));
+//                rectangles.add(new RectangleVis(20, 55, 35, 45, Color.BLUE, id++));
                 loadedData = true;
                 if( view != null ) {
                     view.cleanImage();
@@ -1761,6 +1789,105 @@ public class Menu extends javax.swing.JFrame {
             view.repaint();
         }
     }//GEN-LAST:event_fursJMenuItemActionPerformed
+
+    private void overlapTreeJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_overlapTreeJMenuItemActionPerformed
+        
+//        ArrayList<OverlapRect> overlap = Util.toRectangle(rectangles);
+//        overlap = removeOverlap(overlap, 1);
+//        Util.toRectangleVis(rectangles, overlap);
+//        
+//        view.cleanImage();
+//        view.repaint();
+        
+        
+        
+        double[][] distances = new double[rectangles.size()][rectangles.size()];
+        for( int i = 0; i < distances.length; ++i ) {
+            for( int j = 0; j < distances[0].length; ++j )
+                distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
+        }
+        
+        JFileChooser jFileChooser = new JFileChooser();
+        int result = jFileChooser.showOpenDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            try {                 
+                
+                
+                File file = jFileChooser.getSelectedFile();
+                Scanner scn = new Scanner(file);
+                scn.nextLine();
+                scn.nextLine();
+                scn.nextLine();
+                scn.nextLine();
+                ArrayList<ArrayList<Double>> attrs = new ArrayList<>();
+                while( scn.hasNext() ) {
+                    
+                    attrs.add(new ArrayList<>());
+                    String[] linhas = scn.nextLine().split(";");
+                    for( int i = 1; i < linhas.length-1; ++i ) 
+                        attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                        
+                    
+                }
+                
+                // clustering techniques
+                RepresentativeFinder kmeans = new KMeans(Arrays.asList(points), new FarPointsMedoidApproach(), (int)(points.length*0.1));
+                RepresentativeFinder kmedoid = new KMedoid(Arrays.asList(points), new FarPointsMedoidApproach(), (int)(points.length*0.1));
+                RepresentativeFinder bisectingKMeans = new BisectingKMeans(Arrays.asList(points), new FarPointsMedoidApproach(), (int) (points.length*0.1));
+                RepresentativeFinder dbscan = new Dbscan(Arrays.asList(points), 100, (int)(60.0/100.0)*7);
+                
+                // singular value decomposition techniques
+                RepresentativeFinder csm = new CSM(attrs, (int)(attrs.size()*0.2), attrs.size());
+                RepresentativeFinder ksvd = new KSvd(attrs, (int)(attrs.size()*0.1));
+                
+                
+                // dictionary representation
+                // must test with alpha = 0.3
+                RepresentativeFinder ds3 = new DS3(distances, 0.1);
+                RepresentativeFinder smrs = new SMRS(attrs);
+                
+                controller = new ExplorerTreeController(points, 
+                         rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
+                         ds3, 3, RECTSIZE, RECTSIZE/2);
+                
+                controller.build();                
+                controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
+                
+                
+                
+                
+                OverlapTree overlapTree = new OverlapTree(controller);
+                overlapTree.execute();
+                controller = null;
+//                rectangles  = new ArrayList<>();
+//                for( int i = 0; i < overlapTree.test.size(); ++i )
+//                    rectangles.add(new RectangleVis(overlapTree.test.get(i).x, overlapTree.test.get(i).y, 
+//                                                    overlapTree.test.get(i).width, overlapTree.test.get(i).height, 
+//                                                    Color.red, menor));
+                Util.toRectangleVis(rectangles, overlapTree.getProjection());
+
+//                view.cleanImage();
+ //               view.repaint();
+                        
+                view.cleanImage();
+                view.repaint();
+                
+                
+            } catch( IOException e ) {
+                
+            }
+        }
+        
+        
+    }//GEN-LAST:event_overlapTreeJMenuItemActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        ArrayList<OverlapRect> overlap = Util.toRectangle(rectangles);
+        overlap = removeOverlap(overlap, 1);
+        Util.toRectangleVis(rectangles, overlap);
+        
+        view.cleanImage();
+        view.repaint();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
     
     
     public void updateDiagram() {
@@ -1942,8 +2069,8 @@ public class Menu extends javax.swing.JFrame {
     }
     
     
-    private List<OverlapRect> removeOverlap(List<OverlapRect> rect, int rep) {
-        List<OverlapRect> rects = new ArrayList<>();
+    private ArrayList<OverlapRect> removeOverlap(ArrayList<OverlapRect> rect, int rep) {
+        ArrayList<OverlapRect> rects = new ArrayList<>();
         for( int i = 0; i < rect.size(); ++i ) {
             rects.add(new OverlapRect(rect.get(i).x, rect.get(i).y, rect.get(i).width, rect.get(i).height, rect.get(i).getId()));
         }
@@ -2082,7 +2209,7 @@ public class Menu extends javax.swing.JFrame {
 
         int rep = -1;
         List<OverlapRect> toforce = new ArrayList<>();
-        List<OverlapRect> overlaps = new ArrayList<>();
+        ArrayList<OverlapRect> overlaps = new ArrayList<>();
         List<Map.Entry<OverlapRect, OverlapRect>> entryset = projected.entrySet().stream().collect(Collectors.toList());
         for( int i = 0; i < entryset.size(); ++i ) {
             double d = Util.euclideanDistance(entryset.get(i).getKey().x, entryset.get(i).getKey().y, 
@@ -2818,11 +2945,14 @@ public class Menu extends javax.swing.JFrame {
                                     if( controller == null ) {
                                         g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
                                         g2Buffer.setColor(Color.BLUE);
-                                        g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                        g2Buffer.fillRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                        g2Buffer.setColor(Color.BLACK);
+                                        g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                                     }
-//                                    g2Buffer.setColor(Color.RED);
-//                                    g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-//                                    g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10); 
+                                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1f));
+                                    g2Buffer.setColor(Color.RED);
+                                    g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                                    g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX(), (int)r.getUY()+10); 
                                 }
                             }
                         }
@@ -3100,11 +3230,13 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu8;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator10;
     private javax.swing.JPopupMenu.Separator jSeparator11;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
+    private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JPopupMenu.Separator jSeparator8;
     private javax.swing.JPopupMenu.Separator jSeparator9;
     private javax.swing.JMenuItem kMeansJMenuItem;
@@ -3114,6 +3246,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem loadDataJMenuItem;
     private javax.swing.JMenuItem mstJMenuItem;
     private javax.swing.JMenuItem nextDendogramJMenuItem;
+    private javax.swing.JMenuItem overlapTreeJMenuItem;
     private javax.swing.JMenuItem prismJMenuItem;
     private javax.swing.JMenuItem projSnippetJMenuItem;
     private javax.swing.JMenuItem runDs3JMenuItem;

@@ -20,84 +20,105 @@ public class OverlapNode {
     
     
     private List<OverlapNode> instances;
-    private OverlapRect boundingBox;
-    private OverlapRect finalBoundingBox;
+    public OverlapRect boundingBox;
+    public OverlapRect finalBoundingBox;
     private int representative;
     private int id;
+    private boolean leaf;
     
     public OverlapNode(OverlapRect boundingBox) {
         this.boundingBox = boundingBox;
+        this.finalBoundingBox = new OverlapRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
         this.id = boundingBox.getId();
+        leaf = true;
     }
     
     public OverlapNode(List<OverlapNode> instances, int representative) {
         this.instances = instances;        
         this.representative = representative;
+        leaf = false;
     }
     
-    public OverlapRect getBoundingBox() {
-        return boundingBox;
-    }
     
-    private void calculateBoundingBox() {
+    public void calculateBoundingBox() {
         double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE;
-        double maxX = -1.0, maxY = -1.0;
+        double maxX = -Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
+                
         
-        
-        for( OverlapNode e: instances ) {
+        for( int i = 0; i < instances.size(); i++ ) {
+            double x1 = instances.get(i).boundingBox.x;
+            if (maxX < x1)
+                maxX = x1;
+            if (minX > x1)
+                minX = x1;
             
-            double x = e.getBoundingBox().getUX();
-            double y = e.getBoundingBox().getUY();
+            double x2 = instances.get(i).boundingBox.x+instances.get(i).boundingBox.width;
+            if (maxX < x2)
+                maxX = x2;
+            if (minX > x2)
+                minX = x2;
+
+            double y1 = instances.get(i).boundingBox.y;
+            if (maxY < y1)
+                maxY = y1;
+            if (minY > y1)
+                minY = y1;
             
-            if( x < minX ) 
-                minX = x;
-            if( y < minY )
-                minY = y;
-            
-            if( x > maxX )
-                maxX = x;
-            
-            if( y > maxY )
-                maxY = y;            
+            double y2 = instances.get(i).boundingBox.y+instances.get(i).boundingBox.height;
+            if (maxY < y2)
+                maxY = y2;
+            if (minY > y2)
+                minY = y2;
         }
         
-        finalBoundingBox = new OverlapRect(minX, minY, maxX-minX, maxY-minY);
-        boundingBox = new OverlapRect(minX, minY, maxX-minX, maxY-minY);
+        double space = 0;
+        double width = (maxX-minX) + space;
+        double height = (maxY-minY) + space;
+        
+        
+        finalBoundingBox = new OverlapRect(minX, minY, width, height);
+        boundingBox = new OverlapRect(minX, minY, width, height);
+        
     }
     
     public void removeOverlap() {
         
-        List<OverlapNode> subset = new ArrayList<>();
+        List<OverlapNode> subset = instances;
+        /*new ArrayList<>();
         for( int i = 0; i < instances.size(); ++i ) {
-            subset.add(new OverlapNode(new OverlapRect(instances.get(i).getBoundingBox().x, instances.get(i).getBoundingBox().y, 
-                                       instances.get(i).getBoundingBox().width, instances.get(i).getBoundingBox().height, 
-                                       instances.get(i).getBoundingBox().getId())));
-        }
+            subset.add(new OverlapNode(new OverlapRect(instances.get(i).boundingBox.x, instances.get(i).boundingBox.y, 
+                                       instances.get(i).boundingBox.width, instances.get(i).boundingBox.height, 
+                                       instances.get(i).boundingBox.getId())));
+        }*/
         
         Collections.sort(subset, (a, b) -> {
-            return Double.compare(Util.euclideanDistance(b.getBoundingBox().x, b.getBoundingBox().y, 
-                                                         instances.get(representative).getBoundingBox().x, 
-                                                         instances.get(representative).getBoundingBox().y), 
-                                  Util.euclideanDistance(a.getBoundingBox().x, a.getBoundingBox().y, 
-                                                         instances.get(representative).getBoundingBox().x, 
-                                                         instances.get(representative).getBoundingBox().y));
+            return Double.compare(Util.euclideanDistance(b.boundingBox.x, b.boundingBox.y, 
+                                                         instances.get(representative).boundingBox.x, 
+                                                         instances.get(representative).boundingBox.y), 
+                                  Util.euclideanDistance(a.boundingBox.x, a.boundingBox.y, 
+                                                         instances.get(representative).boundingBox.x, 
+                                                         instances.get(representative).boundingBox.y));
         });
         
-        System.out.println("Representative "+instances.get(representative).getBoundingBox().getId());
+        System.out.println("Representative "+instances.get(representative).boundingBox.getId());
         
                 
+        System.out.println("------------------------------------------------------");
         for( int i = 0; i < subset.size(); ++i ) {
+            
+          //  System.out.println(">> "+subset.get(i).boundingBox.x+"  "+subset.get(i).boundingBox.y+"  "+subset.get(i).boundingBox.width+"  "+subset.get(i).boundingBox.height);
+            
             OverlapNode r1 = subset.get(i);
             for( int j = i+1; j < subset.size(); ++j ) {
                 OverlapNode r2 = subset.get(j);
-                if( r1.getBoundingBox().intersects(r2.getBoundingBox()) ) {
-                    System.out.println("Removendo sobrepresentativeosição de "+r1.getBoundingBox().getId()+" e "+r2.getBoundingBox().getId());
-                    double inter = intersection(r1.getBoundingBox(), r2.getBoundingBox());
+                if( r1.boundingBox.intersects(r2.boundingBox) ) {
+                    System.out.println("Removendo sobrepresentativeosição de "+r1.boundingBox.getId()+" e "+r2.boundingBox.getId());
+                    double inter = intersection(r1.boundingBox, r2.boundingBox);
                     
-                    double ax = r2.getBoundingBox().x;
-                    double ay = r2.getBoundingBox().y;
-                    double bx = r1.getBoundingBox().x;
-                    double by = r1.getBoundingBox().y;
+                    double ax = r2.boundingBox.x;
+                    double ay = r2.boundingBox.y;
+                    double bx = r1.boundingBox.x;
+                    double by = r1.boundingBox.y;
 
                     double lenAB = Util.euclideanDistance(ax, ay, bx, by);
                     
@@ -105,15 +126,15 @@ public class OverlapNode {
                         ax += 0.5;
                         //ay += 0.;
                         lenAB = Util.euclideanDistance(ax, ay, bx, by);
-                        inter = intersection(r1.getBoundingBox(), new OverlapRect(ax, ay, r2.getBoundingBox().width, r2.getBoundingBox().height));
+                        inter = intersection(r1.boundingBox, new OverlapRect(ax, ay, r2.boundingBox.width, r2.boundingBox.height));
                     }
 
                     System.out.println("len: "+lenAB+" --  inter: "+inter);
                     double ammountx = (bx-ax)/lenAB * (inter*lenAB - lenAB);
                     double ammounty = (by-ay)/lenAB * (inter*lenAB - lenAB);
                     
-                    r1.getBoundingBox().x = bx+ammountx;
-                    r1.getBoundingBox().y = by+ammounty;
+                    r1.boundingBox.x = bx+ammountx;
+                    r1.boundingBox.y = by+ammounty;
                     
                     
                     for( int o = i; o >= 0; --o ) {                    
@@ -131,28 +152,28 @@ public class OverlapNode {
                                 OverlapRect a = aa.boundingBox;
                                 OverlapRect b = bb.boundingBox;
                                 
-                                return Double.compare(Util.euclideanDistance(a.x, a.y, p.getBoundingBox().x, p.getBoundingBox().y), 
-                                                      Util.euclideanDistance(b.x, b.y, p.getBoundingBox().x, p.getBoundingBox().y));
+                                return Double.compare(Util.euclideanDistance(a.x, a.y, p.boundingBox.x, p.boundingBox.y), 
+                                                      Util.euclideanDistance(b.x, b.y, p.boundingBox.x, p.boundingBox.y));
                             });
 
 
                             for( int k = 0; k < first.size(); ++k ) {
                                 OverlapNode r3 = first.get(k);
-                                if( p.getBoundingBox().intersects(r3.getBoundingBox()) ) {
-                                    System.out.println("Atualizando posições: "+r3.getBoundingBox().getId());
-                                    inter = intersection(p.getBoundingBox(), r3.getBoundingBox());
-                                    ax = p.getBoundingBox().x;
-                                    ay = p.getBoundingBox().y;
-                                    bx = r3.getBoundingBox().x;
-                                    by = r3.getBoundingBox().y;
+                                if( p.boundingBox.intersects(r3.boundingBox) ) {
+                                    System.out.println("Atualizando posições: "+r3.boundingBox.getId());
+                                    inter = intersection(p.boundingBox, r3.boundingBox);
+                                    ax = p.boundingBox.x;
+                                    ay = p.boundingBox.y;
+                                    bx = r3.boundingBox.x;
+                                    by = r3.boundingBox.y;
 
                                     lenAB = Util.euclideanDistance(ax, ay, bx, by);
 
                                     ammountx = (bx-ax)/lenAB * (inter*lenAB - lenAB);
                                     ammounty = (by-ay)/lenAB * (inter*lenAB - lenAB);
 
-                                    r3.getBoundingBox().x = bx + ammountx;
-                                    r3.getBoundingBox().y = by + ammounty;
+                                    r3.boundingBox.x = bx + ammountx;
+                                    r3.boundingBox.y = by + ammounty;
                                 }
                             }
 
@@ -164,7 +185,7 @@ public class OverlapNode {
             }
             
         }
-        
+        System.out.println("------------------------------------------------------");
         instances = subset;
         calculateBoundingBox();
     }
@@ -181,16 +202,18 @@ public class OverlapNode {
         return instances;
     }
 
-    public OverlapRect getFinalBoundingBox() {
-        return finalBoundingBox;
-    }
+    
 
     public void updatePositions(double deltax, double deltay) {
         
         for( int i = 0; i < instances.size(); ++i ) {
-            instances.get(i).boundingBox.moveX(deltax);
-            instances.get(i).boundingBox.moveY(deltay);
+            
+            instances.get(i).boundingBox.x += deltax;
+            instances.get(i).boundingBox.y += deltay;
+            
         }
+        
+        calculateBoundingBox();
         
         
     }
@@ -211,7 +234,13 @@ public class OverlapNode {
         return id;
     }
     
-    
+    public boolean isLeaf() {
+        return leaf;
+    }
+
+    public void setRepresentative(int medoid) {
+        representative = medoid;
+    }
     
     
     

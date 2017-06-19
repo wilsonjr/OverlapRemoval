@@ -177,6 +177,12 @@ public class ExplorerTree {
        _activeNodes.put(parent.routing(), parent);
        
        return toRemove;
+
+    }
+    
+    
+    public Point2D.Double[] projection() {
+        return projection();
     }
     
 }
