@@ -109,7 +109,7 @@ public class OverlapTree {
 
 
         OverlapNode envolvingNode = new OverlapNode(elems, medoid);
-       // envolvingNode.updateInstances();
+        envolvingNode.updateInstances();
         
         
         Point p = new Point(0,0);
@@ -148,20 +148,20 @@ public class OverlapTree {
         //envolvingNode.calculateBoundingBox();
         test.add(envolvingNode.boundingBox);
 
-        for( int i = 0; i < envolvingNode.getInstances().size(); ++i ) {
-
-            double deltax = envolvingNode.getInstances().get(i).boundingBox.x-envolvingNode.getInstances().get(i).finalBoundingBox.x;
-            double deltay = envolvingNode.getInstances().get(i).boundingBox.y-envolvingNode.getInstances().get(i).finalBoundingBox.y;
-
-            System.out.println("Deltax: "+deltax);
-            System.out.println("Deltay: "+deltay);
-
-            envolvingNode.getInstances().get(i).updatePositions(deltax, deltay);
-        }
+//        for( int i = 0; i < envolvingNode.getInstances().size(); ++i ) {
 //
+//            double deltax = envolvingNode.getInstances().get(i).boundingBox.x-envolvingNode.getInstances().get(i).finalBoundingBox.x;
+//            double deltay = envolvingNode.getInstances().get(i).boundingBox.y-envolvingNode.getInstances().get(i).finalBoundingBox.y;
 //
+//            System.out.println("Deltax: "+deltax);
+//            System.out.println("Deltay: "+deltay);
 //
-        envolvingNode.updateInstances();
+//            envolvingNode.getInstances().get(i).updatePositions(deltax, deltay);
+//        }
+////
+////
+////
+//        envolvingNode.updateInstances();
 
         return envolvingNode;
     }

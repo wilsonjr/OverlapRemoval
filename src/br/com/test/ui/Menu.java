@@ -266,7 +266,7 @@ public class Menu extends javax.swing.JFrame {
         hexBoardJMenuItem = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
         overlapTreeJMenuItem = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        expandingEdgeJMenuItem = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         sssJMenuItem = new javax.swing.JMenuItem();
         gnatJMenuItem = new javax.swing.JMenuItem();
@@ -432,13 +432,13 @@ public class Menu extends javax.swing.JFrame {
         });
         jMenu2.add(overlapTreeJMenuItem);
 
-        jMenuItem2.setText("jMenuItem2");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        expandingEdgeJMenuItem.setText("Expanding Edge");
+        expandingEdgeJMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                expandingEdgeJMenuItemActionPerformed(evt);
             }
         });
-        jMenu2.add(jMenuItem2);
+        jMenu2.add(expandingEdgeJMenuItem);
 
         jMenuBar1.add(jMenu2);
 
@@ -1741,7 +1741,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         ds3, 7, RECTSIZE, RECTSIZE/2);
+                         bisectingKMeans, 7, RECTSIZE, RECTSIZE/2);
                 
                 controller.build();                
                 controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
@@ -1802,6 +1802,14 @@ public class Menu extends javax.swing.JFrame {
 //        view.repaint();
         
         
+        for( int i = 0; i < rectangles.size(); ++i ) {
+            points[i].x = rectangles.get(i).x;
+            points[i].y = rectangles.get(i).y;
+        }
+        
+        
+        
+        
         
         double[][] distances = new double[rectangles.size()][rectangles.size()];
         for( int i = 0; i < distances.length; ++i ) {
@@ -1849,7 +1857,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         ds3, 7, RECTSIZE, RECTSIZE/2);
+                         bisectingKMeans, 7, RECTSIZE, RECTSIZE/2);
                 
                 controller.build();                
                 controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
@@ -1882,7 +1890,7 @@ public class Menu extends javax.swing.JFrame {
         
     }//GEN-LAST:event_overlapTreeJMenuItemActionPerformed
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    private void expandingEdgeJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expandingEdgeJMenuItemActionPerformed
         ArrayList<OverlapRect> overlap = Util.toRectangle(rectangles);
         overlap = removeOverlap(overlap, 1);
         Util.toRectangleVis(rectangles, overlap);
@@ -1895,7 +1903,7 @@ public class Menu extends javax.swing.JFrame {
         Area area = new Area();
         
         
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    }//GEN-LAST:event_expandingEdgeJMenuItemActionPerformed
     
     
     public void updateDiagram() {
@@ -2088,7 +2096,7 @@ public class Menu extends javax.swing.JFrame {
                                   Util.euclideanDistance(a.x, a.y, rect.get(rep).x, rect.get(rep).y));
         });
         
-        System.out.println("Representative "+rect.get(rep).getId());
+        //System.out.println("Representative "+rect.get(rep).getId());
         
                 
         for( int i = 0; i < rects.size(); ++i ) {
@@ -2096,7 +2104,7 @@ public class Menu extends javax.swing.JFrame {
             for( int j = i+1; j < rects.size(); ++j ) {
                 OverlapRect r2 = rects.get(j);
                 if( r1.intersects(r2) ) {
-                    System.out.println("Removendo sobreposição de "+r1.getId()+" e "+r2.getId());
+                    //System.out.println("Removendo sobreposição de "+r1.getId()+" e "+r2.getId());
                     double inter = intersection(r1, r2);
                     
                     double ax = r2.x;
@@ -2108,12 +2116,12 @@ public class Menu extends javax.swing.JFrame {
                     
                     if( lenAB == 0.0 ) {
                         ax += 0.5;
-                        //ay += 0.;
+                        ay += 0.5;
                         lenAB = Util.euclideanDistance(ax, ay, bx, by);
                         inter = intersection(r1, new OverlapRect(ax, ay, r2.width, r2.height));
                     }
 
-                    System.out.println("len: "+lenAB+" --  inter: "+inter);
+                    //System.out.println("len: "+lenAB+" --  inter: "+inter);
                     double ammountx = (bx-ax)/lenAB * (inter*lenAB - lenAB);
                     double ammounty = (by-ay)/lenAB * (inter*lenAB - lenAB);
                     
@@ -2141,7 +2149,7 @@ public class Menu extends javax.swing.JFrame {
                             for( int k = 0; k < first.size(); ++k ) {
                                 OverlapRect r3 = first.get(k);
                                 if( p.intersects(r3) ) {
-                                    System.out.println("Atualizando posições: "+r3.getId());
+                                   // System.out.println("Atualizando posições: "+r3.getId());
                                     inter = intersection(p, r3);
                                     ax = p.x;
                                     ay = p.y;
@@ -3222,6 +3230,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem decrementJMenuItem;
     private javax.swing.JMenuItem dijsktraRepresentativeJMenuItem;
     private javax.swing.JMenuItem ds3JMenuItem;
+    private javax.swing.JMenuItem expandingEdgeJMenuItem;
     private javax.swing.JMenuItem extractParametersJMenuItem;
     private javax.swing.JMenuItem fursJMenuItem;
     private javax.swing.JMenuItem gnatJMenuItem;
@@ -3238,7 +3247,6 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu8;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator10;
     private javax.swing.JPopupMenu.Separator jSeparator11;
