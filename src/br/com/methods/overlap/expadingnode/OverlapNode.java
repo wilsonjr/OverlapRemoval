@@ -8,15 +8,9 @@ package br.com.methods.overlap.expadingnode;
 
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
-import java.awt.Polygon;
-import java.awt.geom.Area;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import math.geom2d.polygon.Polygon2D;
-import math.geom2d.polygon.Polygons2D;
-import math.geom2d.polygon.SimplePolygon2D;
 
 /**
  *

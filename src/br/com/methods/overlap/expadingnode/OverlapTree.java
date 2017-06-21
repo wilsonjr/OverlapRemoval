@@ -8,61 +8,36 @@ package br.com.methods.overlap.expadingnode;
 
 import br.com.explore.explorertree.ExplorerTreeController;
 import br.com.explore.explorertree.ExplorerTreeNode;
+import br.com.methods.overlap.OverlapRemoval;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author wilson
  */
-public class OverlapTree {
+public class OverlapTree implements OverlapRemoval {
     
    private ExplorerTreeController controller;
    private int SIZERECT = 20;
-   private ArrayList<OverlapRect> rects;
-   public ArrayList<OverlapRect> test = new ArrayList<>();
-   public int count = 0;
    
    public OverlapTree(ExplorerTreeController controller) {
        this.controller = controller;
    }
    
-   
-   public void execute() {
-       
-       System.out.println("Init removing overlap");
-       OverlapNode node = removeOverlap(controller.explorerTree().topNodes(), count+1);
-//       System.out.println("Finish removing overlap");
-       rects = new ArrayList<>();
-       for( int i = 0; i < node.getInstances().size(); ++i ) {
-           System.out.println(">> "+node.getInstances().get(i).boundingBox.x+"  "+node.getInstances().get(i).boundingBox.y+"  "
-                                   +node.getInstances().get(i).boundingBox.width+"  "+node.getInstances().get(i).boundingBox.height);
-           rects.add(new OverlapRect(node.getInstances().get(i).boundingBox.x, 
-                                     node.getInstances().get(i).boundingBox.y,
-                                     node.getInstances().get(i).boundingBox.width,
-                                     node.getInstances().get(i).boundingBox.height,
-                                     node.getInstances().get(i).boundingBox.getId()));
-       }
-       
-       
-       
-   }
-   
-    private OverlapNode removeOverlap(List<ExplorerTreeNode> nodes, int count) {
-        
+    private OverlapNode removeOverlap(List<ExplorerTreeNode> nodes) {        
         List<OverlapNode> elems = new ArrayList<>();
 
-        for( int i = 0; i < nodes.size(); ++i ) {
-            
-            //if( count == 1 && i != 1 )
-            //    continue;
-            
+        for( int i = 0; i < nodes.size(); ++i ) {            
             if( !nodes.get(i).isChild() ) {
                 
-                OverlapNode overlapNode = removeOverlap(nodes.get(i).children(), count+1);
+                OverlapNode overlapNode = removeOverlap(nodes.get(i).children());
                 elems.add(overlapNode);
 
             } else {
@@ -70,7 +45,6 @@ public class OverlapTree {
                 List<OverlapNode> instances = new ArrayList<>();
 
                 for( int j = 0; j < nodes.get(i).indexes().length; ++j ) {
-
                     instances.add(new OverlapNode(new OverlapRect(nodes.get(i).subprojection()[j].x, 
                                                                   nodes.get(i).subprojection()[j].y, 
                                                                   SIZERECT, SIZERECT, nodes.get(i).indexes()[j])));
@@ -78,22 +52,8 @@ public class OverlapTree {
                 int representative = nodes.get(i).representative(controller.projection());
                 OverlapNode node = new OverlapNode(instances, representative);
                 node.removeOverlap();
-
- //               for( int j = 0; j < node.getInstances().size(); ++j ) {
- //                   rects.add(new OverlapRect(node.getInstances().get(j).boundingBox.x, node.getInstances().get(j).boundingBox.y, 
- //                            node.getInstances().get(j).boundingBox.width, node.getInstances().get(j).boundingBox.height, 
- //                           node.getInstances().get(j).boundingBox.getId()));
- //               }
-
-                System.out.println("NODE>> "+node.boundingBox.x+"  "+node.boundingBox.y+"  "
-                                        +node.boundingBox.width+"  "+node.boundingBox.height);
-                // it isn't necessary to perform update on nodes
-
-            //    if( count == 3 )
-                    test.add(node.boundingBox);
+                
                 elems.add(node);
-
-
             }           
         }
 
@@ -140,13 +100,7 @@ public class OverlapTree {
        
         envolvingNode.setRepresentative(medoid);
         
-        
-        
-        
         envolvingNode.removeOverlap();
-        //if( count == 3 )
-        //envolvingNode.calculateBoundingBox();
-        test.add(envolvingNode.boundingBox);
 
 //        for( int i = 0; i < envolvingNode.getInstances().size(); ++i ) {
 //
@@ -166,8 +120,28 @@ public class OverlapTree {
         return envolvingNode;
     }
 
-    public ArrayList<OverlapRect> getProjection() {
-        return rects;
+    @Override
+    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rects) {
+        
+        OverlapNode node = removeOverlap(controller.explorerTree().topNodes());
+        ArrayList<OverlapRect> reprojected = new ArrayList<>();
+
+        for( int i = 0; i < node.getInstances().size(); ++i ) {
+            reprojected.add(new OverlapRect(node.getInstances().get(i).boundingBox.x, node.getInstances().get(i).boundingBox.y,
+                                            node.getInstances().get(i).boundingBox.width, node.getInstances().get(i).boundingBox.height,
+                                            node.getInstances().get(i).boundingBox.getId()));
+        }
+        
+        Collections.sort(reprojected, (a, b)->{
+            return Integer.compare(a.getId(), b.getId());
+        });
+        
+        
+        Map<OverlapRect, OverlapRect> map = new HashMap<>();
+        for( int i = 0; i < rects.size(); ++i )
+            map.put(rects.get(i), reprojected.get(rects.get(i).getId()));
+        
+        return map;
     }
    
     
