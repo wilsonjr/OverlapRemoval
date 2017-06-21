@@ -53,84 +53,77 @@ public class OneLevelOverlap implements OverlapRemoval {
             return Double.compare(Util.euclideanDistance(b.x, b.y, rect.get(rep).x, rect.get(rep).y), 
                                   Util.euclideanDistance(a.x, a.y, rect.get(rep).x, rect.get(rep).y));
         });
-        
-        //System.out.println("Representative "+rect.get(rep).getId());
-        
-                
         for( int i = 0; i < rects.size(); ++i ) {
             OverlapRect r1 = rects.get(i);
             for( int j = i+1; j < rects.size(); ++j ) {
-                OverlapRect r2 = rects.get(j);
-                if( r1.intersects(r2) ) {
-                    //System.out.println("Removendo sobreposição de "+r1.getId()+" e "+r2.getId());
-                    double inter = intersection(r1, r2);
-                    
-                    double ax = r2.x;
-                    double ay = r2.y;
-                    double bx = r1.x;
-                    double by = r1.y;
+               OverlapRect r2 = rects.get(j);
+               if( r1.intersects(r2) ) {
+                   double inter = intersection(r1, r2);
 
-                    double lenAB = Util.euclideanDistance(ax, ay, bx, by);
-                    
-                    if( lenAB == 0.0 ) {
-                        ax += 0.5;
-                        ay += 0.5;
-                        lenAB = Util.euclideanDistance(ax, ay, bx, by);
-                        inter = intersection(r1, new OverlapRect(ax, ay, r2.width, r2.height));
-                    }
+                   double ax = r2.x;
+                   double ay = r2.y;
+                   double bx = r1.x;
+                   double by = r1.y;
 
-                    //System.out.println("len: "+lenAB+" --  inter: "+inter);
-                    double ammountx = (bx-ax)/lenAB * (inter*lenAB - lenAB);
-                    double ammounty = (by-ay)/lenAB * (inter*lenAB - lenAB);
-                    
-                    r1.x = bx+ammountx;
-                    r1.y = by+ammounty;
-                    
-                    
-                    for( int o = i; o >= 0; --o ) {                    
-                        OverlapRect p = rects.get(o);
+                   double lenAB = Util.euclideanDistance(ax, ay, bx, by);
 
-                        List<OverlapRect> first = new ArrayList<>();
+                   if( lenAB == 0.0 ) {
+                       ax += 0.5;
+                       ay += 0.5;
+                       lenAB = Util.euclideanDistance(ax, ay, bx, by);
+                       inter = intersection(r1, new OverlapRect(ax, ay, r2.width, r2.height));
+                   }
 
-                        for( int k = o-1; k >= 0; --k ) {
-                            first.add(rects.get(k));
-                        }
+                   double ammountx = (bx-ax)/lenAB * (inter*lenAB - lenAB);
+                   double ammounty = (by-ay)/lenAB * (inter*lenAB - lenAB);
 
-                        if( !first.isEmpty() ) {
-
-                            Collections.sort(first, (a, b) -> {
-                                return Double.compare(Util.euclideanDistance(a.x, a.y, p.x, p.y), 
-                                                      Util.euclideanDistance(b.x, b.y, p.x, p.y));
-                            });
+                   r1.x = bx+ammountx;
+                   r1.y = by+ammounty;
 
 
-                            for( int k = 0; k < first.size(); ++k ) {
-                                OverlapRect r3 = first.get(k);
-                                if( p.intersects(r3) ) {
-                                   // System.out.println("Atualizando posições: "+r3.getId());
-                                    inter = intersection(p, r3);
-                                    ax = p.x;
-                                    ay = p.y;
-                                    bx = r3.x;
-                                    by = r3.y;
+                   for( int o = i; o >= 0; --o ) {                    
+                       OverlapRect p = rects.get(o);
 
-                                    lenAB = Util.euclideanDistance(ax, ay, bx, by);
+                       List<OverlapRect> first = new ArrayList<>();
 
-                                    ammountx = (bx-ax)/lenAB * (inter*lenAB - lenAB);
-                                    ammounty = (by-ay)/lenAB * (inter*lenAB - lenAB);
+                       for( int k = o-1; k >= 0; --k ) {
+                           first.add(rects.get(k));
+                       }
 
-                                    r3.x = bx + ammountx;
-                                    r3.y = by + ammounty;
-                                }
-                            }
+                       if( !first.isEmpty() ) {
 
-                        }
-                    }
-                    
-                    
-                } 
+                           Collections.sort(first, (a, b) -> {
+                               return Double.compare(Util.euclideanDistance(a.x, a.y, p.x, p.y), 
+                                                     Util.euclideanDistance(b.x, b.y, p.x, p.y));
+                           });
+
+
+                           for( int k = 0; k < first.size(); ++k ) {
+                               OverlapRect r3 = first.get(k);
+                               if( p.intersects(r3) ) {
+                                   inter = intersection(p, r3);
+                                   ax = p.x;
+                                   ay = p.y;
+                                   bx = r3.x;
+                                   by = r3.y;
+
+                                   lenAB = Util.euclideanDistance(ax, ay, bx, by);
+
+                                   ammountx = (bx-ax)/lenAB * (inter*lenAB - lenAB);
+                                   ammounty = (by-ay)/lenAB * (inter*lenAB - lenAB);
+
+                                   r3.x = bx + ammountx;
+                                   r3.y = by + ammounty;
+                               }
+                           }
+
+                       }
+                   }
+
+
+               } 
             }
-            
+
         }
         
         return rects;        

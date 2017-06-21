@@ -50,8 +50,8 @@ public class OverlapTree implements OverlapRemoval {
                                                                   SIZERECT, SIZERECT, nodes.get(i).indexes()[j])));
                 }
                 int representative = nodes.get(i).representative(controller.projection());
-                OverlapNode node = new OverlapNode(instances, representative);
-                node.removeOverlap();
+                OverlapNode node = new OverlapNode(instances);
+                node.removeOverlap(representative);
                 
                 elems.add(node);
             }           
@@ -68,17 +68,14 @@ public class OverlapTree implements OverlapRemoval {
         }
 
 
-        OverlapNode envolvingNode = new OverlapNode(elems, medoid);
+        OverlapNode envolvingNode = new OverlapNode(elems);
         envolvingNode.updateInstances();
         
         
         Point p = new Point(0,0);
-        for( int i = 0; i < envolvingNode.getInstances().size(); ++i ) {
-            
+        for( int i = 0; i < envolvingNode.getInstances().size(); ++i ) {            
             p.x += envolvingNode.getInstances().get(i).boundingBox.x;
             p.y += envolvingNode.getInstances().get(i).boundingBox.y;
-            
-            
         }
         p.x /= (double)envolvingNode.getInstances().size();
         p.y /= (double)envolvingNode.getInstances().size();
@@ -94,34 +91,18 @@ public class OverlapTree implements OverlapRemoval {
                 medoid = i;
                 d = dist;
             }
-                
         }
         
-       
-        envolvingNode.setRepresentative(medoid);
-        
-        envolvingNode.removeOverlap();
-
-//        for( int i = 0; i < envolvingNode.getInstances().size(); ++i ) {
-//
-//            double deltax = envolvingNode.getInstances().get(i).boundingBox.x-envolvingNode.getInstances().get(i).finalBoundingBox.x;
-//            double deltay = envolvingNode.getInstances().get(i).boundingBox.y-envolvingNode.getInstances().get(i).finalBoundingBox.y;
-//
-//            System.out.println("Deltax: "+deltax);
-//            System.out.println("Deltay: "+deltay);
-//
-//            envolvingNode.getInstances().get(i).updatePositions(deltax, deltay);
-//        }
-////
-////
-////
-//        envolvingNode.updateInstances();
+        envolvingNode.removeOverlap(medoid);
 
         return envolvingNode;
     }
 
     @Override
     public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rects) {
+        
+        
+        controller.build();
         
         OverlapNode node = removeOverlap(controller.explorerTree().topNodes());
         ArrayList<OverlapRect> reprojected = new ArrayList<>();

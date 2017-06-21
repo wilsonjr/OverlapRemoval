@@ -1556,31 +1556,18 @@ public class Menu extends javax.swing.JFrame {
             System.out.println("This line doesn't intersect the rectangle");
         
         
-//        if( rectangles == null )
-//            loadDataJMenuItemActionPerformed(null);
-//        
-//        double[][] distances = new double[rectangles.size()][rectangles.size()];
-//        for( int i = 0; i < distances.length; ++i )
-//            for( int j = 0; j < distances[0].length; ++j )
-//                distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
         
-//        Timer t = new Timer();
-//        t.schedule(new TimerTask() {
-//            private double i = 0.0;
-//            @Override
-//            public void run() {
-//                iImage = i; 
-//                DS3 ds3 = new DS3(distances, i);
-//                ds3.execute();
-//                selectedRepresentatives = ds3.getRepresentatives();
-//                
-//                view.cleanImage();
-//                view.repaint();
-//                i += 0.01;
-//                if( i > 0.5 )
-//                    cancel();
-//            }
-//        }, 0, 1000);        
+        double[][] distances = new double[rectangles.size()][rectangles.size()];
+        for( int i = 0; i < distances.length; ++i )
+            for( int j = 0; j < distances[0].length; ++j )
+                distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
+        
+        DS3 ds3 = new DS3(distances, 0.1);
+        ds3.execute();
+        selectedRepresentatives = ds3.getRepresentatives();
+
+        view.cleanImage();
+        view.repaint();  
         
     }//GEN-LAST:event_ds3JMenuItemActionPerformed
 
@@ -1696,10 +1683,19 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_voronoiDiagramJMenuItemActionPerformed
 
     private void testTreeJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testTreeJMenuItemActionPerformed
+        
+        
+        
         double[][] distances = new double[rectangles.size()][rectangles.size()];
         for( int i = 0; i < distances.length; ++i ) {
             for( int j = 0; j < distances[0].length; ++j )
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
+        }
+        
+        
+        for( int i = 0; i < points.length; ++i ) {
+            points[i].x = rectangles.get(i).x;
+            points[i].y = rectangles.get(i).y;
         }
         
         JFileChooser jFileChooser = new JFileChooser();
@@ -1742,7 +1738,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         ds3, 7, RECTSIZE, RECTSIZE/2);
+                         kmeans, 7, RECTSIZE, RECTSIZE/2);
                 
                 controller.build();                
                 controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
@@ -1846,14 +1842,8 @@ public class Menu extends javax.swing.JFrame {
                 
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         ds3, 30, RECTSIZE, RECTSIZE/2);
-                
-                controller.build();                
-                controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
-                
-                
-                
-                
+                         kmeans, 10, RECTSIZE, RECTSIZE/2);
+              
                 OverlapTree overlapTree = new OverlapTree(controller);
                 ArrayList<OverlapRect> overlap = Util.toRectangle(rectangles);
                 Map<OverlapRect, OverlapRect> projected = overlapTree.applyAndShowTime(overlap);
