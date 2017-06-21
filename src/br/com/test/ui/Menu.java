@@ -1742,7 +1742,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         bisectingKMeans, 7, RECTSIZE, RECTSIZE/2);
+                         ds3, 7, RECTSIZE, RECTSIZE/2);
                 
                 controller.build();                
                 controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
