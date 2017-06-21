@@ -41,6 +41,7 @@ import br.com.explore.explorertree.ExplorerTreeNode;
 import br.com.explore.explorertree.ForceLayout;
 import br.com.explore.explorertree.ForceNMAP;
 import br.com.explore.explorertree.Tooltip;
+import br.com.methods.overlap.expadingnode.OneLevelOverlap;
 import br.com.methods.overlap.expadingnode.OverlapTree;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
 import br.com.methods.overlap.incboard.IncBoardExecutor;
@@ -1794,22 +1795,10 @@ public class Menu extends javax.swing.JFrame {
 
     private void overlapTreeJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_overlapTreeJMenuItemActionPerformed
         
-//        ArrayList<OverlapRect> overlap = Util.toRectangle(rectangles);
-//        overlap = removeOverlap(overlap, 1);
-//        Util.toRectangleVis(rectangles, overlap);
-//        
-//        view.cleanImage();
-//        view.repaint();
-        
-        
         for( int i = 0; i < rectangles.size(); ++i ) {
             points[i].x = rectangles.get(i).x;
             points[i].y = rectangles.get(i).y;
         }
-        
-        
-        
-        
         
         double[][] distances = new double[rectangles.size()][rectangles.size()];
         for( int i = 0; i < distances.length; ++i ) {
@@ -1857,7 +1846,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         bisectingKMeans, 7, RECTSIZE, RECTSIZE/2);
+                         ds3, 30, RECTSIZE, RECTSIZE/2);
                 
                 controller.build();                
                 controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
@@ -1866,18 +1855,13 @@ public class Menu extends javax.swing.JFrame {
                 
                 
                 OverlapTree overlapTree = new OverlapTree(controller);
-                overlapTree.execute();
+                ArrayList<OverlapRect> overlap = Util.toRectangle(rectangles);
+                Map<OverlapRect, OverlapRect> projected = overlapTree.applyAndShowTime(overlap);
+                ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
+                
                 controller = null;
-//                rectangles  = new ArrayList<>();
-//                for( int i = 0; i < overlapTree.test.size(); ++i )
-//                    rectangles.add(new RectangleVis(overlapTree.test.get(i).x, overlapTree.test.get(i).y, 
-//                                                    overlapTree.test.get(i).width, overlapTree.test.get(i).height, 
-//                                                    Color.red, menor));
-                Util.toRectangleVis(rectangles, overlapTree.getProjection());
-
-//                view.cleanImage();
- //               view.repaint();
-                        
+                
+                Util.toRectangleVis(rectangles, projectedValues);                        
                 view.cleanImage();
                 view.repaint();
                 
@@ -1892,8 +1876,11 @@ public class Menu extends javax.swing.JFrame {
 
     private void expandingEdgeJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expandingEdgeJMenuItemActionPerformed
         ArrayList<OverlapRect> overlap = Util.toRectangle(rectangles);
-        overlap = removeOverlap(overlap, 1);
-        Util.toRectangleVis(rectangles, overlap);
+        OneLevelOverlap oneLevelOverlap = new OneLevelOverlap(1);
+        Map<OverlapRect, OverlapRect> projected = oneLevelOverlap.applyAndShowTime(overlap);
+        ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
+        //overlap = removeOverlap(overlap, 1);
+        Util.toRectangleVis(rectangles, projectedValues);
         
         view.cleanImage();
         view.repaint();
