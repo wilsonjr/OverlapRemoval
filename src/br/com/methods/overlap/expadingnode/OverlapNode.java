@@ -84,6 +84,7 @@ public class OverlapNode {
         List<OverlapNode> subset = instances;
         Collections.sort(subset, OverlapNodeComparator.getInstance(subset.get(representative)));
         
+        System.out.println("Removing overlaps, please wait...");
         for( int i = 0; i < subset.size(); ++i ) {
           
             OverlapNode r1 = subset.get(i);
@@ -153,6 +154,7 @@ public class OverlapNode {
                 } 
             }            
         }
+        System.out.println("Removing overlaps, done...");
         
         instances = subset;
         calculateBoundingBox();

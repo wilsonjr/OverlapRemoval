@@ -1844,7 +1844,7 @@ public class Menu extends javax.swing.JFrame {
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
                          kmeans, 10, RECTSIZE, RECTSIZE/2);
               
-                OverlapTree overlapTree = new OverlapTree(controller);
+                OverlapTree overlapTree = new OverlapTree(controller, 1);
                 ArrayList<OverlapRect> overlap = Util.toRectangle(rectangles);
                 Map<OverlapRect, OverlapRect> projected = overlapTree.applyAndShowTime(overlap);
                 ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
