@@ -1844,7 +1844,7 @@ public class Menu extends javax.swing.JFrame {
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
                          kmeans, 10, RECTSIZE, RECTSIZE/2);
               
-                OverlapTree overlapTree = new OverlapTree(controller, 1);
+                OverlapTree overlapTree = new OverlapTree(controller);
                 ArrayList<OverlapRect> overlap = Util.toRectangle(rectangles);
                 Map<OverlapRect, OverlapRect> projected = overlapTree.applyAndShowTime(overlap);
                 ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
@@ -2883,11 +2883,11 @@ public class Menu extends javax.swing.JFrame {
             if( imageBuffer == null ) {
                 adjustPanel();
                 setPreferredSize(getSize());
-                this.imageBuffer = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
+                this.imageBuffer = new BufferedImage(getSize().width, getSize().height, BufferedImage.TYPE_INT_ARGB);
                 
                 java.awt.Graphics2D g2Buffer = this.imageBuffer.createGraphics();
                 g2Buffer.setColor(this.getBackground());
-                g2Buffer.fillRect(0, 0, 1000, 1000);
+                g2Buffer.fillRect(0, 0, getSize().width, getSize().height);
 
                 g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 ArrayList<RectangleVis> pivots = new ArrayList<>();

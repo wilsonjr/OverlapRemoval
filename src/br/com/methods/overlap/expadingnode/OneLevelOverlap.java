@@ -27,32 +27,34 @@ public class OneLevelOverlap implements OverlapRemoval {
     }
 
     @Override
-    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rects) {
+    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rects) {       
                 
         ArrayList<OverlapRect> reprojected = removeOverlap(rects);        
-        Collections.sort(reprojected, (a, b)->{
+        
+        Collections.sort(reprojected, (a, b)-> {
             return Integer.compare(a.getId(), b.getId());
         });
         
-        
         Map<OverlapRect, OverlapRect> map = new HashMap<>();
-        for( int i = 0; i < rects.size(); ++i )
-            map.put(rects.get(i), reprojected.get(rects.get(i).getId()));
-        
+        for( int i = 0; i < reprojected.size(); ++i ) {
+            map.put(rects.get(i), reprojected.get(i));
+        }
         return map;
     }
     
     
     private ArrayList<OverlapRect> removeOverlap(ArrayList<OverlapRect> rect) {
         ArrayList<OverlapRect> rects = new ArrayList<>();
+      
         for( int i = 0; i < rect.size(); ++i ) {
             rects.add(new OverlapRect(rect.get(i).x, rect.get(i).y, rect.get(i).width, rect.get(i).height, rect.get(i).getId()));
         }
-        
+                
         Collections.sort(rects, (a, b) -> {
             return Double.compare(Util.euclideanDistance(b.x, b.y, rect.get(rep).x, rect.get(rep).y), 
                                   Util.euclideanDistance(a.x, a.y, rect.get(rep).x, rect.get(rep).y));
         });
+        
         for( int i = 0; i < rects.size(); ++i ) {
             OverlapRect r1 = rects.get(i);
             for( int j = i+1; j < rects.size(); ++j ) {
@@ -79,7 +81,7 @@ public class OneLevelOverlap implements OverlapRemoval {
 
                    r1.x = bx+ammountx;
                    r1.y = by+ammounty;
-
+                   System.out.println("Updating positions 1");
 
                    for( int o = i; o >= 0; --o ) {                    
                        OverlapRect p = rects.get(o);
@@ -114,6 +116,7 @@ public class OneLevelOverlap implements OverlapRemoval {
 
                                    r3.x = bx + ammountx;
                                    r3.y = by + ammounty;
+                                   System.out.println("Updating positions 2");
                                }
                            }
 
@@ -125,6 +128,7 @@ public class OneLevelOverlap implements OverlapRemoval {
             }
 
         }
+        
         
         return rects;        
     }

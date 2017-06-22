@@ -104,14 +104,14 @@ public class Util {
     public static void toRectangleVis(ArrayList<RectangleVis> ori, ArrayList<OverlapRect> rects) {
         
         for( int i = 0; i < rects.size(); ++i ) {    
-            ori.get(i).setUX(rects.get(i).getUX());
-            ori.get(i).setUY(rects.get(i).getUY());
-            ori.get(i).setWidth(rects.get(i).getWidth());
-            ori.get(i).setHeight(rects.get(i).getHeight());
-            ori.get(i).setPivot(rects.get(i).isPivot());
-            ori.get(i).setLevel(rects.get(i).getLevel());
-            ori.get(i).numero = rects.get(i).getId();
-            ori.get(i).setHealth(rects.get(i).getHealth());
+            ori.get(rects.get(i).getId()).setUX(rects.get(i).getUX());
+            ori.get(rects.get(i).getId()).setUY(rects.get(i).getUY());
+            ori.get(rects.get(i).getId()).setWidth(rects.get(i).getWidth());
+            ori.get(rects.get(i).getId()).setHeight(rects.get(i).getHeight());
+            ori.get(rects.get(i).getId()).setPivot(rects.get(i).isPivot());
+            ori.get(rects.get(i).getId()).setLevel(rects.get(i).getLevel());
+            ori.get(rects.get(i).getId()).numero = rects.get(i).getId();
+            ori.get(rects.get(i).getId()).setHealth(rects.get(i).getHealth());
         }   
     }
      

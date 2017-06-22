@@ -125,7 +125,7 @@ public class OverlapTree implements OverlapRemoval {
 
             map = new HashMap<>();
             for (int i = 0; i < rects.size(); ++i) {
-                map.put(rects.get(i), reprojected.get(rects.get(i).getId()));
+                map.put(rects.get(i), reprojected.get(i));
             }
 
             ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(map);
