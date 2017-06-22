@@ -24,6 +24,7 @@ public class OverlapNode {
     public OverlapRect finalBoundingBox;
     private int id;
     private boolean leaf;
+    private final double MIN_DISTANCE = 0.0000001;
     
     public OverlapNode(OverlapRect boundingBox) {
         this.boundingBox = boundingBox;
@@ -101,7 +102,7 @@ public class OverlapNode {
 
                     double lenAB = Util.euclideanDistance(ax, ay, bx, by);
                     
-                    if( lenAB == 0.0 ) {
+                    if( lenAB <= MIN_DISTANCE ) {
                         ax += 0.5;
                         ay += 0.5;
                         lenAB = Util.euclideanDistance(ax, ay, bx, by);
@@ -138,6 +139,13 @@ public class OverlapNode {
                                     by = r3.boundingBox.y;
 
                                     lenAB = Util.euclideanDistance(ax, ay, bx, by);
+                                    
+                                    if( lenAB <= MIN_DISTANCE ) {
+                                        ax += 0.5;
+                                        ay += 0.5;
+                                        lenAB = Util.euclideanDistance(ax, ay, bx, by);
+                                        inter = intersection(p.boundingBox, new OverlapRect(ax, ay, r3.boundingBox.width, r3.boundingBox.height));
+                                    }
 
                                     ammountx = (bx-ax)/lenAB *(inter*lenAB - lenAB);
                                     ammounty = (by-ay)/lenAB *(inter*lenAB - lenAB);

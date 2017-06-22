@@ -65,6 +65,7 @@ public class ExplorerTree {
         // apply distinction algorithm
         levelOneRepresentatives = Util.distinct(levelOneRepresentatives, _projection, _distinctionDistance);
         //levelOneRepresentatives = selectMedoid(levelOneRepresentatives);
+       
         Map<Integer, List<Integer>> map = Util.createIndex(levelOneRepresentatives, _projection);
         
         Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives before {0}", map.size());

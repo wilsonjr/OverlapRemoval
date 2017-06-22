@@ -21,6 +21,7 @@ import java.util.Map;
  */
 public class OneLevelOverlap implements OverlapRemoval {
     private int rep;
+    private final double MIN_DISTANCE = 0.0000001;
     
     public OneLevelOverlap(int rep) {
         this.rep = rep;
@@ -69,19 +70,18 @@ public class OneLevelOverlap implements OverlapRemoval {
 
                    double lenAB = Util.euclideanDistance(ax, ay, bx, by);
 
-                   if( lenAB == 0.0 ) {
-                       ax += 0.5;
-                       ay += 0.5;
-                       lenAB = Util.euclideanDistance(ax, ay, bx, by);
-                       inter = intersection(r1, new OverlapRect(ax, ay, r2.width, r2.height));
-                   }
+                   if( lenAB <= MIN_DISTANCE ) {
+                        ax += 0.5;
+                        ay += 0.5;
+                        lenAB = Util.euclideanDistance(ax, ay, bx, by);
+                        inter = intersection(r1, new OverlapRect(ax, ay, r2.width, r2.height));
+                    }
 
                    double ammountx = (bx-ax)/lenAB * (inter*lenAB - lenAB);
                    double ammounty = (by-ay)/lenAB * (inter*lenAB - lenAB);
 
                    r1.x = bx+ammountx;
                    r1.y = by+ammounty;
-                   System.out.println("Updating positions 1");
 
                    for( int o = i; o >= 0; --o ) {                    
                        OverlapRect p = rects.get(o);
@@ -110,13 +110,20 @@ public class OneLevelOverlap implements OverlapRemoval {
                                    by = r3.y;
 
                                    lenAB = Util.euclideanDistance(ax, ay, bx, by);
+                                   
+                                   if( lenAB <= MIN_DISTANCE ) {
+                                        ax += 0.5;
+                                        ay += 0.5;
+                                        lenAB = Util.euclideanDistance(ax, ay, bx, by);
+                                        inter = intersection(p, new OverlapRect(ax, ay, r3.width, r3.height));
+                                    }
+
 
                                    ammountx = (bx-ax)/lenAB * (inter*lenAB - lenAB);
                                    ammounty = (by-ay)/lenAB * (inter*lenAB - lenAB);
 
                                    r3.x = bx + ammountx;
                                    r3.y = by + ammounty;
-                                   System.out.println("Updating positions 2");
                                }
                            }
 

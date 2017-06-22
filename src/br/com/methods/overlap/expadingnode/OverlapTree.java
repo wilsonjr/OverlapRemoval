@@ -63,16 +63,7 @@ public class OverlapTree implements OverlapRemoval {
             }
         }
 
-        int medoid = 0;
-        int greater = -1;
-
-        for (int i = 0; i < elems.size(); ++i) {
-            if (elems.get(i).getInstances().size() > greater) {
-                medoid = i;
-                greater = elems.get(i).getInstances().size();
-            }
-        }
-
+        int medoid = -1;
         OverlapNode envolvingNode = new OverlapNode(elems);
         envolvingNode.updateInstances();
 
@@ -124,9 +115,8 @@ public class OverlapTree implements OverlapRemoval {
             });
 
             map = new HashMap<>();
-            for (int i = 0; i < rects.size(); ++i) {
-                System.out.println("*> "+rects.get(i).getId()+" -- "+reprojected.get(i).getId()+"<*");
-                map.put(rects.get(i), reprojected.get(i));
+            for( int i = 0; i < rects.size(); ++i ) {
+                 map.put(rects.get(i), reprojected.get(i));
             }
 
             rects = Util.getProjectedValues(map);
@@ -134,7 +124,6 @@ public class OverlapTree implements OverlapRemoval {
                 return Integer.compare(a.getId(), b.getId());
             });
             
-
             Point2D.Double[] projection = rects.stream().map((v) -> new Point2D.Double(v.x, v.y)).toArray(Point2D.Double[]::new);
             Point2D.Double[] projectionCenter = rects.stream().map((v) -> new Point2D.Double(v.getCenterX(), v.getCenterY()))
                     .toArray(Point2D.Double[]::new);

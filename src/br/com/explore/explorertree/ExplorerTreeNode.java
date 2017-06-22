@@ -584,12 +584,10 @@ public class ExplorerTreeNode {
     public int representative(Point2D.Double[] projection) {
         
         for( int i = 0; i < _subprojection.length; ++i ) {
-            System.out.println(projection[_routing]+" == "+_subprojection[i]+" ?");
             if( projection[_routing].equals(_subprojection[i]) )
                 return i;
         }
         
-        System.out.println("returning -1");
         return -1;        
     }
     

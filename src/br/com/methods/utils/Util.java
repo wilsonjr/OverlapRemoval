@@ -1156,7 +1156,7 @@ public class Util {
         ArrayList<OverlapRect> projectedValues = new ArrayList<>();
         System.out.println("********************");
         projected.entrySet().forEach((element)->{   
-            System.out.println(element.getKey().x+", "+element.getKey().y);
+        //    System.out.println(element.getValue().x+", "+element.getValue().y);
             projectedValues.add(element.getValue());
             projectedValues.get(projectedValues.size()-1).setId(element.getKey().getId());
         });
@@ -1657,7 +1657,7 @@ public class Util {
                     continue;
                 
                 Point2D.Double p1 = points[i];
-                Point2D.Double p2 = points[representatives[j]];
+                Point2D.Double p2 = points[representatives[j]];                
                 
                 double dist = Util.euclideanDistance(p1.x, p1.y, p2.x, p2.y);
                 if( dist < minDist ) {
@@ -1665,7 +1665,6 @@ public class Util {
                     index = j;
                 }
             }
-            
             List<Integer> nearest = hash.get(representatives[index]);
             nearest.add(i);
         }
