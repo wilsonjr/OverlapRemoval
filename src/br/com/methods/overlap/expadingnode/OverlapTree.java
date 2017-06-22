@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.com.methods.overlap.expadingnode;
 
 import br.com.explore.explorertree.ExplorerTreeController;
@@ -12,6 +11,7 @@ import br.com.methods.overlap.OverlapRemoval;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,20 +23,20 @@ import java.util.Map;
  * @author wilson
  */
 public class OverlapTree implements OverlapRemoval {
-    
-   private ExplorerTreeController controller;
-   private int SIZERECT = 20;
-   
-   public OverlapTree(ExplorerTreeController controller) {
-       this.controller = controller;
-   }
-   
-    private OverlapNode removeOverlap(List<ExplorerTreeNode> nodes) {        
+
+    private ExplorerTreeController controller;
+    private int SIZERECT = 20;
+
+    public OverlapTree(ExplorerTreeController controller) {
+        this.controller = controller;
+    }
+
+    private OverlapNode removeOverlap(List<ExplorerTreeNode> nodes) {
         List<OverlapNode> elems = new ArrayList<>();
 
-        for( int i = 0; i < nodes.size(); ++i ) {            
-            if( !nodes.get(i).isChild() ) {
-                
+        for (int i = 0; i < nodes.size(); ++i) {
+            if (!nodes.get(i).isChild()) {
+
                 OverlapNode overlapNode = removeOverlap(nodes.get(i).children());
                 elems.add(overlapNode);
 
@@ -44,55 +44,53 @@ public class OverlapTree implements OverlapRemoval {
 
                 List<OverlapNode> instances = new ArrayList<>();
 
-                for( int j = 0; j < nodes.get(i).indexes().length; ++j ) {
-                    instances.add(new OverlapNode(new OverlapRect(nodes.get(i).subprojection()[j].x, 
-                                                                  nodes.get(i).subprojection()[j].y, 
-                                                                  SIZERECT, SIZERECT, nodes.get(i).indexes()[j])));
+                for (int j = 0; j < nodes.get(i).indexes().length; ++j) {
+                    instances.add(new OverlapNode(new OverlapRect(nodes.get(i).subprojection()[j].x,
+                            nodes.get(i).subprojection()[j].y,
+                            SIZERECT, SIZERECT, nodes.get(i).indexes()[j])));
                 }
                 int representative = nodes.get(i).representative(controller.projection());
                 OverlapNode node = new OverlapNode(instances);
                 node.removeOverlap(representative);
-                
+
                 elems.add(node);
-            }           
+            }
         }
 
         int medoid = 0;
         int greater = -1;
 
-        for( int i = 0; i < elems.size(); ++i ) {
-            if( elems.get(i).getInstances().size() > greater ) {
+        for (int i = 0; i < elems.size(); ++i) {
+            if (elems.get(i).getInstances().size() > greater) {
                 medoid = i;
                 greater = elems.get(i).getInstances().size();
             }
         }
 
-
         OverlapNode envolvingNode = new OverlapNode(elems);
         envolvingNode.updateInstances();
-        
-        
-        Point p = new Point(0,0);
-        for( int i = 0; i < envolvingNode.getInstances().size(); ++i ) {            
+
+        Point p = new Point(0, 0);
+        for (int i = 0; i < envolvingNode.getInstances().size(); ++i) {
             p.x += envolvingNode.getInstances().get(i).boundingBox.x;
             p.y += envolvingNode.getInstances().get(i).boundingBox.y;
         }
-        p.x /= (double)envolvingNode.getInstances().size();
-        p.y /= (double)envolvingNode.getInstances().size();
-        
+        p.x /= (double) envolvingNode.getInstances().size();
+        p.y /= (double) envolvingNode.getInstances().size();
+
         double d = Double.MAX_VALUE;
-        for( int i = 0; i < envolvingNode.getInstances().size(); ++i ) {
-            
+        for (int i = 0; i < envolvingNode.getInstances().size(); ++i) {
+
             double x = envolvingNode.getInstances().get(i).boundingBox.x;
             double y = envolvingNode.getInstances().get(i).boundingBox.y;
-            
+
             double dist = Util.euclideanDistance(p.x, p.y, x, y);
             if( dist < d ) {
                 medoid = i;
                 d = dist;
             }
         }
-        
+
         envolvingNode.removeOverlap(medoid);
 
         return envolvingNode;
@@ -100,34 +98,62 @@ public class OverlapTree implements OverlapRemoval {
 
     @Override
     public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rects) {
-        
-        
+
         controller.build();
-        
+
         OverlapNode node = removeOverlap(controller.explorerTree().topNodes());
         ArrayList<OverlapRect> reprojected = new ArrayList<>();
 
         for( int i = 0; i < node.getInstances().size(); ++i ) {
             reprojected.add(new OverlapRect(node.getInstances().get(i).boundingBox.x, node.getInstances().get(i).boundingBox.y,
-                                            node.getInstances().get(i).boundingBox.width, node.getInstances().get(i).boundingBox.height,
-                                            node.getInstances().get(i).boundingBox.getId()));
+                    node.getInstances().get(i).boundingBox.width, node.getInstances().get(i).boundingBox.height,
+                    node.getInstances().get(i).boundingBox.getId()));
         }
-        
-        Collections.sort(reprojected, (a, b)->{
+
+        Collections.sort(reprojected, (a, b) -> {
             return Integer.compare(a.getId(), b.getId());
         });
-        
-        
+
         Map<OverlapRect, OverlapRect> map = new HashMap<>();
-        for( int i = 0; i < rects.size(); ++i )
+        for (int i = 0; i < rects.size(); ++i) {
             map.put(rects.get(i), reprojected.get(rects.get(i).getId()));
-        
+        }
+
+        ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(map);
+
+        Point2D.Double[] projection = projectedValues.stream().map((v) -> new Point2D.Double(v.x, v.y)).toArray(Point2D.Double[]::new);
+        Point2D.Double[] projectionCenter = projectedValues.stream().map((v) -> new Point2D.Double(v.getCenterX(), v.getCenterY()))
+                .toArray(Point2D.Double[]::new);
+
+        boolean again = true;
+
+        if( again ) {
+
+            controller.setProjection(projection);
+            controller.setProjectionCenter(projectionCenter);
+            controller.build();
+            
+            node = removeOverlap(controller.explorerTree().topNodes());
+            reprojected = new ArrayList<>();
+
+            for( int i = 0; i < node.getInstances().size(); ++i ) {
+                reprojected.add(new OverlapRect(node.getInstances().get(i).boundingBox.x, node.getInstances().get(i).boundingBox.y,
+                        node.getInstances().get(i).boundingBox.width, node.getInstances().get(i).boundingBox.height,
+                        node.getInstances().get(i).boundingBox.getId()));
+            }
+
+            Collections.sort(reprojected, (a, b) -> {
+                return Integer.compare(a.getId(), b.getId());
+            });
+
+            map = new HashMap<>();
+            for( int i = 0; i < rects.size(); ++i ) {
+                map.put(rects.get(i), reprojected.get(rects.get(i).getId()));
+            }
+
+        }
+
         return map;
     }
-   
-    
-    
-    
-    
-    
+
 }
