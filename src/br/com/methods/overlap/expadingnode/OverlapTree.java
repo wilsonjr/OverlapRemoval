@@ -125,13 +125,18 @@ public class OverlapTree implements OverlapRemoval {
 
             map = new HashMap<>();
             for (int i = 0; i < rects.size(); ++i) {
+                System.out.println("*> "+rects.get(i).getId()+" -- "+reprojected.get(i).getId()+"<*");
                 map.put(rects.get(i), reprojected.get(i));
             }
 
-            ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(map);
+            rects = Util.getProjectedValues(map);
+            Collections.sort(rects, (a, b)-> {
+                return Integer.compare(a.getId(), b.getId());
+            });
+            
 
-            Point2D.Double[] projection = projectedValues.stream().map((v) -> new Point2D.Double(v.x, v.y)).toArray(Point2D.Double[]::new);
-            Point2D.Double[] projectionCenter = projectedValues.stream().map((v) -> new Point2D.Double(v.getCenterX(), v.getCenterY()))
+            Point2D.Double[] projection = rects.stream().map((v) -> new Point2D.Double(v.x, v.y)).toArray(Point2D.Double[]::new);
+            Point2D.Double[] projectionCenter = rects.stream().map((v) -> new Point2D.Double(v.getCenterX(), v.getCenterY()))
                     .toArray(Point2D.Double[]::new);
             
             controller.setProjection(projection);

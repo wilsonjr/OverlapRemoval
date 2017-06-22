@@ -65,6 +65,20 @@ public class ExplorerTreeController {
         return _explorerTree;
     }
 
+    public int getMinInstances() {
+        return _minInstances;
+    }
+
+    public RepresentativeFinder getRepresentativeSelection() {
+        return _representativeSelection;
+    }
+
+    public int getDistinctionDistance() {
+        return _distinctionDistance;
+    }
+    
+    
+
     public void build() {
         _explorerTree = new ExplorerTree(_projection, _representativeSelection, _distinctionDistance, _minInstances);
         _explorerTree.build();
