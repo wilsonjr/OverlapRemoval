@@ -1898,6 +1898,60 @@ public class Menu extends javax.swing.JFrame {
         
     }//GEN-LAST:event_expandingEdgeJMenuItemActionPerformed
 
+    
+    public void normalizeVertex(float begin, float end, float[][] proj) {
+        float maxX = proj[0][0];
+        float minX = proj[0][0];
+        float maxY = proj[0][1];
+        float minY = proj[0][1];
+
+        //Encontra o maior e menor valores para X e Y
+        for (visualizer.graph.Vertex v : this.vertex) {
+            if (maxX < v.getX()) {
+                maxX = v.getX();
+            } else {
+                if (minX > v.getX()) {
+                    minX = v.getX();
+                }
+            }
+
+            if (maxY < v.getY()) {
+                maxY = v.getY();
+            } else {
+                if (minY > v.getY()) {
+                    minY = v.getY();
+                }
+            }
+        }
+
+        ///////Fazer a largura ficar proporcional a altura
+        float endX = ((maxX - minX) * end);
+        if (maxY != minY) {
+            endX = ((maxX - minX) * end) / (maxY - minY);
+        }
+        //////////////////////////////////////////////////
+
+        //Normalizo
+        for (visualizer.graph.Vertex v : this.vertex) {
+            if (maxX != minX) {
+                v.setX((((v.getX() - minX) / (maxX - minX)) *
+                        (endX - begin)) + begin);
+            } else {
+                v.setX(begin);
+            }
+
+            if (maxY != minY) {
+                v.setY(((((v.getY() - minY) / (maxY - minY)) *
+                        (end - begin)) + begin));
+            } else {
+                v.setY(begin);
+            }
+
+        }
+    }
+    
+    
+    
     private void testProjectionJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testProjectionJMenuItemActionPerformed
         JFileChooser jFileChooser = new JFileChooser();
         int result = jFileChooser.showOpenDialog(this);
