@@ -39,7 +39,6 @@ import br.com.explore.explorertree.ExplorerTree;
 import br.com.explore.explorertree.ExplorerTreeController;
 import br.com.explore.explorertree.ExplorerTreeNode;
 import br.com.explore.explorertree.ForceLayout;
-import br.com.explore.explorertree.ForceNMAP;
 import br.com.explore.explorertree.Tooltip;
 import br.com.methods.overlap.expadingnode.OneLevelOverlap;
 import br.com.methods.overlap.expadingnode.OverlapTree;
@@ -132,6 +131,14 @@ import math.geom2d.polygon.SimplePolygon2D;
 import nmap.BoundingBox;
 import nmap.Element;
 import nmap.NMap;
+import visualizer.matrix.DenseMatrix;
+import visualizer.matrix.DenseVector;
+import visualizer.matrix.Vector;
+import visualizer.projection.ProjectionData;
+import visualizer.projection.ProjectionFactory;
+import visualizer.projection.ProjectionType;
+import visualizer.projection.ProjectorType;
+import visualizer.projection.distance.DissimilarityType;
 
 /**
  *
@@ -274,6 +281,7 @@ public class Menu extends javax.swing.JFrame {
         mstJMenuItem = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         extractParametersJMenuItem = new javax.swing.JMenuItem();
+        testProjectionJMenuItem = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         kMeansJMenuItem = new javax.swing.JMenuItem();
         kMedoidJMenuItem = new javax.swing.JMenuItem();
@@ -480,6 +488,14 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu4.add(extractParametersJMenuItem);
+
+        testProjectionJMenuItem.setText("Test Projection");
+        testProjectionJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                testProjectionJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu4.add(testProjectionJMenuItem);
 
         jMenuBar1.add(jMenu4);
 
@@ -1881,6 +1897,65 @@ public class Menu extends javax.swing.JFrame {
         
         
     }//GEN-LAST:event_expandingEdgeJMenuItemActionPerformed
+
+    private void testProjectionJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testProjectionJMenuItemActionPerformed
+        JFileChooser jFileChooser = new JFileChooser();
+        int result = jFileChooser.showOpenDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            
+            try {
+                String path = jFileChooser.getSelectedFile().getAbsolutePath();
+
+                DenseMatrix matrix = new DenseMatrix();
+                matrix.load(path);
+
+                System.out.println(matrix.getRowCount());
+                
+                DenseVector vec = (DenseVector) matrix.getRow(10);
+                for( float v:  vec.getValues() ) {
+                    System.out.println(v);
+                }
+                
+                List<Vector> vectors = new ArrayList<>();                
+                vectors.add(matrix.getRow(10));
+                vectors.add(matrix.getRow(103));
+                vectors.add(matrix.getRow(111));
+                vectors.add(matrix.getRow(144));
+                vectors.add(matrix.getRow(147));
+                vectors.add(matrix.getRow(40));
+                vectors.add(matrix.getRow(15));
+                vectors.add(matrix.getRow(107));
+                vectors.add(matrix.getRow(6));
+                vectors.add(matrix.getRow(54));
+                DenseMatrix matrix2 = new DenseMatrix();
+                for( Vector v: vectors )
+                    matrix2.addRow(v);
+                
+                                
+                ProjectionData pdata = new ProjectionData();
+                pdata.setDissimilarityType(DissimilarityType.EUCLIDEAN);
+                pdata.setProjectorType(ProjectorType.FASTMAP);
+                float[][] proj = ProjectionFactory.getInstance(ProjectionType.IDMAP).project(matrix2, pdata, null);
+                
+                DenseMatrix projecao = new DenseMatrix();
+                ArrayList<String> att = new ArrayList<>();
+                att.add("X");
+                att.add("Y");
+                projecao.setAttributes(att);
+                for( int i = 0; i < proj.length; ++i ) {
+                    
+                    projecao.addRow(new DenseVector(proj[i], matrix2.getRow(i).getId(), matrix2.getRow(i).getKlass()));
+                }
+                projecao.save("test.prj");
+            
+                
+                System.out.println("0k");
+            
+            } catch( IOException e ) {
+                
+            }
+        }   
+    }//GEN-LAST:event_testProjectionJMenuItemActionPerformed
     
     
     public void updateDiagram() {
@@ -3252,6 +3327,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem smrsJMenuItem;
     private javax.swing.JMenuItem sssJMenuItem;
     private javax.swing.JScrollPane telaJScrollPane;
+    private javax.swing.JMenuItem testProjectionJMenuItem;
     private javax.swing.JMenuItem testTreeJMenuItem;
     private javax.swing.JMenuItem viewSelectedJMenuItem;
     private javax.swing.JMenuItem voronoiDiagramJMenuItem;
