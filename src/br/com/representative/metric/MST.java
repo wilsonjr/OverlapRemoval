@@ -10,13 +10,10 @@
 
 package br.com.representative.metric;
 
-import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeFinder;
-import java.awt.geom.Point2D;
+import br.com.methods.utils.Vect;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,10 +30,9 @@ public class MST extends AccessMetric {
     private PriorityQueue<SlimTreeNode> nodes;
     private List<SlimTreeNode> clusters;
     
-    private int k;
+    private int k;    
     
-    
-    public MST(List<Point2D.Double> items, int k) {
+    public MST(List<Vect> items, int k) {
         super(items);
         this.k = k;
     }
@@ -91,8 +87,9 @@ public class MST extends AccessMetric {
         List<Edge> edges = new ArrayList<>();
         for( int i = 0; i < vertices.size(); ++i )
             for( int j = i+1; j < vertices.size(); ++j ) {
-                double d = Util.euclideanDistance(vertices.get(i).point().x, vertices.get(i).point().y,
-                                                  vertices.get(j).point().x, vertices.get(j).point().y);
+                //double d = Util.euclideanDistance(vertices.get(i).point().x, vertices.get(i).point().y,
+                //                                  vertices.get(j).point().x, vertices.get(j).point().y);
+                double d = vertices.get(i).point().distance(vertices.get(j).point());                        
                 edges.add(new Edge(vertices.get(i), vertices.get(j), d));
                 edges.add(new Edge(vertices.get(j), vertices.get(i), d));
             }
@@ -103,12 +100,7 @@ public class MST extends AccessMetric {
         for( int i = 0; i < vertices.size(); ++i )
             sets.add(new DisjointSet<>(vertices.get(i)));
         
-        Collections.sort(edges, new Comparator<Edge>() {
-            @Override
-            public int compare(Edge o1, Edge o2) {
-                return Double.compare(o1.distance(), o2.distance());
-            }
-        });       
+        Collections.sort(edges, (Edge o1, Edge o2) -> Double.compare(o1.distance(), o2.distance()));       
         
         
         Map<Integer, List<Integer>> map = new HashMap<>();

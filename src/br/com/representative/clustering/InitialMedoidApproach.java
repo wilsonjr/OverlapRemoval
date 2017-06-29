@@ -5,7 +5,7 @@
  */
 package br.com.representative.clustering;
 
-import java.awt.Point;
+import br.com.methods.utils.Vect;
 import java.util.List;
 
 /**
@@ -14,6 +14,6 @@ import java.util.List;
  */
 public interface InitialMedoidApproach {    
     
-    Point.Double[] getInitialGuess(List<Point.Double> items, int k);
+    Vect[] getInitialGuess(List<Vect> items, int k);
     
 }

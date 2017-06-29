@@ -6,15 +6,12 @@
 package br.com.representative.clustering.furs;
 
 import br.com.methods.utils.KNN;
-import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Pair;
 import br.com.methods.utils.Vect;
 import br.com.representative.clustering.Partitioning;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -26,7 +23,7 @@ public class FURS extends Partitioning {
     private float deltaS;
     private float deltaK;
 
-    public FURS(List<Point2D.Double> items, int s, int k, float deltaS, float deltaK) {
+    public FURS(List<Vect> items, int s, int k, float deltaS, float deltaK) {
         super(items);
         this.s = s;
         this.k = k;
@@ -38,9 +35,10 @@ public class FURS extends Partitioning {
     public void execute() {
         
         
-        List<OverlapRect> points = items.stream().map((v)->new OverlapRect(v.x, v.y, 0, 0)).collect(Collectors.toList());
+        //List<OverlapRect> points = items.stream().map((v)->new OverlapRect(v.x, v.y, 0, 0)).collect(Collectors.toList());
+        
         KNN knn = new KNN(k);
-        Pair[][] knnPoints = knn.execute(points);
+        Pair[][] knnPoints = knn.executeVect(items);
         
         List<Node> nodes = new ArrayList<>();
         for( int i = 0; i < knnPoints.length; ++i ) 

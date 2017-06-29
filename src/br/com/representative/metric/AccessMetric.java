@@ -5,8 +5,8 @@
  */
 package br.com.representative.metric;
 
+import br.com.methods.utils.Vect;
 import br.com.representative.RepresentativeFinder;
-import java.awt.geom.Point2D;
 import java.util.List;
 
 /**
@@ -14,10 +14,10 @@ import java.util.List;
  * @author Windows
  */
 public abstract class AccessMetric extends RepresentativeFinder {
-    protected List<Point2D.Double> finalItems;
-    protected List<Point2D.Double> items;
+    protected List<Vect> finalItems;
+    protected List<Vect> items;
     
-    public AccessMetric(List<Point2D.Double> items) {
+    public AccessMetric(List<Vect> items) {
         this.finalItems = items;
         this.items = items;
     }

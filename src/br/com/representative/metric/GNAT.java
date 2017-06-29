@@ -11,6 +11,7 @@
 package br.com.representative.metric;
 
 import br.com.methods.utils.Util;
+import br.com.methods.utils.Vect;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.Random;
 public class GNAT extends AccessMetric {
     private int k;
     
-    public GNAT(List<Point2D.Double> items, int k) {
+    public GNAT(List<Vect> items, int k) {
         super(items);
         
         if( items.isEmpty() )
@@ -58,7 +59,7 @@ public class GNAT extends AccessMetric {
         } 
     }
     
-    private void findBestPartPoint(List<Integer> pivots, List<Point2D.Double> set) {
+    private void findBestPartPoint(List<Integer> pivots, List<Vect> set) {
         double dist = Double.MIN_VALUE;
         int pivot = -1;
         
@@ -69,7 +70,8 @@ public class GNAT extends AccessMetric {
             
             double menor = Double.MAX_VALUE;
             for( int j = 0; j < pivots.size(); ++j ) {
-                double d = Util.euclideanDistance(set.get(i).x, set.get(i).y, set.get(pivots.get(j)).x, set.get(pivots.get(j)).y);
+                //double d = Util.euclideanDistance(set.get(i).x, set.get(i).y, set.get(pivots.get(j)).x, set.get(pivots.get(j)).y);
+                double d = set.get(i).distance(set.get(pivots.get(j)));
                 menor = Math.min(d, menor);
             }
             

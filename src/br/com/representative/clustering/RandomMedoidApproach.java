@@ -5,7 +5,7 @@
  */
 package br.com.representative.clustering;
 
-import java.awt.geom.Point2D;
+import br.com.methods.utils.Vect;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +16,10 @@ import java.util.List;
 public class RandomMedoidApproach implements InitialMedoidApproach {
 
     @Override
-    public Point2D.Double[] getInitialGuess(List<Point2D.Double> items, int k) {
+    public Vect[] getInitialGuess(List<Vect> items, int k) {
         
         ArrayList<Integer> selected = new ArrayList<>();
-        Point2D.Double[] medoids = new Point2D.Double[k];
+        Vect[] medoids = new Vect[k];
         int count = 0;
         
         while( count < k ) {

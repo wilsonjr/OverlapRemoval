@@ -7,8 +7,8 @@
 package br.com.representative.clustering.partitioning;
 
 import br.com.methods.utils.Util;
+import br.com.methods.utils.Vect;
 import br.com.representative.clustering.Partitioning;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class Dbscan extends Partitioning {
     private double epsilon;
     private int minPts;
     
-    public Dbscan(List<Point.Double> items, double epsilon, int minPts) {
+    public Dbscan(List<Vect> items, double epsilon, int minPts) {
         super(items);
                
         this.currentCluster = 0;
@@ -72,7 +72,8 @@ public class Dbscan extends Partitioning {
         
         ArrayList<DbscanPoint> seeds = new ArrayList<>();
         for( int i = 0; i < points.size(); ++i ) {
-            double d = Util.euclideanDistance(p.point.x, p.point.y, points.get(i).point.x, points.get(i).point.y);
+            //double d = Util.euclideanDistance(p.point.x, p.point.y, points.get(i).point.x, points.get(i).point.y);
+            double d = p.point.distance(points.get(i).point);
             if( d < epsilon ) 
                 seeds.add(points.get(i));
         }
@@ -85,7 +86,8 @@ public class Dbscan extends Partitioning {
                 DbscanPoint first = seeds.get(0);
                 ArrayList<DbscanPoint> nseeds = new ArrayList<>();
                 for( int i = 0; i < points.size(); ++i ) {
-                    double d = Util.euclideanDistance(first.point.x, first.point.y, points.get(i).point.x, points.get(i).point.y);
+                    //double d = Util.euclideanDistance(first.point.x, first.point.y, points.get(i).point.x, points.get(i).point.y);
+                    double d = first.point.distance(points.get(i).point);
                     if( d < epsilon ) 
                         nseeds.add(points.get(i));
                 }
@@ -109,10 +111,10 @@ public class Dbscan extends Partitioning {
     
     private class DbscanPoint {
         
-        public Point.Double point;
+        public Vect point;
         public int cluster;
         
-        public DbscanPoint(Point.Double point) {
+        public DbscanPoint(Vect point) {
             this.point = point;
             this.cluster = -1;
         }

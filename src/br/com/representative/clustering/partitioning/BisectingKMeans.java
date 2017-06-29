@@ -8,6 +8,7 @@ package br.com.representative.clustering.partitioning;
 
 import br.com.representative.clustering.InitialMedoidApproach;
 import br.com.methods.utils.Util;
+import br.com.methods.utils.Vect;
 import br.com.representative.clustering.KMethod;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -21,14 +22,15 @@ import java.util.Map;
  */
 public class BisectingKMeans extends KMethod {
     
-    public BisectingKMeans(List<Point.Double> items, InitialMedoidApproach initialGuess, int k) {
+    public BisectingKMeans(List<Vect> items, InitialMedoidApproach initialGuess, int k) {
         super(items, initialGuess, k);
     }
     
     @Override
     public void execute() {
-        List<Point.Double> tempCentroids = new ArrayList<>();
-        tempCentroids.add(new Point.Double(0, 0));
+        List<Vect> tempCentroids = new ArrayList<>();
+        //tempCentroids.add(new Point.Double(0, 0));
+        tempCentroids.add(new Vect(items.get(0).vector().length));
         
         // we start with the whole data as a cluster         
         clusters = new ArrayList<>();        
@@ -59,13 +61,13 @@ public class BisectingKMeans extends KMethod {
             clusters.add(chosenSplit.get(1));            
         }
        
-        centroids = tempCentroids.stream().toArray(Point.Double[]::new);
+        centroids = tempCentroids.stream().toArray(Vect[]::new);
         representatives = Util.selectRepresentatives(centroids, items);
     }
     
     
     private List<List<Integer>> chooseSplit(List<Integer> cluster) {
-        ArrayList<Point.Double> clusterItems = new ArrayList<>();
+        ArrayList<Vect> clusterItems = new ArrayList<>();
         Map<Integer, Integer> mapIndex = new HashMap<>();
         for( int j = 0; j < cluster.size(); ++j ) {
             clusterItems.add(items.get(cluster.get(j)));
@@ -90,9 +92,12 @@ public class BisectingKMeans extends KMethod {
             double ec = 0;
 
             for( int j = 0; j < centroids.length; ++j ) {
-                for( int k = 0; k < splitCluster.get(j).size(); ++k ) 
-                    ec += Util.euclideanDistance(centroids[j].x, centroids[j].y, 
-                            items.get(splitCluster.get(j).get(k)).x, items.get(splitCluster.get(j).get(k)).y);
+                for( int k = 0; k < splitCluster.get(j).size(); ++k ) {
+                    //ec += Util.euclideanDistance(centroids[j].x, centroids[j].y, 
+                    //        items.get(splitCluster.get(j).get(k)).x, items.get(splitCluster.get(j).get(k)).y);
+                    ec += centroids[j].distance(items.get(splitCluster.get(j).get(k)));
+                    
+                }
             }
 
             if( ec < minEc ) {

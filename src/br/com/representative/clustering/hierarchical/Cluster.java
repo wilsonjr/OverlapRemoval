@@ -6,8 +6,7 @@
 
 package br.com.representative.clustering.hierarchical;
 
-import br.com.methods.utils.Util;
-import java.awt.Point;
+import br.com.methods.utils.Vect;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,18 +16,18 @@ import java.util.List;
  */
 public class Cluster {
     private String id;
-    private ArrayList<Point.Double> points = new ArrayList<>();
+    private ArrayList<Vect> points = new ArrayList<>();
     private ArrayList<Cluster> sons = new ArrayList<>();
     private Cluster parent;
     private HierarchicalClustering hc;
     
-    public Cluster(Point.Double r, int id) {
+    public Cluster(Vect r, int id) {
         parent = null;
         points.add(r);
         this.id = String.valueOf(id);
     }
     
-    public Cluster(Point.Double r, int id, HierarchicalClustering hc) {
+    public Cluster(Vect r, int id, HierarchicalClustering hc) {
         this(r, id);
         this.hc = hc;
     }
@@ -51,11 +50,11 @@ public class Cluster {
         return sons;
     }
     
-    public void addPoints(List<Point.Double> p) {        
+    public void addPoints(List<Vect> p) {        
         points.addAll(p);
     }
     
-    public List<Point.Double> getPoints() {
+    public List<Vect> getPoints() {
         return points;
     }
     
@@ -72,7 +71,8 @@ public class Cluster {
     }
 
     public double distanceTo(Cluster c) {
-        return Util.euclideanDistance(points.get(0).x, points.get(0).y, c.getPoints().get(0).x, c.getPoints().get(0).y);
+        //return Util.euclideanDistance(points.get(0).x, points.get(0).y, c.getPoints().get(0).x, c.getPoints().get(0).y);
+        return points.get(0).distance(c.getPoints().get(0));
     }
     
     @Override

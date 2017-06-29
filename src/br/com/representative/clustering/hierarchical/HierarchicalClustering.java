@@ -7,8 +7,8 @@
 package br.com.representative.clustering.hierarchical;
 
 import br.com.methods.utils.Util;
+import br.com.methods.utils.Vect;
 import br.com.representative.clustering.Clustering;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ public class HierarchicalClustering extends Clustering {
     private List<List<List<Integer>>> clusterHierarchy;
     private int dendogramLevel = 0;
     
-    public HierarchicalClustering(ArrayList<Point.Double> items, LinkageStrategy linkageStrategy) {                
+    public HierarchicalClustering(ArrayList<Vect> items, LinkageStrategy linkageStrategy) {                
         super(items);
         this.linkageStrategy = linkageStrategy;
     }
@@ -108,7 +108,7 @@ public class HierarchicalClustering extends Clustering {
     }
 
     
-    private void createClusters(List<Point.Double> items) {
+    private void createClusters(List<Vect> items) {
         clusters = new ArrayList<>();      
         clusterHierarchy = new ArrayList<>();
         clusterHierarchy.add(new ArrayList<>());

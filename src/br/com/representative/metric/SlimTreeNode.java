@@ -6,8 +6,7 @@
 
 package br.com.representative.metric;
 
-import br.com.methods.utils.Util;
-import java.awt.geom.Point2D;
+import br.com.methods.utils.Vect;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +17,7 @@ import java.util.List;
 public class SlimTreeNode implements Comparable<SlimTreeNode> {
     private List<Instance> points;
     
-    public SlimTreeNode(List<Point2D.Double> points) {
+    public SlimTreeNode(List<Vect> points) {
         this.points = new ArrayList<>();
         for( int i = 0; i < points.size(); ++i )
             this.points.add(new Instance(points.get(i), i));
@@ -28,7 +27,7 @@ public class SlimTreeNode implements Comparable<SlimTreeNode> {
         points = new ArrayList<>();
     }
     
-    public void add(Point2D.Double p, int index) {
+    public void add(Vect p, int index) {
         points.add(new Instance(p, index));
     }
     
@@ -41,7 +40,7 @@ public class SlimTreeNode implements Comparable<SlimTreeNode> {
         return Integer.compare(o.size(), size());
     }
 
-    public Point2D.Double get(int i) {
+    public Vect get(int i) {
         return points.get(i).p;
     }
     
@@ -51,19 +50,28 @@ public class SlimTreeNode implements Comparable<SlimTreeNode> {
 
     public int medoid() {
         
-        Point2D.Double centroid = new Point2D.Double(0, 0);
-        for( int i = 0; i < points.size(); ++i ) {
-            centroid.x += points.get(i).p.x;
-            centroid.y += points.get(i).p.y;
-        }
+//        Point2D.Double centroid = new Point2D.Double(0, 0);
+//        for( int i = 0; i < points.size(); ++i ) {
+//            centroid.x += points.get(i).p.x;
+//            centroid.y += points.get(i).p.y;
+//        }
+//        
+//        centroid.x /= points.size();
+//        centroid.y /= points.size();
         
-        centroid.x /= points.size();
-        centroid.y /= points.size();
+        Vect centroid = new Vect(points.get(0).p.vector().length);
+        for( int i = 0; i < points.size(); ++i ) {
+            centroid.add(points.get(i).p);
+        }
+        centroid.divide(points.size());
+        
+        
         
         int indexCentroid = -1;
         double minDist = Double.MAX_VALUE;
         for( int i = 0; i < points.size(); ++i ) {
-            double d = Util.euclideanDistance(centroid.x, centroid.y, points.get(i).p.x, points.get(i).p.y);
+            //double d = Util.euclideanDistance(centroid.x, centroid.y, points.get(i).p.x, points.get(i).p.y);
+            double d = centroid.distance(points.get(i).p);
             if( d < minDist ) {
                 minDist = d;
                 indexCentroid = i;
@@ -75,10 +83,10 @@ public class SlimTreeNode implements Comparable<SlimTreeNode> {
     
     
     private class Instance {
-        private Point2D.Double p;
+        private Vect p;
         private int i;
         
-        public Instance(Point2D.Double p, int index) {
+        public Instance(Vect p, int index) {
             this.p = p;
             this.i = index;
         }

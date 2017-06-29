@@ -10,8 +10,7 @@
 
 package br.com.representative.metric;
 
-import br.com.methods.utils.Util;
-import java.awt.geom.Point2D;
+import br.com.methods.utils.Vect;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class SSS extends AccessMetric {
     private double alpha;
     private double maxDistance;
     
-    public SSS(List<Point2D.Double> items, double alpha, double maxDistance) {
+    public SSS(List<Vect> items, double alpha, double maxDistance) {
         super(items);
         
         if( items.isEmpty() )
@@ -35,17 +34,15 @@ public class SSS extends AccessMetric {
 
     @Override
     public void execute() {
-        
-        
         List<Integer> pivots = new ArrayList<>();
-        pivots.add(0);
-        
+        pivots.add(0);        
         
         for( int i = 1; i < items.size(); ++i ) {
             boolean pivot = true;
             
             for( Integer p: pivots ) {
-                double d = Util.euclideanDistance(items.get(p).x, items.get(p).y, items.get(i).x, items.get(i).y);
+                //double d = Util.euclideanDistance(items.get(p).x, items.get(p).y, items.get(i).x, items.get(i).y);
+                double d = items.get(p).distance(items.get(i));
                 if( d < maxDistance*alpha ) {
                     pivot = false;
                     break;
@@ -67,7 +64,8 @@ public class SSS extends AccessMetric {
         double distance = -1;
         for( int i = 0; i < items.size(); ++i )
             for( int j = i+1; j < items.size(); ++j ) {
-                double d = Util.euclideanDistance(items.get(i).x, items.get(i).y, items.get(j).x, items.get(j).y);
+                //double d = Util.euclideanDistance(items.get(i).x, items.get(i).y, items.get(j).x, items.get(j).y);
+                double d = items.get(i).distance(items.get(j));
                 if( distance < d ) 
                     distance = d;
             }

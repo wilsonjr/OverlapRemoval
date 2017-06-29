@@ -178,7 +178,7 @@ public class Menu extends javax.swing.JFrame {
     private int[][] heatmap = null;
     private int maxValue;
     private Point2D.Double[] centerPoints = null;
-    private ArrayList<Point2D.Double> items = null;
+    private ArrayList<Vect> items = null;
     private Point2D.Double[] points = null;
     private ExplorerTree explorerTree;
     
@@ -698,7 +698,7 @@ public class Menu extends javax.swing.JFrame {
                 rectangles.clear();
                 //RainbowScale rbS = new RainbowScale();
                 GrayScale rbS = new GrayScale();
-                
+                List<Point2D.Double> pts = new ArrayList<>();
                 int id = 0;
                 while( scn.hasNext() ) {
                     String[] linha = scn.nextLine().split(";");
@@ -707,10 +707,11 @@ public class Menu extends javax.swing.JFrame {
                     int grupo = id;//Integer.parseInt(linha[3]);
 
                     rectangles.add(new RectangleVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo*10)%255), id++));   
-                    items.add(new Point2D.Double(x, y));
+                    items.add(new Vect(new double[]{x, y}));
+                    pts.add(new Point2D.Double(x, y));
                 }
                 
-                points = items.stream().toArray(Point2D.Double[]::new);
+                points = pts.stream().toArray(Point2D.Double[]::new);
                 centerPoints = new Point2D.Double[rectangles.size()];
                 for( int i = 0; i < centerPoints.length; ++i )
                     centerPoints[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());               
@@ -1172,9 +1173,9 @@ public class Menu extends javax.swing.JFrame {
 
     private void mstJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mstJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        ArrayList<Point.Double> elems = new ArrayList<>();
+        ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
         RepresentativeFinder mst = new MST(elems, 15);
         mst.execute();
@@ -1312,10 +1313,10 @@ public class Menu extends javax.swing.JFrame {
 
     private void hierarchicalClusteringJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hierarchicalClusteringJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        ArrayList<Point.Double> points = new ArrayList<>();
+        ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            points.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
-        hc = new HierarchicalClustering(points, new SingleLinkageStrategy());        
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
+        hc = new HierarchicalClustering(elems, new SingleLinkageStrategy());        
         hc.execute();
         
         nivelDendrogram = 0;
@@ -1350,12 +1351,14 @@ public class Menu extends javax.swing.JFrame {
 
     private void kMeansJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kMeansJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        ArrayList<Point.Double> elems = new ArrayList<>();
+        ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
                 
         RepresentativeFinder kmeans = new KMeans(elems, new FarPointsMedoidApproach(), 3);
+        System.out.println("Init kmeans");
         kmeans.execute();
+        System.out.println("Finished kmeans");
         currentCluster = ((KMeans)kmeans).getClusters();        
         selectedRepresentatives = kmeans.getRepresentatives();
         selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
@@ -1369,9 +1372,9 @@ public class Menu extends javax.swing.JFrame {
 
     private void kMedoidJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kMedoidJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        ArrayList<Point.Double> elems = new ArrayList<>();
+        ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
                 
         RepresentativeFinder kmedoid = new KMedoid(elems, new FarPointsMedoidApproach(), 4);
         kmedoid.execute();
@@ -1388,9 +1391,9 @@ public class Menu extends javax.swing.JFrame {
 
     private void bisectingKMeansJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bisectingKMeansJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        ArrayList<Point.Double> elems = new ArrayList<>();
+        ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
         RepresentativeFinder bkmeans = new BisectingKMeans(elems, new FarPointsMedoidApproach(), 4);
         bkmeans.execute();
@@ -1407,9 +1410,9 @@ public class Menu extends javax.swing.JFrame {
 
     private void dbscanJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbscanJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        ArrayList<Point.Double> elems = new ArrayList<>();
+        ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Point.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY()));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
         RepresentativeFinder dbscan = new Dbscan(elems,100, (int)(60.0/100.0)*7);
         dbscan.execute();
@@ -1701,8 +1704,6 @@ public class Menu extends javax.swing.JFrame {
 
     private void testTreeJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testTreeJMenuItemActionPerformed
         
-        
-        
         double[][] distances = new double[rectangles.size()][rectangles.size()];
         for( int i = 0; i < distances.length; ++i ) {
             for( int j = 0; j < distances[0].length; ++j )
@@ -1736,12 +1737,16 @@ public class Menu extends javax.swing.JFrame {
                         attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                        
                     
                 }
+                List<Vect> elements = new ArrayList<>();
+                for( int i = 0; i < points.length; ++i ) {
+                    elements.add(new Vect(new double[]{points[i].x, points[i].y}));
+                }
                 
                 // clustering techniques
-                RepresentativeFinder kmeans = new KMeans(Arrays.asList(points), new FarPointsMedoidApproach(), (int)(points.length*0.1));
-                RepresentativeFinder kmedoid = new KMedoid(Arrays.asList(points), new FarPointsMedoidApproach(), (int)(points.length*0.1));
-                RepresentativeFinder bisectingKMeans = new BisectingKMeans(Arrays.asList(points), new FarPointsMedoidApproach(), (int) (points.length*0.1));
-                RepresentativeFinder dbscan = new Dbscan(Arrays.asList(points), 100, (int)(60.0/100.0)*7);
+                RepresentativeFinder kmeans = new KMeans(elements, new FarPointsMedoidApproach(), (int)(points.length*0.1));
+                RepresentativeFinder kmedoid = new KMedoid(elements, new FarPointsMedoidApproach(), (int)(points.length*0.1));
+                RepresentativeFinder bisectingKMeans = new BisectingKMeans(elements, new FarPointsMedoidApproach(), (int) (points.length*0.1));
+                RepresentativeFinder dbscan = new Dbscan(elements, 100, (int)(60.0/100.0)*7);
                 
                 // singular value decomposition techniques
                 RepresentativeFinder csm = new CSM(attrs, (int)(attrs.size()*0.2), attrs.size());
@@ -1752,7 +1757,7 @@ public class Menu extends javax.swing.JFrame {
                 // must test with alpha = 0.3
                 RepresentativeFinder ds3 = new DS3(distances, 0.1);
                 RepresentativeFinder smrs = new SMRS(attrs);
-                RepresentativeFinder furs = new FURS(Arrays.asList(points), (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
+                RepresentativeFinder furs = new FURS(elements, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
                 
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
@@ -1776,8 +1781,11 @@ public class Menu extends javax.swing.JFrame {
     private void affinityPropagationJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_affinityPropagationJMenuItemActionPerformed
         if( rectangles == null )
             loadDataJMenuItemActionPerformed(null);
+        ArrayList<Vect> elems = new ArrayList<>();
+        for( int i = 0; i < points.length; ++i )
+            elems.add(new Vect(new double[]{points[i].x, points[i].y}));
         
-        RepresentativeFinder affinityPropagation = new AffinityPropagation(Arrays.asList(points));
+        RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
         System.out.println("Init Affinity Propagation execution");
         affinityPropagation.execute();
         System.out.println("Finished Affinity Propagation execution");
@@ -1794,7 +1802,12 @@ public class Menu extends javax.swing.JFrame {
         if( rectangles == null )
             loadDataJMenuItemActionPerformed(null);
         
-        FURS furs = new FURS(Arrays.asList(points), (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+        ArrayList<Vect> elems = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i )
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
+        
+        FURS furs = new FURS(elems, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
         System.out.println("Init FURS");
         //furs.execute();
         //selectedRepresentatives =  furs.getRepresentatives(); 
@@ -1849,11 +1862,16 @@ public class Menu extends javax.swing.JFrame {
                     
                 }
                 
+                List<Vect> elements = new ArrayList<>();
+                for( int i = 0; i < points.length; ++i ) {
+                    elements.add(new Vect(new double[]{points[i].x, points[i].y}));
+                }
+                
                 // clustering techniques
-                RepresentativeFinder kmeans = new KMeans(Arrays.asList(points), new FarPointsMedoidApproach(), 10);
-                RepresentativeFinder kmedoid = new KMedoid(Arrays.asList(points), new FarPointsMedoidApproach(), (int)(points.length*0.1));
-                RepresentativeFinder bisectingKMeans = new BisectingKMeans(Arrays.asList(points), new FarPointsMedoidApproach(), (int) (points.length*0.1));
-                RepresentativeFinder dbscan = new Dbscan(Arrays.asList(points), 100, (int)(60.0/100.0)*7);
+                RepresentativeFinder kmeans = new KMeans(elements, new FarPointsMedoidApproach(), (int)(points.length*0.1));
+                RepresentativeFinder kmedoid = new KMedoid(elements, new FarPointsMedoidApproach(), (int)(points.length*0.1));
+                RepresentativeFinder bisectingKMeans = new BisectingKMeans(elements, new FarPointsMedoidApproach(), (int) (points.length*0.1));
+                RepresentativeFinder dbscan = new Dbscan(elements, 100, (int)(60.0/100.0)*7);
                 
                 // singular value decomposition techniques
                 RepresentativeFinder csm = new CSM(attrs, (int)(attrs.size()*0.2), attrs.size());
@@ -1864,6 +1882,7 @@ public class Menu extends javax.swing.JFrame {
                 // must test with alpha = 0.3
                 RepresentativeFinder ds3 = new DS3(distances, 0.1);
                 RepresentativeFinder smrs = new SMRS(attrs);
+                RepresentativeFinder furs = new FURS(elements, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
                 
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),

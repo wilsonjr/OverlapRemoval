@@ -5,7 +5,7 @@
  */
 package br.com.representative.clustering;
 
-import java.awt.Point;
+import br.com.methods.utils.Vect;
 import java.util.List;
 
 /**
@@ -15,7 +15,7 @@ import java.util.List;
 public abstract class Partitioning extends Clustering {
     protected List<List<Integer>> clusters;
     
-    public Partitioning(List<Point.Double> items) {
+    public Partitioning(List<Vect> items) {
         super(items);
     }
     

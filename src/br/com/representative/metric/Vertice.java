@@ -6,7 +6,7 @@
 
 package br.com.representative.metric;
 
-import java.awt.geom.Point2D;
+import br.com.methods.utils.Vect;
 
 /**
  *
@@ -15,10 +15,10 @@ import java.awt.geom.Point2D;
 public class Vertice {
     
     private int _id;
-    private Point2D.Double _point;
+    private Vect _point;
     private boolean _visited;
     
-    public Vertice(Point2D.Double point, int id) {
+    public Vertice(Vect point, int id) {
         this._point = point;
         this._id = id;
         this._visited = false;
@@ -32,7 +32,7 @@ public class Vertice {
         _visited = visited;
     }
     
-    public Point2D.Double point() {
+    public Vect point() {
         return _point;
     }
     

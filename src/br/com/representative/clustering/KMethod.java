@@ -5,6 +5,7 @@
  */
 package br.com.representative.clustering;
 
+import br.com.methods.utils.Vect;
 import java.awt.Point;
 import java.util.List;
 
@@ -16,10 +17,10 @@ public abstract class KMethod extends Partitioning {
     
     protected int K;
     protected int ITER;
-    protected Point.Double[] centroids;    
+    protected Vect[] centroids;    
     protected InitialMedoidApproach initialGuessApproach;    
         
-    public KMethod(List<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
+    public KMethod(List<Vect> items, InitialMedoidApproach initialGuessApproach, int k) {
         super(items);
         if( k > items.size()  )
             throw new RuntimeException("Number of representative greater than number of items.");
@@ -29,7 +30,7 @@ public abstract class KMethod extends Partitioning {
         this.ITER = 30;
     }
     
-    public Point.Double[] getCentroids() {
+    public Vect[] getCentroids() {
         return centroids;
     }
 

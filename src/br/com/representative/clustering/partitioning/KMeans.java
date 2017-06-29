@@ -7,8 +7,8 @@ package br.com.representative.clustering.partitioning;
 
 import br.com.representative.clustering.InitialMedoidApproach;
 import br.com.methods.utils.Util;
+import br.com.methods.utils.Vect;
 import br.com.representative.clustering.KMethod;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,14 +20,14 @@ import java.util.List;
 public class KMeans extends KMethod {
     
     
-    public KMeans(List<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
+    public KMeans(List<Vect> items, InitialMedoidApproach initialGuessApproach, int k) {
         super(items, initialGuessApproach, k);
     }
     
     @Override
     public void execute() {        
-        Point.Double[] newGuess = initialGuessApproach.getInitialGuess(items, K);
-        Point.Double[] oldGuess = null;
+        Vect[] newGuess = initialGuessApproach.getInitialGuess(items, K);
+        Vect[] oldGuess = null;
         
         int iter = 0;
         do {
@@ -44,7 +44,8 @@ public class KMeans extends KMethod {
                  
                  
                  for( int j = 0; j < newGuess.length; ++j ) {
-                     double dj = Util.euclideanDistance(items.get(i).x, items.get(i).y, newGuess[j].x, newGuess[j].y);
+                     //double dj = Util.euclideanDistance(items.get(i).x, items.get(i).y, newGuess[j].x, newGuess[j].y);
+                     double dj = items.get(i).distance(newGuess[j]);
                      if( dj < distance ) {
                          distance = dj;
                          centroid = j;
@@ -62,13 +63,22 @@ public class KMeans extends KMethod {
                      cluster.add((int) (Math.random() * (items.size() - 1)));
                  }
                  
-                 double x = 0, y = 0;                 
-                 for( int j = 0; j < cluster.size(); ++j ) {
-                     x += items.get(cluster.get(j)).x;
-                     y += items.get(cluster.get(j)).y;
-                 }
+//                 double x = 0, y = 0;                      
+//                 for( int j = 0; j < cluster.size(); ++j ) {
+//                     x += items.get(cluster.get(j)).x;
+//                     y += items.get(cluster.get(j)).y;
+//                 }
+//                 newGuess[i] = new Point.Double(x/cluster.size(), y/cluster.size());                 
                  
-                 newGuess[i] = new Point.Double(x/cluster.size(), y/cluster.size());                 
+                 double[] sum = new double[items.get(0).vector().length];
+                 Arrays.fill(sum, 0.0);
+                 for( int j = 0; j < cluster.size(); ++j ) {
+                     for( int k = 0; k < sum.length; ++k )
+                         sum[k] += items.get(cluster.get(j)).get(k);
+                 }             
+                 for( int k = 0; k < sum.length; ++k )
+                     sum[k] /= cluster.size();
+                 newGuess[i] = new Vect(sum);
              }
              
             

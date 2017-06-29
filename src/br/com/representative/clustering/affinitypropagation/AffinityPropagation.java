@@ -6,8 +6,8 @@
 package br.com.representative.clustering.affinitypropagation;
 
 import br.com.methods.utils.Util;
+import br.com.methods.utils.Vect;
 import br.com.representative.clustering.Partitioning;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +20,7 @@ public class AffinityPropagation extends Partitioning {
 
     private double alpha;
     
-    public AffinityPropagation(List<Point2D.Double> items) {
+    public AffinityPropagation(List<Vect> items) {
         super(items);
         alpha = 0.5;
     }
@@ -36,7 +36,8 @@ public class AffinityPropagation extends Partitioning {
         for( int i = 0; i < s.length-1; ++i ) 
             for( int j = i+1; j < s.length; ++j ) {
                 //s[i][j] = -((items.get(i).x-items.get(j).x)*(items.get(i).x-items.get(j).x)+(items.get(i).y-items.get(j).y)*(items.get(i).y-items.get(j).y));
-                s[i][j] = -Util.euclideanDistance(items.get(i).x, items.get(i).y, items.get(j).x, items.get(j).y);
+                //s[i][j] = -Util.euclideanDistance(items.get(i).x, items.get(i).y, items.get(j).x, items.get(j).y);
+                s[i][j] = -items.get(i).distance(items.get(j));
                 s[j][i] = s[i][j];
                 similatities.add(s[i][j]);
             }

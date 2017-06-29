@@ -7,8 +7,8 @@ package br.com.representative.clustering.partitioning;
 
 import br.com.representative.clustering.InitialMedoidApproach;
 import br.com.methods.utils.Util;
+import br.com.methods.utils.Vect;
 import br.com.representative.clustering.KMethod;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,14 +19,14 @@ import java.util.List;
  */
 public class KMedoid extends KMethod {
     
-    public KMedoid(List<Point.Double> items, InitialMedoidApproach initialGuessApproach, int k) {
+    public KMedoid(List<Vect> items, InitialMedoidApproach initialGuessApproach, int k) {
         super(items, initialGuessApproach, k);
     }
     
     @Override
     public void execute() {
-        Point.Double[] newGuess = initialGuessApproach.getInitialGuess(getItems(), K);
-        Point.Double[] oldGuess = null;
+        Vect[] newGuess = initialGuessApproach.getInitialGuess(getItems(), K);
+        Vect[] oldGuess = null;
         
         int iter = 0;
         
@@ -42,7 +42,8 @@ public class KMedoid extends KMethod {
                 int centroid = -1;
                 
                 for( int j = 0; j < newGuess.length; ++j ) {
-                    double dij = Util.euclideanDistance(items.get(i).x, items.get(i).y, newGuess[j].x, newGuess[j].y);
+                    //double dij = Util.euclideanDistance(items.get(i).x, items.get(i).y, newGuess[j].x, newGuess[j].y);
+                    double dij = items.get(i).distance(newGuess[j]);
                     if( distance > dij ) {
                         distance = dij;
                         centroid = j;
@@ -62,11 +63,12 @@ public class KMedoid extends KMethod {
                 List<Integer> cluster = clusters.get(i);                                
                 for( int j = 0; j < cluster.size(); ++j ) {
                     double cost = 0;
-                    Point.Double centroid = items.get(cluster.get(j));
+                    Vect centroid = items.get(cluster.get(j));
                     
                     for( int k = 0; k < cluster.size(); ++k ) {
                         if( k == j ) continue;                        
-                        cost += Util.euclideanDistance(centroid.x, centroid.y, items.get(cluster.get(k)).x, items.get(cluster.get(k)).y);
+                        //cost += Util.euclideanDistance(centroid.x, centroid.y, items.get(cluster.get(k)).x, items.get(cluster.get(k)).y);
+                        cost += centroid.distance(items.get(cluster.get(k)));
                     }
                     
                     if( cost < minCost ) {
