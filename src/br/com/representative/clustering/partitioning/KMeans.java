@@ -70,8 +70,8 @@ public class KMeans extends KMethod {
 //                 }
 //                 newGuess[i] = new Point.Double(x/cluster.size(), y/cluster.size());                 
                  
-                 double[] sum = new double[items.get(0).vector().length];
-                 Arrays.fill(sum, 0.0);
+                 float[] sum = new float[items.get(0).vector().length];
+                 Arrays.fill(sum, 0.0f);
                  for( int j = 0; j < cluster.size(); ++j ) {
                      for( int k = 0; k < sum.length; ++k )
                          sum[k] += items.get(cluster.get(j)).get(k);

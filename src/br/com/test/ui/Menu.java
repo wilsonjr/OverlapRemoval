@@ -707,7 +707,7 @@ public class Menu extends javax.swing.JFrame {
                     int grupo = id;//Integer.parseInt(linha[3]);
 
                     rectangles.add(new RectangleVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo*10)%255), id++));   
-                    items.add(new Vect(new double[]{x, y}));
+                    items.add(new Vect(new float[]{(float)x, (float)y}));
                     pts.add(new Point2D.Double(x, y));
                 }
                 
@@ -1175,13 +1175,13 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
+            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
         
         RepresentativeFinder mst = new MST(elems, 15);
         mst.execute();
         selectedRepresentatives = mst.getRepresentatives();
         //selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
-        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
         
         if( view != null ) {
             view.cleanImage();
@@ -1315,7 +1315,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
+            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
         hc = new HierarchicalClustering(elems, new SingleLinkageStrategy());        
         hc.execute();
         
@@ -1353,7 +1353,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
+            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
                 
         RepresentativeFinder kmeans = new KMeans(elems, new FarPointsMedoidApproach(), 3);
         System.out.println("Init kmeans");
@@ -1362,7 +1362,7 @@ public class Menu extends javax.swing.JFrame {
         currentCluster = ((KMeans)kmeans).getClusters();        
         selectedRepresentatives = kmeans.getRepresentatives();
         selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
-        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
         
         if( view != null ) {
             view.cleanImage();
@@ -1374,14 +1374,14 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
+            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
                 
         RepresentativeFinder kmedoid = new KMedoid(elems, new FarPointsMedoidApproach(), 4);
         kmedoid.execute();
         currentCluster = ((KMedoid)kmedoid).getClusters();        
         selectedRepresentatives = kmedoid.getRepresentatives();
         selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
-        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
         
         if( view != null ) {
             view.cleanImage();
@@ -1393,14 +1393,14 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
+            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
         
         RepresentativeFinder bkmeans = new BisectingKMeans(elems, new FarPointsMedoidApproach(), 4);
         bkmeans.execute();
         currentCluster = ((BisectingKMeans)bkmeans).getClusters();
         selectedRepresentatives = bkmeans.getRepresentatives();
         selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
-        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
         
         if( view != null ) {
             view.cleanImage();
@@ -1412,14 +1412,14 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
+            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
         
         RepresentativeFinder dbscan = new Dbscan(elems,100, (int)(60.0/100.0)*7);
         dbscan.execute();
         currentCluster = ((Dbscan)dbscan).getClusters();
         selectedRepresentatives = dbscan.getRepresentatives();
         selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
-        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
         
         if( view != null ) {
             view.cleanImage();
@@ -1428,7 +1428,10 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_dbscanJMenuItemActionPerformed
 
     private void csmJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_csmJMenuItemActionPerformed
-        
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+        ArrayList<Vect> elems = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i )
+            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
         JFileChooser jFileChooser = new JFileChooser();
         int result = jFileChooser.showOpenDialog(this);
         if( result == JFileChooser.APPROVE_OPTION ) {
@@ -1454,7 +1457,7 @@ public class Menu extends javax.swing.JFrame {
 
                 selectedRepresentatives = csm.getRepresentatives();
                 selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
-                hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+                hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
                 
                 if( view != null ) {
                     view.cleanImage();
@@ -1476,6 +1479,11 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_viewSelectedJMenuItemActionPerformed
 
     private void ksvdJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ksvdJMenuItemActionPerformed
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+        ArrayList<Vect> elems = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i )
+            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
+        
         JFileChooser jFileChooser = new JFileChooser();
         int result = jFileChooser.showOpenDialog(this);
         if( result == JFileChooser.APPROVE_OPTION ) {
@@ -1501,7 +1509,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 selectedRepresentatives = ksvd.getRepresentatives();
                 selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
-                hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+                hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
                 
                 if( view != null ) {
                     view.cleanImage();
@@ -1595,6 +1603,11 @@ public class Menu extends javax.swing.JFrame {
         if( rectangles == null )
             loadDataJMenuItemActionPerformed(null);
         
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+        ArrayList<Vect> elems = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i )
+            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
+        
         double[][] distances = new double[rectangles.size()][rectangles.size()];
         for( int i = 0; i < distances.length; ++i ) {
             for( int j = 0; j < distances[0].length; ++j )
@@ -1607,40 +1620,40 @@ public class Menu extends javax.swing.JFrame {
         
         
         
-        int[] temp = new int[selectedRepresentatives.length];
-        Map<Integer, List<Integer>> mapTemp = Util.createIndex(selectedRepresentatives, points);
-        int tempIdx = 0;
-        for( Map.Entry<Integer, List<Integer>> v: mapTemp.entrySet() ) {
-            System.out.println(tempIdx+": Estou aqui: "+v.getKey());
-            List<Integer> list = v.getValue();
-            Point2D.Double p = new Point2D.Double(0,0);
-            for( int i = 0; i < list.size(); ++i ) {
-                p.x += points[list.get(i)].x;
-                p.y += points[list.get(i)].y;
-            }
-
-            p.x /= list.size();
-            p.y /= list.size();
-
-            int idx = list.get(0);
-            double dist = Double.MAX_VALUE;
-            for( int i = 0; i < list.size(); ++i ) {
-                double d = Util.euclideanDistance(p.x, p.y, points[list.get(i)].x, points[list.get(i)].y);
-                if( d < dist ) {
-                    dist = d;
-                    idx = list.get(i);
-                }
-            }
-
-            temp[tempIdx++] = idx;
-            System.out.println("novo: "+idx);
-        }
+//        int[] temp = new int[selectedRepresentatives.length];
+//        Map<Integer, List<Integer>> mapTemp = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
+//        int tempIdx = 0;
+//        for( Map.Entry<Integer, List<Integer>> v: mapTemp.entrySet() ) {
+//            System.out.println(tempIdx+": Estou aqui: "+v.getKey());
+//            List<Integer> list = v.getValue();
+//            Point2D.Double p = new Point2D.Double(0,0);
+//            for( int i = 0; i < list.size(); ++i ) {
+//                p.x += points[list.get(i)].x;
+//                p.y += points[list.get(i)].y;
+//            }
 //
-        selectedRepresentatives = temp;
-        
-        
+//            p.x /= list.size();
+//            p.y /= list.size();
+//
+//            int idx = list.get(0);
+//            double dist = Double.MAX_VALUE;
+//            for( int i = 0; i < list.size(); ++i ) {
+//                double d = Util.euclideanDistance(p.x, p.y, points[list.get(i)].x, points[list.get(i)].y);
+//                if( d < dist ) {
+//                    dist = d;
+//                    idx = list.get(i);
+//                }
+//            }
+//
+//            temp[tempIdx++] = idx;
+//            System.out.println("novo: "+idx);
+//        }
+////
+//        selectedRepresentatives = temp;
+//        
+//        
         selectedRepresentatives = Util.distinct(selectedRepresentatives, points, RECTSIZE/2);
-        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
     
         if( view != null ) {
             view.cleanImage();
@@ -1703,7 +1716,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_voronoiDiagramJMenuItemActionPerformed
 
     private void testTreeJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testTreeJMenuItemActionPerformed
-        
+                
         double[][] distances = new double[rectangles.size()][rectangles.size()];
         for( int i = 0; i < distances.length; ++i ) {
             for( int j = 0; j < distances[0].length; ++j )
@@ -1723,6 +1736,17 @@ public class Menu extends javax.swing.JFrame {
                 
                 
                 File file = jFileChooser.getSelectedFile();
+                
+                
+                DenseMatrix matrix = new DenseMatrix();
+                matrix.load(file.getAbsolutePath());
+                
+                List<Vect> dataset = new ArrayList<>();
+                for( int i = 0; i < matrix.getRowCount(); ++i ) {
+                    dataset.add(new Vect(matrix.getRow(i).getValues()));
+                }
+
+                
                 Scanner scn = new Scanner(file);
                 scn.nextLine();
                 scn.nextLine();
@@ -1739,7 +1763,7 @@ public class Menu extends javax.swing.JFrame {
                 }
                 List<Vect> elements = new ArrayList<>();
                 for( int i = 0; i < points.length; ++i ) {
-                    elements.add(new Vect(new double[]{points[i].x, points[i].y}));
+                    elements.add(new Vect(new float[]{(float)points[i].x, (float)points[i].y}));
                 }
                 
                 // clustering techniques
@@ -1759,11 +1783,12 @@ public class Menu extends javax.swing.JFrame {
                 RepresentativeFinder smrs = new SMRS(attrs);
                 RepresentativeFinder furs = new FURS(elements, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
                 
-                controller = new ExplorerTreeController(points, 
+                controller = new ExplorerTreeController(elements.stream().map((v)->v).toArray(Vect[]::new), points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         furs, 7, RECTSIZE, RECTSIZE/2);
+                         ds3, 7, RECTSIZE, RECTSIZE/2);
                 
-                controller.build();                
+                controller.build();                 
+                
                 controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
                 
                 view.cleanImage();
@@ -1783,14 +1808,14 @@ public class Menu extends javax.swing.JFrame {
             loadDataJMenuItemActionPerformed(null);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < points.length; ++i )
-            elems.add(new Vect(new double[]{points[i].x, points[i].y}));
+            elems.add(new Vect(new float[]{(float)points[i].x, (float)points[i].y}));
         
         RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
         System.out.println("Init Affinity Propagation execution");
         affinityPropagation.execute();
         System.out.println("Finished Affinity Propagation execution");
         selectedRepresentatives = affinityPropagation.getRepresentatives();
-        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
     
         if( view != null ) {
             view.cleanImage();
@@ -1805,7 +1830,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
+            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
         
         FURS furs = new FURS(elems, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
         System.out.println("Init FURS");
@@ -1814,12 +1839,12 @@ public class Menu extends javax.swing.JFrame {
         
         List<Vect> elements = new ArrayList<>();        
         for( int i = 0; i < points.length; ++i ) {
-            elements.add(new Vect(new double[]{points[i].x, points[i].y}));
+            elements.add(new Vect(new float[]{(float)points[i].x, (float)points[i].y}));
         }
         selectedRepresentatives = furs.execute(elements, 15, (int)(0.2*points.length));
         System.out.println("Finished FURS");
        
-        hashRepresentative = Util.createIndex(selectedRepresentatives, points);
+        hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
         
         if( view != null ) {
             view.cleanImage();
@@ -1840,6 +1865,7 @@ public class Menu extends javax.swing.JFrame {
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
         }
         
+        
         JFileChooser jFileChooser = new JFileChooser();
         int result = jFileChooser.showOpenDialog(this);
         if( result == JFileChooser.APPROVE_OPTION ) {
@@ -1847,6 +1873,15 @@ public class Menu extends javax.swing.JFrame {
                 
                 
                 File file = jFileChooser.getSelectedFile();
+                
+                DenseMatrix matrix = new DenseMatrix();
+                matrix.load(file.getAbsolutePath());
+                
+                List<Vect> dataset = new ArrayList<>();
+                for( int i = 0; i < matrix.getRowCount(); ++i ) {
+                    dataset.add(new Vect(matrix.getRow(i).getValues()));
+                }
+                
                 Scanner scn = new Scanner(file);
                 scn.nextLine();
                 scn.nextLine();
@@ -1864,7 +1899,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 List<Vect> elements = new ArrayList<>();
                 for( int i = 0; i < points.length; ++i ) {
-                    elements.add(new Vect(new double[]{points[i].x, points[i].y}));
+                    elements.add(new Vect(new float[]{(float)points[i].x, (float)points[i].y}));
                 }
                 
                 // clustering techniques
@@ -1884,7 +1919,7 @@ public class Menu extends javax.swing.JFrame {
                 RepresentativeFinder smrs = new SMRS(attrs);
                 RepresentativeFinder furs = new FURS(elements, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
                 
-                controller = new ExplorerTreeController(points, 
+                controller = new ExplorerTreeController(dataset.stream().map((v)->v).toArray(Vect[]::new), points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
                          kmeans, 10, RECTSIZE, RECTSIZE/2);
               
@@ -3298,6 +3333,15 @@ public class Menu extends javax.swing.JFrame {
                     for( int i = 0; i < clickedPolygon.xpoints.length; ++i )
                         g2Buffer.fillOval(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i], 5, 5); 
                 }*/
+                g2Buffer.setColor(Color.RED);
+                g2Buffer.fillOval((int)499.09649658203125,(int) 238.1253662109375, 10, 10);
+                g2Buffer.fillOval((int)687.8350219726562 ,(int)60.0, 10, 10);
+                g2Buffer.fillOval((int)491.6928405761719 ,(int)293.20166015625, 10, 10);
+                g2Buffer.fillOval((int)289.2015380859375 ,(int)465.4545593261719, 10, 10);
+                g2Buffer.fillOval((int)60.0              ,(int) 345.5175476074219, 10, 10);
+                g2Buffer.fillOval((int)548.0838012695312 ,(int)220.02418518066406, 10, 10);
+                g2Buffer.fillOval((int)1477.6260986328125,(int) 191.5023193359375, 10, 10);
+                
                 
                 if( tooltip != null ) {
                     tooltip.draw(g2Buffer);

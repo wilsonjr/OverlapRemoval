@@ -51,9 +51,10 @@ public class OverlapTree implements OverlapRemoval {
                 List<OverlapNode> instances = new ArrayList<>();
 
                 for (int j = 0; j < nodes.get(i).indexes().length; ++j) {
-                    instances.add(new OverlapNode(new OverlapRect(nodes.get(i).subprojection()[j].x,
-                            nodes.get(i).subprojection()[j].y,
-                            SIZERECT, SIZERECT, nodes.get(i).indexes()[j])));
+//                    instances.add(new OverlapNode(new OverlapRect(nodes.get(i).subprojection()[j].x,
+//                            nodes.get(i).subprojection()[j].y,
+//                            SIZERECT, SIZERECT, nodes.get(i).indexes()[j]))
+//                    );
                 }
                 int representative = nodes.get(i).representative(controller.projection());
                 OverlapNode node = new OverlapNode(instances);

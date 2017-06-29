@@ -13,22 +13,22 @@ import java.util.Arrays;
  */
 public class Vect {
     
-    private double[] _vector;
+    private float[] _vector;
     
-    public Vect(double[] vector) {
+    public Vect(float[] vector) {
         _vector = vector;
     }
     
     public Vect(int n) {
-        _vector = new double[n];
+        _vector = new float[n];
         Arrays.fill(_vector, 0);
     }
     
-    public double[] vector() {
+    public float[] vector() {
         return _vector;
     }
     
-    public double get(int i) {
+    public float get(int i) {
         return _vector[i];
     }
     

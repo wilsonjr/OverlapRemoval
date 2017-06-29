@@ -6,6 +6,7 @@
 package br.com.explore.explorertree;
 
 import br.com.methods.utils.Util;
+import br.com.methods.utils.Vect;
 import br.com.representative.RepresentativeFinder;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
@@ -23,8 +24,7 @@ import java.util.logging.Logger;
 public class ExplorerTree {
     
     private List<ExplorerTreeNode> _topNodes;
-    private List<Polygon> _topTesselation;
-    private Point2D.Double[] _projection;
+    private Vect[] _projection;
     
     private RepresentativeFinder _representativeAlgorithm;
     
@@ -33,7 +33,9 @@ public class ExplorerTree {
     
     private Map<Integer, ExplorerTreeNode> _activeNodes;
     
-    public ExplorerTree(Point2D.Double[] projection, RepresentativeFinder representativeAlgorithm, 
+    private Point2D.Double[] _indexesProjection;
+    
+    public ExplorerTree(Vect[] projection, RepresentativeFinder representativeAlgorithm, 
                         int distinctionDistance, int minChildren) {
         _projection = projection;
         _representativeAlgorithm = representativeAlgorithm;
@@ -61,21 +63,44 @@ public class ExplorerTree {
         _representativeAlgorithm.execute();
         int[] levelOneRepresentatives = _representativeAlgorithm.getRepresentatives();
         
+        _indexesProjection = Util.projectData(levelOneRepresentatives, _projection);
+        for( int i = 0; i < _indexesProjection.length; ++i ) {
+                System.out.println("*** "+_indexesProjection[i].x+" "+_indexesProjection[i].y);
+            }
         
         // apply distinction algorithm
-        levelOneRepresentatives = Util.distinct(levelOneRepresentatives, _projection, _distinctionDistance);
+        // TODO select projection points that remain in indexes
+        levelOneRepresentatives = Util.distinct(levelOneRepresentatives, _indexesProjection, _distinctionDistance);
         //levelOneRepresentatives = selectMedoid(levelOneRepresentatives);
-       
+       _indexesProjection = Util.projectData(levelOneRepresentatives, _projection);
+         for( int i = 0; i < _indexesProjection.length; ++i ) {
+                System.out.println("*** 2 "+_indexesProjection[i].x+" "+_indexesProjection[i].y);
+            }
         Map<Integer, List<Integer>> map = Util.createIndex(levelOneRepresentatives, _projection);
-        
+        _indexesProjection = Util.projectData(levelOneRepresentatives, _projection);
+         for( int i = 0; i < _indexesProjection.length; ++i ) {
+                System.out.println("*** 3 "+_indexesProjection[i].x+" "+_indexesProjection[i].y);
+            }
         Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives before {0}", map.size());
         // remove representatives which represent only < _minChildren
         Util.removeDummyRepresentive(map, _minChildren);
+        _indexesProjection = Util.projectData(levelOneRepresentatives, _projection);
+         for( int i = 0; i < _indexesProjection.length; ++i ) {
+                System.out.println("*** 4 "+_indexesProjection[i].x+" "+_indexesProjection[i].y);
+            }
         Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives after  {0}", map.size());
         System.out.println("................................");
        
         levelOneRepresentatives = map.entrySet().stream().mapToInt((value)->value.getKey()).toArray();
+         _indexesProjection = Util.projectData(levelOneRepresentatives, _projection);
+         for( int i = 0; i < _indexesProjection.length; ++i ) {
+                System.out.println("*** 5 "+_indexesProjection[i].x+" "+_indexesProjection[i].y);
+            }
         levelOneRepresentatives = selectMedoid(levelOneRepresentatives);
+        _indexesProjection = Util.projectData(levelOneRepresentatives, _projection);
+         for( int i = 0; i < _indexesProjection.length; ++i ) {
+                System.out.println("*** 6 "+_indexesProjection[i].x+" "+_indexesProjection[i].y);
+            }
         map = Util.createIndex(levelOneRepresentatives, _projection);
         
         
@@ -86,14 +111,18 @@ public class ExplorerTree {
             int representative = item.getKey();
             // get the indexes of the elements that it represents
             List<Integer> indexes = item.getValue();
-            System.out.println(representative+" >> "+indexes.size());
             
             
-            Point2D.Double[] points = new Point2D.Double[indexes.size()];
-
+//            Point2D.Double[] points = new Point2D.Double[indexes.size()];
+//
+//            // create subprojection 
+//            for( int j = 0; j < points.length; ++j )
+//                points[j] = new Point2D.Double(_projection[indexes.get(j)].x, _projection[indexes.get(j)].y);   
+            
             // create subprojection 
+            Vect[] points = new Vect[indexes.size()];
             for( int j = 0; j < points.length; ++j )
-                points[j] = new Point2D.Double(_projection[indexes.get(j)].x, _projection[indexes.get(j)].y);           
+                points[j] = new Vect(_projection[indexes.get(j)].vector());            
 
             // do the same to each subprojection
             _topNodes.add(new ExplorerTreeNode(_minChildren, _distinctionDistance, representative, points,
@@ -133,6 +162,10 @@ public class ExplorerTree {
         return _topNodes;
     }
     
+    public Point2D.Double[] indexesProjection() {
+        return _indexesProjection;
+    }
+    
     private int[] selectMedoid(int[] indexes) {
         int[] temp = new int[indexes.length];
         Map<Integer, List<Integer>> mapTemp = Util.createIndex(indexes, _projection);
@@ -141,19 +174,29 @@ public class ExplorerTree {
         for( Map.Entry<Integer, List<Integer>> v: mapTemp.entrySet() ) {
             
             List<Integer> list = v.getValue();
-            Point2D.Double p = new Point2D.Double(0,0);
-            for( int i = 0; i < list.size(); ++i ) {
-                p.x += _projection[list.get(i)].x;
-                p.y += _projection[list.get(i)].y;
-            }
             
-            p.x /= list.size();
-            p.y /= list.size();
+//            Point2D.Double p = new Point2D.Double(0,0);
+//            for( int i = 0; i < list.size(); ++i ) {
+//                p.x += _projection[list.get(i)].x;
+//                p.y += _projection[list.get(i)].y;
+//            }
+//            
+//            p.x /= list.size();
+//            p.y /= list.size();
+            
+            
+            Vect p = new Vect(_projection[0].vector().length);
+            for( int i = 0; i < list.size(); ++i ) {
+                p.add(_projection[list.get(i)]);
+            }
+            p.divide(list.size());
+            
             
             int medoid = list.get(0);
             double dist = Double.MAX_VALUE;
             for( int i = 0; i < list.size(); ++i ) {
-                double d = Util.euclideanDistance(p.x, p.y, _projection[list.get(i)].x, _projection[list.get(i)].y);
+                //double d = Util.euclideanDistance(p.x, p.y, _projection[list.get(i)].x, _projection[list.get(i)].y);
+                double d = p.distance(_projection[list.get(i)]);
                 if( d < dist ) {
                     dist = d;
                     medoid = list.get(i);
@@ -183,7 +226,7 @@ public class ExplorerTree {
     
     
     public Point2D.Double[] projection() {
-        return projection();
+        return _indexesProjection;
     }
     
 }

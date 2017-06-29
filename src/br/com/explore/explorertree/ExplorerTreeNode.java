@@ -10,6 +10,7 @@
 package br.com.explore.explorertree;
 
 import br.com.methods.utils.Util;
+import br.com.methods.utils.Vect;
 import br.com.representative.RepresentativeFinder;
 import br.com.representative.clustering.FarPointsMedoidApproach;
 import br.com.representative.clustering.partitioning.KMedoid;
@@ -34,7 +35,7 @@ public class ExplorerTreeNode {
     
     private final List<ExplorerTreeNode> _children;
     
-    private final Point2D.Double[] _subprojection;
+    private final Vect[] _subprojection;
     
     private final int[] _indexes;
     
@@ -48,11 +49,13 @@ public class ExplorerTreeNode {
     
     private Polygon _polygon;
     
+    private Point2D.Double[] _indexesProjection;
+    
     // to implement further
     // private int[] dissimilar
     // private int[] similar
     
-    public ExplorerTreeNode(int minChildren, int distinctionDistance, int routing, Point2D.Double[] subprojection, 
+    public ExplorerTreeNode(int minChildren, int distinctionDistance, int routing, Vect[] subprojection, 
                             int[] indexes, RepresentativeFinder representativeAlgorithm, ExplorerTreeNode parent) {
         _indexes = indexes;
         _minChildren = minChildren;
@@ -79,12 +82,20 @@ public class ExplorerTreeNode {
         _representativeAlgorithm.execute();
         int[] nthLevelRepresentatives = _representativeAlgorithm.getRepresentatives();
         if( nthLevelRepresentatives.length > 0 ) {
+            
+            if( nthLevelRepresentatives.length == 1 )
+                return;
         
             // select medoids since the selected representatives must have high chances to overlap
             nthLevelRepresentatives = selectMedoid(nthLevelRepresentatives);
             
+            _indexesProjection = Util.projectData(nthLevelRepresentatives, _subprojection);
+            
+            
+            
             // apply distinction algorithm
-            nthLevelRepresentatives = Util.distinct(nthLevelRepresentatives, _subprojection, _distinctionDistance);
+            nthLevelRepresentatives = Util.distinct(nthLevelRepresentatives, _indexesProjection, _distinctionDistance);
+            _indexesProjection = Util.projectData(nthLevelRepresentatives, _subprojection);
             
             Map<Integer, List<Integer>> map = Util.createIndex(nthLevelRepresentatives, _subprojection);            
             Map<Integer, List<Integer>> copyMap = new HashMap<>();
@@ -104,7 +115,9 @@ public class ExplorerTreeNode {
             
             nthLevelRepresentatives = map.entrySet().stream().mapToInt((value)->value.getKey()).toArray();
             //nthLevelRepresentatives = selectMedoid(nthLevelRepresentatives);
-            nthLevelRepresentatives = Util.distinct(nthLevelRepresentatives, _subprojection, _distinctionDistance);            
+            
+            nthLevelRepresentatives = Util.distinct(nthLevelRepresentatives, _indexesProjection, _distinctionDistance);            
+            
             
             if( nthLevelRepresentatives.length == 1 ) {// this will lead to a infinite loop...             
                 if( _indexes.length < 2*_minChildren )
@@ -112,10 +125,13 @@ public class ExplorerTreeNode {
                 
                 map = tryToDivideCluster();
                 nthLevelRepresentatives = map.entrySet().stream().mapToInt((value)->value.getKey()).toArray(); 
-                nthLevelRepresentatives = Util.distinct(nthLevelRepresentatives, _subprojection, _distinctionDistance);
+                nthLevelRepresentatives = Util.distinct(nthLevelRepresentatives, _indexesProjection, _distinctionDistance);
+                
                 if( nthLevelRepresentatives.length == 1 )  // we don't propagate again since it will cause a infinite loop
                     return;                
-            }
+                _indexesProjection = Util.projectData(nthLevelRepresentatives, _subprojection);
+            } else
+                _indexesProjection = Util.projectData(nthLevelRepresentatives, _subprojection);
             
             
             // store the nearest neighbors for each representative
@@ -126,11 +142,17 @@ public class ExplorerTreeNode {
                 // get the indexes of the elements that it represents
                 List<Integer> indexesChildren = item.getValue();
                
-                Point2D.Double[] points = new Point2D.Double[indexesChildren.size()];
-
+//                Point2D.Double[] points = new Point2D.Double[indexesChildren.size()];
+//                // create subprojection 
+//                for( int j = 0; j < points.length; ++j )
+//                    points[j] = new Point2D.Double(_subprojection[indexesChildren.get(j)].x, _subprojection[indexesChildren.get(j)].y);
+                
                 // create subprojection 
+                Vect[] points = new Vect[indexesChildren.size()];
                 for( int j = 0; j < points.length; ++j )
-                    points[j] = new Point2D.Double(_subprojection[indexesChildren.get(j)].x, _subprojection[indexesChildren.get(j)].y);
+                    points[j] = new Vect(_subprojection[indexesChildren.get(j)].vector());        
+                
+                
 
                 // continue to the further children, we must always pass original indexes
                 _children.add(new ExplorerTreeNode(_minChildren, _distinctionDistance, _indexes[representative], points, 
@@ -153,19 +175,26 @@ public class ExplorerTreeNode {
         for( Map.Entry<Integer, List<Integer>> v: mapTemp.entrySet() ) {
             
             List<Integer> list = v.getValue();
-            Point2D.Double p = new Point2D.Double(0,0);
-            for( int i = 0; i < list.size(); ++i ) {
-                p.x += _subprojection[list.get(i)].x;
-                p.y += _subprojection[list.get(i)].y;
-            }
+//            Point2D.Double p = new Point2D.Double(0,0);
+//            for( int i = 0; i < list.size(); ++i ) {
+//                p.x += _subprojection[list.get(i)].x;
+//                p.y += _subprojection[list.get(i)].y;
+//            }
+//            
+//            p.x /= list.size();
+//            p.y /= list.size();
             
-            p.x /= list.size();
-            p.y /= list.size();
+            Vect p = new Vect(_subprojection[0].vector().length);
+            for( int i = 0; i < list.size(); ++i ) {
+                p.add(_subprojection[list.get(i)]);
+            }
+            p.divide(list.size());
             
             int medoid = list.get(0);
             double dist = Double.MAX_VALUE;
             for( int i = 0; i < list.size(); ++i ) {
-                double d = Util.euclideanDistance(p.x, p.y, _subprojection[list.get(i)].x, _subprojection[list.get(i)].y);
+                //double d = Util.euclideanDistance(p.x, p.y, _subprojection[list.get(i)].x, _subprojection[list.get(i)].y);
+                double d = p.distance(_subprojection[list.get(i)]);
                 if( d < dist ) {
                     dist = d;
                     medoid = list.get(i);
@@ -214,8 +243,9 @@ public class ExplorerTreeNode {
         for( int i = 0; i < reps.size(); ++i ) 
             for( int j = i+1; j < reps.size(); ++j ) {
                 double distance = //getSingleLinkage(reps.get(i).list, reps.get(j).list);
-                Util.euclideanDistance(_subprojection[reps.get(i).idx].x, _subprojection[reps.get(i).idx].y, 
-                                                       _subprojection[reps.get(j).idx].x, _subprojection[reps.get(j).idx].y);
+                //Util.euclideanDistance(_subprojection[reps.get(i).idx].x, _subprojection[reps.get(i).idx].y, 
+                //                                       _subprojection[reps.get(j).idx].x, _subprojection[reps.get(j).idx].y);
+                        _subprojection[reps.get(i).idx].distance(_subprojection[reps.get(j).idx]);
                 LinkageRepresentative linkage = new LinkageRepresentative(reps.get(i), reps.get(j), distance);
                 queue.add(linkage);
                 linkageMap.put(createKey(linkage.u, linkage.v), linkage);
@@ -231,19 +261,19 @@ public class ExplorerTreeNode {
             double distv = top.distance;
             
             for( Map.Entry<Integer, List<Integer>> v: newMap.entrySet() ) {
-                double du = //getSingleLinkage(top.u.list, v.getValue());
-                        
-                           Util.euclideanDistance(_subprojection[top.u.idx].x, _subprojection[top.u.idx].y, 
-                                                   _subprojection[v.getKey()].x, _subprojection[v.getKey()].y);
+                double du = //getSingleLinkage(top.u.list, v.getValue());                        
+                           //Util.euclideanDistance(_subprojection[top.u.idx].x, _subprojection[top.u.idx].y, 
+                            //                       _subprojection[v.getKey()].x, _subprojection[v.getKey()].y);
+                            _subprojection[top.u.idx].distance(_subprojection[v.getKey()]);
                 if( du < distu ) {
                     distu = du;
                     idxu = v.getKey();
                 }
                 
                 double dv = //getSingleLinkage(top.v.list, v.getValue());
-                            Util.euclideanDistance(_subprojection[top.v.idx].x, _subprojection[top.v.idx].y, 
-                                                   _subprojection[v.getKey()].x, _subprojection[v.getKey()].y);
-                
+                            //Util.euclideanDistance(_subprojection[top.v.idx].x, _subprojection[top.v.idx].y, 
+                            //                       _subprojection[v.getKey()].x, _subprojection[v.getKey()].y);
+                            _subprojection[top.v.idx].distance(_subprojection[v.getKey()]);
                 if( dv < distv ) {
                     distv = dv;
                     idxv = v.getKey();
@@ -319,8 +349,9 @@ public class ExplorerTreeNode {
                         
 
                         double linkageDistance = //getSingleLinkage(neighbors, c.list);
-                        Util.euclideanDistance(_subprojection[medoid].x, _subprojection[medoid].y, 
-                                _subprojection[c.idx].x, _subprojection[c.idx].y);
+                        //Util.euclideanDistance(_subprojection[medoid].x, _subprojection[medoid].y, 
+                        //        _subprojection[c.idx].x, _subprojection[c.idx].y);
+                                _subprojection[medoid].distance(_subprojection[c.idx]);
                         LinkageRepresentative uvC = new LinkageRepresentative(newCluster, c, linkageDistance);
                         queue.add(uvC);
                         linkageMap.put(createKey(newCluster, c), uvC);
@@ -345,8 +376,9 @@ public class ExplorerTreeNode {
 
                 for( Map.Entry<Integer, List<Integer>> v: newMap.entrySet() ) {
                     double d = //getSingleLinkage(neighbors, v.getValue());
-                            Util.euclideanDistance(_subprojection[medoid].x, _subprojection[medoid].y, 
-                                                      _subprojection[v.getKey()].x, _subprojection[v.getKey()].y);
+                            //Util.euclideanDistance(_subprojection[medoid].x, _subprojection[medoid].y, 
+                            //                          _subprojection[v.getKey()].x, _subprojection[v.getKey()].y);
+                            _subprojection[medoid].distance(_subprojection[v.getKey()]);
                     if( dist > d ) {
                         dist = d;
                         idx = v.getKey();
@@ -402,17 +434,24 @@ public class ExplorerTreeNode {
         int medoid = idx;
         
         double dMedoid = Double.MAX_VALUE;
-        Point2D.Double pMedoid = new Point2D.Double(0,0);        
-        for( int i = 0; i < nList.size(); ++i ) {            
-            pMedoid.x += _subprojection[nList.get(i)].x;
-            pMedoid.y += _subprojection[nList.get(i)].y;            
-        }
+//        Point2D.Double pMedoid = new Point2D.Double(0,0);        
+//        for( int i = 0; i < nList.size(); ++i ) {            
+//            pMedoid.x += _subprojection[nList.get(i)].x;
+//            pMedoid.y += _subprojection[nList.get(i)].y;            
+//        }
+//        
+//        pMedoid.x /= (double)nList.size();
+//        pMedoid.y /= (double)nList.size();
         
-        pMedoid.x /= (double)nList.size();
-        pMedoid.y /= (double)nList.size();
-        
+        Vect pMedoid = new Vect(_subprojection[0].vector().length);
         for( int i = 0; i < nList.size(); ++i ) {
-            double d = Util.euclideanDistance(pMedoid.x, pMedoid.y, _subprojection[nList.get(i)].x, _subprojection[nList.get(i)].y);
+            pMedoid.add(_subprojection[nList.get(i)]);
+        }
+        pMedoid.divide(nList.size());
+
+        for( int i = 0; i < nList.size(); ++i ) {
+            //double d = Util.euclideanDistance(pMedoid.x, pMedoid.y, _subprojection[nList.get(i)].x, _subprojection[nList.get(i)].y);
+            double d = pMedoid.distance(_subprojection[nList.get(i)]);
             if( dMedoid > d ) {
                 dMedoid = d;
                 medoid = nList.get(i);
@@ -502,8 +541,9 @@ public class ExplorerTreeNode {
         List<Double> distances = new ArrayList<>();
         for( int j = 0; j < u.size(); ++j )
             for( int k = 0; k < v.size(); ++k ) {
-                double d = Util.euclideanDistance(_subprojection[u.get(j)].x, _subprojection[u.get(j)].y,
-                                                  _subprojection[v.get(k)].x, _subprojection[v.get(k)].y);
+                //double d = Util.euclideanDistance(_subprojection[u.get(j)].x, _subprojection[u.get(j)].y,
+                //                                  _subprojection[v.get(k)].x, _subprojection[v.get(k)].y);
+                double d = _subprojection[u.get(j)].distance(_subprojection[v.get(k)]);
                 distances.add(d);
             }
         
@@ -539,11 +579,11 @@ public class ExplorerTreeNode {
     }
     
 
-    public Point2D.Double routingPoint() {        
-        return _subprojection[_routing];
-    }
+//    public Point2D.Double routingPoint() {        
+//        return _subprojection[_routing];
+//    }
 
-    public Point2D.Double[] subprojection() {
+    public Vect[] subprojection() {
         return _subprojection;
     }
     

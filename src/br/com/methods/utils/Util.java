@@ -13,6 +13,7 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,12 +25,21 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.swing.JFileChooser;
 import kn.uni.voronoitreemap.datastructure.OpenList;
 import kn.uni.voronoitreemap.diagram.PowerDiagram;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
 import kn.uni.voronoitreemap.j2d.Site;
 import math.geom2d.polygon.Polygons2D;
 import math.geom2d.polygon.SimplePolygon2D;
+import visualizer.matrix.DenseMatrix;
+import visualizer.matrix.DenseVector;
+import visualizer.matrix.Vector;
+import visualizer.projection.ProjectionData;
+import visualizer.projection.ProjectionFactory;
+import visualizer.projection.ProjectionType;
+import visualizer.projection.ProjectorType;
+import visualizer.projection.distance.DissimilarityType;
 
 /**
  * Classe utilizada para auxiliar nos métodos de remoção de sobreposição.
@@ -1611,10 +1621,12 @@ public class Util {
         
         List<DistancePoint> list = new ArrayList<>();
         for( int i = 0; i < indexes.length; ++i )
-            for( int j = i+1; j < indexes.length; ++j )
-                list.add(new DistancePoint(Util.euclideanDistance(points[indexes[i]].x, points[indexes[i]].y, 
-                                                                  points[indexes[j]].x, points[indexes[j]].y), i, j));
-        
+            for( int j = i+1; j < indexes.length; ++j ) {
+                //list.add(new DistancePoint(Util.euclideanDistance(points[indexes[i]].x, points[indexes[i]].y, 
+                //                                                  points[indexes[j]].x, points[indexes[j]].y), i, j));
+                list.add(new DistancePoint(Util.euclideanDistance(points[i].x, points[i].y, 
+                                                                  points[j].x, points[j].y), i, j));
+            }
         Collections.sort(list, (DistancePoint a, DistancePoint b)->{
             return new Double(a.distance).compareTo(b.distance);
         });
@@ -1624,9 +1636,13 @@ public class Util {
             if( !valid[list.get(i).i] || !valid[list.get(i).j] )
                 continue;
             
-            Rectangle r1 = new Rectangle((int)points[indexes[list.get(i).i]].x, (int)points[indexes[list.get(i).i]].y, 
+//            Rectangle r1 = new Rectangle((int)points[indexes[list.get(i).i]].x, (int)points[indexes[list.get(i).i]].y, 
+//                                         2*radius, 2*radius);
+//            Rectangle r2 = new Rectangle((int)points[indexes[list.get(i).j]].x, (int)points[indexes[list.get(i).j]].y, 
+//                                         2*radius, 2*radius);
+            Rectangle r1 = new Rectangle((int)points[list.get(i).i].x, (int)points[list.get(i).i].y, 
                                          2*radius, 2*radius);
-            Rectangle r2 = new Rectangle((int)points[indexes[list.get(i).j]].x, (int)points[indexes[list.get(i).j]].y, 
+            Rectangle r2 = new Rectangle((int)points[list.get(i).j].x, (int)points[list.get(i).j].y, 
                                          2*radius, 2*radius);
             
             if( r1.intersects(r2) )
@@ -1643,7 +1659,7 @@ public class Util {
         return distinctIndexes.stream().mapToInt((e)->e).toArray();
     }
     
-    public static Map<Integer, List<Integer>> createIndex(int[] representatives, Point2D.Double[] points) {
+    public static Map<Integer, List<Integer>> createIndex(int[] representatives, Vect[] points) {
         Map<Integer, List<Integer>> hash = new HashMap<>();
         Set<Integer> representativeSet = new HashSet<>();
         
@@ -1663,10 +1679,11 @@ public class Util {
                 if( i == representatives[j] )
                     continue;
                 
-                Point2D.Double p1 = points[i];
-                Point2D.Double p2 = points[representatives[j]];                
+                Vect p1 = points[i];
+                Vect p2 = points[representatives[j]];                
                 
-                double dist = Util.euclideanDistance(p1.x, p1.y, p2.x, p2.y);
+                //double dist = Util.euclideanDistance(p1.x, p1.y, p2.x, p2.y);
+                double dist = p1.distance(p2);
                 if( dist < minDist ) {
                     minDist = dist;
                     index = j;
@@ -1776,6 +1793,89 @@ public class Util {
         }   
     
     }
+    
+    private static float[][] normalizeVertex(float begin, float end, float[][] proj) {
+        
+        float[][] newproj = new float[proj.length][proj[0].length];
+        float maxX = proj[0][0];
+        float minX = proj[0][0];
+        float maxY = proj[0][1];
+        float minY = proj[0][1];
+
+        //Encontra o maior e menor valores para X e Y        
+        for( int i = 0; i < proj.length; ++i ) {
+            if (maxX < proj[i][0]) {
+                maxX = proj[i][0];
+            } else {
+                if (minX > proj[i][0]) {
+                    minX = proj[i][0];
+                }
+            }
+
+            if (maxY < proj[i][1]) {
+                maxY = proj[i][1];
+            } else {
+                if (minY > proj[i][1]) {
+                    minY = proj[i][1];
+                }
+            }
+        }
+        
+        
+
+        ///////Fazer a largura ficar proporcional a altura
+        float endX = ((maxX - minX) * end);
+        if (maxY != minY) {
+            endX = ((maxX - minX) * end) / (maxY - minY);
+        }
+        //////////////////////////////////////////////////
+
+        //Normalizo        
+        for( int i = 0; i < proj.length; ++i ) {
+            if (maxX != minX) {                
+                newproj[i][0] = (((proj[i][0] - minX) / (maxX - minX)) * (endX - begin)) + begin;
+            } else {
+                newproj[i][0] = begin;
+            }
+
+            if (maxY != minY) {
+                newproj[i][1] = ((((proj[i][1] - minY) / (maxY - minY)) * (end - begin)) + begin);
+            } else {
+                newproj[i][1] = begin;
+            }
+        }
+        
+        return newproj;
+    }
+    
+    public static Point2D.Double[] projectData(int[] indexes, Vect[] dataset) { 
+        List<Vector> vectors = new ArrayList<>();
+        for( int i = 0; i < indexes.length; ++i ) {
+            vectors.add(new DenseVector(dataset[indexes[i]].vector()));
+        }
+
+        DenseMatrix matrix = new DenseMatrix();
+        for( Vector v: vectors )
+            matrix.addRow(v);
+
+        ProjectionData pdata = new ProjectionData();
+        pdata.setDissimilarityType(DissimilarityType.EUCLIDEAN);
+        pdata.setProjectorType(ProjectorType.FASTMAP);
+        int k = (int)(0.1*indexes.length>1?0.1*indexes.length:1);
+        pdata.setKnnNumberNeighbors(k);
+        float[][] proj = ProjectionFactory.getInstance(ProjectionType.IDMAP).project(matrix, pdata, null);
+
+        float begin = 10 * 5 + 10;
+        float end = ((float) 768.0) / 1.65f;
+        float[][] newproj = normalizeVertex(begin, end, proj);
+        
+        Point2D.Double[] projection = new Point2D.Double[newproj.length];
+        for( int i = 0; i < projection.length; ++i )
+            projection[i] = new Point2D.Double(newproj[i][0], newproj[i][1]);                    
+        
+        return projection;
+    }         
+    
 
     
              

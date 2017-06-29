@@ -6,6 +6,7 @@
 package br.com.explore.explorertree;
 
 import br.com.methods.utils.Util;
+import br.com.methods.utils.Vect;
 import br.com.representative.RepresentativeFinder;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
@@ -37,11 +38,14 @@ public class ExplorerTreeController {
     private List<Polygon> _polygons;
 
     private Map<ExplorerTreeNode, Polygon> _pointPolygon = new HashMap<>();
+    
+    private Vect[] _dataset;
 
-    public ExplorerTreeController(Point2D.Double[] projection, Point2D.Double[] projectionCenter,
+    public ExplorerTreeController(Vect[] dataset, Point2D.Double[] projection, Point2D.Double[] projectionCenter,
             RepresentativeFinder representativeSelection,
             int minInstances, int sizeIntances, int distinctionDistance) {
-
+        
+        _dataset = dataset;
         _projectionCenter = projectionCenter;
         _projection = projection;
         _representativeSelection = representativeSelection;
@@ -80,7 +84,7 @@ public class ExplorerTreeController {
     
 
     public void build() {
-        _explorerTree = new ExplorerTree(_projection, _representativeSelection, _distinctionDistance, _minInstances);
+        _explorerTree = new ExplorerTree(_dataset, _representativeSelection, _distinctionDistance, _minInstances);
         _explorerTree.build();
         _explorerTree.buildActiveNodes();
 
@@ -102,14 +106,17 @@ public class ExplorerTreeController {
         window.addPoint(width, 0);
         window.addPoint(width, height);
         window.addPoint(0, height);
-
+        System.out.println("Representative size: "+_representative.length);
         Point2D.Double[] points = new Point2D.Double[_representative.length - indexNewRepresentative];
 
         Map<Point2D.Double, Integer> pointIndex = new HashMap<>();
         for (int i = 0; i < points.length; ++i) {
             int index = _representative[i + indexNewRepresentative];
             addedIndexes.add(index);
-            points[i] = new Point2D.Double(_projectionCenter[index].x, _projectionCenter[index].y);
+            points[i] = new Point2D.Double(_explorerTree.indexesProjection()[i + indexNewRepresentative].x, 
+                                           _explorerTree.indexesProjection()[i + indexNewRepresentative].y);
+            System.out.println(">> "+_explorerTree.indexesProjection()[i + indexNewRepresentative].x+" "+
+                                    _explorerTree.indexesProjection()[i + indexNewRepresentative].y);
             pointIndex.put(points[i], index);
         }
 
