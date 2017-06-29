@@ -1899,30 +1899,34 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_expandingEdgeJMenuItemActionPerformed
 
     
-    public void normalizeVertex(float begin, float end, float[][] proj) {
+    public float[][] normalizeVertex(float begin, float end, float[][] proj) {
+        
+        float[][] newproj = new float[proj.length][proj[0].length];
         float maxX = proj[0][0];
         float minX = proj[0][0];
         float maxY = proj[0][1];
         float minY = proj[0][1];
 
-        //Encontra o maior e menor valores para X e Y
-        for (visualizer.graph.Vertex v : this.vertex) {
-            if (maxX < v.getX()) {
-                maxX = v.getX();
+        //Encontra o maior e menor valores para X e Y        
+        for( int i = 0; i < proj.length; ++i ) {
+            if (maxX < proj[i][0]) {
+                maxX = proj[i][0];
             } else {
-                if (minX > v.getX()) {
-                    minX = v.getX();
+                if (minX > proj[i][0]) {
+                    minX = proj[i][0];
                 }
             }
 
-            if (maxY < v.getY()) {
-                maxY = v.getY();
+            if (maxY < proj[i][1]) {
+                maxY = proj[i][1];
             } else {
-                if (minY > v.getY()) {
-                    minY = v.getY();
+                if (minY > proj[i][1]) {
+                    minY = proj[i][1];
                 }
             }
         }
+        
+        
 
         ///////Fazer a largura ficar proporcional a altura
         float endX = ((maxX - minX) * end);
@@ -1931,23 +1935,22 @@ public class Menu extends javax.swing.JFrame {
         }
         //////////////////////////////////////////////////
 
-        //Normalizo
-        for (visualizer.graph.Vertex v : this.vertex) {
-            if (maxX != minX) {
-                v.setX((((v.getX() - minX) / (maxX - minX)) *
-                        (endX - begin)) + begin);
+        //Normalizo        
+        for( int i = 0; i < proj.length; ++i ) {
+            if (maxX != minX) {                
+                newproj[i][0] = (((proj[i][0] - minX) / (maxX - minX)) * (endX - begin)) + begin;
             } else {
-                v.setX(begin);
+                newproj[i][0] = begin;
             }
 
             if (maxY != minY) {
-                v.setY(((((v.getY() - minY) / (maxY - minY)) *
-                        (end - begin)) + begin));
+                newproj[i][1] = ((((proj[i][1] - minY) / (maxY - minY)) * (end - begin)) + begin);
             } else {
-                v.setY(begin);
+                newproj[i][1] = begin;
             }
-
         }
+        
+        return newproj;
     }
     
     
@@ -1991,14 +1994,18 @@ public class Menu extends javax.swing.JFrame {
                 pdata.setProjectorType(ProjectorType.FASTMAP);
                 float[][] proj = ProjectionFactory.getInstance(ProjectionType.IDMAP).project(matrix2, pdata, null);
                 
+                float begin = 10 * 5 + 10;
+                float end = ((float) 768.0) / 1.65f;
+                float[][] newproj = normalizeVertex(begin, end, proj);
                 DenseMatrix projecao = new DenseMatrix();
                 ArrayList<String> att = new ArrayList<>();
                 att.add("X");
                 att.add("Y");
                 projecao.setAttributes(att);
+                
                 for( int i = 0; i < proj.length; ++i ) {
                     
-                    projecao.addRow(new DenseVector(proj[i], matrix2.getRow(i).getId(), matrix2.getRow(i).getKlass()));
+                    projecao.addRow(new DenseVector(newproj[i], matrix2.getRow(i).getId(), matrix2.getRow(i).getKlass()));
                 }
                 projecao.save("test.prj");
             
