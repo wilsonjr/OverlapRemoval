@@ -46,12 +46,19 @@ public class OneLevelOverlap implements OverlapRemoval {
     
     private ArrayList<OverlapRect> removeOverlap(ArrayList<OverlapRect> rect) {
         ArrayList<OverlapRect> rects = new ArrayList<>();
-      
+        ArrayList<OverlapRect> rects2 = new ArrayList<>();
+        
         for( int i = 0; i < rect.size(); ++i ) {
             rects.add(new OverlapRect(rect.get(i).x, rect.get(i).y, rect.get(i).width, rect.get(i).height, rect.get(i).getId()));
+            rects2.add(new OverlapRect(rect.get(i).x, rect.get(i).y, rect.get(i).width, rect.get(i).height, rect.get(i).getId()));
         }
                 
         Collections.sort(rects, (a, b) -> {
+            return Double.compare(Util.euclideanDistance(b.x, b.y, rect.get(rep).x, rect.get(rep).y), 
+                                  Util.euclideanDistance(a.x, a.y, rect.get(rep).x, rect.get(rep).y));
+        });
+        
+        Collections.sort(rects2, (a, b) -> {
             return Double.compare(Util.euclideanDistance(b.x, b.y, rect.get(rep).x, rect.get(rep).y), 
                                   Util.euclideanDistance(a.x, a.y, rect.get(rep).x, rect.get(rep).y));
         });
@@ -131,7 +138,29 @@ public class OneLevelOverlap implements OverlapRemoval {
                    }
 
 
-               } 
+               } else {
+                   
+                   double d1 = Util.euclideanDistance(rects.get(i).x, rects.get(i).y, rects.get(j).x, rects.get(j).y);
+                   double d2 = Util.euclideanDistance(rects2.get(i).x, rects2.get(i).y, rects2.get(j).x, rects2.get(j).y);
+                   
+                   if( d1 < d2 ) {
+                       double ax = r2.x;
+                       double ay = r2.y;
+                       double bx = r1.x;
+                       double by = r1.y;
+                       
+                       double lenAB = d1;
+                       
+                       double ammountx = (bx-ax)/lenAB*(d2-d1);
+                       double ammounty = (by-ay)/lenAB*(d2-d1);
+                       
+                       r1.x = bx+ammountx;
+                       r1.y = by+ammounty;
+                       
+                   }
+                   
+                   
+               }
             }
 
         }

@@ -57,6 +57,7 @@ import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Pair;
 import br.com.methods.utils.RectangleVis;
 import br.com.methods.utils.Util;
+import br.com.methods.utils.Vect;
 import br.com.projection.spacereduction.SeamCarving;
 import br.com.representative.Dijsktra;
 import br.com.representative.RepresentativeFinder;
@@ -1751,10 +1752,11 @@ public class Menu extends javax.swing.JFrame {
                 // must test with alpha = 0.3
                 RepresentativeFinder ds3 = new DS3(distances, 0.1);
                 RepresentativeFinder smrs = new SMRS(attrs);
+                RepresentativeFinder furs = new FURS(Arrays.asList(points), (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
                 
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         kmeans, 7, RECTSIZE, RECTSIZE/2);
+                         furs, 7, RECTSIZE, RECTSIZE/2);
                 
                 controller.build();                
                 controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
@@ -1792,11 +1794,18 @@ public class Menu extends javax.swing.JFrame {
         if( rectangles == null )
             loadDataJMenuItemActionPerformed(null);
         
-        RepresentativeFinder furs = new FURS(Arrays.asList(points), (int)(0.2*points.length), 15);
+        FURS furs = new FURS(Arrays.asList(points), (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
         System.out.println("Init FURS");
-        furs.execute();
+        //furs.execute();
+        //selectedRepresentatives =  furs.getRepresentatives(); 
+        
+        List<Vect> elements = new ArrayList<>();        
+        for( int i = 0; i < points.length; ++i ) {
+            elements.add(new Vect(new double[]{points[i].x, points[i].y}));
+        }
+        selectedRepresentatives = furs.execute(elements, 15, (int)(0.2*points.length));
         System.out.println("Finished FURS");
-        selectedRepresentatives =  furs.getRepresentatives();
+       
         hashRepresentative = Util.createIndex(selectedRepresentatives, points);
         
         if( view != null ) {
