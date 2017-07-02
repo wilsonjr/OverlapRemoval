@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package br.com.explore.explorertree;
+package br.com.explore.explorertree.util;
 
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;

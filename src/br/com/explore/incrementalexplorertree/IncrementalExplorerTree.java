@@ -2,8 +2,12 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-package br.com.explore.explorertree;
+package br.com.explore.incrementalexplorertree;
 
 import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
@@ -23,9 +27,9 @@ import java.util.logging.Logger;
  *
  * @author Windows
  */
-public class ExplorerTree {
+public class IncrementalExplorerTree {
     
-    private List<ExplorerTreeNode> _topNodes;
+    private List<IncrementalExplorerTreeNode> _topNodes;
     private Vect[] _projection;
     
     private RepresentativeFinder _representativeAlgorithm;
@@ -33,11 +37,11 @@ public class ExplorerTree {
     private int _distinctionDistance;
     private int _minChildren;
     
-    private Map<Integer, ExplorerTreeNode> _activeNodes;
+    private Map<Integer, IncrementalExplorerTreeNode> _activeNodes;
     
     private Point2D.Double[] _indexesProjection;
     
-    public ExplorerTree(Vect[] projection, RepresentativeFinder representativeAlgorithm, 
+    public IncrementalExplorerTree(Vect[] projection, RepresentativeFinder representativeAlgorithm, 
                         int distinctionDistance, int minChildren) {
         _projection = projection;
         _representativeAlgorithm = representativeAlgorithm;
@@ -46,17 +50,17 @@ public class ExplorerTree {
     }
     
     public void build() {
-        Logger.getLogger(ExplorerTree.class.getName()).log(Level.INFO, "Creating level one.");
+        Logger.getLogger(IncrementalExplorerTree.class.getName()).log(Level.INFO, "Creating level one.");
         createLevelOne();
-        Logger.getLogger(ExplorerTree.class.getName()).log(Level.INFO, "Finish creating level one.");
-        Logger.getLogger(ExplorerTree.class.getName()).log(Level.INFO, "Now creating subtrees");
+        Logger.getLogger(IncrementalExplorerTree.class.getName()).log(Level.INFO, "Finish creating level one.");
+        Logger.getLogger(IncrementalExplorerTree.class.getName()).log(Level.INFO, "Now creating subtrees");
         createSubTree();
-        Logger.getLogger(ExplorerTree.class.getName()).log(Level.INFO, "Finish creating subtrees");
+        Logger.getLogger(IncrementalExplorerTree.class.getName()).log(Level.INFO, "Finish creating subtrees");
     }
     
         
     public void createSubTree() {
-        _topNodes.stream().forEach(ExplorerTreeNode::createSubTree);
+        _topNodes.stream().forEach(IncrementalExplorerTreeNode::createSubTree);
     }
     
     private void createLevelOne() {
@@ -100,7 +104,7 @@ public class ExplorerTree {
 //        for( int i = 0; i < _indexesProjection.length; ++i ) {
 //            System.out.println("*** 3 "+_indexesProjection[i].x+" "+_indexesProjection[i].y);
 //        }
-        Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives before {0}", map.size());
+        Logger.getLogger(IncrementalExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives before {0}", map.size());
         
         // remove representatives which represent only < _minChildren
         Util.removeDummyRepresentive(map, _minChildren);
@@ -108,7 +112,7 @@ public class ExplorerTree {
 //            System.out.println("*** 4 "+_indexesProjection[i].x+" "+_indexesProjection[i].y);
 //        }
         
-        Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives after  {0}", map.size());
+        Logger.getLogger(IncrementalExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives after  {0}", map.size());
         System.out.println("................................");
         
         
@@ -170,7 +174,7 @@ public class ExplorerTree {
             System.out.println("Olha o elem: "+elem+": "+indexes.get(elem));
             System.out.println("ExplorerTree::representative: "+representative+" size: "+points.length);
             // do the same to each subprojection
-            ExplorerTreeNode node = new ExplorerTreeNode(_minChildren, _distinctionDistance, representative, points,
+            IncrementalExplorerTreeNode node = new IncrementalExplorerTreeNode(_minChildren, _distinctionDistance, representative, points,
                     indexes.stream().mapToInt((Integer value)->value).toArray(), _representativeAlgorithm, null, elem, 
                     indexToPoint.get(representative));
             node.addEntry(representative, indexToPoint.get(representative));
@@ -195,18 +199,18 @@ public class ExplorerTree {
     }
     
     public void expandNode(int index, Polygon polygon) {
-        ExplorerTreeNode node = _activeNodes.get(index);
+        IncrementalExplorerTreeNode node = _activeNodes.get(index);
         node.setPolygon(polygon);
         _activeNodes.remove(index);
         
-        node.children().stream().forEach((ExplorerTreeNode value) -> { _activeNodes.put(value.routing(), value); });        
+        node.children().stream().forEach((IncrementalExplorerTreeNode value) -> { _activeNodes.put(value.routing(), value); });        
     }
     
-    public Map<Integer, ExplorerTreeNode> activeNodes() {
+    public Map<Integer, IncrementalExplorerTreeNode> activeNodes() {
         return _activeNodes;
     }
     
-    public List<ExplorerTreeNode> topNodes() {
+    public List<IncrementalExplorerTreeNode> topNodes() {
         return _topNodes;
     }
     
@@ -247,7 +251,7 @@ public class ExplorerTree {
         return temp;
     }
 
-    public List<Integer> filterNodes(ExplorerTreeNode parent) {
+    public List<Integer> filterNodes(IncrementalExplorerTreeNode parent) {
         
        List<Integer> toRemove = new ArrayList<>();
        _activeNodes.entrySet().stream().filter((value) -> ( value.getValue().isChild(parent) )).forEachOrdered((value) -> {

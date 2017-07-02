@@ -2,8 +2,12 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-package br.com.explore.explorertree;
+package br.com.explore.incrementalexplorertree;
 
 import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
@@ -22,9 +26,9 @@ import math.geom2d.polygon.SimplePolygon2D;
  *
  * @author Windows
  */
-public class ExplorerTreeController {
+public class IncrementalExplorerTreeController {
 
-    private ExplorerTree _explorerTree;
+    private IncrementalExplorerTree _explorerTree;
     private final int _minInstances;
     private final RepresentativeFinder _representativeSelection;
     private final int _sizeInstances;
@@ -37,7 +41,7 @@ public class ExplorerTreeController {
 
     private List<Polygon> _polygons;
 
-    private Map<ExplorerTreeNode, Polygon> _pointPolygon = new HashMap<>();
+    private Map<IncrementalExplorerTreeNode, Polygon> _pointPolygon = new HashMap<>();
     
     private Vect[] _dataset;
     
@@ -46,7 +50,7 @@ public class ExplorerTreeController {
     private static Point2D.Double[] incrementalProjection = null;
     private static Point2D.Double[] incrementalProjectionBefore = null;
 
-    public ExplorerTreeController(Vect[] dataset, Point2D.Double[] projection, Point2D.Double[] projectionCenter,
+    public IncrementalExplorerTreeController(Vect[] dataset, Point2D.Double[] projection, Point2D.Double[] projectionCenter,
             RepresentativeFinder representativeSelection,
             int minInstances, int sizeIntances, int distinctionDistance) {
         
@@ -70,7 +74,7 @@ public class ExplorerTreeController {
         this._projectionCenter = _projectionCenter;
     }
 
-    public ExplorerTree explorerTree() {
+    public IncrementalExplorerTree explorerTree() {
         return _explorerTree;
     }
 
@@ -86,15 +90,15 @@ public class ExplorerTreeController {
         return _distinctionDistance;
     }
     
-    private void normalizeProjection(List<ExplorerTreeNode> nodes) {
+    private void normalizeProjection(List<IncrementalExplorerTreeNode> nodes) {
         
         
         for( int i = 0; i < nodes.size(); ++i ) {
-            ExplorerTreeNode node = nodes.get(i);
+            IncrementalExplorerTreeNode node = nodes.get(i);
             
             System.out.println("NODE ROUTING: "+node.routing()+" "+node.pointRep().x+" "+node.pointRep().y);
             
-            List<ExplorerTreeNode> ch = node.children();
+            List<IncrementalExplorerTreeNode> ch = node.children();
             
             double deltax = 0;
             double deltay = 0;
@@ -164,10 +168,10 @@ public class ExplorerTreeController {
         }
     }
     
-    private void viewTree(List<ExplorerTreeNode> nodes, String distance) {
+    private void viewTree(List<IncrementalExplorerTreeNode> nodes, String distance) {
         
         for( int i = 0; i < nodes.size(); ++i ) {
-            ExplorerTreeNode node = nodes.get(i);
+            IncrementalExplorerTreeNode node = nodes.get(i);
             System.out.println(distance+"routing: "+node.routing()+", point("+node.pointRep().x+","+node.pointRep().y+")");
             viewTree(node.children(), distance+"-----");            
         }
@@ -177,7 +181,7 @@ public class ExplorerTreeController {
     
 
     public void build() {
-        _explorerTree = new ExplorerTree(_dataset, _representativeSelection, _distinctionDistance, _minInstances);
+        _explorerTree = new IncrementalExplorerTree(_dataset, _representativeSelection, _distinctionDistance, _minInstances);
         _explorerTree.build();
         _explorerTree.buildActiveNodes();
 
@@ -194,7 +198,7 @@ public class ExplorerTreeController {
         viewTree(_explorerTree.topNodes(), "");
         normalizeProjection(_explorerTree.topNodes());
         viewTree(_explorerTree.topNodes(), "");
-        for( ExplorerTreeNode node: _explorerTree.topNodes() ) {
+        for( IncrementalExplorerTreeNode node: _explorerTree.topNodes() ) {
             System.out.println("pointRep: "+node.pointRep().x+" "+node.pointRep().y);
             addPointsBefore(node.pointRep());
         }
@@ -281,7 +285,7 @@ public class ExplorerTreeController {
         return index;
     }
 
-    public ExplorerTreeNode getNode(int index) {
+    public IncrementalExplorerTreeNode getNode(int index) {
         return _explorerTree.activeNodes().get(index);
     }
 
@@ -302,7 +306,7 @@ public class ExplorerTreeController {
     }
 
     public int expandNode(int index, Polygon clickedPolygon) {
-        ExplorerTreeNode node = _explorerTree.activeNodes().get(index);
+        IncrementalExplorerTreeNode node = _explorerTree.activeNodes().get(index);
 
         _explorerTree.expandNode(index, clickedPolygon);
         int[] reps = new int[node.children().size() + _representative.length - 1];
@@ -316,13 +320,13 @@ public class ExplorerTreeController {
 
         int indexNewRepresentative = j;
 
-        for (ExplorerTreeNode n : node.children()) {
+        for (IncrementalExplorerTreeNode n : node.children()) {
             reps[j++] = n.routing();
         }
 
         _representative = Arrays.copyOf(reps, reps.length);
 
-        for (ExplorerTreeNode n : node.children()) {
+        for (IncrementalExplorerTreeNode n : node.children()) {
             List<Integer> nearest = new ArrayList<>();
             Arrays.stream(n.indexes()).forEach((i) -> nearest.add(i));
             _nearest.put(n.routing(), nearest);
@@ -334,8 +338,8 @@ public class ExplorerTreeController {
 
     public List<Integer> agglomerateNode(int index) {
 
-        ExplorerTreeNode node = _explorerTree.activeNodes().get(index);
-        ExplorerTreeNode parent = node.parent();
+        IncrementalExplorerTreeNode node = _explorerTree.activeNodes().get(index);
+        IncrementalExplorerTreeNode parent = node.parent();
 
         List<Integer> indexes = _explorerTree.filterNodes(parent);
         for (Integer v : indexes) {

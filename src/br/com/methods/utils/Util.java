@@ -1,8 +1,8 @@
 package br.com.methods.utils;
 
 import Jama.Matrix;
-import br.com.explore.explorertree.ExplorerTreeController;
-import br.com.explore.explorertree.ExplorerTreeNode;
+import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeController;
+import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeNode;
 import br.com.methods.overlap.prism.PRISMEdge;
 import br.com.methods.overlap.prism.PRISMPoint;
 import br.com.methods.overlap.prism.SetPoint;
@@ -1578,8 +1578,8 @@ public class Util {
     }
 
     public static Polygon[] clipBounds(Polygon[] diagrams, Point2D.Double[] pts, 
-            Map<ExplorerTreeNode, Polygon> map, List<Point2D.Double> pVoronoi, 
-            ExplorerTreeController controller, Map<Point2D.Double, Integer> indexes) {
+            Map<IncrementalExplorerTreeNode, Polygon> map, List<Point2D.Double> pVoronoi, 
+ IncrementalExplorerTreeController controller, Map<Point2D.Double, Integer> indexes) {
         
         SimplePolygon2D p1 = new SimplePolygon2D();
         for( int i = 0; i < pts.length; ++i ) {

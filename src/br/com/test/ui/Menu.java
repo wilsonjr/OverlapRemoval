@@ -30,16 +30,240 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package br.com.test.ui;
 
 
-import br.com.explore.explorertree.ExplorerTree;
-import br.com.explore.explorertree.ExplorerTreeController;
-import br.com.explore.explorertree.ExplorerTreeNode;
-import br.com.explore.explorertree.ForceLayout;
-import br.com.explore.explorertree.Tooltip;
+import br.com.explore.incrementalexplorertree.IncrementalExplorerTree;
+import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeController;
+import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeNode;
+import br.com.explore.explorertree.util.ForceLayout;
+import br.com.explore.explorertree.util.Tooltip;
 import br.com.methods.overlap.expadingnode.OneLevelOverlap;
 import br.com.methods.overlap.expadingnode.OverlapTree;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
@@ -180,14 +404,14 @@ public class Menu extends javax.swing.JFrame {
     private Point2D.Double[] centerPoints = null;
     private ArrayList<Vect> items = null;
     private Point2D.Double[] points = null;
-    private ExplorerTree explorerTree;
+    private IncrementalExplorerTree explorerTree;
     
     private Polygon clickedPolygon = null;
     private int indexNewRepresentatives = -1;
     
     private Map<Point2D.Double, Polygon> mapPointPolygon = new HashMap<>();
     
-    private ExplorerTreeController controller = null;
+    private IncrementalExplorerTreeController controller = null;
     
     private List<Integer> movingIndexes = new ArrayList<>();
     private List<Point2D.Double> toDraw = new ArrayList<>();
@@ -1783,7 +2007,7 @@ public class Menu extends javax.swing.JFrame {
                 RepresentativeFinder smrs = new SMRS(attrs);
                 RepresentativeFinder furs = new FURS(elements, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
                 
-                controller = new ExplorerTreeController(dataset.stream().map((v)->v).toArray(Vect[]::new), points, 
+                controller = new IncrementalExplorerTreeController(dataset.stream().map((v)->v).toArray(Vect[]::new), points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
                          ds3, 7, RECTSIZE, RECTSIZE/2);
                 
@@ -1922,7 +2146,7 @@ public class Menu extends javax.swing.JFrame {
                 RepresentativeFinder smrs = new SMRS(attrs);
                 RepresentativeFinder furs = new FURS(elements, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
                 
-                controller = new ExplorerTreeController(dataset.stream().map((v)->v).toArray(Vect[]::new), points, 
+                controller = new IncrementalExplorerTreeController(dataset.stream().map((v)->v).toArray(Vect[]::new), points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
                          kmeans, 10, RECTSIZE, RECTSIZE/2);
               
@@ -2488,7 +2712,7 @@ public class Menu extends javax.swing.JFrame {
             double distance =  Util.euclideanDistance(rectangles.get(representative).x, rectangles.get(representative).y, 
                                                       proj1.get(i).x, proj1.get(i).y);
             
-            double weight = ExplorerTreeController.calculateWeight(10, 0.2*10, maxDistance, distance);
+            double weight = IncrementalExplorerTreeController.calculateWeight(10, 0.2*10, maxDistance, distance);
             data.add(new Element(proj2.get(i).getId(), (float)proj2.get(i).x, (float)proj2.get(i).y, (float) weight, 1));
             
             System.out.println("id: "+proj2.get(i).getId()+" x: "+proj2.get(i).x+" -- y: "+proj2.get(i).y);
@@ -2849,7 +3073,7 @@ public class Menu extends javax.swing.JFrame {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
                         
                         if( index != -1 ) {  
-                            ExplorerTreeNode node = controller.getNode(index);                            
+                            IncrementalExplorerTreeNode node = controller.getNode(index);                            
                             if( notches > 0 && node.parent() != null )
                                 agglomerateAnimation(index, node);
                             else if( notches < 0 && !node.children().isEmpty() )
@@ -2879,7 +3103,7 @@ public class Menu extends javax.swing.JFrame {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
                         lastClicked = new Point2D.Double(e.getX(), e.getY());
                         if( index != -1 ) {        
-                            ExplorerTreeNode node = controller.getNode(index);                            
+                            IncrementalExplorerTreeNode node = controller.getNode(index);                            
                             if( e.isControlDown() && node.parent() != null )
                                 agglomerateAnimation(index, node);                                      
                             else if( !node.children().isEmpty() )
@@ -2909,7 +3133,7 @@ public class Menu extends javax.swing.JFrame {
                             
                             if( tooltip != null )
                                 return;
-                            ExplorerTreeNode node = controller.getNode(index);                            
+                            IncrementalExplorerTreeNode node = controller.getNode(index);                            
                             if( node.children().isEmpty() ) {      
                                 semaphore = true;
                                 List<OverlapRect> projection = removeOverlap(controller.nearest().get(index));
@@ -2979,7 +3203,7 @@ public class Menu extends javax.swing.JFrame {
                      
         }
         
-        private void agglomerateAnimation(int index, ExplorerTreeNode node) {
+        private void agglomerateAnimation(int index, IncrementalExplorerTreeNode node) {
             
             semaphore = true;
             movingIndexes = controller.agglomerateNode(index);

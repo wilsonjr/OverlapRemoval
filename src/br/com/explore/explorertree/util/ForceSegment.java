@@ -2,10 +2,15 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
-package br.com.explore.explorertree;
+package br.com.explore.explorertree.util;
 
+import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeController;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
 import java.util.ArrayList;
@@ -36,7 +41,7 @@ public class ForceSegment implements RepulsiveNode {
             double by = elems.get(i).y;
             
             double lenAB = Util.euclideanDistance(ax, ay, bx, by);
-            double weight = ExplorerTreeController.calculateWeight(maxWeight, minWeight, maxDist, lenAB);
+            double weight = IncrementalExplorerTreeController.calculateWeight(maxWeight, minWeight, maxDist, lenAB);
             
             double cx = bx + (bx-ax)/lenAB * weight;
             double cy = by + (by-ay)/lenAB * weight;

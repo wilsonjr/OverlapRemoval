@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.explore.explorertree;
+package br.com.explore.explorertree.util;
 
 import br.com.methods.utils.OverlapRect;
 import java.awt.Color;

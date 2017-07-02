@@ -2,11 +2,23 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ *//*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package br.com.methods.overlap.expadingnode;
 
-import br.com.explore.explorertree.ExplorerTreeController;
-import br.com.explore.explorertree.ExplorerTreeNode;
+import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeController;
+import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeNode;
 import br.com.methods.overlap.OverlapRemoval;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
@@ -24,20 +36,20 @@ import java.util.Map;
  */
 public class OverlapTree implements OverlapRemoval {
 
-    private ExplorerTreeController controller;
+    private IncrementalExplorerTreeController controller;
     private int SIZERECT = 20;
     private int additionalIterations = 0;
     
-    public OverlapTree(ExplorerTreeController controller, int additionalIterations) {
+    public OverlapTree(IncrementalExplorerTreeController controller, int additionalIterations) {
         this.controller = controller;
         this.additionalIterations = additionalIterations;
     }
 
-    public OverlapTree(ExplorerTreeController controller) {
+    public OverlapTree(IncrementalExplorerTreeController controller) {
         this(controller, 0);
     }
 
-    private OverlapNode removeOverlap(List<ExplorerTreeNode> nodes) {
+    private OverlapNode removeOverlap(List<IncrementalExplorerTreeNode> nodes) {
         List<OverlapNode> elems = new ArrayList<>();
 
         for (int i = 0; i < nodes.size(); ++i) {
