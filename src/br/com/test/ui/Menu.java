@@ -1783,13 +1783,16 @@ public class Menu extends javax.swing.JFrame {
                 RepresentativeFinder smrs = new SMRS(attrs);
                 RepresentativeFinder furs = new FURS(elements, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
                 
-                controller = new ExplorerTreeController(elements.stream().map((v)->v).toArray(Vect[]::new), points, 
+                controller = new ExplorerTreeController(dataset.stream().map((v)->v).toArray(Vect[]::new), points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
                          ds3, 7, RECTSIZE, RECTSIZE/2);
                 
                 controller.build();                 
                 
-                controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
+                int width = 1600;
+                int height = 1000;
+                
+                //controller.updateDiagram(width, height, 0, null);
                 
                 view.cleanImage();
                 view.repaint();
@@ -2037,16 +2040,14 @@ public class Menu extends javax.swing.JFrame {
                 }
                 
                 List<Vector> vectors = new ArrayList<>();                
-                vectors.add(matrix.getRow(10));
+                vectors.add(matrix.getRow(110));
+                vectors.add(matrix.getRow(146));
+                vectors.add(matrix.getRow(70));
+                vectors.add(matrix.getRow(129));
                 vectors.add(matrix.getRow(103));
-                vectors.add(matrix.getRow(111));
-                vectors.add(matrix.getRow(144));
-                vectors.add(matrix.getRow(147));
-                vectors.add(matrix.getRow(40));
-                vectors.add(matrix.getRow(15));
-                vectors.add(matrix.getRow(107));
-                vectors.add(matrix.getRow(6));
-                vectors.add(matrix.getRow(54));
+                vectors.add(matrix.getRow(18));
+                vectors.add(matrix.getRow(42));
+                vectors.add(matrix.getRow(72));
                 DenseMatrix matrix2 = new DenseMatrix();
                 for( Vector v: vectors )
                     matrix2.addRow(v);
@@ -2058,7 +2059,8 @@ public class Menu extends javax.swing.JFrame {
                 float[][] proj = ProjectionFactory.getInstance(ProjectionType.IDMAP).project(matrix2, pdata, null);
                 
                 float begin = 10 * 5 + 10;
-                float end = ((float) 768.0) / 1.65f;
+                float value = 768.5f*9.f/150f;
+                float end = ((float) 768.5) / 1.65f;
                 float[][] newproj = normalizeVertex(begin, end, proj);
                 DenseMatrix projecao = new DenseMatrix();
                 ArrayList<String> att = new ArrayList<>();
@@ -3081,12 +3083,18 @@ public class Menu extends javax.swing.JFrame {
             
             if( imageBuffer == null ) {
                 adjustPanel();
-                setPreferredSize(getSize());
-                this.imageBuffer = new BufferedImage(getSize().width, getSize().height, BufferedImage.TYPE_INT_ARGB);
+                int width = 1600; // getSize().width;
+                int height = 1200; // getSize().height;
+                setPreferredSize(new Dimension(width, height));
+                
+                
+                
+                
+                this.imageBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                 
                 java.awt.Graphics2D g2Buffer = this.imageBuffer.createGraphics();
                 g2Buffer.setColor(this.getBackground());
-                g2Buffer.fillRect(0, 0, getSize().width, getSize().height);
+                g2Buffer.fillRect(0, 0, width, height);
 
                 g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 ArrayList<RectangleVis> pivots = new ArrayList<>();
@@ -3141,10 +3149,10 @@ public class Menu extends javax.swing.JFrame {
                                         g2Buffer.setColor(Color.BLACK);
                                         g2Buffer.drawRect((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                                     }
-                                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1f));
-                                    g2Buffer.setColor(Color.RED);
-                                    g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                                    g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX(), (int)r.getUY()+10); 
+//                                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1f));
+//                                    g2Buffer.setColor(Color.RED);
+//                                    g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+//                                    g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX(), (int)r.getUY()+10); 
                                 }
                             }
                         }
@@ -3250,97 +3258,115 @@ public class Menu extends javax.swing.JFrame {
                     g2Buffer.setColor(Color.GREEN);
                     g2Buffer.drawPolygon(p);                    
                 }
-                
-                if( selectedRepresentatives != null || controller !=  null && controller.representative() != null ) {
-
-                    if( controller != null && controller.nearest() != null ) {
-
-                     //  Util.paintSphere(centerPoints, selectedRepresentatives, hashRepresentative, g2Buffer);
-                        int[] representative = controller.representative();
-                        Map<Integer, List<Integer>> map = controller.nearest();
-                        Point2D.Double[] projectionCenter = controller.projectionCenter();
-                        Point2D.Double[] projection = controller.projection();
-                                
-                        for( int i = 0; i < representative.length; ++i ) {
-                            
-                            float alpha = (float)map.get(representative[i]).size()/(float)points.length;
-                          
-                            Polygon poly = controller.polygon(representative[i]);//getPolygon((int)r.x, (int)r.y);
-                            if( poly != null ) {
-                                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, alpha));
-                                g2Buffer.setColor(Color.RED);
-                                g2Buffer.fillPolygon(poly);
-                                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
-                                g2Buffer.setColor(Color.RED);
-                                g2Buffer.drawPolygon(poly);                                
-                            }
-                            
-                            if( movingRepresentative(representative[i]) )
-                                continue;
-                            
-                            int size = controller.sizeRepresentative(map.get(representative[i]).size());
-                            
-                            Point2D.Double p = projection[representative[i]];
-                            
-                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
-                            g2Buffer.setColor(Color.RED);
-                            g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
-                            g2Buffer.setColor(Color.BLACK);
-                            g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
-                            if( hideShowNumbers ) {
-                                g2Buffer.setColor(Color.BLUE);
-                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                                g2Buffer.drawString(String.valueOf(rectangles.get(representative[i]).numero), 
-                                        (int)p.x+10, (int)p.y+10);  
-                            }
-                        }
-                    } else {
-                        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-                            RectangleVis r = rectangles.get(selectedRepresentatives[i]);
-                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
-                            g2Buffer.setColor(Color.RED);
-                            g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                            g2Buffer.setColor(Color.BLACK);
-                            g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-                                    
-                            if( hideShowNumbers ) {
-                                g2Buffer.setColor(Color.GREEN);
-                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                                g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
-                            }
-                        }
+//                
+                if( controller != null ) {
+                    Point2D.Double[] instances = controller.getIncrementalInstances();
+                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.5f));
+                    for( int i = 0; i < instances.length; ++i ) {
+                        g2Buffer.setColor(Color.BLUE);
+                        g2Buffer.fillRect((int)instances[i].x, (int)instances[i].y, RECTSIZE, RECTSIZE);
+                        g2Buffer.setColor(Color.BLACK);
+                        g2Buffer.drawRect((int)instances[i].x, (int)instances[i].y, RECTSIZE, RECTSIZE);
                     }
                     
-                    if( !toDraw.isEmpty() ) {
-                        int j = movingIndexes.size()-1;
-                        for( int i = toDraw.size()-1; i >= (toDraw.size()-movingIndexes.size()); --i ) {
-                            Point2D.Double p = toDraw.get(i);
-                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
-                            int index = movingIndexes.get(j--);
-                            int size = controller.sizeRepresentative(controller.nearest().get(index).size());
-                            g2Buffer.setColor(Color.RED);
-                            g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
-                            g2Buffer.setColor(Color.BLACK);
-                            g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
-                        }
+                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1f));
+                    g2Buffer.setColor(Color.RED);
+                     instances = controller.getIncrementalInstancesBefore();
+                    for( int i = 0; i < instances.length; ++i ) {
+                        g2Buffer.fillOval((int)instances[i].x, (int)instances[i].y, 10, 10);
                     }
-                    
-                    
                 }
+                
+//                if( selectedRepresentatives != null || controller !=  null && controller.representative() != null ) {
+//
+//                    if( controller != null && controller.nearest() != null ) {
+//                        
+//                        
+//                        
+//
+//                     //  Util.paintSphere(centerPoints, selectedRepresentatives, hashRepresentative, g2Buffer);
+//                        int[] representative = controller.representative();
+//                        Map<Integer, List<Integer>> map = controller.nearest();
+//                        Point2D.Double[] projectionCenter = controller.projectionCenter();
+//                        Point2D.Double[] projection = controller.projection();
+//                                
+//                        for( int i = 0; i < representative.length; ++i ) {
+//                            
+//                            float alpha = (float)map.get(representative[i]).size()/(float)points.length;
+//                          
+//                            Polygon poly = controller.polygon(representative[i]);//getPolygon((int)r.x, (int)r.y);
+//                            if( poly != null ) {
+//                                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, alpha));
+//                                g2Buffer.setColor(Color.RED);
+//                                g2Buffer.fillPolygon(poly);
+//                                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+//                                g2Buffer.setColor(Color.RED);
+//                                g2Buffer.drawPolygon(poly);                                
+//                            }
+//                            
+//                            if( movingRepresentative(representative[i]) )
+//                                continue;
+//                            
+//                            int size = controller.sizeRepresentative(map.get(representative[i]).size());
+//                            
+//                            //Point2D.Double p = projection[representative[i]];
+//                            Point2D.Double p = controller.getPoint(representative[i]);
+//                            
+//                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+//                            g2Buffer.setColor(Color.RED);
+//                            g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
+//                            g2Buffer.setColor(Color.BLACK);
+//                            g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
+//                            if( hideShowNumbers ) {
+//                                g2Buffer.setColor(Color.BLUE);
+//                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+//                                g2Buffer.drawString(String.valueOf(rectangles.get(representative[i]).numero), 
+//                                        (int)p.x+10, (int)p.y+10);  
+//                            }
+//                        }
+//                    } else {
+//                        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+//                            RectangleVis r = rectangles.get(selectedRepresentatives[i]);
+//                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+//                            g2Buffer.setColor(Color.RED);
+//                            g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+//                            g2Buffer.setColor(Color.BLACK);
+//                            g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+//                                    
+//                            if( hideShowNumbers ) {
+//                                g2Buffer.setColor(Color.GREEN);
+//                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+//                                g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
+//                            }
+//                        }
+//                    }
+//                    
+//                    if( !toDraw.isEmpty() ) {
+//                        int j = movingIndexes.size()-1;
+//                        for( int i = toDraw.size()-1; i >= (toDraw.size()-movingIndexes.size()); --i ) {
+//                            Point2D.Double p = toDraw.get(i);
+//                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+//                            int index = movingIndexes.get(j--);
+//                            int size = controller.sizeRepresentative(controller.nearest().get(index).size());
+//                            g2Buffer.setColor(Color.RED);
+//                            g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
+//                            g2Buffer.setColor(Color.BLACK);
+//                            g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
+//                        }
+//                    }
+//                    
+//                    
+//                }
                 
                 /*if( clickedPolygon != null ) {
                     g2Buffer.setColor(Color.BLACK);
                     for( int i = 0; i < clickedPolygon.xpoints.length; ++i )
                         g2Buffer.fillOval(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i], 5, 5); 
                 }*/
-                g2Buffer.setColor(Color.RED);
-                g2Buffer.fillOval((int)499.09649658203125,(int) 238.1253662109375, 10, 10);
-                g2Buffer.fillOval((int)687.8350219726562 ,(int)60.0, 10, 10);
-                g2Buffer.fillOval((int)491.6928405761719 ,(int)293.20166015625, 10, 10);
-                g2Buffer.fillOval((int)289.2015380859375 ,(int)465.4545593261719, 10, 10);
-                g2Buffer.fillOval((int)60.0              ,(int) 345.5175476074219, 10, 10);
-                g2Buffer.fillOval((int)548.0838012695312 ,(int)220.02418518066406, 10, 10);
-                g2Buffer.fillOval((int)1477.6260986328125,(int) 191.5023193359375, 10, 10);
+                
+                
+                
+                
                 
                 
                 if( tooltip != null ) {

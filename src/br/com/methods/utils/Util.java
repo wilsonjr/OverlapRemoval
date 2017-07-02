@@ -1861,12 +1861,18 @@ public class Util {
         ProjectionData pdata = new ProjectionData();
         pdata.setDissimilarityType(DissimilarityType.EUCLIDEAN);
         pdata.setProjectorType(ProjectorType.FASTMAP);
-        int k = (int)(0.1*indexes.length>1?0.1*indexes.length:1);
+        
+        int k = indexes.length > 2 ? 2 : 1;
         pdata.setKnnNumberNeighbors(k);
         float[][] proj = ProjectionFactory.getInstance(ProjectionType.IDMAP).project(matrix, pdata, null);
 
-        float begin = 10 * 5 + 10;
-        float end = ((float) 768.0) / 1.65f;
+        
+        float value = (768.5f*dataset.length)/200.0f;
+        float begin = 5*10+10;
+        float end = ((float) value) / 1.65f;
+        
+        System.out.println(">> size: "+dataset.length+", end: "+end);
+        
         float[][] newproj = normalizeVertex(begin, end, proj);
         
         Point2D.Double[] projection = new Point2D.Double[newproj.length];
@@ -1874,9 +1880,76 @@ public class Util {
             projection[i] = new Point2D.Double(newproj[i][0], newproj[i][1]);                    
         
         return projection;
-    }         
+    }  
     
+    public static Point2D.Double[] projectData(Vect[] dataset) { 
+        List<Vector> vectors = new ArrayList<>();
+        for( int i = 0; i < dataset.length; ++i ) {
+            vectors.add(new DenseVector(dataset[i].vector()));
+        }
 
+        DenseMatrix matrix = new DenseMatrix();
+        for( Vector v: vectors )
+            matrix.addRow(v);
+
+        ProjectionData pdata = new ProjectionData();
+        pdata.setDissimilarityType(DissimilarityType.EUCLIDEAN);
+        pdata.setProjectorType(ProjectorType.FASTMAP);
+        
+        int k = dataset.length > 2 ? 2 : 1;
+        pdata.setKnnNumberNeighbors(k);
+        float[][] proj = ProjectionFactory.getInstance(ProjectionType.IDMAP).project(matrix, pdata, null);
+
+        
+        float value = (768.5f*dataset.length)/200.0f;
+        float begin = 5*10+10;
+        float end = ((float) value) / 1.65f;
+        
+        System.out.println(">> size: "+dataset.length+", end: "+end);
+        
+        float[][] newproj = normalizeVertex(begin, end, proj);
+        
+        Point2D.Double[] projection = new Point2D.Double[newproj.length];
+        for( int i = 0; i < projection.length; ++i )
+            projection[i] = new Point2D.Double(newproj[i][0], newproj[i][1]);                    
+        
+        return projection;
+    }
+    
+    public static Point2D.Double[] projectData(int[] indexes, Vect[] dataset, int size) { 
+        List<Vector> vectors = new ArrayList<>();
+        for( int i = 0; i < indexes.length; ++i ) {
+            System.out.println("index: "+indexes[i]);
+            vectors.add(new DenseVector(dataset[indexes[i]].vector()));
+        }
+
+        DenseMatrix matrix = new DenseMatrix();
+        for( Vector v: vectors )
+            matrix.addRow(v);
+
+        ProjectionData pdata = new ProjectionData();
+        pdata.setDissimilarityType(DissimilarityType.EUCLIDEAN);
+        pdata.setProjectorType(ProjectorType.FASTMAP);
+        
+        int k = indexes.length > 2 ? 2 : 1;
+        pdata.setKnnNumberNeighbors(k);
+        float[][] proj = ProjectionFactory.getInstance(ProjectionType.IDMAP).project(matrix, pdata, null);
+
+        
+        float value = (768.5f*size)/200.0f;
+        float begin = 5*10+10;
+        float end = ((float) value) / 1.65f;
+        
+        //System.out.println(">> size: "+dataset.length+", end: "+end);
+        
+        float[][] newproj = normalizeVertex(begin, end, proj);
+        
+        Point2D.Double[] projection = new Point2D.Double[newproj.length];
+        for( int i = 0; i < projection.length; ++i )
+            projection[i] = new Point2D.Double(newproj[i][0], newproj[i][1]);                    
+        
+        return projection;
+    }
     
              
     private static class Item {
