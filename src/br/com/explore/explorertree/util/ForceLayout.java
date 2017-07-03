@@ -10,7 +10,7 @@
 
 package br.com.explore.explorertree.util;
 
-import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeController;
+import br.com.explorer.explorertree.ExplorerTreeController;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
 import java.awt.geom.Point2D;
@@ -47,7 +47,7 @@ public class ForceLayout implements RepulsiveNode {
             double by = elems.get(i).y;
             double lenAB = Util.euclideanDistance(ax, ay, bx, by);
             
-            double weight = IncrementalExplorerTreeController.calculateWeight(maxWeight, minWeight, maxDist, lenAB);
+            double weight = ExplorerTreeController.calculateWeight(maxWeight, minWeight, maxDist, lenAB);
             
             Point2D dir = computeForceIJ(elems.get(representative), elems.get(i), weight);
             dxy.setLocation(dxy.getX()-dir.getX(), dxy.getY()-dir.getY());

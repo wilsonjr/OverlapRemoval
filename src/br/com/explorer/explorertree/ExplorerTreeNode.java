@@ -10,6 +10,7 @@
 package br.com.explorer.explorertree;
 
 import br.com.methods.utils.Util;
+import br.com.methods.utils.Vect;
 import br.com.representative.RepresentativeFinder;
 import br.com.representative.clustering.FarPointsMedoidApproach;
 import br.com.representative.clustering.partitioning.KMedoid;
@@ -84,9 +85,9 @@ public class ExplorerTreeNode {
             nthLevelRepresentatives = selectMedoid(nthLevelRepresentatives);
             
             // apply distinction algorithm
-            nthLevelRepresentatives = Util.distinct(nthLevelRepresentatives, _subprojection, _distinctionDistance);
+            nthLevelRepresentatives = Util.distinct2(nthLevelRepresentatives, _subprojection, _distinctionDistance);
             
-            Map<Integer, List<Integer>> map = Util.createIndex(nthLevelRepresentatives, _subprojection);            
+            Map<Integer, List<Integer>> map = Util.createIndex2(nthLevelRepresentatives, _subprojection);            
             Map<Integer, List<Integer>> copyMap = new HashMap<>();
             for( Map.Entry<Integer, List<Integer>> v: map.entrySet() ) {
                 copyMap.put(v.getKey(), v.getValue());
@@ -94,7 +95,7 @@ public class ExplorerTreeNode {
             
             //Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Routing: {0} - Number of representatives before {1}", new Object[]{_routing, map.size()});
             // remove representatives which represent only < _minChildren
-            Util.removeDummyRepresentive(map, (int) (_lowerBound*_minChildren));
+            Util.removeDummyRepresentive2(map, (int) (_lowerBound*_minChildren));
             //Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Routing: {0} - Number of representatives after  {1}", new Object[]{_routing, map.size()});
         
             if( map.size() <= 1  ) {
@@ -104,7 +105,7 @@ public class ExplorerTreeNode {
             
             nthLevelRepresentatives = map.entrySet().stream().mapToInt((value)->value.getKey()).toArray();
             //nthLevelRepresentatives = selectMedoid(nthLevelRepresentatives);
-            nthLevelRepresentatives = Util.distinct(nthLevelRepresentatives, _subprojection, _distinctionDistance);            
+            nthLevelRepresentatives = Util.distinct2(nthLevelRepresentatives, _subprojection, _distinctionDistance);            
             
             if( nthLevelRepresentatives.length == 1 ) {// this will lead to a infinite loop...             
                 if( _indexes.length < 2*_minChildren )
@@ -112,14 +113,14 @@ public class ExplorerTreeNode {
                 
                 map = tryToDivideCluster();
                 nthLevelRepresentatives = map.entrySet().stream().mapToInt((value)->value.getKey()).toArray(); 
-                nthLevelRepresentatives = Util.distinct(nthLevelRepresentatives, _subprojection, _distinctionDistance);
+                nthLevelRepresentatives = Util.distinct2(nthLevelRepresentatives, _subprojection, _distinctionDistance);
                 if( nthLevelRepresentatives.length == 1 )  // we don't propagate again since it will cause a infinite loop
                     return;                
             }
             
             
             // store the nearest neighbors for each representative
-            map = Util.createIndex(nthLevelRepresentatives, _subprojection);             
+            map = Util.createIndex2(nthLevelRepresentatives, _subprojection);             
             
             map.entrySet().forEach((item)-> {
                 int representative = item.getKey();
@@ -147,7 +148,7 @@ public class ExplorerTreeNode {
 
     private int[] selectMedoid(int[] indexes) {
         int[] temp = new int[indexes.length];
-        Map<Integer, List<Integer>> mapTemp = Util.createIndex(indexes, _subprojection);
+        Map<Integer, List<Integer>> mapTemp = Util.createIndex2(indexes, _subprojection);
         int k = 0;
         
         for( Map.Entry<Integer, List<Integer>> v: mapTemp.entrySet() ) {
@@ -436,7 +437,7 @@ public class ExplorerTreeNode {
     private Map<Integer, List<Integer>> tryToDivideCluster() {
         System.out.println("Entrei aqui pela "+(nodeCount++)+"-ésima vez.");
         
-        KMedoid kmedoid = new KMedoid(Arrays.asList(_subprojection), new FarPointsMedoidApproach(), _indexes.length/_minChildren);        
+        KMedoid kmedoid = new KMedoid(Arrays.asList(Vect.convert(_subprojection)), new FarPointsMedoidApproach(), _indexes.length/_minChildren);        
         kmedoid.execute();
         
         int[] representative = kmedoid.getRepresentatives();

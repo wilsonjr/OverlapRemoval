@@ -63,20 +63,20 @@ public class ExplorerTree {
         
         
         // apply distinction algorithm
-        levelOneRepresentatives = Util.distinct(levelOneRepresentatives, _projection, _distinctionDistance);
+        levelOneRepresentatives = Util.distinct2(levelOneRepresentatives, _projection, _distinctionDistance);
         //levelOneRepresentatives = selectMedoid(levelOneRepresentatives);
        
-        Map<Integer, List<Integer>> map = Util.createIndex(levelOneRepresentatives, _projection);
+        Map<Integer, List<Integer>> map = Util.createIndex2(levelOneRepresentatives, _projection);
         
         Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives before {0}", map.size());
         // remove representatives which represent only < _minChildren
-        Util.removeDummyRepresentive(map, _minChildren);
+        Util.removeDummyRepresentive2(map, _minChildren);
         Logger.getLogger(ExplorerTreeNode.class.getName()).log(Level.INFO, "Number of representatives after  {0}", map.size());
         System.out.println("................................");
        
         levelOneRepresentatives = map.entrySet().stream().mapToInt((value)->value.getKey()).toArray();
         levelOneRepresentatives = selectMedoid(levelOneRepresentatives);
-        map = Util.createIndex(levelOneRepresentatives, _projection);
+        map = Util.createIndex2(levelOneRepresentatives, _projection);
         
         
         // for each representative

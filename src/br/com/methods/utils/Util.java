@@ -1,8 +1,8 @@
 package br.com.methods.utils;
 
 import Jama.Matrix;
-import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeController;
-import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeNode;
+import br.com.explorer.explorertree.ExplorerTreeController;
+import br.com.explorer.explorertree.ExplorerTreeNode;
 import br.com.methods.overlap.prism.PRISMEdge;
 import br.com.methods.overlap.prism.PRISMPoint;
 import br.com.methods.overlap.prism.SetPoint;
@@ -13,7 +13,6 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +24,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.swing.JFileChooser;
 import kn.uni.voronoitreemap.datastructure.OpenList;
 import kn.uni.voronoitreemap.diagram.PowerDiagram;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
@@ -1577,9 +1575,46 @@ public class Util {
         return hull;
     }
 
+//    public static Polygon[] clipBounds(Polygon[] diagrams, Point2D.Double[] pts, 
+//            Map<IncrementalExplorerTreeNode, Polygon> map, List<Point2D.Double> pVoronoi, 
+// IncrementalExplorerTreeController controller, Map<Point2D.Double, Integer> indexes) {
+//        
+//        SimplePolygon2D p1 = new SimplePolygon2D();
+//        for( int i = 0; i < pts.length; ++i ) {
+//            p1.addVertex(new math.geom2d.Point2D(pts[i].x, pts[i].y));
+//        }
+//        
+//        Polygon[] intersects = new Polygon[diagrams.length];
+//        for( int i = 0; i < diagrams.length; ++i ) {
+//            SimplePolygon2D p2 = new SimplePolygon2D();
+//            if( diagrams[i] != null ) {
+//                for( int j = 0; j < diagrams[i].xpoints.length; ++j )
+//                    p2.addVertex(new math.geom2d.Point2D(diagrams[i].xpoints[j], diagrams[i].ypoints[j]));
+//                
+//                SimplePolygon2D p = (SimplePolygon2D) Polygons2D.intersection(p1, p2);
+//                intersects[i] = new Polygon();
+//                for( math.geom2d.Point2D point: p.vertices() )
+//                    intersects[i].addPoint((int)point.x(), (int)point.y());
+//            } else
+//                System.out.println("diagrams[i] null!");
+//        }
+//
+//        for( int i = 0; i < intersects.length; ++i ) {
+//            Polygon poly = new Polygon();
+//            for( int j = 0; j < intersects[i].xpoints.length; ++j ) {                
+//                if( intersects[i].xpoints[j] != 0 && intersects[i].ypoints[j] != 0 )
+//                    poly.addPoint(intersects[i].xpoints[j], intersects[i].ypoints[j]);                
+//            }
+//            intersects[i] = new Polygon(poly.xpoints, poly.ypoints, poly.npoints);
+//            
+//            map.put(controller.getNode(indexes.get(pVoronoi.get(i))), intersects[i]);            
+//        }  
+//        return intersects;
+//    }
+    
     public static Polygon[] clipBounds(Polygon[] diagrams, Point2D.Double[] pts, 
-            Map<IncrementalExplorerTreeNode, Polygon> map, List<Point2D.Double> pVoronoi, 
- IncrementalExplorerTreeController controller, Map<Point2D.Double, Integer> indexes) {
+            Map<ExplorerTreeNode, Polygon> map, List<Point2D.Double> pVoronoi, 
+            ExplorerTreeController controller, Map<Point2D.Double, Integer> indexes) {
         
         SimplePolygon2D p1 = new SimplePolygon2D();
         for( int i = 0; i < pts.length; ++i ) {
@@ -1659,6 +1694,88 @@ public class Util {
         return distinctIndexes.stream().mapToInt((e)->e).toArray();
     }
     
+    
+    
+    public static int[] distinct(int[] indexes, Vect[] points, int radius) {
+        
+        boolean valid[] = new boolean[indexes.length];
+        Arrays.fill(valid, true);
+        
+        List<DistancePoint> list = new ArrayList<>();
+        for( int i = 0; i < indexes.length; ++i )
+            for( int j = i+1; j < indexes.length; ++j ) {
+                list.add(new DistancePoint(Util.euclideanDistance(points[indexes[i]].get(0), points[indexes[i]].get(1), 
+                                                                  points[indexes[j]].get(0), points[indexes[j]].get(1)), i, j));
+            }
+        Collections.sort(list, (DistancePoint a, DistancePoint b)->{
+            return new Double(a.distance).compareTo(b.distance);
+        });
+        
+        for( int i = 0; i < list.size(); ++i ) {
+            
+            if( !valid[list.get(i).i] || !valid[list.get(i).j] )
+                continue;
+            
+            Rectangle r1 = new Rectangle((int)points[indexes[list.get(i).i]].get(0), (int)points[indexes[list.get(i).i]].get(1), 
+                                         2*radius, 2*radius);
+            Rectangle r2 = new Rectangle((int)points[indexes[list.get(i).j]].get(0), (int)points[indexes[list.get(i).j]].get(1), 
+                                         2*radius, 2*radius);
+            
+            if( r1.intersects(r2) )
+                valid[list.get(i).j] = false;
+            else
+                break; // it is ordered by distance, so that the remaining pairs have no intersection            
+        }
+        
+        List<Integer> distinctIndexes = new ArrayList<>();
+        for( int i = 0; i < valid.length; ++i )
+            if( valid[i] )
+                distinctIndexes.add(indexes[i]);
+        
+        return distinctIndexes.stream().mapToInt((e)->e).toArray();
+    }
+    
+    public static Map<Integer, List<Integer>> createIndex(int[] representatives, Point2D.Double[] points) {
+        Map<Integer, List<Integer>> hash = new HashMap<>();
+        Set<Integer> representativeSet = new HashSet<>();
+        
+        for( int i = 0; i < representatives.length; ++i ) {
+            hash.put(representatives[i], new ArrayList<>());
+            representativeSet.add(representatives[i]);
+        }
+        
+        for( int i = 0; i < points.length; ++i ) {
+            
+            if( representativeSet.contains(i) )
+                continue;
+            
+            int index = -1;
+            double minDist = Double.MAX_VALUE;
+            for( int j = 0; j < representatives.length; ++j ) {
+                if( i == representatives[j] )
+                    continue;
+                
+                Point2D.Double p1 = points[i];
+                Point2D.Double p2 = points[representatives[j]];                
+                
+                double dist = Util.euclideanDistance(p1.x, p1.y, p2.x, p2.y);
+                if( dist < minDist ) {
+                    minDist = dist;
+                    index = j;
+                }
+            }
+            List<Integer> nearest = hash.get(representatives[index]);
+            nearest.add(i);
+        }
+        
+        // add representatives itself to the neighbors
+        for( int i = 0; i < representatives.length; ++i )
+            hash.get(representatives[i]).add(representatives[i]);
+            
+        
+        return hash;
+    } 
+    
     public static Map<Integer, List<Integer>> createIndex(int[] representatives, Vect[] points) {
         Map<Integer, List<Integer>> hash = new HashMap<>();
         Set<Integer> representativeSet = new HashSet<>();
@@ -1682,8 +1799,8 @@ public class Util {
                 Vect p1 = points[i];
                 Vect p2 = points[representatives[j]];                
                 
-                //double dist = Util.euclideanDistance(p1.x, p1.y, p2.x, p2.y);
-                double dist = p1.distance(p2);
+                double dist = Util.euclideanDistance(p1.get(0), p1.get(1), p2.get(0), p2.get(1));
+                //double dist = p1.distance(p2);
                 if( dist < minDist ) {
                     minDist = dist;
                     index = j;
@@ -1851,7 +1968,10 @@ public class Util {
     public static Point2D.Double[] projectData(int[] indexes, Vect[] dataset) { 
         List<Vector> vectors = new ArrayList<>();
         for( int i = 0; i < indexes.length; ++i ) {
-            vectors.add(new DenseVector(dataset[indexes[i]].vector()));
+            float[] vector = new float[dataset[indexes[i]].vector().length];
+            for( int j = 0; j < vector.length; ++j )
+                vector[j] = (float) dataset[indexes[i]].get(j);            
+            vectors.add(new DenseVector(vector));
         }
 
         DenseMatrix matrix = new DenseMatrix();
@@ -1883,9 +2003,12 @@ public class Util {
     }  
     
     public static Point2D.Double[] projectData(Vect[] dataset) { 
-        List<Vector> vectors = new ArrayList<>();
+        List<Vector> vectors = new ArrayList<>();        
         for( int i = 0; i < dataset.length; ++i ) {
-            vectors.add(new DenseVector(dataset[i].vector()));
+            float[] vector = new float[dataset[i].vector().length];
+            for( int j = 0; j < vector.length; ++j )
+                vector[j] = (float) dataset[i].get(j);            
+            vectors.add(new DenseVector(vector));
         }
 
         DenseMatrix matrix = new DenseMatrix();
@@ -1919,8 +2042,10 @@ public class Util {
     public static Point2D.Double[] projectData(int[] indexes, Vect[] dataset, int size) { 
         List<Vector> vectors = new ArrayList<>();
         for( int i = 0; i < indexes.length; ++i ) {
-            System.out.println("index: "+indexes[i]);
-            vectors.add(new DenseVector(dataset[indexes[i]].vector()));
+            float[] vector = new float[dataset[indexes[i]].vector().length];
+            for( int j = 0; j < vector.length; ++j )
+                vector[j] = (float) dataset[indexes[i]].get(j);            
+            vectors.add(new DenseVector(vector));
         }
 
         DenseMatrix matrix = new DenseMatrix();
@@ -1981,5 +2106,169 @@ public class Util {
         
         
     }
+    
+    public static int[] selectRepresentatives(Point2D.Double[] centroids, List<Point2D.Double> items) {
+        int[] indexes = new int[centroids.length];
+        
+        for( int i = 0; i < centroids.length; ++i ) {
+            double distance = Util.euclideanDistance(items.get(0).x, items.get(0).y, centroids[i].x, centroids[i].y);
+            int index = 0;
+            
+            for( int j = 1; j < items.size(); ++j ) {
+                
+                double dj = Util.euclideanDistance(items.get(j).x, items.get(j).y, centroids[i].x, centroids[i].y);
+                if( dj < distance ) {
+                    index = j;
+                    distance = dj;
+                }                
+            }
+            
+            indexes[i] = index;
+            
+        }
+        
+        return indexes;
+    }
+    
+    public static int[] selectRepresentatives2(List<? extends List<Integer>> clusters, List<Point2D.Double> items) {
+        
+        int[] indexes = new int[clusters.size()];
+        
+        for( int i = 0; i < clusters.size(); ++i ) {
+            
+            List<Point2D.Double> itemsInCluster = new ArrayList<>();
+            Point2D.Double[] centroid = new Point2D.Double[1];
+            centroid[0] = new Point2D.Double(0, 0);
+            Map<Integer, Integer> map = new HashMap<>();
+                        
+            for( int j = 0; j < clusters.get(i).size(); ++j ) {                
+                int index = clusters.get(i).get(j);
+                
+                centroid[0].x += items.get(index).x;
+                centroid[0].y += items.get(index).y;
+                
+                itemsInCluster.add(items.get(index));
+                map.put(j, index);
+            }
+            
+            centroid[0].x /= (double) clusters.get(i).size();
+            centroid[0].y /= (double) clusters.get(i).size();
+            
+            int medoid = 0;
+            double d = Double.MAX_VALUE;
+            for( int j = 0; j < clusters.get(i).size(); ++j ) {
+                double dd = Util.euclideanDistance(centroid[0].x, centroid[0].y, 
+                                                   items.get(clusters.get(i).get(j)).x, items.get(clusters.get(i).get(j)).y);
+                if( dd < d ) {
+                    d = dd;
+                    medoid = clusters.get(i).get(j);
+                }
+            }
+            
+            indexes[i] = medoid;
+        }
+        
+        return indexes;
+    }
+    
+    
+    
+    /*---------------------------------------------------------------------------------*/
+    public static int[] distinct2(int[] indexes, Point2D.Double[] points, int radius) {
+        
+        boolean valid[] = new boolean[indexes.length];
+        Arrays.fill(valid, true);
+        
+        List<DistancePoint> list = new ArrayList<>();
+        for( int i = 0; i < indexes.length; ++i )
+            for( int j = i+1; j < indexes.length; ++j )
+                list.add(new DistancePoint(Util.euclideanDistance(points[indexes[i]].x, points[indexes[i]].y, 
+                                                                  points[indexes[j]].x, points[indexes[j]].y), i, j));
+        
+        Collections.sort(list, (DistancePoint a, DistancePoint b)->{
+            return new Double(a.distance).compareTo(b.distance);
+        });
+        
+        for( int i = 0; i < list.size(); ++i ) {
+            
+            if( !valid[list.get(i).i] || !valid[list.get(i).j] )
+                continue;
+            
+            Rectangle r1 = new Rectangle((int)points[indexes[list.get(i).i]].x, (int)points[indexes[list.get(i).i]].y, 
+                                         2*radius, 2*radius);
+            Rectangle r2 = new Rectangle((int)points[indexes[list.get(i).j]].x, (int)points[indexes[list.get(i).j]].y, 
+                                         2*radius, 2*radius);
+            
+            if( r1.intersects(r2) )
+                valid[list.get(i).j] = false;
+            else
+                break; // it is ordered by distance, so that the remaining pairs have no intersection            
+        }
+        
+        List<Integer> distinctIndexes = new ArrayList<>();
+        for( int i = 0; i < valid.length; ++i )
+            if( valid[i] )
+                distinctIndexes.add(indexes[i]);
+        
+        return distinctIndexes.stream().mapToInt((e)->e).toArray();
+    }
+    
+    public static Map<Integer, List<Integer>> createIndex2(int[] representatives, Point2D.Double[] points) {
+        Map<Integer, List<Integer>> hash = new HashMap<>();
+        Set<Integer> representativeSet = new HashSet<>();
+        
+        for( int i = 0; i < representatives.length; ++i ) {
+            hash.put(representatives[i], new ArrayList<>());
+            representativeSet.add(representatives[i]);
+        }
+        
+        for( int i = 0; i < points.length; ++i ) {
+            
+            if( representativeSet.contains(i) )
+                continue;
+            
+            int index = -1;
+            double minDist = Double.MAX_VALUE;
+            for( int j = 0; j < representatives.length; ++j ) {
+                if( i == representatives[j] )
+                    continue;
+                
+                Point2D.Double p1 = points[i];
+                Point2D.Double p2 = points[representatives[j]];                
+                
+                double dist = Util.euclideanDistance(p1.x, p1.y, p2.x, p2.y);
+                if( dist < minDist ) {
+                    minDist = dist;
+                    index = j;
+                }
+            }
+            List<Integer> nearest = hash.get(representatives[index]);
+            nearest.add(i);
+        }
+        
+        // add representatives itself to the neighbors
+        for( int i = 0; i < representatives.length; ++i )
+            hash.get(representatives[i]).add(representatives[i]);
+            
+        
+        return hash;
+    }
+    
+    
+    public static void removeDummyRepresentive2(Map<Integer, List<Integer>> map, int minChildren) {
+        
+        List<Integer> toRemove = new ArrayList<>();
+        
+        map.entrySet().stream().filter((entry) -> ( entry.getValue().size() <= minChildren )).forEachOrdered((entry) -> {
+            toRemove.add(entry.getKey());
+        });
+            
+        toRemove.forEach((value) -> { 
+            map.remove(value);
+        });
+        
+    }
+    
+    
     
 }

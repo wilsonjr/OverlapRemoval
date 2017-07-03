@@ -13,22 +13,22 @@ import java.util.Arrays;
  */
 public class Vect {
     
-    private float[] _vector;
+    private double[] _vector;
     
-    public Vect(float[] vector) {
+    public Vect(double[] vector) {
         _vector = vector;
     }
     
     public Vect(int n) {
-        _vector = new float[n];
+        _vector = new double[n];
         Arrays.fill(_vector, 0);
     }
     
-    public float[] vector() {
+    public double[] vector() {
         return _vector;
     }
     
-    public float get(int i) {
+    public double get(int i) {
         return _vector[i];
     }
     
@@ -55,4 +55,12 @@ public class Vect {
             _vector[i] /= n;
     }
     
+    public static Vect[] convert(java.awt.geom.Point2D.Double[] points) {
+        Vect[] elems = new Vect[points.length];
+        
+        for( int i = 0; i < elems.length; ++i )
+            elems[i] = new Vect(new double[]{points[i].x, points[i].y});
+        
+        return elems;
+    }
 }

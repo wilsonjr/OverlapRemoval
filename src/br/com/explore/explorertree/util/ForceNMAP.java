@@ -10,7 +10,7 @@
 
 package br.com.explore.explorertree.util;
 
-import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeController;
+import br.com.explorer.explorertree.ExplorerTreeController;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class ForceNMAP implements RepulsiveNode {
             double distance =  Util.euclideanDistance(elems.get(representative).x, elems.get(representative).y, 
                                                       elems.get(i).x, elems.get(i).y);
             
-            double weight = IncrementalExplorerTreeController.calculateWeight(maxWeight, minWeight, maxDist, distance);
+            double weight = ExplorerTreeController.calculateWeight(maxWeight, minWeight, maxDist, distance);
             data.add(new Element(elems.get(i).getId(), (float)elems.get(i).x, (float)elems.get(i).y, (float) weight, 1));            
         }
         

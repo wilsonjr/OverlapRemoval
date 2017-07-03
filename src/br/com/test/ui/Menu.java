@@ -259,13 +259,12 @@
 package br.com.test.ui;
 
 
-import br.com.explore.incrementalexplorertree.IncrementalExplorerTree;
-import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeController;
-import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeNode;
 import br.com.explore.explorertree.util.ForceLayout;
 import br.com.explore.explorertree.util.Tooltip;
+import br.com.explorer.explorertree.ExplorerTree;
+import br.com.explorer.explorertree.ExplorerTreeController;
+import br.com.explorer.explorertree.ExplorerTreeNode;
 import br.com.methods.overlap.expadingnode.OneLevelOverlap;
-import br.com.methods.overlap.expadingnode.OverlapTree;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
 import br.com.methods.overlap.incboard.IncBoardExecutor;
 import br.com.methods.overlap.incboard.PointItem;
@@ -404,14 +403,14 @@ public class Menu extends javax.swing.JFrame {
     private Point2D.Double[] centerPoints = null;
     private ArrayList<Vect> items = null;
     private Point2D.Double[] points = null;
-    private IncrementalExplorerTree explorerTree;
+    private ExplorerTree explorerTree;
     
     private Polygon clickedPolygon = null;
     private int indexNewRepresentatives = -1;
     
     private Map<Point2D.Double, Polygon> mapPointPolygon = new HashMap<>();
     
-    private IncrementalExplorerTreeController controller = null;
+    private ExplorerTreeController controller = null;
     
     private List<Integer> movingIndexes = new ArrayList<>();
     private List<Point2D.Double> toDraw = new ArrayList<>();
@@ -931,7 +930,7 @@ public class Menu extends javax.swing.JFrame {
                     int grupo = id;//Integer.parseInt(linha[3]);
 
                     rectangles.add(new RectangleVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo*10)%255), id++));   
-                    items.add(new Vect(new float[]{(float)x, (float)y}));
+                    items.add(new Vect(new double[]{x, y}));
                     pts.add(new Point2D.Double(x, y));
                 }
                 
@@ -1399,7 +1398,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
         RepresentativeFinder mst = new MST(elems, 15);
         mst.execute();
@@ -1539,7 +1538,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         hc = new HierarchicalClustering(elems, new SingleLinkageStrategy());        
         hc.execute();
         
@@ -1577,7 +1576,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
                 
         RepresentativeFinder kmeans = new KMeans(elems, new FarPointsMedoidApproach(), 3);
         System.out.println("Init kmeans");
@@ -1598,7 +1597,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
                 
         RepresentativeFinder kmedoid = new KMedoid(elems, new FarPointsMedoidApproach(), 4);
         kmedoid.execute();
@@ -1617,7 +1616,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
         RepresentativeFinder bkmeans = new BisectingKMeans(elems, new FarPointsMedoidApproach(), 4);
         bkmeans.execute();
@@ -1636,7 +1635,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
         RepresentativeFinder dbscan = new Dbscan(elems,100, (int)(60.0/100.0)*7);
         dbscan.execute();
@@ -1655,7 +1654,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         JFileChooser jFileChooser = new JFileChooser();
         int result = jFileChooser.showOpenDialog(this);
         if( result == JFileChooser.APPROVE_OPTION ) {
@@ -1706,7 +1705,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
         JFileChooser jFileChooser = new JFileChooser();
         int result = jFileChooser.showOpenDialog(this);
@@ -1830,7 +1829,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
         double[][] distances = new double[rectangles.size()][rectangles.size()];
         for( int i = 0; i < distances.length; ++i ) {
@@ -1960,17 +1959,6 @@ public class Menu extends javax.swing.JFrame {
                 
                 
                 File file = jFileChooser.getSelectedFile();
-                
-                
-                DenseMatrix matrix = new DenseMatrix();
-                matrix.load(file.getAbsolutePath());
-                
-                List<Vect> dataset = new ArrayList<>();
-                for( int i = 0; i < matrix.getRowCount(); ++i ) {
-                    dataset.add(new Vect(matrix.getRow(i).getValues()));
-                }
-
-                
                 Scanner scn = new Scanner(file);
                 scn.nextLine();
                 scn.nextLine();
@@ -1985,16 +1973,12 @@ public class Menu extends javax.swing.JFrame {
                         attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                        
                     
                 }
-                List<Vect> elements = new ArrayList<>();
-                for( int i = 0; i < points.length; ++i ) {
-                    elements.add(new Vect(new float[]{(float)points[i].x, (float)points[i].y}));
-                }
                 
                 // clustering techniques
-                RepresentativeFinder kmeans = new KMeans(elements, new FarPointsMedoidApproach(), (int)(points.length*0.1));
-                RepresentativeFinder kmedoid = new KMedoid(elements, new FarPointsMedoidApproach(), (int)(points.length*0.1));
-                RepresentativeFinder bisectingKMeans = new BisectingKMeans(elements, new FarPointsMedoidApproach(), (int) (points.length*0.1));
-                RepresentativeFinder dbscan = new Dbscan(elements, 100, (int)(60.0/100.0)*7);
+//                RepresentativeFinder kmeans = new KMeans(Arrays.asList(points), new FarPointsMedoidApproach(), (int)(points.length*0.1));
+//                RepresentativeFinder kmedoid = new KMedoid(Arrays.asList(points), new FarPointsMedoidApproach(), (int)(points.length*0.1));
+//                RepresentativeFinder bisectingKMeans = new BisectingKMeans(Arrays.asList(points), new FarPointsMedoidApproach(), (int) (points.length*0.1));
+//                RepresentativeFinder dbscan = new Dbscan(Arrays.asList(points), 100, (int)(60.0/100.0)*7);
                 
                 // singular value decomposition techniques
                 RepresentativeFinder csm = new CSM(attrs, (int)(attrs.size()*0.2), attrs.size());
@@ -2005,18 +1989,13 @@ public class Menu extends javax.swing.JFrame {
                 // must test with alpha = 0.3
                 RepresentativeFinder ds3 = new DS3(distances, 0.1);
                 RepresentativeFinder smrs = new SMRS(attrs);
-                RepresentativeFinder furs = new FURS(elements, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
                 
-                controller = new IncrementalExplorerTreeController(dataset.stream().map((v)->v).toArray(Vect[]::new), points, 
+                controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
                          ds3, 7, RECTSIZE, RECTSIZE/2);
                 
-                controller.build();                 
-                
-                int width = 1600;
-                int height = 1000;
-                
-                //controller.updateDiagram(width, height, 0, null);
+                controller.build();                
+                controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
                 
                 view.cleanImage();
                 view.repaint();
@@ -2035,7 +2014,7 @@ public class Menu extends javax.swing.JFrame {
             loadDataJMenuItemActionPerformed(null);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < points.length; ++i )
-            elems.add(new Vect(new float[]{(float)points[i].x, (float)points[i].y}));
+            elems.add(new Vect(new double[]{points[i].x, points[i].y}));
         
         RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
         System.out.println("Init Affinity Propagation execution");
@@ -2057,7 +2036,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
-            elems.add(new Vect(new float[]{(float)rects.get(i).getCenterX(), (float)rects.get(i).getCenterY()}));
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
         FURS furs = new FURS(elems, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
         System.out.println("Init FURS");
@@ -2066,7 +2045,7 @@ public class Menu extends javax.swing.JFrame {
         
         List<Vect> elements = new ArrayList<>();        
         for( int i = 0; i < points.length; ++i ) {
-            elements.add(new Vect(new float[]{(float)points[i].x, (float)points[i].y}));
+            elements.add(new Vect(new double[]{points[i].x, points[i].y}));
         }
         selectedRepresentatives = furs.execute(elements, 15, (int)(0.2*points.length));
         System.out.println("Finished FURS");
@@ -2106,7 +2085,11 @@ public class Menu extends javax.swing.JFrame {
                 
                 List<Vect> dataset = new ArrayList<>();
                 for( int i = 0; i < matrix.getRowCount(); ++i ) {
-                    dataset.add(new Vect(matrix.getRow(i).getValues()));
+                    float[] values = matrix.getRow(i).getValues();
+                    double[] dvalues = new double[values.length];
+                    for( int j = 0; j < dvalues.length; ++j )
+                        dvalues[j] = values[i];
+                    dataset.add(new Vect(dvalues));
                 }
                 
                 Scanner scn = new Scanner(file);
@@ -2126,7 +2109,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 List<Vect> elements = new ArrayList<>();
                 for( int i = 0; i < points.length; ++i ) {
-                    elements.add(new Vect(new float[]{(float)points[i].x, (float)points[i].y}));
+                    elements.add(new Vect(new double[]{points[i].x, points[i].y}));
                 }
                 
                 // clustering techniques
@@ -2146,20 +2129,20 @@ public class Menu extends javax.swing.JFrame {
                 RepresentativeFinder smrs = new SMRS(attrs);
                 RepresentativeFinder furs = new FURS(elements, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
                 
-                controller = new IncrementalExplorerTreeController(dataset.stream().map((v)->v).toArray(Vect[]::new), points, 
-                         rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         kmeans, 10, RECTSIZE, RECTSIZE/2);
-              
-                OverlapTree overlapTree = new OverlapTree(controller, 1);
-                ArrayList<OverlapRect> overlap = Util.toRectangle(rectangles);
-                Map<OverlapRect, OverlapRect> projected = overlapTree.applyAndShowTime(overlap);
-                ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
-                
-                controller = null;
-                
-                Util.toRectangleVis(rectangles, projectedValues);                        
-                view.cleanImage();
-                view.repaint();
+//                controller = new IncrementalExplorerTreeController(dataset.stream().map((v)->v).toArray(Vect[]::new), points, 
+//                         rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
+//                         kmeans, 10, RECTSIZE, RECTSIZE/2);
+//              
+//                OverlapTree overlapTree = new OverlapTree(controller, 1);
+//                ArrayList<OverlapRect> overlap = Util.toRectangle(rectangles);
+//                Map<OverlapRect, OverlapRect> projected = overlapTree.applyAndShowTime(overlap);
+//                ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
+//                
+//                controller = null;
+//                
+//                Util.toRectangleVis(rectangles, projectedValues);                        
+//                view.cleanImage();
+//                view.repaint();
                 
                 
             } catch( IOException e ) {
@@ -2307,51 +2290,51 @@ public class Menu extends javax.swing.JFrame {
         }   
     }//GEN-LAST:event_testProjectionJMenuItemActionPerformed
     
-    
-    public void updateDiagram() {
-        
-        Polygon window = new Polygon();
-        int width = view.getSize().width;
-        int height = view.getSize().height;
-        window.addPoint(0, 0);
-        window.addPoint(width, 0);
-        window.addPoint(width, height);
-        window.addPoint(0, height);
-
-        System.out.println("initial index: "+indexNewRepresentatives);
-        System.out.println("quantidade real: "+selectedRepresentatives.length);
-        
-        Point2D.Double[] points = new Point2D.Double[selectedRepresentatives.length-indexNewRepresentatives];
-        System.out.println("SIZE: "+points.length);
-        for( int i = 0; i < points.length; ++i ) {
-            int index = selectedRepresentatives[i+indexNewRepresentatives];
-            points[i] = new Point2D.Double(rectangles.get(index).getCenterX(), rectangles.get(index).getCenterY());
-        }
-        
-        Point2D.Double[] pointsClickedPolygon = new Point2D.Double[clickedPolygon.npoints];
-        for( int i = 0; i < clickedPolygon.npoints; ++i )
-            pointsClickedPolygon[i] = new Point2D.Double(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i]);           
-        
-        
-        List<Point2D.Double> pVoronoi = new ArrayList<>();
-        
-        Polygon[] diagrams2 = Util.voronoiDiagram(window, points, pVoronoi);            
-        Polygon[] intersects2 = Util.clipBounds(diagrams2, pointsClickedPolygon, null, pVoronoi, null, null);        
-        
-        List<Polygon> polys = new ArrayList<>(Arrays.asList(intersects2));
-        
-        
-        System.out.println("Size: "+polys.size());
-        
-        for( Polygon p: polys ) {
-            for( int i = 0; i < p.xpoints.length; ++i ) {
-                System.out.println(p.xpoints[i]+", "+p.ypoints[i]);
-            }
-            System.out.println();
-        }
-        intersectsPolygon.addAll(polys);
-        
-    }
+//    
+//    public void updateDiagram() {
+//        
+//        Polygon window = new Polygon();
+//        int width = view.getSize().width;
+//        int height = view.getSize().height;
+//        window.addPoint(0, 0);
+//        window.addPoint(width, 0);
+//        window.addPoint(width, height);
+//        window.addPoint(0, height);
+//
+//        System.out.println("initial index: "+indexNewRepresentatives);
+//        System.out.println("quantidade real: "+selectedRepresentatives.length);
+//        
+//        Point2D.Double[] points = new Point2D.Double[selectedRepresentatives.length-indexNewRepresentatives];
+//        System.out.println("SIZE: "+points.length);
+//        for( int i = 0; i < points.length; ++i ) {
+//            int index = selectedRepresentatives[i+indexNewRepresentatives];
+//            points[i] = new Point2D.Double(rectangles.get(index).getCenterX(), rectangles.get(index).getCenterY());
+//        }
+//        
+//        Point2D.Double[] pointsClickedPolygon = new Point2D.Double[clickedPolygon.npoints];
+//        for( int i = 0; i < clickedPolygon.npoints; ++i )
+//            pointsClickedPolygon[i] = new Point2D.Double(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i]);           
+//        
+//        
+//        List<Point2D.Double> pVoronoi = new ArrayList<>();
+//        
+//        Polygon[] diagrams2 = Util.voronoiDiagram(window, points, pVoronoi);            
+//        Polygon[] intersects2 = Util.clipBounds(diagrams2, pointsClickedPolygon, null, pVoronoi, null, null);        
+//        
+//        List<Polygon> polys = new ArrayList<>(Arrays.asList(intersects2));
+//        
+//        
+//        System.out.println("Size: "+polys.size());
+//        
+//        for( Polygon p: polys ) {
+//            for( int i = 0; i < p.xpoints.length; ++i ) {
+//                System.out.println(p.xpoints[i]+", "+p.ypoints[i]);
+//            }
+//            System.out.println();
+//        }
+//        intersectsPolygon.addAll(polys);
+//        
+//    }
     
     public double getMaxDistance() {
         double d = Double.MIN_VALUE;
@@ -2712,7 +2695,7 @@ public class Menu extends javax.swing.JFrame {
             double distance =  Util.euclideanDistance(rectangles.get(representative).x, rectangles.get(representative).y, 
                                                       proj1.get(i).x, proj1.get(i).y);
             
-            double weight = IncrementalExplorerTreeController.calculateWeight(10, 0.2*10, maxDistance, distance);
+            double weight = ExplorerTreeController.calculateWeight(10, 0.2*10, maxDistance, distance);
             data.add(new Element(proj2.get(i).getId(), (float)proj2.get(i).x, (float)proj2.get(i).y, (float) weight, 1));
             
             System.out.println("id: "+proj2.get(i).getId()+" x: "+proj2.get(i).x+" -- y: "+proj2.get(i).y);
@@ -3073,7 +3056,7 @@ public class Menu extends javax.swing.JFrame {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
                         
                         if( index != -1 ) {  
-                            IncrementalExplorerTreeNode node = controller.getNode(index);                            
+                            ExplorerTreeNode node = controller.getNode(index);                            
                             if( notches > 0 && node.parent() != null )
                                 agglomerateAnimation(index, node);
                             else if( notches < 0 && !node.children().isEmpty() )
@@ -3103,7 +3086,7 @@ public class Menu extends javax.swing.JFrame {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
                         lastClicked = new Point2D.Double(e.getX(), e.getY());
                         if( index != -1 ) {        
-                            IncrementalExplorerTreeNode node = controller.getNode(index);                            
+                            ExplorerTreeNode node = controller.getNode(index);                            
                             if( e.isControlDown() && node.parent() != null )
                                 agglomerateAnimation(index, node);                                      
                             else if( !node.children().isEmpty() )
@@ -3133,7 +3116,7 @@ public class Menu extends javax.swing.JFrame {
                             
                             if( tooltip != null )
                                 return;
-                            IncrementalExplorerTreeNode node = controller.getNode(index);                            
+                            ExplorerTreeNode node = controller.getNode(index);                            
                             if( node.children().isEmpty() ) {      
                                 semaphore = true;
                                 List<OverlapRect> projection = removeOverlap(controller.nearest().get(index));
@@ -3203,7 +3186,7 @@ public class Menu extends javax.swing.JFrame {
                      
         }
         
-        private void agglomerateAnimation(int index, IncrementalExplorerTreeNode node) {
+        private void agglomerateAnimation(int index, ExplorerTreeNode node) {
             
             semaphore = true;
             movingIndexes = controller.agglomerateNode(index);
@@ -3483,104 +3466,101 @@ public class Menu extends javax.swing.JFrame {
                     g2Buffer.drawPolygon(p);                    
                 }
 //                
-                if( controller != null ) {
-                    Point2D.Double[] instances = controller.getIncrementalInstances();
-                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.5f));
-                    for( int i = 0; i < instances.length; ++i ) {
-                        g2Buffer.setColor(Color.BLUE);
-                        g2Buffer.fillRect((int)instances[i].x, (int)instances[i].y, RECTSIZE, RECTSIZE);
-                        g2Buffer.setColor(Color.BLACK);
-                        g2Buffer.drawRect((int)instances[i].x, (int)instances[i].y, RECTSIZE, RECTSIZE);
+//                if( controller != null ) {
+//                    Point2D.Double[] instances = controller.getIncrementalInstances();
+//                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.5f));
+//                    for( int i = 0; i < instances.length; ++i ) {
+//                        g2Buffer.setColor(Color.BLUE);
+//                        g2Buffer.fillRect((int)instances[i].x, (int)instances[i].y, RECTSIZE, RECTSIZE);
+//                        g2Buffer.setColor(Color.BLACK);
+//                        g2Buffer.drawRect((int)instances[i].x, (int)instances[i].y, RECTSIZE, RECTSIZE);
+//                    }
+//                    
+//                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1f));
+//                    g2Buffer.setColor(Color.RED);
+//                     instances = controller.getIncrementalInstancesBefore();
+//                    for( int i = 0; i < instances.length; ++i ) {
+//                        g2Buffer.fillOval((int)instances[i].x, (int)instances[i].y, 10, 10);
+//                    }
+//                }
+                
+                if( selectedRepresentatives != null || controller !=  null && controller.representative() != null ) {
+
+                    if( controller != null && controller.nearest() != null ) {
+                        
+                     //  Util.paintSphere(centerPoints, selectedRepresentatives, hashRepresentative, g2Buffer);
+                        int[] representative = controller.representative();
+                        Map<Integer, List<Integer>> map = controller.nearest();
+                        Point2D.Double[] projectionCenter = controller.projectionCenter();
+                        Point2D.Double[] projection = controller.projection();
+                                
+                        for( int i = 0; i < representative.length; ++i ) {
+                            
+                            float alpha = (float)map.get(representative[i]).size()/(float)points.length;
+                          
+                            Polygon poly = controller.polygon(representative[i]);//getPolygon((int)r.x, (int)r.y);
+                            if( poly != null ) {
+                                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, alpha));
+                                g2Buffer.setColor(Color.RED);
+                                g2Buffer.fillPolygon(poly);
+                                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                                g2Buffer.setColor(Color.RED);
+                                g2Buffer.drawPolygon(poly);                                
+                            }
+                            
+                            if( movingRepresentative(representative[i]) )
+                                continue;
+                            
+                            int size = controller.sizeRepresentative(map.get(representative[i]).size());
+                            
+                            Point2D.Double p = projection[representative[i]];
+                           // Point2D.Double p = controller.getPoint(representative[i]);
+                            
+                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                            g2Buffer.setColor(Color.RED);
+                            g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
+                            g2Buffer.setColor(Color.BLACK);
+                            g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
+                            if( hideShowNumbers ) {
+                                g2Buffer.setColor(Color.BLUE);
+                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                                g2Buffer.drawString(String.valueOf(rectangles.get(representative[i]).numero), 
+                                        (int)p.x+10, (int)p.y+10);  
+                            }
+                        }
+                    } else {
+                        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+                            RectangleVis r = rectangles.get(selectedRepresentatives[i]);
+                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                            g2Buffer.setColor(Color.RED);
+                            g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                            g2Buffer.setColor(Color.BLACK);
+                            g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                                    
+                            if( hideShowNumbers ) {
+                                g2Buffer.setColor(Color.GREEN);
+                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                                g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
+                            }
+                        }
                     }
                     
-                    g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1f));
-                    g2Buffer.setColor(Color.RED);
-                     instances = controller.getIncrementalInstancesBefore();
-                    for( int i = 0; i < instances.length; ++i ) {
-                        g2Buffer.fillOval((int)instances[i].x, (int)instances[i].y, 10, 10);
+                    if( !toDraw.isEmpty() ) {
+                        int j = movingIndexes.size()-1;
+                        for( int i = toDraw.size()-1; i >= (toDraw.size()-movingIndexes.size()); --i ) {
+                            Point2D.Double p = toDraw.get(i);
+                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                            int index = movingIndexes.get(j--);
+                            int size = controller.sizeRepresentative(controller.nearest().get(index).size());
+                            g2Buffer.setColor(Color.RED);
+                            g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
+                            g2Buffer.setColor(Color.BLACK);
+                            g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
+                        }
                     }
+                    
+                    
                 }
-                
-//                if( selectedRepresentatives != null || controller !=  null && controller.representative() != null ) {
-//
-//                    if( controller != null && controller.nearest() != null ) {
-//                        
-//                        
-//                        
-//
-//                     //  Util.paintSphere(centerPoints, selectedRepresentatives, hashRepresentative, g2Buffer);
-//                        int[] representative = controller.representative();
-//                        Map<Integer, List<Integer>> map = controller.nearest();
-//                        Point2D.Double[] projectionCenter = controller.projectionCenter();
-//                        Point2D.Double[] projection = controller.projection();
-//                                
-//                        for( int i = 0; i < representative.length; ++i ) {
-//                            
-//                            float alpha = (float)map.get(representative[i]).size()/(float)points.length;
-//                          
-//                            Polygon poly = controller.polygon(representative[i]);//getPolygon((int)r.x, (int)r.y);
-//                            if( poly != null ) {
-//                                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, alpha));
-//                                g2Buffer.setColor(Color.RED);
-//                                g2Buffer.fillPolygon(poly);
-//                                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
-//                                g2Buffer.setColor(Color.RED);
-//                                g2Buffer.drawPolygon(poly);                                
-//                            }
-//                            
-//                            if( movingRepresentative(representative[i]) )
-//                                continue;
-//                            
-//                            int size = controller.sizeRepresentative(map.get(representative[i]).size());
-//                            
-//                            //Point2D.Double p = projection[representative[i]];
-//                            Point2D.Double p = controller.getPoint(representative[i]);
-//                            
-//                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
-//                            g2Buffer.setColor(Color.RED);
-//                            g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
-//                            g2Buffer.setColor(Color.BLACK);
-//                            g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
-//                            if( hideShowNumbers ) {
-//                                g2Buffer.setColor(Color.BLUE);
-//                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-//                                g2Buffer.drawString(String.valueOf(rectangles.get(representative[i]).numero), 
-//                                        (int)p.x+10, (int)p.y+10);  
-//                            }
-//                        }
-//                    } else {
-//                        for( int i = 0; i < selectedRepresentatives.length; ++i ) {
-//                            RectangleVis r = rectangles.get(selectedRepresentatives[i]);
-//                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
-//                            g2Buffer.setColor(Color.RED);
-//                            g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-//                            g2Buffer.setColor(Color.BLACK);
-//                            g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
-//                                    
-//                            if( hideShowNumbers ) {
-//                                g2Buffer.setColor(Color.GREEN);
-//                                g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-//                                g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
-//                            }
-//                        }
-//                    }
-//                    
-//                    if( !toDraw.isEmpty() ) {
-//                        int j = movingIndexes.size()-1;
-//                        for( int i = toDraw.size()-1; i >= (toDraw.size()-movingIndexes.size()); --i ) {
-//                            Point2D.Double p = toDraw.get(i);
-//                            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
-//                            int index = movingIndexes.get(j--);
-//                            int size = controller.sizeRepresentative(controller.nearest().get(index).size());
-//                            g2Buffer.setColor(Color.RED);
-//                            g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
-//                            g2Buffer.setColor(Color.BLACK);
-//                            g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
-//                        }
-//                    }
-//                    
-//                    
-//                }
                 
                 /*if( clickedPolygon != null ) {
                     g2Buffer.setColor(Color.BLACK);
