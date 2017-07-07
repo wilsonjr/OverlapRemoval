@@ -17,8 +17,8 @@
  */
 package br.com.methods.overlap.expadingnode;
 
-import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeController;
-import br.com.explore.incrementalexplorertree.IncrementalExplorerTreeNode;
+import br.com.explorer.explorertree.ExplorerTreeController;
+import br.com.explorer.explorertree.ExplorerTreeNode;
 import br.com.methods.overlap.OverlapRemoval;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
@@ -36,20 +36,20 @@ import java.util.Map;
  */
 public class OverlapTree implements OverlapRemoval {
 
-    private IncrementalExplorerTreeController controller;
+    private ExplorerTreeController controller;
     private int SIZERECT = 20;
     private int additionalIterations = 0;
     
-    public OverlapTree(IncrementalExplorerTreeController controller, int additionalIterations) {
+    public OverlapTree(ExplorerTreeController controller, int additionalIterations) {
         this.controller = controller;
         this.additionalIterations = additionalIterations;
     }
 
-    public OverlapTree(IncrementalExplorerTreeController controller) {
+    public OverlapTree(ExplorerTreeController controller) {
         this(controller, 0);
     }
 
-    private OverlapNode removeOverlap(List<IncrementalExplorerTreeNode> nodes) {
+    private OverlapNode removeOverlap(List<ExplorerTreeNode> nodes) {
         List<OverlapNode> elems = new ArrayList<>();
 
         for (int i = 0; i < nodes.size(); ++i) {
