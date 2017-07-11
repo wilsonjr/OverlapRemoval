@@ -305,14 +305,6 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="viewSelectedJMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="dijsktraRepresentativeJMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Dijsktra"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dijsktraRepresentativeJMenuItemActionPerformed"/>
-              </Events>
-            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="csmJMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="CSM"/>

@@ -282,7 +282,6 @@ import br.com.methods.utils.RectangleVis;
 import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
 import br.com.projection.spacereduction.SeamCarving;
-import br.com.representative.Dijsktra;
 import br.com.representative.RepresentativeFinder;
 import br.com.representative.clustering.FarPointsMedoidApproach;
 import br.com.representative.clustering.affinitypropagation.AffinityPropagation;
@@ -328,6 +327,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -340,6 +341,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
@@ -519,7 +522,6 @@ public class Menu extends javax.swing.JFrame {
         decrementJMenuItem = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
         viewSelectedJMenuItem = new javax.swing.JMenuItem();
-        dijsktraRepresentativeJMenuItem = new javax.swing.JMenuItem();
         csmJMenuItem = new javax.swing.JMenuItem();
         ksvdJMenuItem = new javax.swing.JMenuItem();
         smrsJMenuItem = new javax.swing.JMenuItem();
@@ -805,14 +807,6 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu8.add(viewSelectedJMenuItem);
-
-        dijsktraRepresentativeJMenuItem.setText("Dijsktra");
-        dijsktraRepresentativeJMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dijsktraRepresentativeJMenuItemActionPerformed(evt);
-            }
-        });
-        jMenu8.add(dijsktraRepresentativeJMenuItem);
 
         csmJMenuItem.setText("CSM");
         csmJMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1498,41 +1492,6 @@ public class Menu extends javax.swing.JFrame {
         //Timer t = new Timer();
        // t.schedule(null, WIDTH, WIDTH);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
-
-    private void dijsktraRepresentativeJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dijsktraRepresentativeJMenuItemActionPerformed
-        Vertex[] grafo = new Vertex[rectangles.size()];
-        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        OverlapRect[] rectsV = new OverlapRect[rects.size()];
-        rectsV = rects.toArray(rectsV);
-
-        for( int i = 0; i < grafo.length; ++i )
-            grafo[i] = new Vertex(i);
-        for( int i = 0; i < grafo.length; ++i ) 
-            for( int j = i+1; j < grafo.length; ++j )  {
-                double d = Util.euclideanDistance(rectsV[i].getCenterX(), rectsV[i].getCenterY(), rectsV[j].getCenterX(), rectsV[j].getCenterY());
-                System.out.println("Distance: "+d);
-                
-                grafo[i].add(new Edge(i, j, d));
-                grafo[j].add(new Edge(j, i, d));
-            }
-        
-        Dijsktra d = new Dijsktra(grafo);
-        for( int i = 0; i < grafo.length; ++i )
-            for( int j = i+1; j < grafo.length; ++j )
-                d.exec(i, j, rectsV);
-        
-        maior = Integer.MIN_VALUE;
-        menor = Integer.MAX_VALUE;
-        for( int i = 0; i < rectsV.length; ++i ) {
-            System.out.println("Health: "+rectsV[i].getHealth());
-            maior = Math.max(maior, rectsV[i].getHealth());
-            menor = Math.min(menor, rectsV[i].getHealth());
-        }
-        Util.toRectangleVis(rectangles, rects);
-        view.cleanImage();
-        view.repaint();
-        
-    }//GEN-LAST:event_dijsktraRepresentativeJMenuItemActionPerformed
 
     private void hierarchicalClusteringJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hierarchicalClusteringJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
@@ -3643,7 +3602,6 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem csmJMenuItem;
     private javax.swing.JMenuItem dbscanJMenuItem;
     private javax.swing.JMenuItem decrementJMenuItem;
-    private javax.swing.JMenuItem dijsktraRepresentativeJMenuItem;
     private javax.swing.JMenuItem ds3JMenuItem;
     private javax.swing.JMenuItem expandingEdgeJMenuItem;
     private javax.swing.JMenuItem extractParametersJMenuItem;
