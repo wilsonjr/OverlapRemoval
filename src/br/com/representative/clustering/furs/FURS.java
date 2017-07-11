@@ -8,6 +8,7 @@ package br.com.representative.clustering.furs;
 import br.com.methods.utils.KNN;
 import br.com.methods.utils.Pair;
 import br.com.methods.utils.Vect;
+import br.com.representative.RepresentativeRegistry;
 import br.com.representative.clustering.Partitioning;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +30,10 @@ public class FURS extends Partitioning {
         this.k = k;
         this.deltaK = deltaK;
         this.deltaS = deltaS;
+    }
+    
+    static {
+        RepresentativeRegistry.addClassPackage(FURS.class.getName(), FURS.class.getCanonicalName());
     }
 
     @Override

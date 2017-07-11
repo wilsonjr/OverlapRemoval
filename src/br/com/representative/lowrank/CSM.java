@@ -6,6 +6,7 @@
 
 package br.com.representative.lowrank;
 
+import br.com.representative.RepresentativeRegistry;
 import java.util.Arrays;
 import java.util.List;
 import org.ejml.data.DenseMatrix64F;
@@ -27,6 +28,10 @@ public class CSM extends LowRank {
             throw new RuntimeException("Number of representative greater than number of instances.");
         this.c = c;    
         this.k = k;
+    }
+    
+    static {
+        RepresentativeRegistry.addClassPackage(CSM.class.getName(), CSM.class.getCanonicalName());
     }
     
     @Override

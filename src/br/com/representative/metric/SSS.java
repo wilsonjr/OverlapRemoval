@@ -11,6 +11,7 @@
 package br.com.representative.metric;
 
 import br.com.methods.utils.Vect;
+import br.com.representative.RepresentativeRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,11 @@ public class SSS extends AccessMetric {
         this.alpha = alpha;
         this.maxDistance = maxDistance;
     }
-
+    
+    static {
+        RepresentativeRegistry.addClassPackage(SSS.class.getName(), SSS.class.getCanonicalName());
+    }
+    
     @Override
     public void execute() {
         List<Integer> pivots = new ArrayList<>();

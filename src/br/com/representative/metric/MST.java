@@ -11,6 +11,7 @@
 package br.com.representative.metric;
 
 import br.com.methods.utils.Vect;
+import br.com.representative.RepresentativeRegistry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,6 +38,9 @@ public class MST extends AccessMetric {
         this.k = k;
     }
     
+    static {
+        RepresentativeRegistry.addClassPackage(MST.class.getName(), MST.class.getCanonicalName());
+    }
 
     @Override
     public void execute() {

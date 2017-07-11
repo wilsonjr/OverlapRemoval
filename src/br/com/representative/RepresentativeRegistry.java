@@ -17,7 +17,8 @@ import java.util.logging.Logger;
  */
 public class RepresentativeRegistry {
         
-    private static HashMap<String, Object> map = new HashMap<>();
+    private static HashMap<String, Object> map = new HashMap<>();    
+    private static HashMap<String, String> classPackage = new HashMap<>();
     
     protected RepresentativeRegistry() {}
     
@@ -42,6 +43,11 @@ public class RepresentativeRegistry {
         
         return classInstantiation;
     }
+    
+    public static void addClassPackage(String key, String value) {        
+        classPackage.put(key, value);
+    }
+        
     
     
 }

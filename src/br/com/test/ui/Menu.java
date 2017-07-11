@@ -902,10 +902,7 @@ public class Menu extends javax.swing.JFrame {
 
     
     private void sairJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sairJMenuItemActionPerformed
-        List<Vect> list = new ArrayList<>();
-        Object object = RepresentativeRegistry.getInstance("br.com.representative.clustering.affinitypropagation.AffinityPropagation", list);
-        
-        System.out.println("Olá, pelo visto deu certo! :)");
+       RepresentativeRegistry.addClassPackage("", "");
         dispose();
     }//GEN-LAST:event_sairJMenuItemActionPerformed
 
@@ -1984,7 +1981,7 @@ public class Menu extends javax.swing.JFrame {
         //Object object = RepresentativeRegistry.getInstance("br.com.representative.clustering.affinitypropagation.AffinityPropagation", list);
         
         System.out.println("Olá, pelo visto deu certo! :)");
-        RepresentativeFinder affinityPropagation = AffinityPropagation.getInstance(elems);
+        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class.getCanonicalName(), elems);
         
         //RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
         System.out.println("Init Affinity Propagation execution");

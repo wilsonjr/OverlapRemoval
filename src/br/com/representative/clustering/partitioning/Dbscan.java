@@ -8,6 +8,7 @@ package br.com.representative.clustering.partitioning;
 
 import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
+import br.com.representative.RepresentativeRegistry;
 import br.com.representative.clustering.Partitioning;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,10 @@ public class Dbscan extends Partitioning {
     
     public void setMinPts(int minPts) {
         this.minPts = minPts;
+    }
+    
+    static {
+        RepresentativeRegistry.addClassPackage(Dbscan.class.getName(), Dbscan.class.getCanonicalName());
     }
     
     @Override

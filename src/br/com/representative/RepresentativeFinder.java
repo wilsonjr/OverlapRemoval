@@ -9,7 +9,7 @@ package br.com.representative;
  *
  * @author Windows
  */
-public abstract class RepresentativeFinder {
+public abstract class RepresentativeFinder {    
     protected int[] representatives;
     
     public abstract void execute();

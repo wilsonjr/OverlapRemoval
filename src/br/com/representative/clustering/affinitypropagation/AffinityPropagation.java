@@ -24,7 +24,11 @@ public class AffinityPropagation extends Partitioning {
         super(items);
         alpha = 0.5;
     }
-
+    
+    static {
+        RepresentativeRegistry.addClassPackage(AffinityPropagation.class.getName(), AffinityPropagation.class.getCanonicalName());
+    }
+    
     @Override
     public void execute() {
         
@@ -108,10 +112,6 @@ public class AffinityPropagation extends Partitioning {
         }
                 
         representatives = indexes.stream().mapToInt((e)->e).toArray();        
-    }
-    
-    public static AffinityPropagation getInstance(List<Vect> list) {        
-        return (AffinityPropagation) RepresentativeRegistry.getInstance(AffinityPropagation.class.getCanonicalName(), list);
     }
     
 }

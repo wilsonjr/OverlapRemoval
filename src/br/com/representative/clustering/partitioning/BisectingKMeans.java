@@ -9,8 +9,8 @@ package br.com.representative.clustering.partitioning;
 import br.com.representative.clustering.InitialMedoidApproach;
 import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
+import br.com.representative.RepresentativeRegistry;
 import br.com.representative.clustering.KMethod;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +24,10 @@ public class BisectingKMeans extends KMethod {
     
     public BisectingKMeans(List<Vect> items, InitialMedoidApproach initialGuess, int k) {
         super(items, initialGuess, k);
+    }
+    
+    static {
+        RepresentativeRegistry.addClassPackage(BisectingKMeans.class.getName(), BisectingKMeans.class.getCanonicalName());
     }
     
     @Override

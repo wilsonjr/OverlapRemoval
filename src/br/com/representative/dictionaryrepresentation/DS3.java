@@ -13,6 +13,7 @@ package br.com.representative.dictionaryrepresentation;
  */
 
 import br.com.methods.utils.Util;
+import br.com.representative.RepresentativeRegistry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +26,7 @@ public class DS3 extends SparseRepresentation {
     
     private double[][] D;
     private double[][] copyD;
-    private double copyAlpha;
+    
     
     public DS3(double[][] D) {
         this(D, 0.12);
@@ -33,12 +34,15 @@ public class DS3 extends SparseRepresentation {
     
     public DS3(double[][] D, double alpha) {
         super(alpha);
-        copyAlpha = alpha;
         this.D = D;
         copyD = new double[D.length][D.length];
         for( int i = 0; i < D.length; ++i )
             for( int j = 0; j < D[0].length; ++j )
                 copyD[i][j] = D[i][j];
+    }
+    
+    static {
+        RepresentativeRegistry.addClassPackage(DS3.class.getName(), DS3.class.getCanonicalName());
     }
        
     @Override

@@ -8,6 +8,7 @@ package br.com.representative.clustering.hierarchical;
 
 import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
+import br.com.representative.RepresentativeRegistry;
 import br.com.representative.clustering.Clustering;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +33,11 @@ public class HierarchicalClustering extends Clustering {
     public HierarchicalClustering(ArrayList<Vect> items, LinkageStrategy linkageStrategy) {                
         super(items);
         this.linkageStrategy = linkageStrategy;
+    }
+    
+    
+    static {
+        RepresentativeRegistry.addClassPackage(HierarchicalClustering.class.getName(), HierarchicalClustering.class.getCanonicalName());
     }
     
     @Override

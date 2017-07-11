@@ -10,9 +10,8 @@
 
 package br.com.representative.metric;
 
-import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
-import java.awt.geom.Point2D;
+import br.com.representative.RepresentativeRegistry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -33,6 +32,10 @@ public class GNAT extends AccessMetric {
         this.finalItems = items;
         this.items = items;
         this.k = k;
+    }
+    
+    static {
+        RepresentativeRegistry.addClassPackage(GNAT.class.getName(), GNAT.class.getCanonicalName());
     }
     
     @Override
