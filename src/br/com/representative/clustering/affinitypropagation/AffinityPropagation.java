@@ -5,8 +5,8 @@
  */
 package br.com.representative.clustering.affinitypropagation;
 
-import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
+import br.com.representative.RepresentativeRegistry;
 import br.com.representative.clustering.Partitioning;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,6 +108,10 @@ public class AffinityPropagation extends Partitioning {
         }
                 
         representatives = indexes.stream().mapToInt((e)->e).toArray();        
+    }
+    
+    public static AffinityPropagation getInstance(List<Vect> list) {        
+        return (AffinityPropagation) RepresentativeRegistry.getInstance(AffinityPropagation.class.getCanonicalName(), list);
     }
     
 }

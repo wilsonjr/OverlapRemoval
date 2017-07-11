@@ -283,6 +283,7 @@ import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
 import br.com.projection.spacereduction.SeamCarving;
 import br.com.representative.RepresentativeFinder;
+import br.com.representative.RepresentativeRegistry;
 import br.com.representative.clustering.FarPointsMedoidApproach;
 import br.com.representative.clustering.affinitypropagation.AffinityPropagation;
 import br.com.representative.clustering.furs.FURS;
@@ -901,6 +902,10 @@ public class Menu extends javax.swing.JFrame {
 
     
     private void sairJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sairJMenuItemActionPerformed
+        List<Vect> list = new ArrayList<>();
+        Object object = RepresentativeRegistry.getInstance("br.com.representative.clustering.affinitypropagation.AffinityPropagation", list);
+        
+        System.out.println("Olá, pelo visto deu certo! :)");
         dispose();
     }//GEN-LAST:event_sairJMenuItemActionPerformed
 
@@ -1975,7 +1980,13 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < points.length; ++i )
             elems.add(new Vect(new double[]{points[i].x, points[i].y}));
         
-        RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
+        
+        //Object object = RepresentativeRegistry.getInstance("br.com.representative.clustering.affinitypropagation.AffinityPropagation", list);
+        
+        System.out.println("Olá, pelo visto deu certo! :)");
+        RepresentativeFinder affinityPropagation = AffinityPropagation.getInstance(elems);
+        
+        //RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
         System.out.println("Init Affinity Propagation execution");
         affinityPropagation.execute();
         System.out.println("Finished Affinity Propagation execution");
