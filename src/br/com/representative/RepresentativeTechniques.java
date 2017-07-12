@@ -23,7 +23,23 @@ public enum RepresentativeTechniques {
     
     @Override
     public String toString() {
-        return Class.forName(className);
+        switch( value ) {
+            case 1: return "KMeans";
+            case 2: return "KMedoid";
+            case 3: return "Dbscan";
+            case 4: return "BisectingKMeans";
+            case 5: return "FURS";
+            case 6: return "AffinityPropagation";
+            case 7: return "HierarchicalClustering";
+            case 8: return "DS3";
+            case 9: return "SMRS";
+            case 10: return "CSM";
+            case 11: return "KSvd";
+            case 12: return "GNAT";
+            case 13: return "MST";
+            case 14: return "SSSS";
+            default: return "KMeans";
+        }
     }
     
 }

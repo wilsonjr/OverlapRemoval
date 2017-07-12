@@ -6,7 +6,6 @@
 package br.com.representative.clustering.affinitypropagation;
 
 import br.com.methods.utils.Vect;
-import br.com.representative.RepresentativeRegistry;
 import br.com.representative.clustering.Partitioning;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,10 +22,6 @@ public class AffinityPropagation extends Partitioning {
     public AffinityPropagation(List<Vect> items) {
         super(items);
         alpha = 0.5;
-    }
-    
-    static {
-        RepresentativeRegistry.addClassPackage(AffinityPropagation.class.getName(), AffinityPropagation.class.getCanonicalName());
     }
     
     @Override

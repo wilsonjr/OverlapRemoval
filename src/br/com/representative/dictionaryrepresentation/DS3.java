@@ -13,7 +13,6 @@ package br.com.representative.dictionaryrepresentation;
  */
 
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeRegistry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,11 +39,7 @@ public class DS3 extends SparseRepresentation {
             for( int j = 0; j < D[0].length; ++j )
                 copyD[i][j] = D[i][j];
     }
-    
-    static {
-        RepresentativeRegistry.addClassPackage(DS3.class.getName(), DS3.class.getCanonicalName());
-    }
-       
+           
     @Override
     public void execute() {
         double max = Double.MIN_VALUE;

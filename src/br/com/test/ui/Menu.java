@@ -284,6 +284,7 @@ import br.com.methods.utils.Vect;
 import br.com.projection.spacereduction.SeamCarving;
 import br.com.representative.RepresentativeFinder;
 import br.com.representative.RepresentativeRegistry;
+import br.com.representative.RepresentativeTechniques;
 import br.com.representative.clustering.FarPointsMedoidApproach;
 import br.com.representative.clustering.affinitypropagation.AffinityPropagation;
 import br.com.representative.clustering.furs.FURS;
@@ -1981,7 +1982,11 @@ public class Menu extends javax.swing.JFrame {
         //Object object = RepresentativeRegistry.getInstance("br.com.representative.clustering.affinitypropagation.AffinityPropagation", list);
         
         System.out.println("Olá, pelo visto deu certo! :)");
-        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class.getCanonicalName(), elems);
+        //RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class.getCanonicalName(), elems);
+        
+        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.
+                getInstance(RepresentativeTechniques.AFFINITY_PROPAGATION.toString(), items);
+        
         
         //RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
         System.out.println("Init Affinity Propagation execution");

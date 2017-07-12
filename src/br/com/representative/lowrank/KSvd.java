@@ -8,7 +8,6 @@ package br.com.representative.lowrank;
 
 import Jama.Matrix;
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeRegistry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,10 +32,6 @@ public class KSvd extends LowRank {
         if( dictsize > items.size() )
             throw new RuntimeException("Number of representative greater than number of instances.");
         
-    }
-    
-    static {
-        RepresentativeRegistry.addClassPackage(KSvd.class.getName(), KSvd.class.getCanonicalName());
     }
     
     @Override

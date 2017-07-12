@@ -13,7 +13,6 @@ package br.com.representative.dictionaryrepresentation;
  */
 
 import br.com.methods.utils.Util;
-import br.com.representative.RepresentativeRegistry;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,11 +29,7 @@ public class SMRS extends SparseRepresentation {
         this.itemsFinal = Util.elementMatrix(items);
         this.items = this.itemsFinal;
     }
-    
-    static {
-        RepresentativeRegistry.addClassPackage(SMRS.class.getName(), SMRS.class.getCanonicalName());
-    }
-    
+            
     @Override
     public void execute() {
        

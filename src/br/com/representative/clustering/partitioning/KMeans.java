@@ -8,7 +8,6 @@ package br.com.representative.clustering.partitioning;
 import br.com.representative.clustering.InitialMedoidApproach;
 import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
-import br.com.representative.RepresentativeRegistry;
 import br.com.representative.clustering.KMethod;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,10 +22,6 @@ public class KMeans extends KMethod {
     
     public KMeans(List<Vect> items, InitialMedoidApproach initialGuessApproach, int k) {
         super(items, initialGuessApproach, k);
-    }
-    
-    static {
-        RepresentativeRegistry.addClassPackage(KMeans.class.getName(), KMeans.class.getCanonicalName());
     }
     
     @Override

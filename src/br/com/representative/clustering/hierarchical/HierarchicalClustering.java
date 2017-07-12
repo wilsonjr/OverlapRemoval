@@ -35,11 +35,6 @@ public class HierarchicalClustering extends Clustering {
         this.linkageStrategy = linkageStrategy;
     }
     
-    
-    static {
-        RepresentativeRegistry.addClassPackage(HierarchicalClustering.class.getName(), HierarchicalClustering.class.getCanonicalName());
-    }
-    
     @Override
     public void execute() {
         // 1. create one cluster for each element
