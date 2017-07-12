@@ -898,7 +898,6 @@ public class Menu extends javax.swing.JFrame {
 
     
     private void sairJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sairJMenuItemActionPerformed
-       RepresentativeRegistry.addClassPackage("", "");
         dispose();
     }//GEN-LAST:event_sairJMenuItemActionPerformed
 
