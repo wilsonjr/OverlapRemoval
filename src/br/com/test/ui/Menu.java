@@ -264,6 +264,8 @@ import br.com.explore.explorertree.util.Tooltip;
 import br.com.explorer.explorertree.ExplorerTree;
 import br.com.explorer.explorertree.ExplorerTreeController;
 import br.com.explorer.explorertree.ExplorerTreeNode;
+import br.com.methods.overlap.OverlapRegistry;
+import br.com.methods.overlap.OverlapRemoval;
 import br.com.methods.overlap.expadingnode.OneLevelOverlap;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
 import br.com.methods.overlap.incboard.IncBoardExecutor;
@@ -951,7 +953,8 @@ public class Menu extends javax.swing.JFrame {
     private void rwordleCJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordleCJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         double[] center0 = Util.getCenter(rects);
-        RWordleC rw = new RWordleC();
+        //OverlapRemoval rw = new RWordleC();
+        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class);
         Map<OverlapRect, OverlapRect> projected = rw.apply(rects);
         ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
         double[] center1 = Util.getCenter(projectedValues);
@@ -977,7 +980,9 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         double[] center0 = Util.getCenter(rects);
         
-        RWordleL rwl = new RWordleL(alpha, false);
+        //OverlapRemoval rwl = new RWordleL(alpha, false);
+        OverlapRemoval rwl = (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, alpha, false);
+        
         Map<OverlapRect, OverlapRect> projected = rwl.apply(rects);
         ArrayList<OverlapRect> projectedValues =  Util.getProjectedValues(projected);
         double[] center1 = Util.getCenter(projectedValues);
@@ -1108,7 +1113,8 @@ public class Menu extends javax.swing.JFrame {
     private void vpscJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vpscJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         double[] center0 = Util.getCenter(rects);
-        VPSC vpsc = new VPSC();
+        //OverlapRemoval vpsc = new VPSC();
+        OverlapRemoval vpsc = (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class);
         
         Map<OverlapRect, OverlapRect> projected = vpsc.applyAndShowTime(rects);        
         ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);        
@@ -1138,7 +1144,8 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         
         double[] center0 = Util.getCenter(rects);
-        PRISM prism = new PRISM(algo);
+        //OverlapRemoval prism = new PRISM(algo);
+        OverlapRemoval prism = (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, algo);
         Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
         ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
         
@@ -1173,7 +1180,9 @@ public class Menu extends javax.swing.JFrame {
         String k_value = JOptionPane.showInputDialog("Por favor, insira o valor de 'k':");
         boolean applySeamCarving = Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
         
-        ProjSnippet ps = new ProjSnippet(Double.parseDouble(alpha_value), Integer.parseInt(k_value)+1);
+        OverlapRemoval ps = new ProjSnippet(Double.parseDouble(alpha_value), Integer.parseInt(k_value)+1);
+        //OverlapRemoval ps = (OverlapRemoval) OverlapRegistry.getInstance(Double.parseDouble(alpha_value), Integer.parseInt(k_value)+1);
+        
         Map<OverlapRect, OverlapRect> projected = ps.apply(rects);
         ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
         if( projected != null ) {
@@ -1223,7 +1232,8 @@ public class Menu extends javax.swing.JFrame {
                     id++;
                 }
 
-                IncBoardExecutor executor = new IncBoardExecutor();
+                //IncBoardExecutor executor = new IncBoardExecutor();
+                IncBoardExecutor executor = (IncBoardExecutor) OverlapRegistry.getInstance(IncBoardExecutor.class);
                 executor.apply(items);
                 
                 rectangles.clear();
@@ -1273,7 +1283,8 @@ public class Menu extends javax.swing.JFrame {
                     ++id;
                 }
 
-                HexBoardExecutor executor = new HexBoardExecutor();
+                //HexBoardExecutor executor = new HexBoardExecutor();
+                HexBoardExecutor executor = (HexBoardExecutor) OverlapRegistry.getInstance(HexBoardExecutor.class);
                 executor.apply(items);
 
                 int zMin = executor.getMinRow()-executor.getMinCol();
