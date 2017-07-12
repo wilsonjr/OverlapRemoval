@@ -163,5 +163,4 @@ public class MST extends AccessMetric {
         return new ArrayList<>(Arrays.asList(firstNode, secondNode));
     }
       
-    
 }

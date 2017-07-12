@@ -273,7 +273,5 @@ public class KSvd extends LowRank {
             dictsize = 1;
     }
     
-    
-    
          
 }

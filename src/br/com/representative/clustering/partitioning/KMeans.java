@@ -88,5 +88,4 @@ public class KMeans extends KMethod {
         representatives = Util.selectRepresentatives(centroids, items);
     }
     
-    
 }

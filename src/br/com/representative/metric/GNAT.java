@@ -56,6 +56,8 @@ public class GNAT extends AccessMetric {
                 k--;
             }        
         } 
+        
+        representatives = pivots.stream().mapToInt((e)->e).toArray();
     }
     
     private void findBestPartPoint(List<Integer> pivots, List<Vect> set) {
@@ -93,5 +95,5 @@ public class GNAT extends AccessMetric {
         if( k == 0 )
             k = 1;
     }
-    
+        
 }

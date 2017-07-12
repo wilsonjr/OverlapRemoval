@@ -256,9 +256,7 @@ public class SMRS extends SparseRepresentation {
                 newItems[i][j] = itemsFinal[i][indexes[j]];
         items = newItems;  
     }
-    
-    
-        
+            
     private class Item {
         public double value;
         public int index;

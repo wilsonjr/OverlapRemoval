@@ -8,7 +8,6 @@ package br.com.representative.clustering.hierarchical;
 
 import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
-import br.com.representative.RepresentativeRegistry;
 import br.com.representative.clustering.Clustering;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -167,5 +166,5 @@ public class HierarchicalClustering extends Clustering {
         representatives = Util.selectRepresentatives(clusterHierarchy.get(dendogramLevel), items);
         return representatives;
     }
-
+    
 }

@@ -86,5 +86,5 @@ public class KMedoid extends KMethod {
         
         representatives = Util.selectRepresentatives(newGuess, items);
     }
-    
+        
 }

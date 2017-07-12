@@ -269,9 +269,7 @@ import br.com.methods.overlap.hexboard.HexBoardExecutor;
 import br.com.methods.overlap.incboard.IncBoardExecutor;
 import br.com.methods.overlap.incboard.PointItem;
 import br.com.methods.overlap.prism.PRISM;
-import br.com.methods.overlap.projsnippet.Edge;
 import br.com.methods.overlap.projsnippet.ProjSnippet;
-import br.com.methods.overlap.projsnippet.Vertex;
 import br.com.methods.overlap.rwordle.RWordleC;
 import br.com.methods.overlap.rwordle.RWordleL;
 import br.com.methods.overlap.vpsc.VPSC;
@@ -284,7 +282,6 @@ import br.com.methods.utils.Vect;
 import br.com.projection.spacereduction.SeamCarving;
 import br.com.representative.RepresentativeFinder;
 import br.com.representative.RepresentativeRegistry;
-import br.com.representative.RepresentativeTechniques;
 import br.com.representative.clustering.FarPointsMedoidApproach;
 import br.com.representative.clustering.affinitypropagation.AffinityPropagation;
 import br.com.representative.clustering.furs.FURS;
@@ -298,7 +295,9 @@ import br.com.representative.dictionaryrepresentation.DS3;
 import br.com.representative.dictionaryrepresentation.SMRS;
 import br.com.representative.lowrank.CSM;
 import br.com.representative.lowrank.KSvd;
+import br.com.representative.metric.GNAT;
 import br.com.representative.metric.MST;
+import br.com.representative.metric.SSS;
 import br.com.test.draw.color.GrayScale;
 import br.com.test.draw.color.RainbowScale;
 import java.awt.BorderLayout;
@@ -329,8 +328,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -343,8 +340,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
@@ -1354,41 +1349,53 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_saveDataCoordJMenuItemActionPerformed
 
     private void sssJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sssJMenuItemActionPerformed
-//        double a = Double.parseDouble(JOptionPane.showInputDialog("Insira o valor de alpha: "));
-//        
-//        SSS sss = new SSS();
-//        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-//        
-//        sss.selectPivots(rects, a, getMaxDistance());
-//        int i = 0;
-//        for( OverlapRect r: rects ) {
-//                r.setId(i++); 
-//                r.setLevel(1);
-//        }
-//        Util.toRectangleVis(rectangles, rects);
-//        System.out.println("OK SSS!");
-//        view.cleanImage();
-//        view.repaint();
+        double alpha = 0.05;
+        double maxDistance = getMaxDistance();
+        if( rectangles == null )
+            loadDataJMenuItemActionPerformed(null);
+        ArrayList<Vect> elems = new ArrayList<>();
+        for( int i = 0; i < points.length; ++i )
+            elems.add(new Vect(new double[]{points[i].x, points[i].y}));
+        
+        
+        RepresentativeFinder sss = (RepresentativeFinder) RepresentativeRegistry.getInstance(SSS.class, items, alpha, maxDistance);
+        
+        
+//        RepresentativeFinder sss = (RepresentativeFinder) RepresentativeRegistry.getInstance(RepresentativeTechniques.SSS.toString(), 
+//                elems, alpha, maxDistance);
+        sss.execute();
+        selectedRepresentatives = sss.getRepresentatives();
+        hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
+    
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
+
     }//GEN-LAST:event_sssJMenuItemActionPerformed
 
     private void gnatJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gnatJMenuItemActionPerformed
-//        
-//        
-//        GNAT gnat = new GNAT();
-//        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-//        
-//        int k = 5*rects.size()/100; //Integer.parseInt(JOptionPane.showInputDialog("Insira o número de pivôs: "));
-//        
-//        gnat.selectPivots(rects, k);
-//        int i = 0;
-//        for( OverlapRect r: rects ) {
-//            r.setId(i++);
-//            r.setLevel(1);
-//        }
-//        Util.toRectangleVis(rectangles, rects);
-//        System.out.println("OK GNAT!");
-//        view.cleanImage();
-//        view.repaint();
+        
+        if( rectangles == null )
+            loadDataJMenuItemActionPerformed(null);
+        ArrayList<Vect> elems = new ArrayList<>();
+        for( int i = 0; i < points.length; ++i )
+            elems.add(new Vect(new double[]{points[i].x, points[i].y}));
+        int k = 5*elems.size()/100;
+        
+        RepresentativeFinder gnat = (RepresentativeFinder) RepresentativeRegistry.getInstance(GNAT.class, items, k);
+        
+        
+//        RepresentativeFinder gnat = (RepresentativeFinder) RepresentativeRegistry.getInstance(RepresentativeTechniques.GNAT.toString(), 
+//                elems, k);
+        gnat.execute();
+        selectedRepresentatives = gnat.getRepresentatives();
+        hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
+    
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
     }//GEN-LAST:event_gnatJMenuItemActionPerformed
 
     private void mstJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mstJMenuItemActionPerformed
@@ -1397,7 +1404,8 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
-        RepresentativeFinder mst = new MST(elems, 15);
+        //RepresentativeFinder mst = new MST(elems, 15);
+        RepresentativeFinder mst = (RepresentativeFinder) RepresentativeRegistry.getInstance(MST.class, elems, 15);
         mst.execute();
         selectedRepresentatives = mst.getRepresentatives();
         //selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
@@ -1407,18 +1415,6 @@ public class Menu extends javax.swing.JFrame {
             view.cleanImage();
             view.repaint();
         }
-//        MST mst = new MST();
-//        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-//        
-//        int i = 0;
-//        for( OverlapRect r: rects ) 
-//            r.setId(i++);
-//        mst.selectPivots(rects, 20);
-//        
-//        Util.toRectangleVis(rectangles, rects);
-//        System.out.println("OK MST!");
-//        view.cleanImage();
-//        view.repaint();
     }//GEN-LAST:event_mstJMenuItemActionPerformed
 
     private void extractParametersJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractParametersJMenuItemActionPerformed
@@ -1501,7 +1497,8 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < rects.size(); ++i )
             elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
-        hc = new HierarchicalClustering(elems, new SingleLinkageStrategy());        
+       // hc = new HierarchicalClustering(elems, new SingleLinkageStrategy());   
+        hc = (HierarchicalClustering) RepresentativeRegistry.getInstance(HierarchicalClustering.class, elems, new SingleLinkageStrategy());
         hc.execute();
         
         nivelDendrogram = 0;
@@ -1540,7 +1537,8 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
                 
-        RepresentativeFinder kmeans = new KMeans(elems, new FarPointsMedoidApproach(), 3);
+        //RepresentativeFinder kmeans = new KMeans(elems, new FarPointsMedoidApproach(), 3);
+        RepresentativeFinder kmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMeans.class, elems, new FarPointsMedoidApproach(), 3);
         System.out.println("Init kmeans");
         kmeans.execute();
         System.out.println("Finished kmeans");
@@ -1561,7 +1559,8 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
                 
-        RepresentativeFinder kmedoid = new KMedoid(elems, new FarPointsMedoidApproach(), 4);
+        //RepresentativeFinder kmedoid = new KMedoid(elems, new FarPointsMedoidApproach(), 4);
+        RepresentativeFinder kmedoid = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMedoid.class, elems, new FarPointsMedoidApproach(), 4);
         kmedoid.execute();
         currentCluster = ((KMedoid)kmedoid).getClusters();        
         selectedRepresentatives = kmedoid.getRepresentatives();
@@ -1580,7 +1579,9 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
-        RepresentativeFinder bkmeans = new BisectingKMeans(elems, new FarPointsMedoidApproach(), 4);
+        //RepresentativeFinder bkmeans = new BisectingKMeans(elems, new FarPointsMedoidApproach(), 4);
+        RepresentativeFinder bkmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(BisectingKMeans.class, elems, new FarPointsMedoidApproach(), 4);
+        
         bkmeans.execute();
         currentCluster = ((BisectingKMeans)bkmeans).getClusters();
         selectedRepresentatives = bkmeans.getRepresentatives();
@@ -1599,7 +1600,8 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
-        RepresentativeFinder dbscan = new Dbscan(elems,100, (int)(60.0/100.0)*7);
+        //RepresentativeFinder dbscan = new Dbscan(elems, 100, (int)(60.0/100.0)*7);
+        RepresentativeFinder dbscan = (RepresentativeFinder) RepresentativeRegistry.getInstance(Dbscan.class, elems, 100, (int)(60.0/100.0)*7);
         dbscan.execute();
         currentCluster = ((Dbscan)dbscan).getClusters();
         selectedRepresentatives = dbscan.getRepresentatives();
@@ -1637,7 +1639,8 @@ public class Menu extends javax.swing.JFrame {
                     
                 }
                 
-                CSM csm = new CSM(attrs, (int) ((int) attrs.size()*0.10), attrs.size());
+                //RepresentativeFinder csm = new CSM(attrs, (int) (attrs.size()*0.10), attrs.size());
+                RepresentativeFinder csm = (RepresentativeFinder) RepresentativeRegistry.getInstance(CSM.class, attrs, (int) (attrs.size()*0.10), attrs.size());
                 csm.execute();
 
                 selectedRepresentatives = csm.getRepresentatives();
@@ -1689,7 +1692,8 @@ public class Menu extends javax.swing.JFrame {
                     
                 }
                 
-                KSvd ksvd = new KSvd(attrs, (int) ((int) attrs.size()*0.2));
+                //RepresentativeFinder ksvd = new KSvd(attrs, (int) (attrs.size()*0.2));
+                RepresentativeFinder ksvd = (RepresentativeFinder) RepresentativeRegistry.getInstance(KSvd.class, attrs, (int) (attrs.size()*0.2));
                 ksvd.execute();
                 
                 selectedRepresentatives = ksvd.getRepresentatives();
@@ -1737,7 +1741,8 @@ public class Menu extends javax.swing.JFrame {
                         attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                        
                     
                 }
-                SMRS smrs = new SMRS(attrs);
+                //RepresentativeFinder smrs = new SMRS(attrs);
+                RepresentativeFinder smrs = (RepresentativeFinder) RepresentativeRegistry.getInstance(SMRS.class, attrs);
                 smrs.execute();
                 
                 selectedRepresentatives = smrs.getRepresentatives();
@@ -1799,7 +1804,8 @@ public class Menu extends javax.swing.JFrame {
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
         }
         
-        RepresentativeFinder ds3 = new DS3(distances, 0.1); // gives the best results 
+        //RepresentativeFinder ds3 = new DS3(distances, 0.1); // gives the best results 
+        RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.1);
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
         
@@ -1949,12 +1955,13 @@ public class Menu extends javax.swing.JFrame {
                 
                 // dictionary representation
                 // must test with alpha = 0.3
-                RepresentativeFinder ds3 = new DS3(distances, 0.1);
+                //RepresentativeFinder ds3 = new DS3(distances, 0.1);
+                RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.1);
                 RepresentativeFinder smrs = new SMRS(attrs);
                 
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         ds3, 7, RECTSIZE, RECTSIZE/2);
+                         ds3, 4, RECTSIZE, RECTSIZE/2);
                 
                 controller.build();                
                 controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
@@ -1979,16 +1986,8 @@ public class Menu extends javax.swing.JFrame {
             elems.add(new Vect(new double[]{points[i].x, points[i].y}));
         
         
-        //Object object = RepresentativeRegistry.getInstance("br.com.representative.clustering.affinitypropagation.AffinityPropagation", list);
-        
-        System.out.println("Olá, pelo visto deu certo! :)");
-        //RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class.getCanonicalName(), elems);
-        
-        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.
-                getInstance(RepresentativeTechniques.AFFINITY_PROPAGATION.toString(), items);
-        
-        
-        //RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
+        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, items);
+        ///RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
         System.out.println("Init Affinity Propagation execution");
         affinityPropagation.execute();
         System.out.println("Finished Affinity Propagation execution");
@@ -2010,16 +2009,19 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
-        FURS furs = new FURS(elems, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
-        System.out.println("Init FURS");
-        //furs.execute();
-        //selectedRepresentatives =  furs.getRepresentatives(); 
+        //RepresentativeFinder furs = new FURS(elems, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
         
-        List<Vect> elements = new ArrayList<>();        
-        for( int i = 0; i < points.length; ++i ) {
-            elements.add(new Vect(new double[]{points[i].x, points[i].y}));
-        }
-        selectedRepresentatives = furs.execute(elements, 15, (int)(0.2*points.length));
+        RepresentativeFinder furs = (FURS) RepresentativeRegistry.getInstance(FURS.class, 
+                                       elems, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
+        System.out.println("Init FURS");
+        furs.execute();
+        selectedRepresentatives =  furs.getRepresentatives(); 
+        
+//        List<Vect> elements = new ArrayList<>();        
+//        for( int i = 0; i < points.length; ++i ) {
+//            elements.add(new Vect(new double[]{points[i].x, points[i].y}));
+//        }
+//        selectedRepresentatives = furs.execute(elements, 15, (int)(0.2*points.length));
         System.out.println("Finished FURS");
        
         hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));

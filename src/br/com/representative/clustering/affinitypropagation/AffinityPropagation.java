@@ -108,5 +108,5 @@ public class AffinityPropagation extends Partitioning {
                 
         representatives = indexes.stream().mapToInt((e)->e).toArray();        
     }
-    
+        
 }

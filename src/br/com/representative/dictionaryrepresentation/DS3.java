@@ -26,11 +26,6 @@ public class DS3 extends SparseRepresentation {
     private double[][] D;
     private double[][] copyD;
     
-    
-    public DS3(double[][] D) {
-        this(D, 0.12);
-    }
-    
     public DS3(double[][] D, double alpha) {
         super(alpha);
         this.D = D;
@@ -273,7 +268,6 @@ public class DS3 extends SparseRepresentation {
         D = distances;
     }    
     
-
     private class Item {
         public double value;
         public int index;

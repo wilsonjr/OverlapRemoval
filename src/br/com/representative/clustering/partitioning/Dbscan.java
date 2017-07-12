@@ -107,8 +107,6 @@ public class Dbscan extends Partitioning {
         } 
     }
     
-    
-    
     private class DbscanPoint {
         
         public Vect point;
@@ -122,7 +120,6 @@ public class Dbscan extends Partitioning {
         public boolean processed() {
             return cluster != -1;
         }
-        
     }
-    
+        
 }
