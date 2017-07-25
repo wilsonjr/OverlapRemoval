@@ -22,9 +22,9 @@ public class Coverage {
         
         for( int i = 0; i < similarity.length; ++i ) {
             
-            double max = -1;
+            double max = -1.0;
             for( int j = 0; j < indexes.length; ++j )
-                max = Double.max(max, similarity[i][indexes[j]]);
+                max = Double.max(max, similarity[indexes[j]][i]);
             
             sum += max;
         }
