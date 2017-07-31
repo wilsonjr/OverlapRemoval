@@ -1584,7 +1584,7 @@ public class Menu extends javax.swing.JFrame {
         
         //RepresentativeFinder bkmeans = new BisectingKMeans(elems, new FarPointsMedoidApproach(), 4);
         RepresentativeFinder bkmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(BisectingKMeans.class, elems, 
-                new FarPointsMedoidApproach(), (int)(elems.size()*0.03));
+                new FarPointsMedoidApproach(), (int)(elems.size()*0.02));
         
         bkmeans.execute();
         //currentCluster = ((BisectingKMeans)bkmeans).getClusters();
