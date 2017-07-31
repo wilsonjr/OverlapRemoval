@@ -14,10 +14,18 @@ package br.com.representative.analysis;
  *
  * @author wilson
  */
-public class Coverage {
+public class Coverage implements RepresentativeAnalysis {
     
-    public static double calculate(int indexes[], double[][] similarity) {
-        
+    private int[] indexes;
+    private double[][] similarity;
+    
+    public Coverage(int indexes[], double[][] similarity) {
+        this.indexes = indexes;
+        this.similarity = similarity;
+    }
+
+    @Override
+    public double init() {
         double sum = 0.0;
         
         for( int i = 0; i < similarity.length; ++i ) {
@@ -30,6 +38,11 @@ public class Coverage {
         }
         
         return sum/similarity.length;
+    }
+    
+    @Override
+    public String toString() {
+        return "Coverage";
     }
     
 }

@@ -18,13 +18,15 @@ import org.rosuda.REngine.Rserve.RserveException;
  * Rserve, DescTools need to be installed.
  * @author Windows
  */
-public class Entropy {
-    /**
-     * 
-     * @param pts
-     * @return 
-     */
-    public static double calculate(Point2D.Double[] pts) {
+public class Entropy implements RepresentativeAnalysis {
+    private Point2D.Double[] pts;
+    
+    public Entropy(Point2D.Double[] pts) {
+        this.pts = pts;
+    }
+    
+    @Override
+    public double init() {
         try {
              
             double[] values = new double[pts.length*2];
@@ -52,6 +54,12 @@ public class Entropy {
             System.err.println("Exception when computing Entropy: "+e.toString());
         } 
         return -1.0;
+    }
+    
+    
+    @Override
+    public String toString() {
+        return "Entropy";
     }
     
 }

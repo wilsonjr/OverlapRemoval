@@ -10,9 +10,18 @@ package br.com.representative.analysis;
  *
  * @author wilson
  */
-public class Redundancy {
- 
-    public static double calculate(int indexes[], double[][] similarity) {
+public class Redundancy implements RepresentativeAnalysis {
+    
+    private int[] indexes;
+    private double[][] similarity;
+    
+    public Redundancy(int[] indexes, double[][] similarity) {
+        this.indexes = indexes;
+        this.similarity = similarity;                 
+    }
+    
+    @Override
+    public double init() {
         
         double sum = 0.0;
         
@@ -26,6 +35,11 @@ public class Redundancy {
         }
         
         return sum/similarity.length;    
+    }
+    
+    @Override
+    public String toString() {
+        return "Redundancy";
     }
     
 }
