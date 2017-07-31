@@ -1359,19 +1359,22 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_saveDataCoordJMenuItemActionPerformed
 
     private void sssJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sssJMenuItemActionPerformed
-        double alpha = 0.05;
+        double alpha = Double.parseDouble(JOptionPane.showInputDialog("alpha"));
+
         double maxDistance = getMaxDistance();
         if( rectangles == null )
             loadDataJMenuItemActionPerformed(null);
         ArrayList<Vect> elems = new ArrayList<>();
-        for( int i = 0; i < points.length; ++i )
+        for( int i = 0; i < points.length; ++i ) {
             elems.add(new Vect(new double[]{points[i].x, points[i].y}));
-        
+        }
         
         RepresentativeFinder sss = (RepresentativeFinder) RepresentativeRegistry.getInstance(SSS.class, items, alpha, maxDistance);
-        
+        ((SSS)sss).setAlpha(alpha);
+        ((SSS)sss).setMaxDistance(maxDistance);
         sss.execute();
         selectedRepresentatives = sss.getRepresentatives();
+        System.out.println("Size: "+selectedRepresentatives.length);
         hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
     
         if( view != null ) {
@@ -1388,12 +1391,14 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<Vect> elems = new ArrayList<>();
         for( int i = 0; i < points.length; ++i )
             elems.add(new Vect(new double[]{points[i].x, points[i].y}));
-        int k = 5*elems.size()/100;
+        int k = Integer.parseInt(JOptionPane.showInputDialog("k"));
         
         RepresentativeFinder gnat = (RepresentativeFinder) RepresentativeRegistry.getInstance(GNAT.class, items, k);
+        ((GNAT)gnat).setK(k);
         
         gnat.execute();
         selectedRepresentatives = gnat.getRepresentatives();
+        System.out.println("Size: "+selectedRepresentatives.length);
         hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
     
         if( view != null ) {
@@ -1408,10 +1413,14 @@ public class Menu extends javax.swing.JFrame {
         for( int i = 0; i < rects.size(); ++i )
             elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
         
+        int k = Integer.parseInt(JOptionPane.showInputDialog("k"));
         
-        RepresentativeFinder mst = (RepresentativeFinder) RepresentativeRegistry.getInstance(MST.class, elems, 15);
+        RepresentativeFinder mst = (RepresentativeFinder) RepresentativeRegistry.getInstance(MST.class, elems, k);
+        
+        ((MST)mst).setK(k);
         mst.execute();
         selectedRepresentatives = mst.getRepresentatives();
+        System.out.println("Size: "+selectedRepresentatives.length);
         hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
         
         if( view != null ) {
@@ -1643,12 +1652,16 @@ public class Menu extends javax.swing.JFrame {
                     
                 }
                 
+                
+                
                 //RepresentativeFinder csm = new CSM(attrs, (int) (attrs.size()*0.10), attrs.size());
-                RepresentativeFinder csm = (RepresentativeFinder) RepresentativeRegistry.getInstance(CSM.class, attrs, (int) (attrs.size()*0.10), attrs.size());
+                RepresentativeFinder csm = (RepresentativeFinder) RepresentativeRegistry.getInstance(CSM.class, attrs, 
+                        (int) (attrs.size()*0.03), attrs.size());
                 csm.execute();
 
                 selectedRepresentatives = csm.getRepresentatives();
-                selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+                System.out.println("Size: "+selectedRepresentatives.length);
+               // selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
                 hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
                 
                 if( view != null ) {
@@ -1697,11 +1710,14 @@ public class Menu extends javax.swing.JFrame {
                 }
                 
                 //RepresentativeFinder ksvd = new KSvd(attrs, (int) (attrs.size()*0.2));
-                RepresentativeFinder ksvd = (RepresentativeFinder) RepresentativeRegistry.getInstance(KSvd.class, attrs, (int) (attrs.size()*0.2));
+                System.out.println("Executing...");
+                RepresentativeFinder ksvd = (RepresentativeFinder) RepresentativeRegistry.getInstance(KSvd.class, attrs, 
+                        (int) (attrs.size()*0.03));
                 ksvd.execute();
                 
                 selectedRepresentatives = ksvd.getRepresentatives();
-                selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+                System.out.println("Size: "+selectedRepresentatives.length);
+                //selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
                 hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
                 
                 if( view != null ) {
@@ -1784,7 +1800,7 @@ public class Menu extends javax.swing.JFrame {
             for( int j = 0; j < distances[0].length; ++j )
                 distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
         
-        DS3 ds3 = new DS3(distances, 0.1);
+        DS3 ds3 = new DS3(distances, 0.1, 10, 30);
         ds3.execute();
         selectedRepresentatives = ds3.getRepresentatives();
 
@@ -1809,7 +1825,11 @@ public class Menu extends javax.swing.JFrame {
         }
         
         //RepresentativeFinder ds3 = new DS3(distances, 0.1); // gives the best results 
-        RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.1);
+        
+        double alpha = Double.parseDouble(JOptionPane.showInputDialog("alpha"));
+        RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 
+                alpha, 40,50);
+        ((DS3)ds3).setAlpha(alpha);
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
         
@@ -1847,7 +1867,7 @@ public class Menu extends javax.swing.JFrame {
 //        selectedRepresentatives = temp;
 //        
 //        
-        selectedRepresentatives = Util.distinct(selectedRepresentatives, points, RECTSIZE/2);
+       // selectedRepresentatives = Util.distinct(selectedRepresentatives, points, RECTSIZE/2);
         hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
     
         if( view != null ) {
@@ -1990,12 +2010,14 @@ public class Menu extends javax.swing.JFrame {
             elems.add(new Vect(new double[]{points[i].x, points[i].y}));
         
         
-        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, items);
+        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, items, 17, 29);
         ///RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
         System.out.println("Init Affinity Propagation execution");
         affinityPropagation.execute();
         System.out.println("Finished Affinity Propagation execution");
         selectedRepresentatives = affinityPropagation.getRepresentatives();
+        
+        System.out.println("Size: "+selectedRepresentatives.length);
         hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
     
         if( view != null ) {
@@ -2103,7 +2125,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 // dictionary representation
                 // must test with alpha = 0.3
-                RepresentativeFinder ds3 = new DS3(distances, 0.1);
+                RepresentativeFinder ds3 = new DS3(distances, 0.1, (int)(0.01*points.length), (int)(0.02*points.length));
                 RepresentativeFinder smrs = new SMRS(attrs);
                 RepresentativeFinder furs = new FURS(elements, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
                 

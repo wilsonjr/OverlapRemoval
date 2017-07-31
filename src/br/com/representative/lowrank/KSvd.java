@@ -45,9 +45,11 @@ public class KSvd extends LowRank {
         double previousError = 0, error = 0;
         int count;
         for( count = 0; count < maxiter; ++count ) {
-            
+            System.out.println("Iteration number "+count);
             // sparse coding stage
             double[][] gammai = new double[dictsize][items[0].length];
+            
+            System.out.println("Finding sparse represenation");
             for( int i = 0; i < items[0].length; ++i ) {
                 for( int k = 0; k < n; ++k )
                     y[k] = items[k][i];
@@ -62,8 +64,9 @@ public class KSvd extends LowRank {
             /** codebook update stage **/            
             // for each column k = 1, 2, ..., k, in D^(j-1)
             // note that D^(j-1) is the current dictionary
-           
+            System.out.println("Updating dictionary");
             for( int k = 0; k < D[0].length; ++k ) {
+                
                 
                 // define the group of examples that use this atom
                 List<Integer> wk = new ArrayList<>();
@@ -117,6 +120,7 @@ public class KSvd extends LowRank {
                 
             }
             
+            System.out.println("Error: "+Math.abs(error-previousError));
             if( Math.abs(error-previousError) <= 0.0000001 )
                 break;
             previousError = error;

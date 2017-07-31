@@ -26,7 +26,8 @@ public class CSM extends LowRank {
         if( c > items.size() )
             throw new RuntimeException("Number of representative greater than number of instances.");
         this.c = c;    
-        this.k = k;
+        this.k = Math.min(items.get(0).size(), items.size())/2+1;
+       // this.k = k;
     }
         
     @Override

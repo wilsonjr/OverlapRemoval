@@ -26,9 +26,13 @@ public class DS3 extends SparseRepresentation {
     private double[][] D;
     private double[][] copyD;
     
-    public DS3(double[][] D, double alpha) {
+    private int low, high;
+    
+    public DS3(double[][] D, double alpha, int low, int high) {
         super(alpha);
         this.D = D;
+        this.low = low;
+        this.high = high;
         copyD = new double[D.length][D.length];
         for( int i = 0; i < D.length; ++i )
             for( int j = 0; j < D[0].length; ++j )
@@ -53,8 +57,8 @@ public class DS3 extends SparseRepresentation {
         double[] rhov = computeRegularizer(D, p);
         double rho = rhov[1]*alpha;
         double mu = Math.pow(10, -1);
-        int maxIter = 3000;
-        double errThr = Math.pow(10, -5);        
+        int maxIter = 1200;
+        double errThr = Math.pow(10, -7);        
         
         double[][] Z = ds3(D, p, rho, mu, maxIter, CFD, errThr);
         formRepresentatives(Z);        
@@ -98,10 +102,15 @@ public class DS3 extends SparseRepresentation {
                 System.out.println("Finishing: ||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");
             } else {
                 k++;
-               // if( k%10 == 0 ) {
-                    //formRepresentatives(C2);
-                    //System.out.println("||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");       
-               // }
+                if( k%10 == 0 ) {
+                    formRepresentatives(C2);
+                    System.out.println("||Z-C||= "+err1+", ||C1-C2||= "+err2+", iteration = "+k+" , repNum = "+representatives.length+"\n");       
+                    
+                    if( representatives.length >= low && representatives.length <= high ) 
+                        terminate = true;
+                    
+                    
+                }
             }
             
             C1 = C2;
@@ -267,6 +276,10 @@ public class DS3 extends SparseRepresentation {
        
         D = distances;
     }    
+
+    public void setAlpha(double alpha) {
+        this.alpha = alpha;
+    }
     
     private class Item {
         public double value;

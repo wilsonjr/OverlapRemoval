@@ -25,11 +25,7 @@ public class GNAT extends AccessMetric {
     public GNAT(List<Vect> items, int k) {
         super(items);
         
-        if( items.isEmpty() )
-            throw new IllegalArgumentException("The set must not be empty.");
         
-        this.finalItems = items;
-        this.items = items;
         this.k = k;
     }
     
@@ -94,6 +90,10 @@ public class GNAT extends AccessMetric {
         k = (int)(indexes.length*0.1);
         if( k == 0 )
             k = 1;
+    }
+
+    public void setK(int k) {
+        this.k = k;
     }
         
 }

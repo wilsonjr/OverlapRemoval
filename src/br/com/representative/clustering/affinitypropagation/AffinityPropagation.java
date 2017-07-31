@@ -18,10 +18,13 @@ import java.util.List;
 public class AffinityPropagation extends Partitioning {
 
     private double alpha;
+    private int low, high;
     
-    public AffinityPropagation(List<Vect> items) {
+    public AffinityPropagation(List<Vect> items, int low, int high) {
         super(items);
         alpha = 0.5;
+        this.low = low;
+        this.high = high;
     }
     
     @Override
@@ -56,6 +59,7 @@ public class AffinityPropagation extends Partitioning {
         int maxIterations = 230;
         
         for( int iter = 0; iter < maxIterations; ++iter ) {
+            System.out.print("Iteration number "+(iter+1)+", ");
             
             // update responsabilities
             for( int i = 0; i < items.size(); ++i ) {                
@@ -97,7 +101,17 @@ public class AffinityPropagation extends Partitioning {
                         
                     }
                 }
-            }             
+            }    
+            
+            int repCount = 0;
+            for( int i = 0; i < items.size(); ++i )
+                if( r[i][i]+a[i][i] > 0 )
+                    repCount++;
+                            
+            System.out.println(repCount+" representative found");
+            
+            if( repCount >= low && repCount <= high )
+                break;
         }
         
         List<Integer> indexes = new ArrayList<>();        

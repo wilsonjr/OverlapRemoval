@@ -69,6 +69,16 @@ public class SSS extends AccessMetric {
                 if( distance < d ) 
                     distance = d;
             }
+        
+        maxDistance = distance;
+    }
+
+    public void setAlpha(double alpha) {
+        this.alpha = alpha;
+    }
+
+    public void setMaxDistance(double maxDistance) {
+        this.maxDistance = maxDistance;
     }
     
 }
