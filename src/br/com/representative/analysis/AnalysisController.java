@@ -29,11 +29,9 @@ public class AnalysisController {
     
     public static void execute(RepresentativeAnalysis representativeAnalysis) {
         
-        long start = System.currentTimeMillis();
-        representativeAnalysis.init();
-        long finish = System.currentTimeMillis();
-        Logger.getLogger(AnalysisController.class.getName()).log(Level.INFO, "Execution time "+representativeAnalysis.toString()+
-                                                                             ": {0}s ",((finish-start)/1000.0));
+        double value = representativeAnalysis.init();
+        
+        Logger.getLogger(AnalysisController.class.getName()).log(Level.INFO, "Value for {0} metric: {1}", new Object[]{representativeAnalysis.toString(), value});
     }
     
     
