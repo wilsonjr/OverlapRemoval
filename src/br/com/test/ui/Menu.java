@@ -1552,13 +1552,14 @@ public class Menu extends javax.swing.JFrame {
             elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
                 
         RepresentativeFinder kmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMeans.class, 
-                elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.10));
+                elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.038));
         System.out.println("Init kmeans");
         kmeans.execute();
         System.out.println("Finished kmeans");
         //currentCluster = ((KMeans)kmeans).getClusters();        
         selectedRepresentatives = kmeans.getRepresentatives();
-        selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+        System.out.println("Size: "+selectedRepresentatives.length);
+        //selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
         hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
         
         if( view != null ) {
@@ -1574,11 +1575,12 @@ public class Menu extends javax.swing.JFrame {
             elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
                 
         RepresentativeFinder kmedoid = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMedoid.class, 
-                elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.05));
+                elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.0332));
         kmedoid.execute();
         //currentCluster = ((KMedoid)kmedoid).getClusters();        
         selectedRepresentatives = kmedoid.getRepresentatives();
-        selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+        System.out.println("Size: "+selectedRepresentatives.length);
+        //selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
         hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
         
         if( view != null ) {
@@ -1595,7 +1597,7 @@ public class Menu extends javax.swing.JFrame {
         
         //RepresentativeFinder bkmeans = new BisectingKMeans(elems, new FarPointsMedoidApproach(), 4);
         RepresentativeFinder bkmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(BisectingKMeans.class, elems, 
-                new FarPointsMedoidApproach(), (int)(elems.size()*0.02));
+                new FarPointsMedoidApproach(), (int)(elems.size()*0.0332));
         
         bkmeans.execute();
         //currentCluster = ((BisectingKMeans)bkmeans).getClusters();
@@ -1658,7 +1660,7 @@ public class Menu extends javax.swing.JFrame {
                 
                 //RepresentativeFinder csm = new CSM(attrs, (int) (attrs.size()*0.10), attrs.size());
                 RepresentativeFinder csm = (RepresentativeFinder) RepresentativeRegistry.getInstance(CSM.class, attrs, 
-                        (int) (attrs.size()*0.03), attrs.size());
+                        (int) (attrs.size()*0.0332), attrs.size());
                 csm.execute();
 
                 selectedRepresentatives = csm.getRepresentatives();
@@ -1714,7 +1716,7 @@ public class Menu extends javax.swing.JFrame {
                 //RepresentativeFinder ksvd = new KSvd(attrs, (int) (attrs.size()*0.2));
                 System.out.println("Executing...");
                 RepresentativeFinder ksvd = (RepresentativeFinder) RepresentativeRegistry.getInstance(KSvd.class, attrs, 
-                        (int) (attrs.size()*0.03));
+                        (int) (attrs.size()*0.0332));
                 ksvd.execute();
                 
                 selectedRepresentatives = ksvd.getRepresentatives();
@@ -1830,7 +1832,7 @@ public class Menu extends javax.swing.JFrame {
         
         double alpha = Double.parseDouble(JOptionPane.showInputDialog("alpha"));
         RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 
-                alpha, 40,50);
+                alpha, 17, 21);
         ((DS3)ds3).setAlpha(alpha);
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
@@ -2012,7 +2014,7 @@ public class Menu extends javax.swing.JFrame {
             elems.add(new Vect(new double[]{points[i].x, points[i].y}));
         
         
-        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 17, 29);
+        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 17, 21);
         ///RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
         System.out.println("Init Affinity Propagation execution");
         affinityPropagation.execute();
@@ -2040,7 +2042,7 @@ public class Menu extends javax.swing.JFrame {
         //RepresentativeFinder furs = new FURS(elems, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
         
         RepresentativeFinder furs = (FURS) RepresentativeRegistry.getInstance(FURS.class, 
-                                       elems, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
+                                       elems, (int)(0.0332*points.length), 15, 0.2f, 15.0f/(float)points.length);
         System.out.println("Init FURS");
         furs.execute();
         selectedRepresentatives =  furs.getRepresentatives(); 
