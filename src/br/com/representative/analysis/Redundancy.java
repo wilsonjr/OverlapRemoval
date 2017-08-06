@@ -29,12 +29,12 @@ public class Redundancy implements RepresentativeAnalysis {
             
             double sumSimilarity = 0.0;
             for( int j = 0; j < indexes.length; ++j )
-                sumSimilarity += similarity[indexes[j]][indexes[i]];            
+                sumSimilarity += similarity[indexes[i]][indexes[j]];            
             
             sum += (1.0 - 1.0/sumSimilarity);            
         }
         
-        return sum/similarity.length;    
+        return sum/indexes.length;    
     }
     
     @Override
