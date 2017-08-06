@@ -41,12 +41,12 @@ public class Entropy implements RepresentativeAnalysis {
             list += ")";
             
             
-            RConnection c = new RConnection();
+            RConnection connection = ConnectionSingleton.getInstance();   
             String script = "m <- matrix("+list+", nrow="+String.valueOf(pts.length)+", ncol=2);" +
                             "require(DescTools);"+
                             "Entropy(table(m));";
             
-            REXP x = c.eval(script);
+            REXP x = connection.eval(script);
             
             return Math.abs(x.asDouble());            
             
