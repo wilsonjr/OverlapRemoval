@@ -1841,7 +1841,7 @@ public class Menu extends javax.swing.JFrame {
         //RepresentativeFinder ds3 = new DS3(distances, 0.1); // gives the best results 
         
         double alphaParameter = Double.parseDouble(JOptionPane.showInputDialog("alpha"));
-        RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, alphaParameter, 8, 8);
+        RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, alphaParameter, 10, 10);
         ((DS3)ds3).setAlpha(alphaParameter);
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
@@ -2023,7 +2023,7 @@ public class Menu extends javax.swing.JFrame {
             elems.add(new Vect(new double[]{points[i].x, points[i].y}));
         
         
-        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 8, 8);
+        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 10, 10);
         ///RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
         System.out.println("Init Affinity Propagation execution");
         affinityPropagation.execute();
@@ -2053,7 +2053,7 @@ public class Menu extends javax.swing.JFrame {
         int k = Integer.parseInt(JOptionPane.showInputDialog("K"));
         
         RepresentativeFinder furs = (FURS) RepresentativeRegistry.getInstance(FURS.class, 
-                                       elems, (int)((8.0/points.length)*points.length), k, 0.2f, 15.0f/(float)points.length);
+                                       elems, (int)((10.0/points.length)*points.length), k, 0.2f, 15.0f/(float)points.length);
         System.out.println("Init FURS");
         ((FURS)furs).setK(k);
         furs.execute();
