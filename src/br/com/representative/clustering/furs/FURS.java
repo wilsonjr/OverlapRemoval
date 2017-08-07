@@ -126,5 +126,9 @@ public class FURS extends Partitioning {
         k = (int)(deltaK*k > 1 ? deltaK*k : 1);
         s = (int)(deltaS*s > 1 ? deltaS*s : 1);
     }
+
+    public void setK(int k) {
+        this.k = k;
+    }
     
 }
