@@ -57,6 +57,7 @@ public class AffinityPropagation extends Partitioning {
         }
         
         int maxIterations = 230;
+        int repNumber = -1, numberEquals = 0;
         
         for( int iter = 0; iter < maxIterations; ++iter ) {
             System.out.print("Iteration number "+(iter+1)+", ");
@@ -112,15 +113,57 @@ public class AffinityPropagation extends Partitioning {
             
             if( repCount >= low && repCount <= high )
                 break;
+            
+            if( repCount == repNumber )
+                numberEquals++;
+            else 
+                numberEquals = 0;
+            
+            if( numberEquals == 10 ) {
+                System.out.println("No different configuration of representative was found");
+                break;
+            }
+            repNumber = repCount;
         }
         
         List<Integer> indexes = new ArrayList<>();        
+        List<item> its = new ArrayList<>();
         for( int i = 0; i < items.size(); ++i ) {
-            if( r[i][i]+a[i][i] > 0 ) 
-                indexes.add(i);
+            if( r[i][i]+a[i][i] > 0 )  {
+                System.out.println("r[i][i]+a[i][i]: "+(r[i][i]+a[i][i]));
+                its.add(new item((a[i][i]), i));
+                //indexes.add(i);
+            }
         }
+        
+        Collections.sort(its);
+        
+        its.stream().forEach((v)->System.out.println(v.i+" <> "+v.v));
+        
+        for( int i = 0; indexes.size() < low; ) {
+            indexes.add(its.get(i++).i);
+        }
+        
                 
         representatives = indexes.stream().mapToInt((e)->e).toArray();        
     }
+    
+    private class item implements Comparable<item>{
+        double v;
+        int i;
+        
+        item(double vv, int ii) {
+            v = vv;
+            i = ii;
+        }
+
+        @Override
+        public int compareTo(item o) {
+            return Double.compare(v, o.v);
+        }
+    
+    }
+    
+    
         
 }
