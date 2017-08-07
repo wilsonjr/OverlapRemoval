@@ -284,6 +284,7 @@ import br.com.methods.utils.Vect;
 import br.com.projection.spacereduction.SeamCarving;
 import br.com.representative.RepresentativeFinder;
 import br.com.representative.RepresentativeRegistry;
+import br.com.representative.analysis.AnalysisController;
 import br.com.representative.clustering.FarPointsMedoidApproach;
 import br.com.representative.clustering.affinitypropagation.AffinityPropagation;
 import br.com.representative.clustering.furs.FURS;
@@ -532,6 +533,7 @@ public class Menu extends javax.swing.JFrame {
         voronoiDiagramJMenuItem = new javax.swing.JMenuItem();
         testTreeJMenuItem = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        analysisJMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -881,6 +883,14 @@ public class Menu extends javax.swing.JFrame {
         });
         jMenu8.add(testTreeJMenuItem);
         jMenu8.add(jSeparator5);
+
+        analysisJMenuItem.setText("Analysis");
+        analysisJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                analysisJMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(analysisJMenuItem);
 
         jMenuBar1.add(jMenu8);
 
@@ -1552,7 +1562,7 @@ public class Menu extends javax.swing.JFrame {
             elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
                 
         RepresentativeFinder kmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMeans.class, 
-                elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.038));
+                elems, new FarPointsMedoidApproach(), (int)(elems.size()*(8.0/elems.size())));
         System.out.println("Init kmeans");
         kmeans.execute();
         System.out.println("Finished kmeans");
@@ -1830,10 +1840,9 @@ public class Menu extends javax.swing.JFrame {
         
         //RepresentativeFinder ds3 = new DS3(distances, 0.1); // gives the best results 
         
-        double alpha = Double.parseDouble(JOptionPane.showInputDialog("alpha"));
-        RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 
-                alpha, 17, 21);
-        ((DS3)ds3).setAlpha(alpha);
+        double alphaParameter = Double.parseDouble(JOptionPane.showInputDialog("alpha"));
+        RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, alphaParameter, 8, 8);
+        ((DS3)ds3).setAlpha(alphaParameter);
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
         
@@ -2014,7 +2023,7 @@ public class Menu extends javax.swing.JFrame {
             elems.add(new Vect(new double[]{points[i].x, points[i].y}));
         
         
-        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 17, 21);
+        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 8, 8);
         ///RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
         System.out.println("Init Affinity Propagation execution");
         affinityPropagation.execute();
@@ -2041,12 +2050,16 @@ public class Menu extends javax.swing.JFrame {
         
         //RepresentativeFinder furs = new FURS(elems, (int)(0.2*points.length), 15, 0.2f, 15.0f/(float)points.length);
         
-        RepresentativeFinder furs = (FURS) RepresentativeRegistry.getInstance(FURS.class, 
-                                       elems, (int)(0.0332*points.length), 15, 0.2f, 15.0f/(float)points.length);
-        System.out.println("Init FURS");
-        furs.execute();
-        selectedRepresentatives =  furs.getRepresentatives(); 
+        int k = Integer.parseInt(JOptionPane.showInputDialog("K"));
         
+        RepresentativeFinder furs = (FURS) RepresentativeRegistry.getInstance(FURS.class, 
+                                       elems, (int)((8.0/points.length)*points.length), k, 0.2f, 15.0f/(float)points.length);
+        System.out.println("Init FURS");
+        ((FURS)furs).setK(k);
+        furs.execute();
+        
+        selectedRepresentatives =  furs.getRepresentatives(); 
+        System.out.println("Size: "+selectedRepresentatives.length);
 //        List<Vect> elements = new ArrayList<>();        
 //        for( int i = 0; i < points.length; ++i ) {
 //            elements.add(new Vect(new double[]{points[i].x, points[i].y}));
@@ -2293,6 +2306,153 @@ public class Menu extends javax.swing.JFrame {
             }
         }   
     }//GEN-LAST:event_testProjectionJMenuItemActionPerformed
+
+    private double[][] createSimilarityMatrix(double[][] distances) {
+        double minDistance =  Util.euclideanDistance(points[0].x, points[0].y, points[0].x, points[0].y);
+        double maxDistance = -1.0;
+        distances = new double[points.length][points.length];
+        for( int i = 0; i < distances.length; ++i )
+            for( int j = i; j < distances.length; ++j ) {
+                distances[i][j] = Util.euclideanDistance(points[i].x, points[i].y, points[j].x, points[j].y);
+                distances[j][i] = distances[i][j];
+                maxDistance = Math.max(maxDistance, distances[i][j]);
+                minDistance = Math.min(minDistance, distances[i][j]);
+            }
+        
+        // normalize distances
+        double[][] similarity = new double[distances.length][distances.length];        
+        for( int i = 0; i < similarity.length; ++i )
+            for( int j = 0; j < similarity.length; ++j )
+                similarity[i][j] = (distances[i][j]-minDistance)/(maxDistance-minDistance);
+        
+        return similarity;
+    }
+    
+    
+    private void analysisJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_analysisJMenuItemActionPerformed
+        boolean dataset = Integer.parseInt("CBR-ILP-IR dataset? 1 - yes; 0 - no") == 1;
+        
+        double[][] distances = new double[rectangles.size()][rectangles.size()];
+        for( int i = 0; i < distances.length; ++i ) {
+            for( int j = 0; j < distances[0].length; ++j )
+                distances[i][j] = Util.euclideanDistance(rectangles.get(i).x, rectangles.get(i).y, rectangles.get(j).x, rectangles.get(j).y);
+        }        
+        
+        double maxDistance = getMaxDistance();
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+        ArrayList<Vect> elems = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i )
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
+        
+        
+        ArrayList<ArrayList<Double>> attrs = new ArrayList<>();
+        JFileChooser jFileChooser = new JFileChooser();
+        int result = jFileChooser.showOpenDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
+            try {                 
+                File file = jFileChooser.getSelectedFile();
+                Scanner scn = new Scanner(file);
+                scn.nextLine();
+                scn.nextLine();
+                scn.nextLine();
+                scn.nextLine();
+                
+                while( scn.hasNext() ) {
+                    attrs.add(new ArrayList<>());
+                    String[] linhas = scn.nextLine().split(";");
+                    for( int i = 1; i < linhas.length-1; ++i ) 
+                        attrs.get(attrs.size()-1).add(Double.parseDouble(linhas[i]));                                            
+                }
+                
+            } catch( FileNotFoundException e ) {
+
+            }
+        }
+        
+        
+        double[][] similarity = createSimilarityMatrix(distances);
+        
+        // tests for CBR-ILP-IR dataset
+        if( dataset ) {
+            
+            RepresentativeFinder sss = (RepresentativeFinder) RepresentativeRegistry.getInstance(SSS.class, elems, 0.1297, maxDistance); // verificar se é isso msm
+            RepresentativeFinder gnat = (RepresentativeFinder) RepresentativeRegistry.getInstance(GNAT.class, elems, 21);
+            RepresentativeFinder kmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMeans.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.038));
+            RepresentativeFinder kmedoid = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMedoid.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.038));
+            RepresentativeFinder bkmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(BisectingKMeans.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.038));
+            RepresentativeFinder csm = (RepresentativeFinder) RepresentativeRegistry.getInstance(CSM.class, attrs, (int)(attrs.size()*0.038), attrs.size());
+            RepresentativeFinder ksvd = (RepresentativeFinder) RepresentativeRegistry.getInstance(KSvd.class, attrs, (int)(attrs.size()*0.038));
+            RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.09, 21, 21);
+            RepresentativeFinder ap = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 21, 21);
+            RepresentativeFinder furs = (RepresentativeFinder) RepresentativeRegistry.getInstance(FURS.class, elems, (int)(elems.size()*0.038), 15, 0.2f, 15.0f/(float)points.length);
+
+
+            //List<RepresentativeFinder> techniques = Arrays.asList(sss, gnat, kmeans, kmedoid, bkmeans, csm, ksvd, ds3, ap, furs);
+                
+            List<RepresentativeFinder> techniques = Arrays.asList(bkmeans);
+            
+            techniques.forEach((v) -> {
+
+                    
+
+                    long startTime = System.currentTimeMillis();
+                    v.execute();
+                    long endTime = System.currentTimeMillis();
+                    int[] indexes = v.getRepresentatives();
+                    
+
+                    Point2D.Double[] pts = new Point2D.Double[indexes.length];
+                    for( int i = 0; i < indexes.length; ++i )  
+                            pts[i] = new Point2D.Double(points[indexes[i]].x, points[indexes[i]].y);
+
+                    System.out.println("Technique: "+v.toString());
+                    AnalysisController.execute(indexes, similarity, pts); 
+                    System.out.println("Execution Time: "+ ((endTime-startTime)/1000.0));
+                    System.out.println("Number of representatives: "+indexes.length);
+                    for( int i = 0; i < indexes.length; ++i )
+                        System.out.print(indexes[i]+" ");
+                    
+                    System.out.println("\n-------");
+
+                    System.out.println("\n");
+
+            });
+            
+        } else { // tests for ImageCorel dataset
+            
+            RepresentativeFinder sss = (RepresentativeFinder) RepresentativeRegistry.getInstance(SSS.class, elems, 0.131, maxDistance); // verificar se é isso msm
+            RepresentativeFinder gnat = (RepresentativeFinder) RepresentativeRegistry.getInstance(GNAT.class, elems, 23);
+            RepresentativeFinder kmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMeans.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.023));
+            RepresentativeFinder kmedoid = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMedoid.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.023));
+            RepresentativeFinder csm = (RepresentativeFinder) RepresentativeRegistry.getInstance(CSM.class, attrs, (int)(attrs.size()*0.023), attrs.size());
+            RepresentativeFinder ksvd = (RepresentativeFinder) RepresentativeRegistry.getInstance(KSvd.class, attrs, (int)(attrs.size()*0.023));
+            RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.03, 20, 25);
+            RepresentativeFinder ap = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 20, 25);
+            RepresentativeFinder furs = (RepresentativeFinder) RepresentativeRegistry.getInstance(FURS.class, elems, (int)(elems.size()*0.023), 15, 0.2f, 15.0f/(float)points.length);
+
+
+            List<RepresentativeFinder> techniques = Arrays.asList(sss, gnat, kmeans, kmedoid, csm, ksvd, ds3, ap, furs);
+
+            techniques.forEach((v) -> {
+
+                    System.out.println("Technique: "+v.toString());
+
+                    v.execute();
+                    int[] indexes = v.getRepresentatives();
+
+                    Point2D.Double[] points = new Point2D.Double[indexes.length];
+                    for( int i = 0; i < indexes.length; ++i )  
+                            points[i] = new Point2D.Double(points[indexes[i]].x, points[indexes[i]].y);
+
+                    AnalysisController.execute(indexes, similarity, points);
+
+                    System.out.println("\n");
+
+            });
+            
+            
+        }
+    }//GEN-LAST:event_analysisJMenuItemActionPerformed
     
 //    
 //    public void updateDiagram() {
@@ -3643,6 +3803,7 @@ public class Menu extends javax.swing.JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem affinityPropagationJMenuItem;
+    private javax.swing.JMenuItem analysisJMenuItem;
     private javax.swing.JMenuItem bisectingKMeansJMenuItem;
     private javax.swing.JMenuItem csmJMenuItem;
     private javax.swing.JMenuItem dbscanJMenuItem;
