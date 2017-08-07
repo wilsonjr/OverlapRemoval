@@ -57,11 +57,11 @@ public class DS3 extends SparseRepresentation {
         double[] rhov = computeRegularizer(D, p);
         double rho = rhov[1]*alpha;
         double mu = Math.pow(10, -1);
-        int maxIter = 1200;
+        int maxIter = 1500;
         double errThr = Math.pow(10, -7);        
         
         double[][] Z = ds3(D, p, rho, mu, maxIter, CFD, errThr);
-        formRepresentatives(Z);        
+        formRepresentatives(Z, true);        
     
     }
     
@@ -98,18 +98,13 @@ public class DS3 extends SparseRepresentation {
             
             if( k >= maxIter || (err1 <= errThr && err2 <= errThr) ) {
                 terminate = true;
-                formRepresentatives(C2);
+                formRepresentatives(C2, terminate);
                 System.out.println("Finishing: ||Z-C||= "+err1+", ||C1-C2||= "+err2+", repNum = "+representatives.length+", iteration = "+k+" \n");
             } else {
                 k++;
                 if( k%10 == 0 ) {
-                    formRepresentatives(C2);
+                    formRepresentatives(C2, false);
                     System.out.println("||Z-C||= "+err1+", ||C1-C2||= "+err2+", iteration = "+k+" , repNum = "+representatives.length+"\n");       
-                    
-                    if( representatives.length >= low && representatives.length <= high ) 
-                        terminate = true;
-                    
-                    
                 }
             }
             
@@ -241,7 +236,7 @@ public class DS3 extends SparseRepresentation {
         return C2;        
     }
     
-    private void formRepresentatives(double[][] C) {
+    private void formRepresentatives(double[][] C, boolean terminated) {
         double ratio = 0.1;
         int n = C.length;
         
@@ -261,9 +256,22 @@ public class DS3 extends SparseRepresentation {
         
         
         Arrays.sort(v, (Item a, Item b)->{ return (a.value < b.value ? 1 : (a.value > b.value ? -1 : 0)); });
-        representatives = new int[v.length];
-        for( int i = 0; i < v.length; ++i )
-            representatives[i] = v[i].index;        
+        
+        
+        if( terminated ) {
+            
+            representatives = new int[low];
+            for( int i = 0; i < representatives.length; ++i )
+                representatives[i] = v[i].index;            
+        } else {
+            
+            representatives = new int[v.length];
+            for( int i = 0; i < v.length; ++i )
+                representatives[i] = v[i].index;        
+        }
+        
+        
+        
     }
     
     @Override
