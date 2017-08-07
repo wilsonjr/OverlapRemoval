@@ -2330,7 +2330,7 @@ public class Menu extends javax.swing.JFrame {
     
     
     private void analysisJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_analysisJMenuItemActionPerformed
-        boolean dataset = Integer.parseInt("CBR-ILP-IR dataset? 1 - yes; 0 - no") == 1;
+        boolean dataset = Integer.parseInt(JOptionPane.showInputDialog("CBR-ILP-IR dataset? 1 - yes; 0 - no")) == 1;
         
         double[][] distances = new double[rectangles.size()][rectangles.size()];
         for( int i = 0; i < distances.length; ++i ) {
@@ -2375,38 +2375,30 @@ public class Menu extends javax.swing.JFrame {
         // tests for CBR-ILP-IR dataset
         if( dataset ) {
             
-            RepresentativeFinder sss = (RepresentativeFinder) RepresentativeRegistry.getInstance(SSS.class, elems, 0.1297, maxDistance); // verificar se é isso msm
-            RepresentativeFinder gnat = (RepresentativeFinder) RepresentativeRegistry.getInstance(GNAT.class, elems, 21);
-            RepresentativeFinder kmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMeans.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.038));
-            RepresentativeFinder kmedoid = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMedoid.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.038));
-            RepresentativeFinder bkmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(BisectingKMeans.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.038));
-            RepresentativeFinder csm = (RepresentativeFinder) RepresentativeRegistry.getInstance(CSM.class, attrs, (int)(attrs.size()*0.038), attrs.size());
-            RepresentativeFinder ksvd = (RepresentativeFinder) RepresentativeRegistry.getInstance(KSvd.class, attrs, (int)(attrs.size()*0.038));
-            RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.09, 21, 21);
-            RepresentativeFinder ap = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 21, 21);
-            RepresentativeFinder furs = (RepresentativeFinder) RepresentativeRegistry.getInstance(FURS.class, elems, (int)(elems.size()*0.038), 15, 0.2f, 15.0f/(float)points.length);
+            RepresentativeFinder sss = (RepresentativeFinder) RepresentativeRegistry.getInstance(SSS.class, elems, 0.23, maxDistance); // verificar se é isso msm
+            RepresentativeFinder gnat = (RepresentativeFinder) RepresentativeRegistry.getInstance(GNAT.class, elems, 8);
+            RepresentativeFinder kmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMeans.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*(8.0/elems.size())));
+            RepresentativeFinder kmedoid = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMedoid.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*(8.0/elems.size())));
+            RepresentativeFinder bkmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(BisectingKMeans.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*(8.0/elems.size())));
+            RepresentativeFinder csm = (RepresentativeFinder) RepresentativeRegistry.getInstance(CSM.class, attrs, (int)(attrs.size()*(8.0/elems.size())), attrs.size());
+            RepresentativeFinder ksvd = (RepresentativeFinder) RepresentativeRegistry.getInstance(KSvd.class, attrs, (int)(attrs.size()*(8.0/elems.size())));
+            RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.09, 8, 8);
+            RepresentativeFinder ap = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 8, 8);
+            RepresentativeFinder furs = (RepresentativeFinder) RepresentativeRegistry.getInstance(FURS.class, elems, (int)(elems.size()*(8.0/elems.size())), 3, 0.2f, 15.0f/(float)points.length);
 
 
-            //List<RepresentativeFinder> techniques = Arrays.asList(sss, gnat, kmeans, kmedoid, bkmeans, csm, ksvd, ds3, ap, furs);
+            List<RepresentativeFinder> techniques = Arrays.asList(sss, gnat, kmeans, kmedoid, bkmeans, csm, ksvd, ds3, ap, furs);
                 
-            List<RepresentativeFinder> techniques = Arrays.asList(bkmeans);
             
             techniques.forEach((v) -> {
-
-                    
 
                     long startTime = System.currentTimeMillis();
                     v.execute();
                     long endTime = System.currentTimeMillis();
                     int[] indexes = v.getRepresentatives();
-                    
-
-                    Point2D.Double[] pts = new Point2D.Double[indexes.length];
-                    for( int i = 0; i < indexes.length; ++i )  
-                            pts[i] = new Point2D.Double(points[indexes[i]].x, points[indexes[i]].y);
 
                     System.out.println("Technique: "+v.toString());
-                    AnalysisController.execute(indexes, similarity, pts); 
+                    AnalysisController.execute(indexes, similarity); 
                     System.out.println("Execution Time: "+ ((endTime-startTime)/1000.0));
                     System.out.println("Number of representatives: "+indexes.length);
                     for( int i = 0; i < indexes.length; ++i )
@@ -2419,32 +2411,37 @@ public class Menu extends javax.swing.JFrame {
             });
             
         } else { // tests for ImageCorel dataset
+            System.out.println("ImageCorel dataset");
             
-            RepresentativeFinder sss = (RepresentativeFinder) RepresentativeRegistry.getInstance(SSS.class, elems, 0.131, maxDistance); // verificar se é isso msm
-            RepresentativeFinder gnat = (RepresentativeFinder) RepresentativeRegistry.getInstance(GNAT.class, elems, 23);
-            RepresentativeFinder kmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMeans.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.023));
-            RepresentativeFinder kmedoid = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMedoid.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.023));
-            RepresentativeFinder csm = (RepresentativeFinder) RepresentativeRegistry.getInstance(CSM.class, attrs, (int)(attrs.size()*0.023), attrs.size());
-            RepresentativeFinder ksvd = (RepresentativeFinder) RepresentativeRegistry.getInstance(KSvd.class, attrs, (int)(attrs.size()*0.023));
-            RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.03, 20, 25);
-            RepresentativeFinder ap = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 20, 25);
-            RepresentativeFinder furs = (RepresentativeFinder) RepresentativeRegistry.getInstance(FURS.class, elems, (int)(elems.size()*0.023), 15, 0.2f, 15.0f/(float)points.length);
+            RepresentativeFinder sss = (RepresentativeFinder) RepresentativeRegistry.getInstance(SSS.class, elems, 0.21, maxDistance); // verificar se é isso msm
+            RepresentativeFinder gnat = (RepresentativeFinder) RepresentativeRegistry.getInstance(GNAT.class, elems, 10);
+            RepresentativeFinder kmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMeans.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*(10.0/elems.size())));
+            RepresentativeFinder kmedoid = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMedoid.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*(10.0/elems.size())));
+            RepresentativeFinder bkmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(BisectingKMeans.class, elems, new FarPointsMedoidApproach(), (int)(elems.size()*(10.0/elems.size())));
+            RepresentativeFinder csm = (RepresentativeFinder) RepresentativeRegistry.getInstance(CSM.class, attrs, (int)(attrs.size()*(10.0/elems.size())), attrs.size());
+            RepresentativeFinder ksvd = (RepresentativeFinder) RepresentativeRegistry.getInstance(KSvd.class, attrs, (int)(attrs.size()*(10.0/elems.size())));
+            RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.02, 10, 10);
+            RepresentativeFinder ap = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 10, 10);
+            RepresentativeFinder furs = (RepresentativeFinder) RepresentativeRegistry.getInstance(FURS.class, elems, (int)(elems.size()*(10.0/elems.size())), 3, 0.2f, 15.0f/(float)points.length);
 
 
-            List<RepresentativeFinder> techniques = Arrays.asList(sss, gnat, kmeans, kmedoid, csm, ksvd, ds3, ap, furs);
+            List<RepresentativeFinder> techniques = Arrays.asList(sss, gnat, kmeans, kmedoid, bkmeans, csm, ksvd, ds3, ap, furs);
 
             techniques.forEach((v) -> {
 
-                    System.out.println("Technique: "+v.toString());
-
+                    long startTime = System.currentTimeMillis();
                     v.execute();
+                    long endTime = System.currentTimeMillis();
                     int[] indexes = v.getRepresentatives();
-
-                    Point2D.Double[] points = new Point2D.Double[indexes.length];
-                    for( int i = 0; i < indexes.length; ++i )  
-                            points[i] = new Point2D.Double(points[indexes[i]].x, points[indexes[i]].y);
-
-                    AnalysisController.execute(indexes, similarity, points);
+                    
+                    System.out.println("Technique: "+v.toString());
+                    AnalysisController.execute(indexes, similarity); 
+                    System.out.println("Execution Time: "+ ((endTime-startTime)/1000.0));
+                    System.out.println("Number of representatives: "+indexes.length);
+                    for( int i = 0; i < indexes.length; ++i )
+                        System.out.print(indexes[i]+" ");
+                    
+                    System.out.println("\n-------");
 
                     System.out.println("\n");
 
