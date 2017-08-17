@@ -44,6 +44,11 @@ public class FURS extends Partitioning {
             for( int j = 0; j < knnPoints[i].length; ++j )
                 if( i != knnPoints[i][j].index )
                     nodes.get(i).add(nodes.get(knnPoints[i][j].index), knnPoints[i][j].value);
+            
+            for( int j = 0; j < knnPoints.length; ++j )
+                for( int k = 0; k < knnPoints[j].length; ++k )
+                    if( i == knnPoints[j][k].index )
+                        nodes.get(i).addAdjIn(nodes.get(knnPoints[j][k].index));
         }
         
         List<Node> L = new ArrayList<>(nodes);
@@ -54,12 +59,16 @@ public class FURS extends Partitioning {
         while( representative.size() < s ) {            
             // reactivation step
             if( L.isEmpty() ) {     
-               nodes.stream().filter((n)-> !n.state() ).forEachOrdered((n)->L.add(n));
+               nodes.stream().filter((n)-> !n.state() && notInRepresentative(n, representative) ).forEachOrdered((n)->{
+                   n.activate();
+                   L.add(n);
+               });
                Collections.sort(L);
             }
             
             // hub selection
             Node v = L.remove(0);
+            v.deactivate();
             representative.add(v);              
             List<Node> Nb = v.neighbors();
             Nb.stream().forEach((n)->{ 
@@ -67,7 +76,7 @@ public class FURS extends Partitioning {
                 L.remove(n);
             });            
         }
-
+        representative.stream().forEach((v)->System.out.println(">> "+v.getId()));
         representatives = representative.stream().mapToInt((n)->n.getId()).toArray();
     }
     
@@ -125,6 +134,15 @@ public class FURS extends Partitioning {
 
     public void setK(int k) {
         this.k = k;
+    }
+
+    private boolean notInRepresentative(Node n, List<Node> representative) {
+        
+        for( int i = 0; i < representative.size(); ++i )
+            if( representative.get(i).getId() == n.getId() )
+                return false;
+        
+        return true;
     }
     
 }

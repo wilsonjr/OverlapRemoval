@@ -15,7 +15,7 @@ import java.util.List;
 public class Node implements Comparable<Node> {
     
     private double centralityDegree;
-    private List<Node> adj;
+    private List<Node> adj, adjIn;
     private boolean active;
     private int id;
     
@@ -23,6 +23,7 @@ public class Node implements Comparable<Node> {
         this.id = id;
         centralityDegree = 0.0;
         adj = new ArrayList<>();
+        adjIn = new ArrayList<>();
         active = true;
     }     
     
@@ -57,7 +58,12 @@ public class Node implements Comparable<Node> {
     
     @Override
     public int compareTo(Node o) { 
-        return Double.compare(centralityDegree, o.getCentralityDegree());        
+        return Integer.compare(o.adjIn.size(), adjIn.size());
+        //return Double.compare(centralityDegree, o.getCentralityDegree());        
+    }
+
+    public void addAdjIn(Node node) {
+        adjIn.add(node);
     }
     
 }

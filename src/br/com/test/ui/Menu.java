@@ -2053,7 +2053,7 @@ public class Menu extends javax.swing.JFrame {
         int k = Integer.parseInt(JOptionPane.showInputDialog("K"));
         
         RepresentativeFinder furs = (FURS) RepresentativeRegistry.getInstance(FURS.class, 
-                                       elems, (int)((10.0/points.length)*points.length), k, 0.2f, 15.0f/(float)points.length);
+                                       elems, (int)((8.0/points.length)*points.length), k, 0.2f, 15.0f/(float)points.length);
         System.out.println("Init FURS");
         ((FURS)furs).setK(k);
         furs.execute();
