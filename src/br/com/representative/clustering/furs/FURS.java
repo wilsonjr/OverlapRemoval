@@ -34,9 +34,6 @@ public class FURS extends Partitioning {
     @Override
     public void execute() {
         
-        
-        //List<OverlapRect> points = items.stream().map((v)->new OverlapRect(v.x, v.y, 0, 0)).collect(Collectors.toList());
-        
         KNN knn = new KNN(k);
         Pair[][] knnPoints = knn.executeVect(items);
         
@@ -56,20 +53,19 @@ public class FURS extends Partitioning {
         
         while( representative.size() < s ) {            
             // reactivation step
-            if( L.isEmpty() ) {                
+            if( L.isEmpty() ) {     
                nodes.stream().filter((n)-> !n.state() ).forEachOrdered((n)->L.add(n));
                Collections.sort(L);
             }
             
             // hub selection
             Node v = L.remove(0);
-            representative.add(v);          
+            representative.add(v);              
             List<Node> Nb = v.neighbors();
             Nb.stream().forEach((n)->{ 
                 n.deactivate(); 
                 L.remove(n);
             });            
-                    
         }
 
         representatives = representative.stream().mapToInt((n)->n.getId()).toArray();
@@ -98,7 +94,7 @@ public class FURS extends Partitioning {
         
         while( representative.size() < s ) {            
             // reactivation step
-            if( L.isEmpty() ) {                
+            if( L.isEmpty() ) {                 
                nodes.stream().filter((n)-> !n.state() ).forEachOrdered((n)->L.add(n));
                Collections.sort(L);
             }

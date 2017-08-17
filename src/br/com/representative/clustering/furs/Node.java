@@ -57,7 +57,7 @@ public class Node implements Comparable<Node> {
     
     @Override
     public int compareTo(Node o) { 
-        return Double.compare(centralityDegree,o.getCentralityDegree());        // descending order
+        return Double.compare(centralityDegree, o.getCentralityDegree());        
     }
     
 }
