@@ -360,12 +360,12 @@ import nmap.Element;
 import nmap.NMap;
 import visualizer.matrix.DenseMatrix;
 import visualizer.matrix.DenseVector;
-import visualizer.matrix.Vector;
 import visualizer.projection.ProjectionData;
 import visualizer.projection.ProjectionFactory;
 import visualizer.projection.ProjectionType;
 import visualizer.projection.ProjectorType;
 import visualizer.projection.distance.DissimilarityType;
+import visualizer.projection.lsp.ControlPointsType;
 
 /**
  *
@@ -2263,24 +2263,18 @@ public class Menu extends javax.swing.JFrame {
                     System.out.println(v);
                 }
                 
-                List<Vector> vectors = new ArrayList<>();                
-                vectors.add(matrix.getRow(110));
-                vectors.add(matrix.getRow(146));
-                vectors.add(matrix.getRow(70));
-                vectors.add(matrix.getRow(129));
-                vectors.add(matrix.getRow(103));
-                vectors.add(matrix.getRow(18));
-                vectors.add(matrix.getRow(42));
-                vectors.add(matrix.getRow(72));
-                DenseMatrix matrix2 = new DenseMatrix();
-                for( Vector v: vectors )
-                    matrix2.addRow(v);
                 
                                 
                 ProjectionData pdata = new ProjectionData();
-                pdata.setDissimilarityType(DissimilarityType.EUCLIDEAN);
-                pdata.setProjectorType(ProjectorType.FASTMAP);
-                float[][] proj = ProjectionFactory.getInstance(ProjectionType.IDMAP).project(matrix2, pdata, null);
+                pdata.setDissimilarityType(DissimilarityType.COSINE_BASED);
+			pdata.setNumberNeighborsConnection(10);
+			pdata.setFractionDelta(8.0f);
+			pdata.setNumberIterations(50);
+			pdata.setControlPointsChoice(ControlPointsType.KMEANS);
+			pdata.setProjectorType(ProjectorType.FASTMAP);
+			pdata.setNumberControlPoints(57);
+			
+                float[][] proj = ProjectionFactory.getInstance(ProjectionType.LSP).project(matrix, pdata, null);
                 
                 float begin = 10 * 5 + 10;
                 float value = 768.5f*9.f/150f;
@@ -2294,7 +2288,9 @@ public class Menu extends javax.swing.JFrame {
                 
                 for( int i = 0; i < proj.length; ++i ) {
                     
-                    projecao.addRow(new DenseVector(newproj[i], matrix2.getRow(i).getId(), matrix2.getRow(i).getKlass()));
+                    projecao.addRow(new DenseVector(newproj[i], matrix.getRow(i).getId(), matrix.getRow(i).getKlass()));
+                    
+                    
                 }
                 projecao.save("test.prj");
             
