@@ -10,6 +10,7 @@ import br.com.methods.utils.Vect;
 import br.com.representative.clustering.Partitioning;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +47,6 @@ public class AffinityPropagation extends Partitioning {
         Collections.sort(similatities);
         int simSize = similatities.size();
         double median = simSize%2 == 0 ? (similatities.get(simSize/2)+similatities.get(simSize/2-1))/2 : similatities.get(simSize/2);
-        System.out.println("median: "+median);
         for( int i = 0; i < s.length; ++i ) {
             s[i][i] = median;
             for( int j = 0; j < s.length; ++j ) {
@@ -105,11 +105,12 @@ public class AffinityPropagation extends Partitioning {
         }
         
         List<Integer> indexes = new ArrayList<>();        
-        List<item> its = new ArrayList<>();
+        Map<Integer, Double> map = new HashMap<>();        
+        
         for( int i = 0; i < items.size(); ++i ) {
             if( r[i][i]+a[i][i] > 0 )  {
-                its.add(new item((a[i][i]), i));
-                indexes.add(i);
+                indexes.add(i);                
+                map.put(i, a[i][i]);
             }
         }
         
@@ -120,12 +121,7 @@ public class AffinityPropagation extends Partitioning {
 
             List<RepresentativeIndexes> representativeIndexes = new ArrayList<>();
             index.entrySet().stream().forEach((v) -> {             
-                double availability = 0.0;
-                for( int i = 0; i < its.size(); ++i ) 
-                    if( its.get(i).i == v.getKey() ) {
-                        availability = its.get(i).v;
-                        break;
-                    }
+                double availability = map.get(v.getKey());                
                 representativeIndexes.add(new RepresentativeIndexes(v.getKey(), v.getValue(), availability));        
             });
 
@@ -144,22 +140,6 @@ public class AffinityPropagation extends Partitioning {
             representatives = indexes.stream().mapToInt((e)->e).toArray();        
         }
     }
-    
-    private class item implements Comparable<item>{
-        double v;
-        int i;
-        
-        item(double vv, int ii) {
-            v = vv;
-            i = ii;
-        }
-
-        @Override
-        public int compareTo(item o) {
-            return Double.compare(v, o.v);
-        }    
-    }
-    
     
     private class RepresentativeIndexes implements Comparable<RepresentativeIndexes> {
         
