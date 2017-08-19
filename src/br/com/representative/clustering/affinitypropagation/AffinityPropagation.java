@@ -5,11 +5,13 @@
  */
 package br.com.representative.clustering.affinitypropagation;
 
+import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
 import br.com.representative.clustering.Partitioning;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -18,13 +20,12 @@ import java.util.List;
 public class AffinityPropagation extends Partitioning {
 
     private double alpha;
-    private int low, high;
+    private int size;
     
-    public AffinityPropagation(List<Vect> items, int low, int high) {
+    public AffinityPropagation(List<Vect> items, int size) {
         super(items);
         alpha = 0.5;
-        this.low = low;
-        this.high = high;
+        this.size = size;
     }
     
     @Override
@@ -37,16 +38,14 @@ public class AffinityPropagation extends Partitioning {
         
         for( int i = 0; i < s.length-1; ++i ) 
             for( int j = i+1; j < s.length; ++j ) {
-                //s[i][j] = -((items.get(i).x-items.get(j).x)*(items.get(i).x-items.get(j).x)+(items.get(i).y-items.get(j).y)*(items.get(i).y-items.get(j).y));
-                //s[i][j] = -Util.euclideanDistance(items.get(i).x, items.get(i).y, items.get(j).x, items.get(j).y);
                 s[i][j] = -items.get(i).distance(items.get(j));
                 s[j][i] = s[i][j];
                 similatities.add(s[i][j]);
             }
         
         Collections.sort(similatities);
-        int size = similatities.size();
-        double median = size%2 == 0 ? (similatities.get(size/2)+similatities.get(size/2-1))/2 : similatities.get(size/2);
+        int simSize = similatities.size();
+        double median = simSize%2 == 0 ? (similatities.get(simSize/2)+similatities.get(simSize/2-1))/2 : similatities.get(simSize/2);
         System.out.println("median: "+median);
         for( int i = 0; i < s.length; ++i ) {
             s[i][i] = median;
@@ -56,11 +55,10 @@ public class AffinityPropagation extends Partitioning {
             }
         }
         
-        int maxIterations = 230;
-        int repNumber = -1, numberEquals = 0;
+        int maxIterations = 100;
         
         for( int iter = 0; iter < maxIterations; ++iter ) {
-            System.out.print("Iteration number "+(iter+1)+", ");
+            System.out.println("Iteration number "+(iter+1));
             
             // update responsabilities
             for( int i = 0; i < items.size(); ++i ) {                
@@ -104,48 +102,47 @@ public class AffinityPropagation extends Partitioning {
                 }
             }    
             
-            int repCount = 0;
-            for( int i = 0; i < items.size(); ++i )
-                if( r[i][i]+a[i][i] > 0 )
-                    repCount++;
-                            
-            System.out.println(repCount+" representative found");
-            
-            if( repCount >= low && repCount <= high )
-                break;
-            
-            if( repCount == repNumber )
-                numberEquals++;
-            else 
-                numberEquals = 0;
-            
-            if( numberEquals == 10 ) {
-                System.out.println("No different configuration of representative was found");
-                break;
-            }
-            repNumber = repCount;
         }
         
         List<Integer> indexes = new ArrayList<>();        
         List<item> its = new ArrayList<>();
         for( int i = 0; i < items.size(); ++i ) {
             if( r[i][i]+a[i][i] > 0 )  {
-                System.out.println("r[i][i]+a[i][i]: "+(r[i][i]+a[i][i]));
                 its.add(new item((a[i][i]), i));
-                //indexes.add(i);
+                indexes.add(i);
             }
         }
         
-        Collections.sort(its);
+        if( size != 0 ) {
+            int[] repsIndexes = indexes.stream().mapToInt((e)->e).toArray();
+
+            Map<Integer, List<Integer>> index = Util.createIndex(repsIndexes, items.stream().map((v)->v).toArray(Vect[]::new));
+
+            List<RepresentativeIndexes> representativeIndexes = new ArrayList<>();
+            index.entrySet().stream().forEach((v) -> {             
+                double availability = 0.0;
+                for( int i = 0; i < its.size(); ++i ) 
+                    if( its.get(i).i == v.getKey() ) {
+                        availability = its.get(i).v;
+                        break;
+                    }
+                representativeIndexes.add(new RepresentativeIndexes(v.getKey(), v.getValue(), availability));        
+            });
+
+
+
+            Collections.sort(representativeIndexes);
+            Collections.sort(representativeIndexes, (RepresentativeIndexes aa, RepresentativeIndexes bb) -> {            
+                return Double.compare(bb.availability, aa.availability);        
+            });
+
+            representatives = new int[size];
+            for( int i = 0; i < size; ++i )
+                representatives[i] = representativeIndexes.get(i).id;
         
-        its.stream().forEach((v)->System.out.println(v.i+" <> "+v.v));
-        
-        for( int i = 0; indexes.size() < low; ) {
-            indexes.add(its.get(i++).i);
+        } else {
+            representatives = indexes.stream().mapToInt((e)->e).toArray();        
         }
-        
-                
-        representatives = indexes.stream().mapToInt((e)->e).toArray();        
     }
     
     private class item implements Comparable<item>{
@@ -160,8 +157,27 @@ public class AffinityPropagation extends Partitioning {
         @Override
         public int compareTo(item o) {
             return Double.compare(v, o.v);
-        }
+        }    
+    }
     
+    
+    private class RepresentativeIndexes implements Comparable<RepresentativeIndexes> {
+        
+        private Integer id;
+        private List<Integer> indexes;
+        private double availability;
+        
+        public RepresentativeIndexes(Integer id, List<Integer> indexes, double availability) {
+            this.id = id;
+            this.indexes = indexes;
+            this.availability = availability;
+        }
+        
+        @Override
+        public int compareTo(RepresentativeIndexes o) {
+            return Integer.compare(o.indexes.size(), indexes.size());
+        }
+        
     }
     
     

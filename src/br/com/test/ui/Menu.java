@@ -2023,7 +2023,7 @@ public class Menu extends javax.swing.JFrame {
             elems.add(new Vect(new double[]{points[i].x, points[i].y}));
         
         
-        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 10, 10);
+        RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, elems, 8);
         ///RepresentativeFinder affinityPropagation = new AffinityPropagation(elems);
         System.out.println("Init Affinity Propagation execution");
         affinityPropagation.execute();
@@ -2033,6 +2033,8 @@ public class Menu extends javax.swing.JFrame {
         System.out.println("Size: "+selectedRepresentatives.length);
         hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
     
+        
+        
         if( view != null ) {
             view.cleanImage();
             view.repaint();
