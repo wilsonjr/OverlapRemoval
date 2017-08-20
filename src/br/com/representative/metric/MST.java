@@ -45,6 +45,8 @@ public class MST extends AccessMetric {
         nodes.add(node);
         int instancesInNode = items.size()/k;
         
+        System.out.println("Instances in one node: "+instancesInNode);
+        
         while( !nodes.isEmpty() ) {
             
             SlimTreeNode u = nodes.peek();

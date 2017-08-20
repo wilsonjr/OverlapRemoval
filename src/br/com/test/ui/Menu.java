@@ -1429,7 +1429,7 @@ public class Menu extends javax.swing.JFrame {
         
         RepresentativeFinder mst = (RepresentativeFinder) RepresentativeRegistry.getInstance(MST.class, elems, k);
         
-        ((MST)mst).setK(k);
+        //((MST)mst).setK(k);
         mst.execute();
         selectedRepresentatives = mst.getRepresentatives();
         System.out.println("Size: "+selectedRepresentatives.length);
