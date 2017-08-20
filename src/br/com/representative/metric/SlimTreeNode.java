@@ -15,12 +15,20 @@ import java.util.List;
  * @author wilson
  */
 public class SlimTreeNode implements Comparable<SlimTreeNode> {
-    private List<Instance> points;
+    private List<Instance> points;    
+    private Instance medoid;
+    private double ray;
+    
     
     public SlimTreeNode(List<Vect> points) {
         this.points = new ArrayList<>();
         for( int i = 0; i < points.size(); ++i )
             this.points.add(new Instance(points.get(i), i));
+    }
+    
+    public SlimTreeNode(Vect point, int index) {
+        this.points = new ArrayList<>();
+        this.points.add(new Instance(point, index));
     }
     
     public SlimTreeNode() {
@@ -29,6 +37,7 @@ public class SlimTreeNode implements Comparable<SlimTreeNode> {
     
     public void add(Vect p, int index) {
         points.add(new Instance(p, index));
+        computeMedoid();
     }
     
     public int size() {
@@ -48,7 +57,7 @@ public class SlimTreeNode implements Comparable<SlimTreeNode> {
         return points.get(i).i;
     }
 
-    public int medoid() {        
+    public void computeMedoid() {        
         Vect centroid = new Vect(points.get(0).p.vector().length);
         for( int i = 0; i < points.size(); ++i ) {
             centroid.add(points.get(i).p);
@@ -63,13 +72,32 @@ public class SlimTreeNode implements Comparable<SlimTreeNode> {
                 minDist = d;
                 indexCentroid = i;
             }
-        }        
+        }    
         
-        return points.get(indexCentroid).i;
+        
+        medoid = points.get(indexCentroid);
+        
+        
+        double maxDist = -1;
+        for( int i = 0; i < points.size(); ++i ) {
+            double d = centroid.distance(medoid.p);
+            maxDist = Math.max(d, maxDist);
+        }
+        
+        ray = maxDist;
+    }
+        
+    public Instance getMedoid() {
+        return medoid;
+    }
+    
+    public boolean qualify(Vect point) {
+                
+        return medoid.p.distance(point) <= ray; 
     }
     
     
-    private class Instance {
+    public class Instance {
         private Vect p;
         private int i;
         
@@ -77,5 +105,23 @@ public class SlimTreeNode implements Comparable<SlimTreeNode> {
             this.p = p;
             this.i = index;
         }
+
+        public Vect getP() {
+            return p;
+        }
+
+        public void setP(Vect p) {
+            this.p = p;
+        }
+
+        public int getI() {
+            return i;
+        }
+
+        public void setI(int i) {
+            this.i = i;
+        }
+        
+        
     }
 }

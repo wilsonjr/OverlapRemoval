@@ -10,7 +10,9 @@
 
 package br.com.representative.metric;
 
+import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
+import br.com.representative.clustering.affinitypropagation.AffinityPropagation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Random;
 
 /**
  *
@@ -31,43 +34,60 @@ public class MST extends AccessMetric {
     private List<SlimTreeNode> clusters;
     
     private int k;    
+    private int maxNodes;
     
-    public MST(List<Vect> items, int k) {
+    public MST(List<Vect> items, int maxNodes, int k) {
         super(items);
+        this.maxNodes = maxNodes;
         this.k = k;
     }
     
     @Override
-    public void execute() {
-        
-        SlimTreeNode node = new SlimTreeNode(items);
-        nodes = new PriorityQueue<>();
-        nodes.add(node);
-        int instancesInNode = items.size()/k;
-        
-        System.out.println("Instances in one node: "+instancesInNode);
-        
-        while( !nodes.isEmpty() ) {
-            
-            SlimTreeNode u = nodes.peek();
-            if( u.size() <= instancesInNode )
-                break;
-            
-            nodes.poll();
-            List<SlimTreeNode> splitted = applyMST(u);
-                        
-            nodes.add(splitted.get(0));
-            nodes.add(splitted.get(1));
-            
-        }
+    public void execute() {        
         clusters = new ArrayList<>();
-        for( SlimTreeNode n: nodes )
-            clusters.add(n);
+        int i = 0;
+        for( ; i < items.size(); ++i ) {
+            SlimTreeNode node = insert(items.get(i), i);
+            node.computeMedoid();
+            if( node.size() > maxNodes ) {
+                
+                
+                List<SlimTreeNode> splitted = solveOverflow(node);
+                
+                clusters.remove(node);
+                splitted.stream().forEach((v) -> {                    
+                    v.computeMedoid();
+                    clusters.add(v);
+                });
+                
+            }
+                        
+        }
+                
         
-        representatives = new int[clusters.size()];
-        for( int i = 0; i < representatives.length; ++i )
-            representatives[i] = clusters.get(i).medoid();
+        int[] repsIndexes = clusters.stream().mapToInt((e)->{
+            e.computeMedoid();
+            return e.getMedoid().getI();
+        }).toArray();
+                
         
+        Map<Integer, List<Integer>> index = Util.createIndex(repsIndexes, items.stream().map((v)->v).toArray(Vect[]::new));
+
+        List<AffinityPropagation.RepresentativeIndexes> representativeIndexes = new ArrayList<>();
+        final AffinityPropagation ap = new AffinityPropagation(items, k);
+        index.entrySet().stream().forEach((Map.Entry<Integer, List<Integer>> v) -> {    
+            
+            
+            representativeIndexes.add(ap.new RepresentativeIndexes(v.getKey(), v.getValue()));
+        });
+
+        Collections.sort(representativeIndexes);
+        
+        representatives = new int[k];
+        for( i = 0; i < k; ++i ) 
+            representatives[i] = representativeIndexes.get(i).getId();
+        
+  
     }
 
     @Override
@@ -79,17 +99,90 @@ public class MST extends AccessMetric {
             k = 1;
     }
     
-    private List<SlimTreeNode> applyMST(SlimTreeNode u) {
+    
+    
+    
+    
+    private SlimTreeNode insert(Vect point, int index) {
+        SlimTreeNode node = null;
+        
+        if( clusters.isEmpty() ) {
+            node = new SlimTreeNode(point, index);
+            clusters.add(node);
+        } else {
+            
+            List<SlimTreeNode> possibleNodes = new ArrayList<>();
+            for( int i = 0; i < clusters.size(); ++i ) {
+
+                if( clusters.get(i).qualify(point) ) 
+                    possibleNodes.add(clusters.get(i));
+            }
+            
+            
+            if( possibleNodes.isEmpty() ) {
+                  
+                double minDist = clusters.get(0).getMedoid().getP().distance(point);
+                node = clusters.get(0);
+
+                for( int i = 0; i < clusters.size(); ++i )
+                    if( minDist > clusters.get(i).getMedoid().getP().distance(point) ) {
+                        minDist = clusters.get(i).getMedoid().getP().distance(point);
+                        node = clusters.get(i);
+                    }
+                
+                
+            } else {
+            
+        
+                String mode = "minoccup";
+
+                switch( mode ) {
+
+                    case "random":
+                        int randint = new Random().nextInt(possibleNodes.size());
+                        node = possibleNodes.get(randint);
+                        break;
+
+                    case "mindist":
+                        double minDist = possibleNodes.get(0).getMedoid().getP().distance(point);
+                        node = possibleNodes.get(0);
+
+                        for( int i = 0; i < possibleNodes.size(); ++i )
+                            if( minDist > possibleNodes.get(i).getMedoid().getP().distance(point) ) {
+                                minDist = possibleNodes.get(i).getMedoid().getP().distance(point);
+                                node = possibleNodes.get(i);
+                            }
+                        break;
+
+                    default:
+                        int minSize = possibleNodes.get(0).size();
+                        node = possibleNodes.get(0);
+
+                        for( int i = 0; i < possibleNodes.size(); ++i )
+                            if( minSize > possibleNodes.get(i).size() ) {
+                                minSize = possibleNodes.get(i).size();
+                                node = possibleNodes.get(i);
+                            }
+
+                        break;
+                }
+            }
+            
+            node.add(point, index);
+        }
+        
+        return node;
+    }
+    
+    private List<SlimTreeNode> solveOverflow(SlimTreeNode node) {
         
         List<Vertice> vertices = new ArrayList<>();
-        for( int i = 0; i < u.size(); ++i )
-            vertices.add(new Vertice(u.get(i),i));
+        for( int i = 0; i < node.size(); ++i )
+            vertices.add(new Vertice(node.get(i),i));
         
         List<Edge> edges = new ArrayList<>();
         for( int i = 0; i < vertices.size(); ++i )
             for( int j = i+1; j < vertices.size(); ++j ) {
-                //double d = Util.euclideanDistance(vertices.get(i).point().x, vertices.get(i).point().y,
-                //                                  vertices.get(j).point().x, vertices.get(j).point().y);
                 double d = vertices.get(i).point().distance(vertices.get(j).point());                        
                 edges.add(new Edge(vertices.get(i), vertices.get(j), d));
                 edges.add(new Edge(vertices.get(j), vertices.get(i), d));
@@ -140,7 +233,7 @@ public class MST extends AccessMetric {
             int top = queue.poll();
             vertices.get(top).setVisited(true);
             
-            firstNode.add(vertices.get(top).point(), u.index(vertices.get(top).id()));
+            firstNode.add(vertices.get(top).point(), node.index(vertices.get(top).id()));
             
             List<Integer> adj = map.get(top);
             for( int i = 0; i < adj.size(); ++i )
@@ -153,7 +246,7 @@ public class MST extends AccessMetric {
             int top = queue.poll();
             vertices.get(top).setVisited(true);
             
-            secondNode.add(vertices.get(top).point(), u.index(vertices.get(top).id()));
+            secondNode.add(vertices.get(top).point(), node.index(vertices.get(top).id()));
             
             List<Integer> adj = map.get(top);
             for( int i = 0; i < adj.size(); ++i )
@@ -163,10 +256,16 @@ public class MST extends AccessMetric {
         
         
         return new ArrayList<>(Arrays.asList(firstNode, secondNode));
+        
     }
-
+    
+    
     public void setK(int k) {
         this.k = k;
+    }
+
+    public void setMaxNodes(int maxNodes) {
+        this.maxNodes = maxNodes;
     }
       
 }

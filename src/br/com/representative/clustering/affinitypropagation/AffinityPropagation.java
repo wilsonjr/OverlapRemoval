@@ -141,7 +141,7 @@ public class AffinityPropagation extends Partitioning {
         }
     }
     
-    private class RepresentativeIndexes implements Comparable<RepresentativeIndexes> {
+    public class RepresentativeIndexes implements Comparable<RepresentativeIndexes> {
         
         private Integer id;
         private List<Integer> indexes;
@@ -153,10 +153,33 @@ public class AffinityPropagation extends Partitioning {
             this.availability = availability;
         }
         
+        public RepresentativeIndexes(Integer id, List<Integer> indexes) {
+            this(id, indexes, 0);
+        }
+        
         @Override
         public int compareTo(RepresentativeIndexes o) {
             return Integer.compare(o.indexes.size(), indexes.size());
         }
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
+        }
+
+        public List<Integer> getIndexes() {
+            return indexes;
+        }
+
+        public void setIndexes(List<Integer> indexes) {
+            this.indexes = indexes;
+        }
+        
+        
+        
         
     }
     
