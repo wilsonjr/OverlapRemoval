@@ -149,7 +149,7 @@ public class ExplorerTreeController {
 
     public int sizeRepresentative(int size) {
         // return _sizeIntances/2;
-        return (int) (5.0 * Math.sqrt(size));
+        return (int) (3.0 * Math.sqrt(size));
     }
 
     public int indexRepresentative(double x, double y) {

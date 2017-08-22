@@ -1840,7 +1840,7 @@ public class Menu extends javax.swing.JFrame {
         //RepresentativeFinder ds3 = new DS3(distances, 0.1); // gives the best results 
         
         double alphaParameter = Double.parseDouble(JOptionPane.showInputDialog("alpha"));
-        RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, alphaParameter, 10, 10);
+        RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, alphaParameter, 0, 0);
         ((DS3)ds3).setAlpha(alphaParameter);
         ds3.execute(); 
         selectedRepresentatives = ds3.getRepresentatives();
@@ -1992,7 +1992,7 @@ public class Menu extends javax.swing.JFrame {
                 // dictionary representation
                 // must test with alpha = 0.3
                 //RepresentativeFinder ds3 = new DS3(distances, 0.1);
-                RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.1);
+                RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.09, 0, 0);
                 RepresentativeFinder smrs = new SMRS(attrs);
                 
                 controller = new ExplorerTreeController(points, 
@@ -2603,15 +2603,23 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles, indexes);
         
         double[] center0 = Util.getCenter(rects);
+        System.out.println("removeOverlap 1");
         PRISM prism = new PRISM(algo);
+        System.out.println("removeOverlap 2");
         Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
+        System.out.println("removeOverlap 3");
         ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
+        System.out.println("removeOverlap 4");
         double[] center1 = Util.getCenter(projectedValues);
-
+        System.out.println("removeOverlap 5");
         double ammountX = center0[0]-center1[0];
+        System.out.println("removeOverlap 6");
         double ammountY = center0[1]-center1[1];
+        System.out.println("removeOverlap 7");
         Util.translate(projectedValues, ammountX, ammountY);        
+        System.out.println("removeOverlap 8");
         Util.normalize(projectedValues);
+        System.out.println("removeOverlap 9");
 
         if( applySeamCarving )
             projectedValues = addSeamCarvingResult(projectedValues);
@@ -3272,12 +3280,19 @@ public class Menu extends javax.swing.JFrame {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
                         if( index != -1 ) {
                             
+                            System.out.println("Entrei (index != -1)");
+                            
                             if( tooltip != null )
                                 return;
+                            
+                            System.out.println("Getting node");
                             ExplorerTreeNode node = controller.getNode(index);                            
-                            if( node.children().isEmpty() ) {      
+                            if( node.children().isEmpty() ) {  
+                                System.out.println("node.children().isEmpty()");
                                 semaphore = true;
+                                System.out.println("Removing overlap...");
                                 List<OverlapRect> projection = removeOverlap(controller.nearest().get(index));
+                                System.out.println("Removing overlap complete...");
                                 tooltip = new Tooltip(new Point2D.Double(e.getX(), e.getY()), projection);
                                 timerTooltip = new Timer(0, new ActionListener() {
                                     private float opacity = 0;
@@ -3286,6 +3301,7 @@ public class Menu extends javax.swing.JFrame {
                                     public void actionPerformed(ActionEvent e) {
                                         if( opacity > 1.0f )
                                             opacity = 1.0f;
+                                        System.out.println("painting");
                                         tooltip.setOpacity(opacity);
                                         opacity += 0.1f;
                                         if( opacity >= 1.0f ) {
@@ -3309,6 +3325,9 @@ public class Menu extends javax.swing.JFrame {
                             }
                               
                         } else if( tooltip != null ) {
+                            
+                            System.out.println("Entrei (index == -1)");
+                            
                             semaphore = true;
                             timerTooltip = new Timer(0, new ActionListener() {
                                 private float opacity = tooltip.getOpacity();

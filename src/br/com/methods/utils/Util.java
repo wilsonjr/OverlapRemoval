@@ -93,8 +93,10 @@ public class Util {
         
         for( int i = 0; i < indexes.size(); ++i ) {
             RectangleVis r = rects.get(indexes.get(i));
-            rs.add(new OverlapRect(r.getUX(), r.getUY(), r.getWidth(), r.getHeight(),
-                                   r.isPivot(), r.getLevel(), r.getCluster(), r.getHealth(), r.numero));
+            rs.add(new OverlapRect(r.getUX(), r.getUY(), r.getWidth(), r.getHeight(), r.isPivot(), r.getLevel(), r.getCluster(), r.getHealth(), r.numero));
+            
+            
+            System.out.println(i+";"+r.getUX()+";"+r.getUY());
         }
         
         return rs;

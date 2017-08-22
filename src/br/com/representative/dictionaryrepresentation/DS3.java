@@ -258,7 +258,7 @@ public class DS3 extends SparseRepresentation {
         Arrays.sort(v, (Item a, Item b)->{ return (a.value < b.value ? 1 : (a.value > b.value ? -1 : 0)); });
         
         
-        if( terminated ) {
+        if( low != 0 ) {
             
             representatives = new int[low];
             for( int i = 0; i < representatives.length; ++i )
