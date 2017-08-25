@@ -1427,7 +1427,7 @@ public class Menu extends javax.swing.JFrame {
         
         int k = Integer.parseInt(JOptionPane.showInputDialog("k"));
         
-        RepresentativeFinder mst = (RepresentativeFinder) RepresentativeRegistry.getInstance(MST.class, elems, k, 10);
+        RepresentativeFinder mst = (RepresentativeFinder) RepresentativeRegistry.getInstance(MST.class, elems, k, 8);
         ((MST)mst).setMaxNodes(k);
         mst.execute();
         selectedRepresentatives = mst.getRepresentatives();
