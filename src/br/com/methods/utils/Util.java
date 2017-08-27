@@ -1011,13 +1011,17 @@ public class Util {
             for( int i = 0; i < edges.length && flag; ++i ) 
                 if( Util.tij(edges[i].getU().getRect(), edges[i].getV().getRect()) != 1.00000000000 )
                     flag = false;
+            
+            System.out.println("Stress majorization iteration number: "+limit);
             if( flag ) {
                 finished = true;
                 return layout;
             }
+            
         } while( limit-- > 0 );
         
-        return null;
+        //finished = true;
+        return layout;
         
     }
     

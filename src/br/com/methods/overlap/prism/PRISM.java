@@ -145,6 +145,7 @@ public class PRISM implements OverlapRemoval {
             for( int i = 0; i < projected.size(); ++i )
                 points[i] = new PRISMPoint(projected.get(i).getCenterX(), projected.get(i).getCenterY(), projected.get(i), i);
             
+            System.out.println("Applying Triangulation");
             
             ArrayList<PRISMEdge> edges = new ArrayList<>();
             if( rects.size() > 2 ) {
@@ -173,6 +174,9 @@ public class PRISM implements OverlapRemoval {
             
             // na segunda parte do algoritmo deve-se adicionar as arestas encontradas pelo VPSC
             if( augmentGp ) {
+                
+                System.out.println("Augmenting Proximity Graph");
+                
                 PRISMEdge[] restEdge = findRestOverlaps(projected);
                 for( int i = 0; i < restEdge.length; ++i ) 
                     if( !edges.contains(restEdge[i]) ) 
@@ -189,6 +193,7 @@ public class PRISM implements OverlapRemoval {
             
             if( flag ) {
                 // chama stress majorization somente se há sobreposição entre dois nós
+                System.out.println("Stress Majorization");
                 PRISMPoint[] pontos;
                 if( algorithm == 0 )
                     pontos = Util.stressMajorization(arestas, points);
@@ -204,16 +209,15 @@ public class PRISM implements OverlapRemoval {
                     
                     if( Util.getFinished() )                         
                         break;                    
-                }                
+                }               
             } else
                 break;
             
+            System.out.println("Finished 'Iteration' number "+maxIterations);
+            
         } while( --maxIterations > 0 );
         
-        if( maxIterations != 0 ) 
-            return projected;
-        
-        return null;
+        return projected;
     }
     
     /**
