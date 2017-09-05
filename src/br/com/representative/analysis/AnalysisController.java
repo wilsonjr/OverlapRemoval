@@ -30,7 +30,8 @@ public class AnalysisController {
         
         double value = representativeAnalysis.init();
         
-        Logger.getLogger(AnalysisController.class.getName()).log(Level.INFO, "Value for {0} metric: {1}", new Object[]{representativeAnalysis.toString(), value});
+        
+        System.out.printf("Value for %s metric: %f\n",representativeAnalysis.toString(), value);     
     }
     
     

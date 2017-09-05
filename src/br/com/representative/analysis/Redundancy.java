@@ -22,15 +22,17 @@ public class Redundancy implements RepresentativeAnalysis {
     
     @Override
     public double init() {
-        
+        System.out.println("Computing redundancy");
         double sum = 0.0;
         
         for( int i = 0; i < indexes.length; ++i ) {
             
             double sumSimilarity = 0.0;
-            for( int j = 0; j < indexes.length; ++j )
+            for( int j = 0; j < indexes.length; ++j ) {
+                if( i == j )
+                    continue;
                 sumSimilarity += similarity[indexes[i]][indexes[j]];            
-            
+            }
             sum += (1.0 - 1.0/sumSimilarity);            
         }
         
