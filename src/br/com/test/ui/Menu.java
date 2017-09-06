@@ -2395,7 +2395,7 @@ public class Menu extends javax.swing.JFrame {
                     int[] indexes = v.getRepresentatives();
 
                     System.out.println("Technique: "+v.toString());
-                    AnalysisController.execute(indexes, similarity); 
+                    AnalysisController.execute(indexes, similarity, points); 
                     System.out.println("Execution Time: "+ ((endTime-startTime)/1000.0));
                     System.out.println("Number of representatives: "+indexes.length);
                     for( int i = 0; i < indexes.length; ++i )
@@ -2432,7 +2432,7 @@ public class Menu extends javax.swing.JFrame {
                     int[] indexes = v.getRepresentatives();
                     
                     System.out.println("Technique: "+v.toString());
-                    AnalysisController.execute(indexes, similarity); 
+                    AnalysisController.execute(indexes, similarity, points); 
                     System.out.println("Execution Time: "+ ((endTime-startTime)/1000.0));
                     System.out.println("Number of representatives: "+indexes.length);
                     for( int i = 0; i < indexes.length; ++i )

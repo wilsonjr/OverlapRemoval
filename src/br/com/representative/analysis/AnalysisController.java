@@ -17,12 +17,14 @@ import java.util.logging.Logger;
  */
 public class AnalysisController {
     
-    public static void execute(int[] indexes, double[][] similarity) {
+    public static void execute(int[] indexes, double[][] similarity, Point2D.Double[] points) {
         
         Redundancy redundancy = new Redundancy(indexes, similarity);
         Coverage coverage = new Coverage(indexes, similarity);
+        ClusterAnalysis cAnalysis = new ClusterAnalysis(indexes, points);
         
-        Arrays.asList(redundancy, coverage).stream().forEach((v)->execute(v));       
+        
+        Arrays.asList(redundancy, coverage, cAnalysis).stream().forEach((v)->execute(v));       
         
     }
     

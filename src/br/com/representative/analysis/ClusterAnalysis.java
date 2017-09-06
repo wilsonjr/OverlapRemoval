@@ -43,7 +43,16 @@ public class ClusterAnalysis implements RepresentativeAnalysis {
         variance /= representative.length;
         
         
+        indexes.entrySet().stream().forEach((v)->System.out.println(">> "+v.getValue().size()));
+        
+        System.out.printf("Value for Cluster Median metric: %f\n", mean);
+        System.out.printf("Value for Cluster Standard Deviation metric: %f\n", Math.sqrt(variance));
         return variance;
+    }
+    
+    @Override
+    public String toString() {
+        return "Cluster Variance";
     }
     
 }
