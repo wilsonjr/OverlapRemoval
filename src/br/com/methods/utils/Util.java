@@ -8,6 +8,7 @@ import br.com.methods.overlap.prism.PRISMPoint;
 import br.com.methods.overlap.prism.SetPoint;
 import br.com.methods.overlap.vpsc.Event;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -15,6 +16,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +30,8 @@ import kn.uni.voronoitreemap.datastructure.OpenList;
 import kn.uni.voronoitreemap.diagram.PowerDiagram;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
 import kn.uni.voronoitreemap.j2d.Site;
+import math.geom2d.polygon.MultiPolygon2D;
+import math.geom2d.polygon.Polygon2D;
 import math.geom2d.polygon.Polygons2D;
 import math.geom2d.polygon.SimplePolygon2D;
 import visualizer.matrix.DenseMatrix;
@@ -1623,9 +1627,14 @@ public class Util {
             ExplorerTreeController controller, Map<Point2D.Double, Integer> indexes) {
         
         SimplePolygon2D p1 = new SimplePolygon2D();
+        
+        System.out.println("-------------------------------------");
         for( int i = 0; i < pts.length; ++i ) {
             p1.addVertex(new math.geom2d.Point2D(pts[i].x, pts[i].y));
+            
+           System.out.print(" ("+pts[i].x+", "+pts[i].y+")");
         }
+        System.out.println("\n-------------------------------------");
         
         Polygon[] intersects = new Polygon[diagrams.length];
         for( int i = 0; i < diagrams.length; ++i ) {
@@ -1634,7 +1643,8 @@ public class Util {
                 for( int j = 0; j < diagrams[i].xpoints.length; ++j )
                     p2.addVertex(new math.geom2d.Point2D(diagrams[i].xpoints[j], diagrams[i].ypoints[j]));
                 
-                SimplePolygon2D p = (SimplePolygon2D) Polygons2D.intersection(p1, p2);
+                Polygon2D interPoly = Polygons2D.intersection(p1, p2);
+                SimplePolygon2D p = (SimplePolygon2D) interPoly; 
                 intersects[i] = new Polygon();
                 for( math.geom2d.Point2D point: p.vertices() )
                     intersects[i].addPoint((int)point.x(), (int)point.y());
@@ -2273,6 +2283,71 @@ public class Util {
             map.remove(value);
         });
         
+    }
+    
+    
+    public static class SutherlandHodgman {
+    
+        public static List<double[]> subject, clipper, result;
+        
+        public static void init(List<double[]> subject, List<double[]> clipper) {
+            
+            SutherlandHodgman.subject = new ArrayList<>(subject);
+            SutherlandHodgman.result  = new ArrayList<>(subject);
+            SutherlandHodgman.clipper = new ArrayList<>(clipper);
+
+            clipPolygon();
+            
+        }
+ 
+
+        private static void clipPolygon() {
+            int len = clipper.size();
+            for (int i = 0; i < len; i++) {
+
+                int len2 = result.size();
+                List<double[]> input = result;
+                result = new ArrayList<>(len2);
+
+                double[] A = clipper.get((i + len - 1) % len);
+                double[] B = clipper.get(i);
+
+                for (int j = 0; j < len2; j++) {
+
+                    double[] P = input.get((j + len2 - 1) % len2);
+                    double[] Q = input.get(j);
+
+                    if (isInside(A, B, Q)) {
+                        if (!isInside(A, B, P))
+                            result.add(intersection(A, B, P, Q));
+                        result.add(Q);
+                    } else if (isInside(A, B, P))
+                        result.add(intersection(A, B, P, Q));
+                }
+            }
+        }
+
+        private static boolean isInside(double[] a, double[] b, double[] c) {
+            return (a[0] - c[0]) * (b[1] - c[1]) > (a[1] - c[1]) * (b[0] - c[0]);
+        }
+
+        private static double[] intersection(double[] a, double[] b, double[] p, double[] q) {
+            double A1 = b[1] - a[1];
+            double B1 = a[0] - b[0];
+            double C1 = A1 * a[0] + B1 * a[1];
+
+            double A2 = q[1] - p[1];
+            double B2 = p[0] - q[0];
+            double C2 = A2 * p[0] + B2 * p[1];
+
+            double det = A1 * B2 - A2 * B1;
+            double x = (B2 * C1 - B1 * C2) / det;
+            double y = (A1 * C2 - A2 * C1) / det;
+
+            return new double[]{x, y};
+        }
+        
+    
     }
     
     

@@ -141,6 +141,8 @@ public class ExplorerTreeController {
 
         List<Point2D.Double> pVoronoi = new ArrayList<>();
         Polygon[] diagrams = Util.voronoiDiagram(window, points, pVoronoi);
+        System.out.println("Quantidade de pontos: "+points.length);
+        System.out.println("Quantidade de diagramas: "+diagrams.length);
         _polygons.addAll(new ArrayList<>(Arrays.asList(Util.clipBounds(diagrams, involvePolygon, _pointPolygon,
                 pVoronoi, this, pointIndex))));
 
@@ -158,7 +160,9 @@ public class ExplorerTreeController {
         for (int i = 0; i < _representative.length; ++i) {
             double cx = _projectionCenter[_representative[i]].x;
             double cy = _projectionCenter[_representative[i]].y;
-            if (Util.euclideanDistance(x, y, cx, cy) < sizeRepresentative(nearest().get(_representative[i]).size())) {
+            if( Util.euclideanDistance(x, y, cx, cy) < _sizeInstances ) {
+                
+                //sizeRepresentative(nearest().get(_representative[i]).size())
                 index = _representative[i];
                 break;
             }
@@ -175,13 +179,9 @@ public class ExplorerTreeController {
         Polygon clickedPolygon = null;
 
         for (Polygon p : _polygons) {
-            SimplePolygon2D sp = new SimplePolygon2D();
-            for (int i = 0; i < p.xpoints.length; ++i) {
-                sp.addVertex(new math.geom2d.Point2D(p.xpoints[i], p.ypoints[i]));
-            }
-            if (sp.contains(x, y)) {
-                clickedPolygon = p;
-            }
+            
+            if( p.contains(x, y) )
+                clickedPolygon = p; 
         }
 
         return clickedPolygon;

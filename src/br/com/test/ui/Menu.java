@@ -1047,8 +1047,6 @@ import br.com.methods.utils.ChangeRetangulo;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Pair;
 import br.com.methods.utils.RectangleVis;
-import br.com.methods.utils.RoundPolygon3;
-import br.com.methods.utils.RoundPolygon2;
 import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
 import br.com.projection.spacereduction.SeamCarving;
@@ -1081,8 +1079,10 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -1128,8 +1128,6 @@ import math.geom2d.polygon.SimplePolygon2D;
 import nmap.BoundingBox;
 import nmap.Element;
 import nmap.NMap;
-import sl.shapes.RegularPolygon;
-import sl.shapes.RoundPolygon;
 import visualizer.matrix.DenseMatrix;
 import visualizer.matrix.DenseVector;
 import visualizer.projection.ProjectionData;
@@ -1153,7 +1151,7 @@ public class Menu extends javax.swing.JFrame {
     private ArrayList<Point> hexPoints;
     private static final int HEXBOARD_SIZE = 20;
     private Polygon p1, p2;
-    private static final int RECTSIZE = 15;
+    private static final int RECTSIZE = 8;
     private int maior, menor;
     private List<List<List<Integer>>> clusters = null;
     private List<List<Integer>> currentCluster = null;
@@ -2728,7 +2726,7 @@ public class Menu extends javax.swing.JFrame {
             points[i].y = rectangles.get(i).y;
         }
         
-        JFileChooser jFileChooser = new JFileChooser();
+        JFileChooser jFileChooser = new JFileChooser("C:\\Users\\wilson\\Desktop\\UNESP\\datasets");
         int result = jFileChooser.showOpenDialog(this);
         if( result == JFileChooser.APPROVE_OPTION ) {
             try {                 
@@ -2764,7 +2762,7 @@ public class Menu extends javax.swing.JFrame {
                 // dictionary representation
                 // must test with alpha = 0.3
                 //RepresentativeFinder ds3 = new DS3(distances, 0.1);
-                RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.09, 0, 0);
+                RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.02, 0, 0);
                 RepresentativeFinder smrs = new SMRS(attrs);
                 
                 controller = new ExplorerTreeController(points, 
@@ -4025,8 +4023,11 @@ public class Menu extends javax.swing.JFrame {
                         return;
                     if( controller != null && controller.representative() != null && controller.nearest() != null ) {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
+                        
                         lastClicked = new Point2D.Double(e.getX(), e.getY());
                         if( index != -1 ) {        
+                            
+                            System.out.println("Index do representativo: "+index);
                             ExplorerTreeNode node = controller.getNode(index);                            
                             if( e.isControlDown() && node.parent() != null )
                                 agglomerateAnimation(index, node);                                      
@@ -4055,19 +4056,13 @@ public class Menu extends javax.swing.JFrame {
                         int index = controller.indexRepresentative(e.getX(), e.getY());
                         if( index != -1 ) {
                             
-                            System.out.println("Entrei (index != -1)");
-                            
                             if( tooltip != null )
                                 return;
                             
-                            System.out.println("Getting node");
                             ExplorerTreeNode node = controller.getNode(index);                            
                             if( node.children().isEmpty() ) {  
-                                System.out.println("node.children().isEmpty()");
                                 semaphore = true;
-                                System.out.println("Removing overlap...");
                                 List<OverlapRect> projection = removeOverlap(controller.nearest().get(index));
-                                System.out.println("Removing overlap complete...");
                                 tooltip = new Tooltip(new Point2D.Double(e.getX(), e.getY()), projection);
                                 timerTooltip = new Timer(0, new ActionListener() {
                                     private float opacity = 0;
@@ -4076,7 +4071,6 @@ public class Menu extends javax.swing.JFrame {
                                     public void actionPerformed(ActionEvent e) {
                                         if( opacity > 1.0f )
                                             opacity = 1.0f;
-                                        System.out.println("painting");
                                         tooltip.setOpacity(opacity);
                                         opacity += 0.1f;
                                         if( opacity >= 1.0f ) {
@@ -4100,9 +4094,7 @@ public class Menu extends javax.swing.JFrame {
                             }
                               
                         } else if( tooltip != null ) {
-                            
-                            System.out.println("Entrei (index == -1)");
-                            
+                                                        
                             semaphore = true;
                             timerTooltip = new Timer(0, new ActionListener() {
                                 private float opacity = tooltip.getOpacity();
@@ -4449,17 +4441,29 @@ public class Menu extends javax.swing.JFrame {
                         for( int i = 0; i < representative.length; ++i ) {
                             
                             float alpha = (float)map.get(representative[i]).size()/(float)points.length;
+                            Point2D.Double p = projection[representative[i]];
                           
                             Polygon poly = controller.polygon(representative[i]);//getPolygon((int)r.x, (int)r.y);
                             if( poly != null ) {
                                 g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.3f));
                                 g2Buffer.setColor(Color.RED); 
-                                Shape polygon = new RoundPolygon(poly, 5);
+                               // Shape polygon = new RoundPolygon(poly, 5);
                                 
                                 //g2Buffer.fill(polygon);
                                 
-                                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
-                                g2Buffer.draw(polygon);
+//                                
+//                                Point2D center = new Point2D.Float((float)p.x+RECTSIZE/2, (float)p.y+RECTSIZE/2);
+//                                float radius = 40;
+//                                
+//                                Paint before = g2Buffer.getPaint();
+//                                
+//                                RadialGradientPaint paint = new RadialGradientPaint(center, radius, new float[]{.5f, 1f}, 
+//                                        new Color[]{Color.BLUE, Color.WHITE});                                
+//                                g2Buffer.setPaint(paint);                                
+//                                g2Buffer.fill(poly);
+                                
+                                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.3f));
+                                g2Buffer.draw(poly);
                                 
                                 
                             }
@@ -4468,20 +4472,47 @@ public class Menu extends javax.swing.JFrame {
                                 continue;
                             
                             int size = RECTSIZE;//controller.sizeRepresentative(map.get(representative[i]).size());
+                                                        
                             
-                            Point2D.Double p = projection[representative[i]];
                            // Point2D.Double p = controller.getPoint(representative[i]);
                             
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                            
+                            
+                            float maxCluster = -1.0f;
+                            for( int index: representative )
+                                maxCluster = Math.max(maxCluster, map.get(index).size());
+                            
+                            
+                            float normalizedSizeCluster = (float)map.get(representative[i]).size()/maxCluster;
+                            System.out.println("normalizedCluster: "+normalizedSizeCluster);
+                            int red = (int) ((255 * (normalizedSizeCluster*100))/100);
+                            int green = 0;
+                            int blue = (int) ((255 * (100 - normalizedSizeCluster*100)))/100;
+                            Color clusterColor = new Color(red, green, blue);
+                            
+                            
+                            int sizeScale = size*2;                            
+                            g2Buffer.setColor(clusterColor);
+                            g2Buffer.fillOval((int)(p.x-size/2.0), (int)(p.y-size/2.0), sizeScale, sizeScale);                            
+                            g2Buffer.setColor(Color.BLACK);
+                            g2Buffer.drawOval((int)(p.x-size/2.0), (int)(p.y-size/2.0), sizeScale, sizeScale);
+                            
+                            
                             g2Buffer.setColor(Color.RED);
                             g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
                             g2Buffer.setColor(Color.BLACK);
                             g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
+                            
+                            
+                            
+                            
+                            
                             if( hideShowNumbers ) {
                                 g2Buffer.setColor(Color.BLUE);
                                 g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
                                 g2Buffer.drawString(String.valueOf(rectangles.get(representative[i]).numero), 
-                                        (int)p.x+10, (int)p.y+10);  
+                                        (int)p.x, (int)p.y+10);  
                             }
                         }
                     } else {
@@ -4493,11 +4524,11 @@ public class Menu extends javax.swing.JFrame {
                             g2Buffer.setColor(Color.BLACK);
                             g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
                                     
-                            if( hideShowNumbers ) {
-                                g2Buffer.setColor(Color.GREEN);
+                            //if( hideShowNumbers ) {
+                                g2Buffer.setColor(Color.BLACK);
                                 g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
                                 g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
-                            }
+                            //}
                         }
                     }
                     
@@ -4524,6 +4555,9 @@ public class Menu extends javax.swing.JFrame {
                         g2Buffer.fillOval(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i], 5, 5); 
                 }*/
                 
+              
+                
+                drawScale(g2Buffer);
                 
                 
                 
@@ -4536,6 +4570,11 @@ public class Menu extends javax.swing.JFrame {
                 g2Buffer.dispose();
                 
             } 
+            
+              
+               
+                
+            
             if( imageBuffer != null )  {
                 g2.drawImage(this.imageBuffer, 0, 0, null);                  
             }
@@ -4585,6 +4624,34 @@ public class Menu extends javax.swing.JFrame {
 
         private boolean movingRepresentative(int i) {
             return movingIndexes.contains(i) || i == parentMoving;
+        }
+
+        private void drawScale(Graphics2D g2Buffer) {
+            g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));            
+            
+            int width = 255;
+            int height = 30;
+            int x = 10;
+            int y = 10;            
+            int spaceDescription = 15;
+            
+            for( int i = 0; i < width; ++i ) {
+                float value = (float)i/(float)width;
+                int r = (int) ((255 * (value*100))/100);
+                int g = 0;
+                int b = (int) ((255 * (100 - value*100)))/100;
+                
+                g2Buffer.setColor(new Color(r, g, b));
+                g2Buffer.drawLine(x+i, y, x+i, y+height);
+            }
+            
+            g2Buffer.setColor(Color.BLACK);
+            g2Buffer.drawRect(x, y, width, height);
+            
+            g2Buffer.drawString("min", x, y + height + spaceDescription);
+            g2Buffer.drawString("max", x + width - g2Buffer.getFontMetrics().stringWidth("max"), y + height + spaceDescription);
+            
+            
         }
 
     }
