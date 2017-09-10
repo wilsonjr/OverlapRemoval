@@ -1626,30 +1626,22 @@ public class Util {
             Map<ExplorerTreeNode, Polygon> map, List<Point2D.Double> pVoronoi, 
             ExplorerTreeController controller, Map<Point2D.Double, Integer> indexes) {
         
-        SimplePolygon2D p1 = new SimplePolygon2D();
-        
-        System.out.println("-------------------------------------");
+        SimplePolygon2D p1 = new SimplePolygon2D();        
         for( int i = 0; i < pts.length; ++i ) {
             p1.addVertex(new math.geom2d.Point2D(pts[i].x, pts[i].y));
-            
-           System.out.print(" ("+pts[i].x+", "+pts[i].y+")");
         }
-        System.out.println("\n-------------------------------------");
         
         Polygon[] intersects = new Polygon[diagrams.length];
         for( int i = 0; i < diagrams.length; ++i ) {
-            SimplePolygon2D p2 = new SimplePolygon2D();
-            if( diagrams[i] != null ) {
-                for( int j = 0; j < diagrams[i].xpoints.length; ++j )
-                    p2.addVertex(new math.geom2d.Point2D(diagrams[i].xpoints[j], diagrams[i].ypoints[j]));
-                
-                Polygon2D interPoly = Polygons2D.intersection(p1, p2);
-                SimplePolygon2D p = (SimplePolygon2D) interPoly; 
-                intersects[i] = new Polygon();
-                for( math.geom2d.Point2D point: p.vertices() )
-                    intersects[i].addPoint((int)point.x(), (int)point.y());
-            } else
-                System.out.println("diagrams[i] null!");
+            SimplePolygon2D p2 = new SimplePolygon2D();            
+            for( int j = 0; j < diagrams[i].xpoints.length; ++j )
+                p2.addVertex(new math.geom2d.Point2D(diagrams[i].xpoints[j], diagrams[i].ypoints[j]));
+
+            Polygon2D interPoly = Polygons2D.intersection(p1, p2);
+            SimplePolygon2D p = (SimplePolygon2D) interPoly; 
+            intersects[i] = new Polygon();
+            for( math.geom2d.Point2D point: p.vertices() )
+                intersects[i].addPoint((int)point.x(), (int)point.y());
         }
 
         for( int i = 0; i < intersects.length; ++i ) {
