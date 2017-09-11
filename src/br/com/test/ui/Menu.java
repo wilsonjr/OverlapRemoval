@@ -1071,6 +1071,7 @@ import br.com.representative.metric.MST;
 import br.com.representative.metric.SSS;
 import br.com.test.draw.color.GrayScale;
 import br.com.test.draw.color.RainbowScale;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -1079,13 +1080,12 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Polygon;
-import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -3977,6 +3977,8 @@ public class Menu extends javax.swing.JFrame {
         private Timer timer = null;
         private Timer timerTooltip = null;
         
+        private int representativePolygon = -1;
+        
         
         public ViewPanel() {
             setBackground(Color.WHITE);
@@ -4052,7 +4054,34 @@ public class Menu extends javax.swing.JFrame {
                     if( semaphore )
                         return;
                     
-                    if( controller != null && controller.representative() != null && controller.nearest() != null ) {
+                    if( controller != null && controller.representative() != null && controller.nearest() != null ) {                        
+                        
+                        Polygon polygon = controller.clickedPolygon(e.getX(), e.getY());                        
+                        if( polygon != null ) {
+                            double dist = Double.MAX_VALUE;
+                            int indexDist = 0;
+
+                            for( int i = 0; i < controller.representative().length; ++i ) {
+
+                                double d = Util.euclideanDistance(e.getX(), e.getY(), 
+                                        points[controller.representative()[i]].x, points[controller.representative()[i]].y);
+
+                                if( d < dist ) {
+                                    dist = d;
+                                    indexDist = controller.representative()[i];
+                                }
+                            }
+
+                            representativePolygon = indexDist;
+                            
+                        } else {
+                            representativePolygon = -1;
+                        }
+                        
+                        cleanImage();
+                        repaint();
+                        
+                        
                         int index = controller.indexRepresentative(e.getX(), e.getY());
                         if( index != -1 ) {
                             
@@ -4267,8 +4296,6 @@ public class Menu extends javax.swing.JFrame {
                     
                     
                     for( RectangleVis r: rectangles ) {                    
-                        ///g2Buffer.setColor(r.cor);
-                        int cinza = (int) (((double)(r.getHealth()-menor)/(double)(maior-menor))*255.0);
                         g2Buffer.setColor(r.cor);
 
                         if( r.isHexBoard ) {
@@ -4463,8 +4490,17 @@ public class Menu extends javax.swing.JFrame {
 //                                g2Buffer.fill(poly);
                                 
                                 g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.3f));
-                                g2Buffer.draw(poly);
-                                
+                                if( representative[i] == representativePolygon ) {
+                                    Stroke before = g2Buffer.getStroke();
+                                    g2Buffer.setStroke(new BasicStroke(5));
+                                    g2Buffer.setColor(Color.BLUE);
+                                    g2Buffer.draw(poly);                                    
+                                    g2Buffer.setStroke(before);
+                                } else {
+                                    
+                                    
+                                    g2Buffer.draw(poly);
+                                }
                                 
                             }
                             
@@ -4559,10 +4595,6 @@ public class Menu extends javax.swing.JFrame {
                 
                 drawScale(g2Buffer);
                 
-                
-                
-                
-                
                 if( tooltip != null ) {
                     tooltip.draw(g2Buffer);
                 }
@@ -4570,10 +4602,6 @@ public class Menu extends javax.swing.JFrame {
                 g2Buffer.dispose();
                 
             } 
-            
-              
-               
-                
             
             if( imageBuffer != null )  {
                 g2.drawImage(this.imageBuffer, 0, 0, null);                  

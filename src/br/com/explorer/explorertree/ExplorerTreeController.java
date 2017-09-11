@@ -178,8 +178,7 @@ public class ExplorerTreeController {
     public Polygon clickedPolygon(double x, double y) {
         Polygon clickedPolygon = null;
 
-        for (Polygon p : _polygons) {
-            
+        for( Polygon p : _polygons ) {            
             if( p.contains(x, y) )
                 clickedPolygon = p; 
         }
