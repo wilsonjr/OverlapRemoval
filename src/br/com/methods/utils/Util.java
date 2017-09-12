@@ -942,7 +942,7 @@ public class Util {
      * @param ammountX Deslocamento em X
      * @param ammountY Deslocamento em Y
      */
-    public static void translate(ArrayList<OverlapRect> rects, double ammountX, double ammountY) {
+    public static void translate(List<OverlapRect> rects, double ammountX, double ammountY) {
         for( int i = 0; i < rects.size(); ++i ) {
             rects.get(i).setUX(rects.get(i).getUX()+ammountX);
             rects.get(i).setUY(rects.get(i).getUY()+ammountY);
@@ -1905,7 +1905,7 @@ public class Util {
         
     }
 
-    public static void toRectangleVis(ArrayList<RectangleVis> cluster, ArrayList<OverlapRect> rects, List<Integer> indexes) {
+    public static void toRectangleVis(ArrayList<RectangleVis> cluster, List<OverlapRect> rects, List<Integer> indexes) {
         
         
         for( int i = 0; i < rects.size(); ++i ) {    
