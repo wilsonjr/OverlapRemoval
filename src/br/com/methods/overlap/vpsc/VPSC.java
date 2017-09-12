@@ -40,6 +40,7 @@ import br.com.methods.utils.Util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.stream.IntStream;
@@ -56,7 +57,7 @@ public class VPSC implements OverlapRemoval {
      * @return Projeção sem sobreposição
      */
     @Override
-    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rectangles) {
+    public Map<OverlapRect, OverlapRect> apply(List<OverlapRect> rectangles) {
         /**
          * copy rectangles 
          */         

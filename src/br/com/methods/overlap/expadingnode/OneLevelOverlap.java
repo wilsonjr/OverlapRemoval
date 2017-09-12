@@ -28,7 +28,7 @@ public class OneLevelOverlap implements OverlapRemoval {
     }
 
     @Override
-    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rects) {       
+    public Map<OverlapRect, OverlapRect> apply(List<OverlapRect> rects) {       
                 
         ArrayList<OverlapRect> reprojected = removeOverlap(rects);        
         
@@ -44,7 +44,7 @@ public class OneLevelOverlap implements OverlapRemoval {
     }
     
     
-    private ArrayList<OverlapRect> removeOverlap(ArrayList<OverlapRect> rect) {
+    private ArrayList<OverlapRect> removeOverlap(List<OverlapRect> rect) {
         ArrayList<OverlapRect> rects = new ArrayList<>();
         ArrayList<OverlapRect> rects2 = new ArrayList<>();
         

@@ -45,6 +45,7 @@ import delaunay_triangulation.Triangle_dt;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -130,7 +131,7 @@ public class PRISM implements OverlapRemoval {
      *                  1 - Estrutura de Yale para matrizes esparsas.
      * @return Retângulos sem sobreposição.
      */
-    private static ArrayList<OverlapRect> apply(ArrayList<OverlapRect> rects, boolean augmentGp, int algorithm) {
+    private static List<OverlapRect> apply(List<OverlapRect> rects, boolean augmentGp, int algorithm) {
         ArrayList<OverlapRect> projected = new ArrayList<>();
         
         for( int i = 0; i < rects.size(); ++i )
@@ -245,7 +246,7 @@ public class PRISM implements OverlapRemoval {
      * @param rects Os 2 retângulos
      * @return 2 retângulos não sobrepostos.
      */
-    private static ArrayList<OverlapRect> naivePRISM(ArrayList<OverlapRect> rects) {
+    private static ArrayList<OverlapRect> naivePRISM(List<OverlapRect> rects) {
         
          ArrayList<OverlapRect> projected = new ArrayList<>();
         
@@ -269,7 +270,7 @@ public class PRISM implements OverlapRemoval {
      * @return Retângulos sem sobreposição.
      */
     @Override
-    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rects) {
+    public Map<OverlapRect, OverlapRect> apply(List<OverlapRect> rects) {
         Map<OverlapRect, OverlapRect> projectedToReprojected = new HashMap<>();
 
         // para um nó apenas não há o que fazer
@@ -286,10 +287,10 @@ public class PRISM implements OverlapRemoval {
             return projectedToReprojected;
         }
         // remove a sobreposição por meio de uma visão local
-        ArrayList<OverlapRect> firstPass = apply(rects, false, structure);
+        List<OverlapRect> firstPass = apply(rects, false, structure);
         
         // remove o restante da sobreposição por meio de uma visão global
-        ArrayList<OverlapRect> secondPass = apply(firstPass, true, structure);
+        List<OverlapRect> secondPass = apply(firstPass, true, structure);
         
         IntStream.range(0, rects.size()).forEach(i->projectedToReprojected.put(rects.get(i), secondPass.get(i)));
         

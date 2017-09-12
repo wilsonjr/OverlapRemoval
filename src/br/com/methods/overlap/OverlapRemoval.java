@@ -11,7 +11,7 @@
 package br.com.methods.overlap;
 
 import br.com.methods.utils.OverlapRect;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,9 +21,9 @@ import java.util.logging.Logger;
  * @author wilson
  */
 public interface OverlapRemoval {
-    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rects);
+    public Map<OverlapRect, OverlapRect> apply(List<OverlapRect> rects);
     
-    default public Map<OverlapRect, OverlapRect> applyAndShowTime(ArrayList<OverlapRect> rects) {
+    default public Map<OverlapRect, OverlapRect> applyAndShowTime(List<OverlapRect> rects) {
         for( int i = 0; i < rects.size(); ++i ) 
             rects.get(i).setId(i);
         

@@ -92,7 +92,7 @@ public class Util {
         return rs;
     }
     
-    public static ArrayList<OverlapRect> toRectangle(ArrayList<RectangleVis> rects, List<Integer> indexes) {
+    public static List<OverlapRect> toRectangle(List<RectangleVis> rects, List<Integer> indexes) {
         ArrayList<OverlapRect> rs = new ArrayList<>();
         
         for( int i = 0; i < indexes.size(); ++i ) {
@@ -865,7 +865,7 @@ public class Util {
      * @param rects Projeção
      * @return double
      */
-    public static double getMinX(ArrayList<OverlapRect> rects) {
+    public static double getMinX(List<OverlapRect> rects) {
         double min = rects.get(0).getUX();
         
         for( int i = 1; i < rects.size(); ++i )
@@ -879,7 +879,7 @@ public class Util {
      * @param rects Projeção
      * @return double
      */
-    public static double getMinY(ArrayList<OverlapRect> rects) {
+    public static double getMinY(List<OverlapRect> rects) {
         double min = rects.get(0).getUY();
                 
         for( int i = 1; i < rects.size(); ++i )
@@ -892,7 +892,7 @@ public class Util {
      * Faz com que nenhuma coordenada tenha valores negativos.
      * @param rects Projeção com coordenadas negativas.
      */
-    public static void normalize(ArrayList<OverlapRect> rects) {
+    public static void normalize(List<OverlapRect> rects) {
         double minX = getMinX(rects);
         double minY = getMinY(rects);
         if( minX < 0 || minY < 0 ) {
@@ -910,7 +910,7 @@ public class Util {
      * @param rects Projeção
      * @return Coordenadas {x, y}
      */
-    public static double[] getCenter(ArrayList<OverlapRect> rects) {
+    public static double[] getCenter(List<OverlapRect> rects) {
         double xmin = rects.get(0).getUX(), xmax = rects.get(0).getLX(), 
                ymin = rects.get(0).getUY(), ymax = rects.get(0).getLY();                      
         

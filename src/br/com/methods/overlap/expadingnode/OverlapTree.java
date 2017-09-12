@@ -107,7 +107,7 @@ public class OverlapTree implements OverlapRemoval {
     }
 
     @Override
-    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rects) {
+    public Map<OverlapRect, OverlapRect> apply(List<OverlapRect> rects) {
         Map<OverlapRect, OverlapRect> map = null;
         
         for( int iter = 0; iter <= additionalIterations; ++iter ) {

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -59,7 +60,7 @@ public class ProjSnippet implements OverlapRemoval {
       * @return 
       */
      @Override
-     public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> retangulos) {
+     public Map<OverlapRect, OverlapRect> apply(List<OverlapRect> retangulos) {
         resultado = -1;
         
         double[][] l = formGraph(retangulos);
@@ -160,7 +161,7 @@ public class ProjSnippet implements OverlapRemoval {
       * @param retangulos Projeção inicial
       * @return Matriz L
       */
-     private double[][] formGraph(ArrayList<OverlapRect> retangulos) {
+     private double[][] formGraph(List<OverlapRect> retangulos) {
          // "converte" os retângulos para usar a biblioteca kNN
          ArrayList<Data.DataEntry> data = new ArrayList<>();
          for( OverlapRect r: retangulos )
@@ -274,7 +275,7 @@ public class ProjSnippet implements OverlapRemoval {
       * @param retangulos Projeção inicial
       * @return Grafo completo sem loop
       */
-     private static Vertex[] completedGraph(ArrayList<OverlapRect> retangulos) {
+     private static Vertex[] completedGraph(List<OverlapRect> retangulos) {
          Vertex[] grafo = new Vertex[retangulos.size()];
          
          for( int i = 0; i < grafo.length; ++i ) {

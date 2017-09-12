@@ -28,6 +28,7 @@ import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -52,7 +53,7 @@ public class RWordleL implements OverlapRemoval {
      * @return Retângulos sem sobreposição.
      */
     @Override
-    public Map<OverlapRect, OverlapRect> apply(ArrayList<OverlapRect> rectangles) {
+    public Map<OverlapRect, OverlapRect> apply(List<OverlapRect> rectangles) {
         
         /**
          * Finds the min and max x and y coordinates in rectangles
