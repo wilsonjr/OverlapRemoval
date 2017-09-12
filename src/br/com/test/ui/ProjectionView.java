@@ -10,6 +10,7 @@ import br.com.explore.explorertree.util.Tooltip;
 import br.com.explorer.explorertree.ExplorerTreeController;
 import br.com.explorer.explorertree.ExplorerTreeNode;
 import br.com.methods.overlap.prism.PRISM;
+import br.com.methods.overlap.rwordle.RWordleC;
 import br.com.methods.utils.ChangeRetangulo;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.RectangleVis;
@@ -76,14 +77,35 @@ public class ProjectionView extends JPanel {
     private List<RectangleVis> afterSeamCarving;
     
     private ExplorerTreeController controller;
+    
+    private Point2D.Double[] points;
+       
+    private List<Integer> movingIndexes = new ArrayList<>();
+    private List<Point2D.Double> toDraw = new ArrayList<>();
+    private Tooltip tooltip = null;
+    
+    private List<List<Integer>> currentCluster = null;
+    
+    private Polygon[] diagrams = null;
+    private Polygon[] intersects = null;
+    
+    private List<Polygon> intersectsPolygon = new ArrayList<>();
+    private List<Integer> nearest = null;
+    private boolean hideShowNumbers = false;
+    private int[] selectedRepresentatives = null;
 
     @SuppressWarnings(value="")
-    public ProjectionView(List<RectangleVis> rectangles, List<RectangleVis> afterSeamCarving, ExplorerTreeController controller) {
+    public ProjectionView(List<RectangleVis> rectangles, 
+                          List<RectangleVis> afterSeamCarving, 
+                          ExplorerTreeController controller,
+                          Point2D.Double[] points) {
         setBackground(Color.WHITE);
         setLayout(new FlowLayout(FlowLayout.LEFT));
         
-        this.rectangles = new ArrayList<>();
-        this.afterSeamCarving = new ArrayList<>();
+        this.rectangles = rectangles;
+        this.afterSeamCarving = afterSeamCarving;
+        this.controller = controller;
+        this.points = points;
 
         addMouseWheelListener(new MouseAdapter() {
             @Override
@@ -492,39 +514,6 @@ public class ProjectionView extends JPanel {
                 g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
             }
 
-            if( cRetangulo != null ) {
-                for( ChangeRetangulo r: cRetangulo ) {
-                    int x1 = (int) r.second.getUX();
-                    int y1 = (int) r.second.getUY();                    
-                    int x2 = (int) r.third.getUX();
-                    int y2 = (int) r.third.getUY();
-
-                    OverlapRect rr = r.third;
-
-                    g2Buffer.fillRect((int)rr.getUX(), (int)rr.getUY(), (int)rr.getWidth(), (int)rr.getHeight());
-                    g2Buffer.setColor(Color.BLACK);
-                    g2Buffer.drawRect((int)rr.getUX(), (int)rr.getUY(), (int)rr.getWidth(), (int)rr.getHeight());
-                    g2Buffer.setColor(Color.WHITE);
-                    g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
-                    g2Buffer.drawString(String.valueOf(rr.getId()), (int)rr.getUX()+10, (int)rr.getUY()+10);
-
-                    g2Buffer.setColor(Color.GRAY);
-                    g2Buffer.drawLine(x1, y1, x2, y2);
-                }
-            }
-
-            if( iImage != 0 ) {
-                try {
-                    File file = new File("C:\\Users\\wilson\\Desktop\\imagem\\imagem"+String.valueOf(iImage)+".png");
-                    System.out.println("Salvando imagem"+String.valueOf(iImage)+".png...");
-                    view.adjustPanel();
-                    BufferedImage img = view.getImage();
-                    ImageIO.write(img, "png", file);
-                } catch( IOException e ) {
-                    System.out.println(e.getMessage());
-                } 
-            }                
-
             for( Polygon p: intersectsPolygon ) {
                 g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
                 g2Buffer.setColor(Color.GREEN);
@@ -777,12 +766,43 @@ public class ProjectionView extends JPanel {
     }
     
     
-    
+    private List<OverlapRect> removeOverlap(List<Integer> indexes) {
+        int algo = 1;//Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
+        boolean applySeamCarving = false;//Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
+        List<OverlapRect> rects = Util.toRectangle(rectangles, indexes);
+        
+        double[] center0 = Util.getCenter(rects);
+        System.out.println("removeOverlap 1");
+      //  PRISM prism = new PRISM(algo);
+        RWordleC rwordlec = new RWordleC();
+        System.out.println("removeOverlap 2");
+        
+      //  Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
+        Map<OverlapRect, OverlapRect> projected = rwordlec.applyAndShowTime(rects);
+        System.out.println("removeOverlap 3");
+        List<OverlapRect> projectedValues = Util.getProjectedValues(projected);
+        System.out.println("removeOverlap 4");
+        double[] center1 = Util.getCenter(projectedValues);
+        System.out.println("removeOverlap 5");
+        double ammountX = center0[0]-center1[0];
+        System.out.println("removeOverlap 6");
+        double ammountY = center0[1]-center1[1];
+        System.out.println("removeOverlap 7");
+        Util.translate(projectedValues, ammountX, ammountY);        
+        System.out.println("removeOverlap 8");
+        Util.normalize(projectedValues);
+        System.out.println("removeOverlap 9");
+
+        if( applySeamCarving )
+            projectedValues = OverlapView.addSeamCarvingResult(projectedValues);
+                
+        return projectedValues;
+    }
     
     private void removeSubsetOverlap(List<Integer> indexes, int representative) {
         int algo = 1;//Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
         boolean applySeamCarving = false;//Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
-        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles, indexes);
+        List<OverlapRect> rects = Util.toRectangle(rectangles, indexes);
         
         System.out.println("-------------------");
         for( int i = 0; i < rects.size(); ++i ) {
@@ -804,7 +824,7 @@ public class ProjectionView extends JPanel {
         double[] center0 = Util.getCenter(rects);
         PRISM prism = new PRISM(algo);
         Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
-        ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
+        List<OverlapRect> projectedValues = Util.getProjectedValues(projected);
         double[] center1 = Util.getCenter(projectedValues);
 
         double ammountX = center0[0]-center1[0];
@@ -813,7 +833,7 @@ public class ProjectionView extends JPanel {
         Util.normalize(projectedValues);
 
         if( applySeamCarving )
-            projectedValues = addSeamCarvingResult(projectedValues);
+            projectedValues = OverlapView.addSeamCarvingResult(projectedValues);
         
         ArrayList<RectangleVis> cluster = new ArrayList<>();
         Util.toRectangleVis(cluster, projectedValues, indexes);
@@ -838,7 +858,7 @@ public class ProjectionView extends JPanel {
 
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        Menu.OverlapPanel panel = new Menu.OverlapPanel(projected, cluster);
+        OverlapView panel = new OverlapView(projected, cluster, afterSeamCarving);
         
         JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);        
         slider.setPaintTicks(true);
@@ -869,7 +889,7 @@ public class ProjectionView extends JPanel {
         }
         JFrame frame2 = new JFrame();
         frame2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        Menu.OverlapPanel panel2= new Menu.OverlapPanel(projected, rectanglesforce);
+        OverlapView panel2 = new OverlapView(projected, rectanglesforce, afterSeamCarving);
         
         JSlider slider2= new JSlider(JSlider.HORIZONTAL, 0, 100, 100);        
         slider2.setPaintTicks(true);
@@ -940,7 +960,7 @@ public class ProjectionView extends JPanel {
 //        frameEqualWeight2.setVisible(true);
 //        
 //        
-        List<OverlapRect> after2 = removeOverlap(overlaps, rep);//new ForceNMAP(800, 600).repulsive(toforce, rep, 0.2*10, 10);
+        List<OverlapRect> after2 = OverlapView.removeOverlap(overlaps, rep);//new ForceNMAP(800, 600).repulsive(toforce, rep, 0.2*10, 10);
 //        List<OverlapRect> after2 = new ArrayList<>();
 //        for( BoundingBox bb: ac ) {
 //            Element e = bb.getElement();
@@ -959,7 +979,7 @@ public class ProjectionView extends JPanel {
         }
         JFrame frame3 = new JFrame();
         frame3.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        Menu.OverlapPanel panel3 = new Menu.OverlapPanel(projected, rectanglesforce2);
+        OverlapView panel3 = new OverlapView(projected, rectanglesforce2, afterSeamCarving);
         
         JSlider slider3 = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);        
         slider3.setPaintTicks(true);
