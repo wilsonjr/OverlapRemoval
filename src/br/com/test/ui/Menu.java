@@ -17,9 +17,7 @@ import br.com.methods.overlap.projsnippet.ProjSnippet;
 import br.com.methods.overlap.rwordle.RWordleC;
 import br.com.methods.overlap.rwordle.RWordleL;
 import br.com.methods.overlap.vpsc.VPSC;
-import br.com.methods.utils.ChangeRetangulo;
 import br.com.methods.utils.OverlapRect;
-import br.com.methods.utils.Pair;
 import br.com.methods.utils.RectangleVis;
 import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
@@ -79,7 +77,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -110,13 +107,15 @@ import visualizer.projection.ProjectionType;
 import visualizer.projection.ProjectorType;
 import visualizer.projection.distance.DissimilarityType;
 import visualizer.projection.lsp.ControlPointsType;
+import visualizer.util.ChangeRetangulo;
 
 /**
  *
  * @author wilson
  */
 public class Menu extends javax.swing.JFrame {
-    private ViewPanel view;
+    //private ViewPanel view;
+    private ProjectionView view;
     private ArrayList<RectangleVis> rectangles, afterSeamCarving;
     private double alpha = 0;
     private int globalCounter = 0;
@@ -170,7 +169,8 @@ public class Menu extends javax.swing.JFrame {
         hexPoints = new ArrayList<>();
         rectangles = new ArrayList<>();
         afterSeamCarving = new ArrayList<>();
-        view = new ViewPanel();
+        //view = new ViewPanel();
+        view = new ProjectionView(rectangles, afterSeamCarving, controller, points);
         initComponents();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -180,38 +180,7 @@ public class Menu extends javax.swing.JFrame {
         
     }
     
-    public static boolean LineIntersectsRect(Point p1, Point p2, Rectangle r)
-    {
-        return LineIntersectsLine(p1, p2, new Point(r.x, r.y), new Point(r.x + r.width, r.y)) ||
-               LineIntersectsLine(p1, p2, new Point(r.x + r.width, r.y), new Point(r.x + r.width, r.y + r.height)) ||
-               LineIntersectsLine(p1, p2, new Point(r.x + r.width, r.y + r.height), new Point(r.x, r.y + r.height)) ||
-               LineIntersectsLine(p1, p2, new Point(r.x, r.y + r.height), new Point(r.x, r.y)) ||
-               (r.contains(p1) && r.contains(p2));
-    }
-
-    private static boolean LineIntersectsLine(Point l1p1, Point l1p2, Point l2p1, Point l2p2)
-    {
-        float q = (l1p1.y - l2p1.y) * (l2p2.x - l2p1.x) - (l1p1.x - l2p1.x) * (l2p2.y - l2p1.y);
-        float d = (l1p2.x - l1p1.x) * (l2p2.y - l2p1.y) - (l1p2.y - l1p1.y) * (l2p2.x - l2p1.x);
-
-        if( d == 0 )
-        {
-            return false;
-        }
-
-        float r = q / d;
-
-        q = (l1p1.y - l2p1.y) * (l1p2.x - l1p1.x) - (l1p1.x - l2p1.x) * (l1p2.y - l1p1.y);
-        float s = q / d;
-
-        if( r < 0 || r > 1 || s < 0 || s > 1 )
-        {
-            return false;
-        }
-
-        return true;
-    }
-    
+   
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -230,7 +199,6 @@ public class Menu extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         limparJMenuItem = new javax.swing.JMenuItem();
         salvarImagemJMenuItem = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
         showHideJMenuItem = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         rwordleCJMenuItem = new javax.swing.JMenuItem();
@@ -324,14 +292,6 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu1.add(salvarImagemJMenuItem);
-
-        jMenuItem1.setText("Move");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        jMenu1.add(jMenuItem1);
 
         showHideJMenuItem.setText("Show/Hide Numbers");
         showHideJMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -685,6 +645,7 @@ public class Menu extends javax.swing.JFrame {
                 }
                 
                 points = pts.stream().toArray(Point2D.Double[]::new);
+                view.setPoints(points);
                 centerPoints = new Point2D.Double[rectangles.size()];
                 for( int i = 0; i < centerPoints.length; ++i )
                     centerPoints[i] = new Point2D.Double(rectangles.get(i).getCenterX(), rectangles.get(i).getCenterY());               
@@ -754,118 +715,7 @@ public class Menu extends javax.swing.JFrame {
         view.cleanImage();
         view.repaint();
     }//GEN-LAST:event_rwordleLJMenuItemActionPerformed
-    
-    private boolean temSobreposicao(double x, double y, ArrayList<ChangeRetangulo> R, int id) {
-        double x1 = x, x2 = x+RECTSIZE;
-        double y1 = y, y2 = y+RECTSIZE;
         
-        for( int i = 0; i < R.size(); ++i ) {
-            OverlapRect r = R.get(i).third.getUX() == 0.0 && R.get(i).third.getUY() == 0.0
-                          ? R.get(i).second : R.get(i).third;
-            
-            if( r.getId() == id )
-                continue;
-            
-            if( x2 > r.getUX() && x1 < r.getUX()+RECTSIZE && y2 > r.getUY() && y1 < r.getUY()+RECTSIZE )
-                return true;            
-        }
-        return false;
-    }
-    
-    private void findPosition(ArrayList<ChangeRetangulo> R) {
-        Collections.sort(R, new Comparator<ChangeRetangulo>() {
-
-            @Override
-            public int compare(ChangeRetangulo o1, ChangeRetangulo o2) {
-                
-                double d1 = Math.sqrt(Math.pow(o1.first.getUX()-o1.second.getUX(), 2)
-                                        +
-                             Math.pow(o1.first.getUY()-o1.second.getUY(), 2));
-                double d2 = Math.sqrt(Math.pow(o2.first.getUX()-o2.second.getUX(), 2)
-                                        +
-                             Math.pow(o2.first.getUY()-o2.second.getUY(), 2));
-                if( d1 < d2 )
-                    return -1;
-                else if( d1 > d2 )
-                    return 1;
-                
-                return 0;
-            }
-        });
-        
-        for( int j = 0; j < R.size(); ++j ) {
-            ChangeRetangulo r = R.get(j);
-            
-            double FACTOR = 0.0001;
-            double i = 1-FACTOR;
-            double x = 0, y = 0;
-            
-            for( ; i >= 0.0; i -= FACTOR ) {
-                x = (1.0-i)*r.second.getUX() + i*r.first.getUX();
-                y = (1.0-i)*r.second.getUY() + i*r.first.getUY();                
-                if( !temSobreposicao(x, y, R, r.third.getId()) )  
-                    break;
-            }
-            i += FACTOR;
-            x = (1.0-i)*r.second.getUX() + i*r.first.getUX();
-            y = (1.0-i)*r.second.getUY() + i*r.first.getUY();
-            
-           // System.out.println("Position: (x:"+x+", y:"+y+") - (x:"+r.second.getUX()+", y:"+r.second.getUY()+")");
-            r.third.setUX(x);
-            r.third.setUY(y);
-                    
-        }
-    }
-    
-    private void reduceKNN(int id, Pair[][] knn, ArrayList<ChangeRetangulo> R) {
-        if( R.get(id).third.getUX() != 0.0 || R.get(id).third.getUY() != 0.0 )
-            return;
-        
-        double FACTOR = 0.0001;
-        double i = 1-FACTOR;
-        double x = 0, y = 0;
-
-        for( ; i >= 0.0; i -= FACTOR ) {
-            x = (1.0-i)*R.get(id).second.getUX() + i*R.get(id).first.getUX();
-            y = (1.0-i)*R.get(id).second.getUY() + i*R.get(id).first.getUY();                
-            if( !temSobreposicao(x, y, R, R.get(id).third.getId()) )  
-                break;
-        }
-        i += FACTOR;
-       // System.out.println("i: "+i+", distancia: "+d);
-        x = (1.0-i)*R.get(id).second.getUX() + i*R.get(id).first.getUX();
-        y = (1.0-i)*R.get(id).second.getUY() + i*R.get(id).first.getUY();
-
-       // System.out.println("Position: (x:"+x+", y:"+y+") - (x:"+r.second.getUX()+", y:"+r.second.getUY()+")");
-        R.get(id).third.setUX(x);
-        R.get(id).third.setUY(y);
-        
-        // faz para os vizinhos até parar...
-        for( int j = 0; j < knn[id].length; ++j ) 
-            reduceKNN(knn[id][j].index, knn, R);
-    }
-    
-    private void findPosition(ArrayList<ChangeRetangulo> R, Pair[][] knn) {
-        OverlapRect[] rs = new OverlapRect[R.size()];
-        int idMinDist = 0;
-        double dist = Double.MAX_VALUE;
-        for( int i = 0; i < R.size(); ++i ) {
-            double d = Math.sqrt(Math.pow(R.get(i).first.getUX()-R.get(i).second.getUX(), 2)
-                                        +
-                        Math.pow(R.get(i).first.getUY()-R.get(i).second.getUY(), 2));
-            if( d < dist ) {
-                dist = d;
-                idMinDist = i;
-            }
-        }
-        
-        reduceKNN(idMinDist, knn, R);
-        
-        for( int j = 0; j < knn.length; ++j ) {
-            reduceKNN(j, knn, R);
-        }       
-    }
-    
     
     private void vpscJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vpscJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
@@ -1220,46 +1070,6 @@ public class Menu extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_salvarImagemJMenuItemActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        view.r3 = new RectangleVis(view.r1.getUX(), view.r1.getUY(), 30, 30, Color.red, 3);
-        
-        double d = Math.sqrt(Math.pow(view.r2.getUX()-view.r1.getUX(), 2)
-                                        +
-                             Math.pow(view.r2.getUY()-view.r1.getUY(), 2));
-        
-        view.cleanImage();
-        view.repaint();
-        
-        
-        Timer t = new Timer(menor, new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        });
-//        t.schedule(new TimerTask() {
-//            private double i = 0.0;
-//            @Override
-//            public void run() {
-//                System.out.println("Ola: "+i);
-//                
-//                double x = (1.0-i)*view.r1.getUX() + i*view.r2.getUX();
-//                double y = (1.0-i)*view.r1.getUY() + i*view.r2.getUY();
-//                view.r3.setUX(x);
-//                view.r3.setUY(y);
-//                view.cleanImage();
-//                view.repaint();
-//                i += 0.05;
-//                if( i >= 1.0 )
-//                    cancel();
-//            }
-//        }, 0, 100);
-//        
-        //Timer t = new Timer();
-       // t.schedule(null, WIDTH, WIDTH);
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
-
     private void hierarchicalClusteringJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hierarchicalClusteringJMenuItemActionPerformed
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         ArrayList<Vect> elems = new ArrayList<>();
@@ -1544,15 +1354,6 @@ public class Menu extends javax.swing.JFrame {
         Point p2 = new Point(6, 4);       
         Rectangle r = new Rectangle(3, 0, 3, 3);
         
-        
-        boolean returned = LineIntersectsRect(p1, p2, r);
-        if( returned )
-            System.out.println("This line intersects the rectangle");
-        else
-            System.out.println("This line doesn't intersect the rectangle");
-        
-        
-        
         double[][] distances = new double[rectangles.size()][rectangles.size()];
         for( int i = 0; i < distances.length; ++i )
             for( int j = 0; j < distances[0].length; ++j )
@@ -1746,6 +1547,8 @@ public class Menu extends javax.swing.JFrame {
                 
                 controller.build();                
                 controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
+                
+                view.setController(controller);
                 
                 view.cleanImage();
                 view.repaint();
@@ -2289,11 +2092,8 @@ public class Menu extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new Menu().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new Menu().setVisible(true);
         });
     }
     
@@ -2303,7 +2103,6 @@ public class Menu extends javax.swing.JFrame {
         rectangles.clear();
        
         if( view != null ) {
-            view.r1 = view.r2 = view.r3 = null;
             view.cleanImage();
             view.repaint();            
         }
@@ -3226,6 +3025,8 @@ public class Menu extends javax.swing.JFrame {
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
             
+            System.out.println("Hey, I'm paintComponent");
+            
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -3657,10 +3458,6 @@ public class Menu extends javax.swing.JFrame {
 
     }
     
-    
-    
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem affinityPropagationJMenuItem;
     private javax.swing.JMenuItem analysisJMenuItem;
@@ -3685,7 +3482,6 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu7;
     private javax.swing.JMenu jMenu8;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator10;
     private javax.swing.JPopupMenu.Separator jSeparator11;

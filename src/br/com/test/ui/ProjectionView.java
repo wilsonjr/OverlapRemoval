@@ -11,7 +11,6 @@ import br.com.explorer.explorertree.ExplorerTreeController;
 import br.com.explorer.explorertree.ExplorerTreeNode;
 import br.com.methods.overlap.prism.PRISM;
 import br.com.methods.overlap.rwordle.RWordleC;
-import br.com.methods.utils.ChangeRetangulo;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.RectangleVis;
 import br.com.methods.utils.Util;
@@ -35,14 +34,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -94,18 +90,17 @@ public class ProjectionView extends JPanel {
     private boolean hideShowNumbers = false;
     private int[] selectedRepresentatives = null;
 
-    @SuppressWarnings(value="")
     public ProjectionView(List<RectangleVis> rectangles, 
                           List<RectangleVis> afterSeamCarving, 
-                          ExplorerTreeController controller,
-                          Point2D.Double[] points) {
+                          ExplorerTreeController explorerController,
+                          Point2D.Double[] pointsProjection) {
         setBackground(Color.WHITE);
         setLayout(new FlowLayout(FlowLayout.LEFT));
         
         this.rectangles = rectangles;
         this.afterSeamCarving = afterSeamCarving;
-        this.controller = controller;
-        this.points = points;
+        this.controller = explorerController;
+        this.points = pointsProjection;
 
         addMouseWheelListener(new MouseAdapter() {
             @Override
@@ -145,7 +140,6 @@ public class ProjectionView extends JPanel {
                     lastClicked = new Point2D.Double(e.getX(), e.getY());
                     if( index != -1 ) {        
 
-                        System.out.println("Index do representativo: "+index);
                         ExplorerTreeNode node = controller.getNode(index);                            
                         if( e.isControlDown() && node.parent() != null )
                             agglomerateAnimation(index, node);                                      
@@ -167,6 +161,7 @@ public class ProjectionView extends JPanel {
 
             @Override
             public void mouseMoved(MouseEvent e) {
+                
                 if( semaphore )
                     return;
 
@@ -189,7 +184,6 @@ public class ProjectionView extends JPanel {
                         }
 
                         representativePolygon = indexDist;
-
                     } else {
                         representativePolygon = -1;
                     }
@@ -1000,8 +994,14 @@ public class ProjectionView extends JPanel {
         frame3.setVisible(true);
         
         
-        
-        
+    }
+    
+    public void setController(ExplorerTreeController controller) {
+        this.controller = controller;
+    }
+    
+    public void setPoints(Point2D.Double[] points) {
+        this.points = points;
     }
     
 }
