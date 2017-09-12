@@ -56,7 +56,7 @@ public class ProjectionView extends JPanel {
     public static final int HEXBOARD_SIZE = 20;
     public static final int RECTSIZE = 8;
     
-    private RectangleVis r1 = null, r2 = null, r3 = null;
+    
     private BufferedImage imageBuffer;
 
     private boolean semaphore = false;
@@ -85,7 +85,6 @@ public class ProjectionView extends JPanel {
     private Polygon[] diagrams = null;
     private Polygon[] intersects = null;
     
-    private List<Polygon> intersectsPolygon = new ArrayList<>();
     private List<Integer> nearest = null;
     private boolean hideShowNumbers = false;
     private int[] selectedRepresentatives = null;
@@ -303,9 +302,6 @@ public class ProjectionView extends JPanel {
 
                     cleanImage();
                     repaint();
-
-
-
             }
         });
 
@@ -376,10 +372,7 @@ public class ProjectionView extends JPanel {
             int width = 1600; // getSize().width;
             int height = 1200; // getSize().height;
             setPreferredSize(new Dimension(width, height));
-
-
-
-
+            
             this.imageBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
             java.awt.Graphics2D g2Buffer = this.imageBuffer.createGraphics();
@@ -388,8 +381,7 @@ public class ProjectionView extends JPanel {
 
             g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             ArrayList<RectangleVis> pivots = new ArrayList<>();
-            if( afterSeamCarving.isEmpty() )
-            {                
+            if( afterSeamCarving.isEmpty() ) {                
                 if( currentCluster != null && !rectangles.isEmpty() ) {
                     RainbowScale rbS = new RainbowScale();
                     int passo = 30;                        
@@ -483,21 +475,7 @@ public class ProjectionView extends JPanel {
                 g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10); 
                 System.out.print("pintando... "+r);
             });
-
-            if( r1 != null ) {
-                g2Buffer.setColor(Color.RED);
-                g2Buffer.fillRect((int)r1.getUX(), (int)r1.getUY(), 30, 30);
-            }
-
-            if( r2 != null ) {
-                g2Buffer.setColor(Color.RED);
-                g2Buffer.fillRect((int)r2.getUX(), (int)r2.getUY(), 30, 30);
-            }
-
-            if( r3 != null ) {
-                g2Buffer.setColor(Color.BLACK);
-                g2Buffer.fillRect((int)r3.getUX(), (int)r3.getUY(), 20, 20);
-            }
+         
 
             for( RectangleVis r: pivots ) {
                 g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
@@ -506,12 +484,6 @@ public class ProjectionView extends JPanel {
                 g2Buffer.setColor(Color.BLACK);
                 g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());                    
                 g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
-            }
-
-            for( Polygon p: intersectsPolygon ) {
-                g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
-                g2Buffer.setColor(Color.GREEN);
-                g2Buffer.drawPolygon(p);                    
             }
 //                
 //                if( controller != null ) {
@@ -544,28 +516,13 @@ public class ProjectionView extends JPanel {
 
                     for( int i = 0; i < representative.length; ++i ) {
 
-                        float alpha = (float)map.get(representative[i]).size()/(float)points.length;
                         Point2D.Double p = projection[representative[i]];
 
                         Polygon poly = controller.polygon(representative[i]);//getPolygon((int)r.x, (int)r.y);
                         if( poly != null ) {
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.3f));
                             g2Buffer.setColor(Color.RED); 
-                           // Shape polygon = new RoundPolygon(poly, 5);
-
-                            //g2Buffer.fill(polygon);
-
-//                                
-//                                Point2D center = new Point2D.Float((float)p.x+RECTSIZE/2, (float)p.y+RECTSIZE/2);
-//                                float radius = 40;
-//                                
-//                                Paint before = g2Buffer.getPaint();
-//                                
-//                                RadialGradientPaint paint = new RadialGradientPaint(center, radius, new float[]{.5f, 1f}, 
-//                                        new Color[]{Color.BLUE, Color.WHITE});                                
-//                                g2Buffer.setPaint(paint);                                
-//                                g2Buffer.fill(poly);
-
+                            
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.3f));
                             if( representative[i] == representativePolygon ) {
                                 Stroke before = g2Buffer.getStroke();
@@ -574,8 +531,6 @@ public class ProjectionView extends JPanel {
                                 g2Buffer.draw(poly);                                    
                                 g2Buffer.setStroke(before);
                             } else {
-
-
                                 g2Buffer.draw(poly);
                             }
 
@@ -583,10 +538,7 @@ public class ProjectionView extends JPanel {
 
                         if( movingRepresentative(representative[i]) )
                             continue;
-
-                        int size = RECTSIZE;//controller.sizeRepresentative(map.get(representative[i]).size());
-
-
+                        
                        // Point2D.Double p = controller.getPoint(representative[i]);
 
                         g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
@@ -598,28 +550,23 @@ public class ProjectionView extends JPanel {
 
 
                         float normalizedSizeCluster = (float)map.get(representative[i]).size()/maxCluster;
-                        System.out.println("normalizedCluster: "+normalizedSizeCluster);
                         int red = (int) ((255 * (normalizedSizeCluster*100))/100);
                         int green = 0;
                         int blue = (int) ((255 * (100 - normalizedSizeCluster*100)))/100;
                         Color clusterColor = new Color(red, green, blue);
 
 
-                        int sizeScale = size*2;                            
+                        int sizeScale = RECTSIZE*2;                            
                         g2Buffer.setColor(clusterColor);
-                        g2Buffer.fillOval((int)(p.x-size/2.0), (int)(p.y-size/2.0), sizeScale, sizeScale);                            
+                        g2Buffer.fillOval((int)(p.x-RECTSIZE/2.0), (int)(p.y-RECTSIZE/2.0), sizeScale, sizeScale);                            
                         g2Buffer.setColor(Color.BLACK);
-                        g2Buffer.drawOval((int)(p.x-size/2.0), (int)(p.y-size/2.0), sizeScale, sizeScale);
+                        g2Buffer.drawOval((int)(p.x-RECTSIZE/2.0), (int)(p.y-RECTSIZE/2.0), sizeScale, sizeScale);
 
 
                         g2Buffer.setColor(Color.RED);
-                        g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
+                        g2Buffer.fillOval((int)p.x, (int)p.y, RECTSIZE, RECTSIZE);
                         g2Buffer.setColor(Color.BLACK);
-                        g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
-
-
-
-
+                        g2Buffer.drawOval((int)p.x, (int)p.y, RECTSIZE, RECTSIZE);
 
                         if( hideShowNumbers ) {
                             g2Buffer.setColor(Color.BLUE);
@@ -658,23 +605,17 @@ public class ProjectionView extends JPanel {
                         g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
                     }
                 }
+                
+                
+                drawScale(g2Buffer);
 
+                if( tooltip != null ) {
+                    tooltip.draw(g2Buffer);
+                }
 
             }
 
-            /*if( clickedPolygon != null ) {
-                g2Buffer.setColor(Color.BLACK);
-                for( int i = 0; i < clickedPolygon.xpoints.length; ++i )
-                    g2Buffer.fillOval(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i], 5, 5); 
-            }*/
-
-
-
-            drawScale(g2Buffer);
-
-            if( tooltip != null ) {
-                tooltip.draw(g2Buffer);
-            }
+            
 
             g2Buffer.dispose();
 
@@ -714,12 +655,7 @@ public class ProjectionView extends JPanel {
                 min_y = y;
 
         }
-
-      /*  for( Vertex v : graph.getVertex() ) {
-            v.setX(v.getX() + zero - min_x);
-            v.setY(v.getY() + zero - min_y);
-        }*/
-
+        
         Dimension d = this.getSize();
         d.width = (int) max_x + zero;
         d.height = (int) max_y + zero;
@@ -755,8 +691,6 @@ public class ProjectionView extends JPanel {
 
         g2Buffer.drawString("min", x, y + height + spaceDescription);
         g2Buffer.drawString("max", x + width - g2Buffer.getFontMetrics().stringWidth("max"), y + height + spaceDescription);
-
-
     }
     
     
@@ -766,27 +700,18 @@ public class ProjectionView extends JPanel {
         List<OverlapRect> rects = Util.toRectangle(rectangles, indexes);
         
         double[] center0 = Util.getCenter(rects);
-        System.out.println("removeOverlap 1");
       //  PRISM prism = new PRISM(algo);
         RWordleC rwordlec = new RWordleC();
-        System.out.println("removeOverlap 2");
         
       //  Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
         Map<OverlapRect, OverlapRect> projected = rwordlec.applyAndShowTime(rects);
-        System.out.println("removeOverlap 3");
         List<OverlapRect> projectedValues = Util.getProjectedValues(projected);
-        System.out.println("removeOverlap 4");
         double[] center1 = Util.getCenter(projectedValues);
-        System.out.println("removeOverlap 5");
         double ammountX = center0[0]-center1[0];
-        System.out.println("removeOverlap 6");
         double ammountY = center0[1]-center1[1];
-        System.out.println("removeOverlap 7");
         Util.translate(projectedValues, ammountX, ammountY);        
-        System.out.println("removeOverlap 8");
         Util.normalize(projectedValues);
-        System.out.println("removeOverlap 9");
-
+     
         if( applySeamCarving )
             projectedValues = OverlapView.addSeamCarvingResult(projectedValues);
                 
