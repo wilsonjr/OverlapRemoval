@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -26,11 +27,15 @@ public class Tooltip {
     private float opacity;
     private int space = 30;
     
+    private List<Color> colors;
+    
     public Tooltip(Point2D.Double point, List<OverlapRect> projected) {
         this.point = point;
         this.projected = projected;
         adjustPanel();
     }
+    
+    
     
     public void draw(Graphics2D g2) {
         
@@ -40,19 +45,30 @@ public class Tooltip {
        // g2.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.6f));
         g2.setColor(Color.BLACK);
         g2.draw(rect);
-        g2.setColor(Color.BLUE);
+               
+        Iterator<Color> itColors = colors.iterator();
         
-        projected.stream().forEach((p)-> {
+        projected.stream().forEach((p) -> {
+            g2.setColor(Color.BLUE);
+                        
+            if( itColors.hasNext() )
+                g2.setColor(itColors.next());
             
             int x = (int) ((p.getUX()+ammountx) - rect.getWidth()/2);
             int y = (int) p.getUY()+ammounty+space/2;
             
             g2.fillOval(x, y, (int)p.getWidth(), (int)p.getHeight());
+            g2.setColor(Color.BLACK);
+            g2.drawOval(x, y, (int)p.getWidth(), (int)p.getHeight());
         
         });
-        
-        
     }
+    
+    public void setColors(List<Color> colors) {
+        this.colors = colors;
+    }
+    
+    
     public void setOpacity(float opacity) {
         this.opacity = opacity;
     }
