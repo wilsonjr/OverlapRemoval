@@ -46,12 +46,12 @@ public class Tooltip {
         g2.setColor(Color.BLACK);
         g2.draw(rect);
                
-        Iterator<Color> itColors = colors.iterator();
+        Iterator<Color> itColors = colors != null ? colors.iterator() : null;
         
         projected.stream().forEach((p) -> {
             g2.setColor(Color.BLUE);
                         
-            if( itColors.hasNext() )
+            if( itColors != null && itColors.hasNext() )
                 g2.setColor(itColors.next());
             
             int x = (int) ((p.getUX()+ammountx) - rect.getWidth()/2);

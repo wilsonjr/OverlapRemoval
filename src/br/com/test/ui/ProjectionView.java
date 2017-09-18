@@ -25,6 +25,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
@@ -32,7 +33,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +55,10 @@ import nmap.NMap;
  * @author Windows
  */
 public class ProjectionView extends JPanel {
+    private double zoom = 1.0;
+    private double currentZoomX = 0.0;
+    private double currentZoomY = 0.0;
+    /*********************************************************/
     
     public static final int HEXBOARD_SIZE = 20;
     public static final int RECTSIZE = 8;
@@ -104,7 +111,13 @@ public class ProjectionView extends JPanel {
         addMouseWheelListener(new MouseAdapter() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                if( semaphore )
+                
+                if( e.getWheelRotation() > 0 )
+                    zoomElements(0.9091f, e.getPoint());
+                else
+                    zoomElements(1.1f, e.getPoint());
+                
+                /*if( semaphore )
                     return;                        
 
                 int notches = e.getWheelRotation();                    
@@ -124,7 +137,7 @@ public class ProjectionView extends JPanel {
                             repaint();
                         }                                
                     } 
-                }
+                }*/
             }
         });
 
@@ -142,9 +155,10 @@ public class ProjectionView extends JPanel {
                         ExplorerTreeNode node = controller.getNode(index);                            
                         if( e.isControlDown() && node.parent() != null )
                             agglomerateAnimation(index, node);                                      
-                        else if( !node.children().isEmpty() )
+                        else if( !node.children().isEmpty() ) {
                             expandAnimation(index, e);
-                        else if( node.children().isEmpty() ) {    
+                            zoomElements(1.5f, e.getPoint(), controller);
+                        } else if( node.children().isEmpty() ) {    
                             semaphore = false;
                             removeSubsetOverlap(controller.nearest().get(index), index);
                             cleanImage();
@@ -157,7 +171,7 @@ public class ProjectionView extends JPanel {
         }); 
 
         addMouseMotionListener(new MouseAdapter() {
-
+            
             @Override
             public void mouseMoved(MouseEvent e) {
                 
@@ -267,7 +281,7 @@ public class ProjectionView extends JPanel {
         });
 
     }
-
+    
     private void agglomerateAnimation(int index, ExplorerTreeNode node) {
 
         semaphore = true;
@@ -353,6 +367,137 @@ public class ProjectionView extends JPanel {
     public BufferedImage getImage() {
         return imageBuffer;
     }
+    
+    private void zoomElements(float rate, Point u) {
+        if (rectangles != null) {
+
+            double maxX = rectangles.get(0).getUX();
+            double minX = rectangles.get(0).getUX();
+            double maxY = rectangles.get(0).getUY();
+            double minY = rectangles.get(0).getUY();
+
+            //Encontra o maior e menor valores para X e Y
+            for (RectangleVis v : rectangles) {
+                if (maxX < v.getUX()) {
+                    maxX = v.getUX();
+                } else if (minX > v.getUX()) {
+                    minX = v.getUX();
+                }
+
+                if (maxY < v.getUY()) {
+                    maxY = v.getUY();
+                } else if (minY > v.getUY()) {
+                    minY = v.getUY();
+                }
+                
+            }
+
+            double endX = maxX * rate;
+            double endY = maxY * rate;
+
+            //Normalizo
+            for (RectangleVis v : rectangles) {
+                if (maxX != minX) {
+                    v.setUX((((v.getX() - minX) / (maxX - minX)) * (endX - minX)) + minX);
+                } else {
+                    v.setUX(minX);
+                }
+
+                if (maxY != minY) {
+                    v.setUY(((((v.getY() - minY) / (maxY - minY)) * (endY - minY)) + minY));
+                } else {
+                    v.setUY(minY);
+                }
+            }
+            
+            Point v = new Point((int)((((u.x - minX) / (maxX - minX)) * (endX - minX)) + minX), 
+                                (int)((((u.y - minY) / (maxY - minY)) * (endY - minY)) + minY));
+            
+            int dx = v.x-u.x;
+            int dy = v.y-u.y;
+            
+            for (RectangleVis vertex : rectangles) {                
+                vertex.setUX(vertex.getUX()-dx);
+                vertex.setUY(vertex.getUY()-dy);
+            }
+            
+            
+
+            //Change the size of the panel according to the graph
+            setPreferredSize(new Dimension(sizeGraph().getSize().width * 2, sizeGraph().getSize().height * 2));
+            setSize(new Dimension(sizeGraph().getSize().width * 2, sizeGraph().getSize().height * 2));
+
+            cleanImage();
+            repaint();
+        }
+    }
+    
+    private void zoomElements(float rate, Point u, ExplorerTreeController controller) {
+        if (controller != null) {
+            
+            int[] representative = controller.representative();
+            Point2D.Double[] projection = controller.projection();
+
+            double maxX = projection[representative[0]].x;
+            double minX = projection[representative[0]].x;
+            double maxY = projection[representative[0]].y;
+            double minY = projection[representative[0]].y;
+
+            //Encontra o maior e menor valores para X e Y
+            for( int i = 0; i < representative.length; ++i ) {
+                Point2D.Double p = projection[representative[i]];
+                if (maxX < p.x) {
+                    maxX = p.x;
+                } else if (minX > p.x) {
+                    minX = p.x;
+                }
+
+                if (maxY < p.y) {
+                    maxY = p.y;
+                } else if (minY > p.y) {
+                    minY = p.y;
+                }
+            }
+
+            double endX = maxX * rate;
+            double endY = maxY * rate;
+
+            //Normalizo
+            for( int i = 0; i < representative.length; ++i ) {
+                Point2D.Double p = projection[representative[i]];
+                if (maxX != minX) {
+                    p.x = (((p.x - minX) / (maxX - minX)) * (endX - minX)) + minX;
+                } else {
+                    p.x = minX;
+                }
+
+                if (maxY != minY) {
+                    p.y = (((p.y - minY) / (maxY - minY)) * (endY - minY)) + minY;
+                } else {
+                    p.y = minY;
+                }
+            }
+            
+            Point v = new Point((int)((((u.x - minX) / (maxX - minX)) * (endX - minX)) + minX), 
+                                (int)((((u.y - minY) / (maxY - minY)) * (endY - minY)) + minY));
+            
+            int dx = v.x-u.x;
+            int dy = v.y-u.y;
+            
+            for( int i = 0; i < representative.length; ++i ) {
+                Point2D.Double p = projection[representative[i]];
+                p.x = p.x-dx;
+                p.y = p.y-dy;
+            }
+            
+            //Change the size of the panel according to the graph
+            setPreferredSize(new Dimension(sizeGraph().getSize().width * 2, sizeGraph().getSize().height * 2));
+            setSize(new Dimension(sizeGraph().getSize().width * 2, sizeGraph().getSize().height * 2));
+
+            cleanImage();
+            repaint();
+        }
+    }
 
 
     @Override
@@ -369,16 +514,15 @@ public class ProjectionView extends JPanel {
 
         if( imageBuffer == null ) {
             adjustPanel();
-            int width = 1600; // getSize().width;
-            int height = 1200; // getSize().height;
-            setPreferredSize(new Dimension(width, height));
+            int width = getSize().width;
+            int height = getSize().height;
             
             this.imageBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
             java.awt.Graphics2D g2Buffer = this.imageBuffer.createGraphics();
             g2Buffer.setColor(this.getBackground());
             g2Buffer.fillRect(0, 0, width, height);
-
+       
             g2Buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             ArrayList<RectangleVis> pivots = new ArrayList<>();
             if( afterSeamCarving.isEmpty() ) {                
@@ -511,7 +655,6 @@ public class ProjectionView extends JPanel {
                  //  Util.paintSphere(centerPoints, selectedRepresentatives, hashRepresentative, g2Buffer);
                     int[] representative = controller.representative();
                     Map<Integer, List<Integer>> map = controller.nearest();
-                    Point2D.Double[] projectionCenter = controller.projectionCenter();
                     Point2D.Double[] projection = controller.projection();
 
                     for( int i = 0; i < representative.length; ++i ) {
@@ -598,11 +741,11 @@ public class ProjectionView extends JPanel {
                         Point2D.Double p = toDraw.get(i);
                         g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
                         int index = movingIndexes.get(j--);
-                        int size = controller.sizeRepresentative(controller.nearest().get(index).size());
+                        int sizeint = controller.sizeRepresentative(controller.nearest().get(index).size());
                         g2Buffer.setColor(Color.RED);
-                        g2Buffer.fillOval((int)p.x, (int)p.y, size, size);
+                        g2Buffer.fillOval((int)p.x, (int)p.y, sizeint, sizeint);
                         g2Buffer.setColor(Color.BLACK);
-                        g2Buffer.drawOval((int)p.x, (int)p.y, size, size);
+                        g2Buffer.drawOval((int)p.x, (int)p.y, sizeint, sizeint);
                     }
                 }
                 
@@ -614,7 +757,9 @@ public class ProjectionView extends JPanel {
                 }
 
             }
-
+            
+            
+            
             
 
             g2Buffer.dispose();
@@ -629,6 +774,38 @@ public class ProjectionView extends JPanel {
 
     public void cleanImage() {
         this.imageBuffer = null;
+    }
+    
+    public Dimension sizeGraph() {
+        if( rectangles == null || rectangles.isEmpty() )
+            return null; 
+
+        double iniX = rectangles.get(0).getCenterX();
+        double iniY = rectangles.get(0).getCenterY();
+        double max_x = iniX, max_y = iniX;
+        double min_x = iniY, min_y = iniY;
+        int zero = 100;//graph.getVertex().get(0).getRay() * 5 + 10;
+
+        for( int i = 1; i < rectangles.size(); i++ ) {
+            double x = rectangles.get(i).getCenterX();
+            if (max_x < x)
+                max_x = x;
+            else if (min_x > x)
+                min_x = x;
+
+            double y = rectangles.get(i).getCenterY();
+            if (max_y < y)
+                max_y = y;
+            else if (min_y > y)
+                min_y = y;
+
+        }
+        
+        Dimension d = this.getSize();
+        d.width = (int) max_x + zero;
+        d.height = (int) max_y + zero;
+        
+        return d;
     }
 
     public void adjustPanel() {
