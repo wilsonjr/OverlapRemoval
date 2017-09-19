@@ -57,7 +57,7 @@ public class ExplorerTree {
     
     private void createLevelOne() {
         
-        // execute algorithm and retrieve representative
+        // execute algorithm and retrieve getRepresentative
         _representativeAlgorithm.execute();
         int[] levelOneRepresentatives = _representativeAlgorithm.getRepresentatives();
         
@@ -79,23 +79,23 @@ public class ExplorerTree {
         map = Util.createIndex2(levelOneRepresentatives, _projection);
         
         
-        // for each representative
+        // for each getRepresentative
         _topNodes = new ArrayList<>();
         
         map.entrySet().forEach((item) -> {
             int representative = item.getKey();
-            // get the indexes of the elements that it represents
+            // get the getIndexes of the elements that it represents
             List<Integer> indexes = item.getValue();
             System.out.println(representative+" >> "+indexes.size());
             
             
             Point2D.Double[] points = new Point2D.Double[indexes.size()];
 
-            // create subprojection 
+            // create getSubprojection 
             for( int j = 0; j < points.length; ++j )
                 points[j] = new Point2D.Double(_projection[indexes.get(j)].x, _projection[indexes.get(j)].y);           
 
-            // do the same to each subprojection
+            // do the same to each getSubprojection
             _topNodes.add(new ExplorerTreeNode(_minChildren, _distinctionDistance, representative, points,
                     indexes.stream().mapToInt((Integer value)->value).toArray(), _representativeAlgorithm, null));
         });        
@@ -113,7 +113,7 @@ public class ExplorerTree {
     public void buildActiveNodes() {
         _activeNodes = new HashMap<>();
         for( int i = 0; i < _topNodes.size(); ++i )
-            _activeNodes.put(_topNodes.get(i).routing(), _topNodes.get(i));
+            _activeNodes.put(_topNodes.get(i).getRouting(), _topNodes.get(i));
         
     }
     
@@ -122,14 +122,14 @@ public class ExplorerTree {
         node.setPolygon(polygon);
         _activeNodes.remove(index);
         
-        node.children().stream().forEach((ExplorerTreeNode value) -> { _activeNodes.put(value.routing(), value); });        
+        node.getChildren().stream().forEach((ExplorerTreeNode value) -> { _activeNodes.put(value.getRouting(), value); });        
     }
     
-    public Map<Integer, ExplorerTreeNode> activeNodes() {
+    public Map<Integer, ExplorerTreeNode> getActiveNodes() {
         return _activeNodes;
     }
     
-    public List<ExplorerTreeNode> topNodes() {
+    public List<ExplorerTreeNode> getTopNodes() {
         return _topNodes;
     }
     
@@ -175,15 +175,57 @@ public class ExplorerTree {
        
        toRemove.stream().forEach((Integer value)->_activeNodes.remove(value));
         
-       _activeNodes.put(parent.routing(), parent);
+       _activeNodes.put(parent.getRouting(), parent);
        
        return toRemove;
 
     }
     
     
-    public Point2D.Double[] projection() {
-        return projection();
+    public Point2D.Double[] getProjection() {
+        return _projection;
     }
+
+    public List<Polygon> getTopTesselation() {
+        return _topTesselation;
+    }
+
+    public void setTopTesselation(List<Polygon> _topTesselation) {
+        this._topTesselation = _topTesselation;
+    }
+
+    public RepresentativeFinder representativeAlgorithm() {
+        return _representativeAlgorithm;
+    }
+
+    public int getDistinctionDistance() {
+        return _distinctionDistance;
+    }
+
+    public void setDistinctionDistance(int _distinctionDistance) {
+        this._distinctionDistance = _distinctionDistance;
+    }
+
+    public int getMinChildren() {
+        return _minChildren;
+    }
+
+    public void setMinChildren(int _minChildren) {
+        this._minChildren = _minChildren;
+    }
+
+    public void setTopNodes(List<ExplorerTreeNode> _topNodes) {
+        this._topNodes = _topNodes;
+    }
+
+    public void setProjection(Point2D.Double[] _projection) {
+        this._projection = _projection;
+    }
+
+    public void setActiveNodes(Map<Integer, ExplorerTreeNode> _activeNodes) {
+        this._activeNodes = _activeNodes;
+    }
+    
+    
     
 }

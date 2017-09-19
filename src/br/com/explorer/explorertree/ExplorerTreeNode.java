@@ -31,21 +31,21 @@ public class ExplorerTreeNode {
     
     public static int nodeCount = 0;
     
-    private final ExplorerTreeNode _parent;
+    private ExplorerTreeNode _parent;
     
-    private final List<ExplorerTreeNode> _children;
+    private List<ExplorerTreeNode> _children;
     
-    private final Point2D.Double[] _subprojection;
+    private Point2D.Double[] _subprojection;
     
-    private final int[] _indexes;
+    private int[] _indexes;
     
-    private final int _distinctionDistance;
-    private final int _routing;
-    private final int _minChildren;
+    private int _distinctionDistance;
+    private int _routing;
+    private int _minChildren;
     
-    private final double _lowerBound = 60.0/100.0;
+    private double _lowerBound = 60.0/100.0;
    
-    private final RepresentativeFinder _representativeAlgorithm;
+    private RepresentativeFinder _representativeAlgorithm;
     
     private Polygon _polygon;
     
@@ -72,11 +72,11 @@ public class ExplorerTreeNode {
         if( _indexes.length < 2.*_lowerBound*_minChildren ) // this node can represent its set of instances
             return;
         
-        // in order to apply the representative selection to the subprojection, we need to filter the elements so that the
-        // algorithm can be applied on the subprojection
+        // in order to apply the getRepresentative selection to the getSubprojection, we need to filter the elements so that the
+        // algorithm can be applied on the getSubprojection
         _representativeAlgorithm.filterData(_indexes);
         
-        // execute algorithm and retrieve representative
+        // execute algorithm and retrieve getRepresentative
         _representativeAlgorithm.execute();
         int[] nthLevelRepresentatives = _representativeAlgorithm.getRepresentatives();
         if( nthLevelRepresentatives.length > 0 ) {
@@ -119,21 +119,21 @@ public class ExplorerTreeNode {
             }
             
             
-            // store the nearest neighbors for each representative
+            // store the nearest neighbors for each getRepresentative
             map = Util.createIndex2(nthLevelRepresentatives, _subprojection);             
             
             map.entrySet().forEach((item)-> {
                 int representative = item.getKey();
-                // get the indexes of the elements that it represents
+                // get the getIndexes of the elements that it represents
                 List<Integer> indexesChildren = item.getValue();
                
                 Point2D.Double[] points = new Point2D.Double[indexesChildren.size()];
 
-                // create subprojection 
+                // create getSubprojection 
                 for( int j = 0; j < points.length; ++j )
                     points[j] = new Point2D.Double(_subprojection[indexesChildren.get(j)].x, _subprojection[indexesChildren.get(j)].y);
 
-                // continue to the further children, we must always pass original indexes
+                // continue to the further getChildren, we must always pass original getIndexes
                 _children.add(new ExplorerTreeNode(_minChildren, _distinctionDistance, _indexes[representative], points, 
                         indexesChildren.stream().mapToInt((Integer i)->_indexes[i]).toArray(),
                         _representativeAlgorithm, this)); 
@@ -187,15 +187,15 @@ public class ExplorerTreeNode {
             _children.get(i).print("\t"+identation);
     }
     
-    public int routing() {
+    public int getRouting() {
         return _routing;
     }
     
-    public List<ExplorerTreeNode> children() {
+    public List<ExplorerTreeNode> getChildren() {
         return _children;
     }
     
-    public int[] indexes() {
+    public int[] getIndexes() {
         return _indexes;
     }
     
@@ -511,11 +511,11 @@ public class ExplorerTreeNode {
         return distances.stream().min(Double::compareTo).get();
     }
 
-    public ExplorerTreeNode parent() {
+    public ExplorerTreeNode getParent() {
         return _parent;
     }
     
-    public Polygon polygon() {
+    public Polygon getPolygon() {
         return _polygon;
     }
 
@@ -529,7 +529,7 @@ public class ExplorerTreeNode {
         while( node != null ) {            
             if( parent == node )
                 return true;
-            node = node.parent();
+            node = node.getParent();
         }
         
         return false;
@@ -544,7 +544,7 @@ public class ExplorerTreeNode {
         return _subprojection[_routing];
     }
 
-    public Point2D.Double[] subprojection() {
+    public Point2D.Double[] getSubprojection() {
         return _subprojection;
     }
     
@@ -582,7 +582,7 @@ public class ExplorerTreeNode {
     }
     
     
-    public int representative(Point2D.Double[] projection) {
+    public int getRepresentative(Point2D.Double[] projection) {
         
         for( int i = 0; i < _subprojection.length; ++i ) {
             if( projection[_routing].equals(_subprojection[i]) )
@@ -591,5 +591,27 @@ public class ExplorerTreeNode {
         
         return -1;        
     }
+
+    public static int getNodeCount() {
+        return nodeCount;
+    }
+
+    public static void setNodeCount(int nodeCount) {
+        ExplorerTreeNode.nodeCount = nodeCount;
+    }
+
+    public int getDistinctionDistance() {
+        return _distinctionDistance;
+    }
+
+    public int getMinChildren() {
+        return _minChildren;
+    }
+
+    public double getLowerBound() {
+        return _lowerBound;
+    }
+ 
+    
     
 }

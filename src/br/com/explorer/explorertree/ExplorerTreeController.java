@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import math.geom2d.polygon.SimplePolygon2D;
 
 /**
  *
@@ -24,9 +23,9 @@ import math.geom2d.polygon.SimplePolygon2D;
 public class ExplorerTreeController {
 
     private ExplorerTree _explorerTree;
-    private final int _minInstances;
-    private final RepresentativeFinder _representativeSelection;
-    private final int _sizeInstances;
+    private int _minInstances;
+    private RepresentativeFinder _representativeSelection;
+    private int _sizeInstances;
     private int _distinctionDistance;
     private Point2D.Double[] _projection;
     private Point2D.Double[] _projectionCenter;
@@ -61,7 +60,7 @@ public class ExplorerTreeController {
         this._projectionCenter = _projectionCenter;
     }
 
-    public ExplorerTree explorerTree() {
+    public ExplorerTree getExplorerTree() {
         return _explorerTree;
     }
 
@@ -69,7 +68,7 @@ public class ExplorerTreeController {
         return _minInstances;
     }
 
-    public RepresentativeFinder getRepresentativeSelection() {
+    public RepresentativeFinder representativeSelection() {
         return _representativeSelection;
     }
 
@@ -84,12 +83,12 @@ public class ExplorerTreeController {
         _explorerTree.build();
         _explorerTree.buildActiveNodes();
 
-        _representative = _explorerTree.topNodes().stream().mapToInt((node) -> node.routing()).toArray();
+        _representative = _explorerTree.getTopNodes().stream().mapToInt((node) -> node.getRouting()).toArray();
 
-        _explorerTree.topNodes().stream().forEach((node) -> {
+        _explorerTree.getTopNodes().stream().forEach((node) -> {
             List<Integer> nearest = new ArrayList<>();
-            Arrays.stream(node.indexes()).forEach((v) -> nearest.add(v));
-            _nearest.put(node.routing(), nearest);
+            Arrays.stream(node.getIndexes()).forEach((v) -> nearest.add(v));
+            _nearest.put(node.getRouting(), nearest);
         });
 
     }
@@ -154,7 +153,7 @@ public class ExplorerTreeController {
         return (int) (3.0 * Math.sqrt(size));
     }
 
-    public int indexRepresentative(double x, double y) {
+    public int getIndexRepresentative(double x, double y) {
         int index = -1;
 
         for (int i = 0; i < _representative.length; ++i) {
@@ -162,7 +161,7 @@ public class ExplorerTreeController {
             double cy = _projectionCenter[_representative[i]].y;
             if( Util.euclideanDistance(x, y, cx, cy) < _sizeInstances ) {
                 
-                //sizeRepresentative(nearest().get(_representative[i]).size())
+                //sizeRepresentative(getNearest().get(_representative[i]).size())
                 index = _representative[i];
                 break;
             }
@@ -172,10 +171,10 @@ public class ExplorerTreeController {
     }
 
     public ExplorerTreeNode getNode(int index) {
-        return _explorerTree.activeNodes().get(index);
+        return _explorerTree.getActiveNodes().get(index);
     }
 
-    public Polygon clickedPolygon(double x, double y) {
+    public Polygon getClickedPolygon(double x, double y) {
         Polygon clickedPolygon = null;
 
         for( Polygon p : _polygons ) {            
@@ -187,10 +186,10 @@ public class ExplorerTreeController {
     }
 
     public int expandNode(int index, Polygon clickedPolygon) {
-        ExplorerTreeNode node = _explorerTree.activeNodes().get(index);
+        ExplorerTreeNode node = _explorerTree.getActiveNodes().get(index);
 
         _explorerTree.expandNode(index, clickedPolygon);
-        int[] reps = new int[node.children().size() + _representative.length - 1];
+        int[] reps = new int[node.getChildren().size() + _representative.length - 1];
 
         int j = 0;
         for (int i = 0; i < _representative.length; ++i) {
@@ -201,16 +200,16 @@ public class ExplorerTreeController {
 
         int indexNewRepresentative = j;
 
-        for (ExplorerTreeNode n : node.children()) {
-            reps[j++] = n.routing();
+        for (ExplorerTreeNode n : node.getChildren()) {
+            reps[j++] = n.getRouting();
         }
 
         _representative = Arrays.copyOf(reps, reps.length);
 
-        for (ExplorerTreeNode n : node.children()) {
+        for (ExplorerTreeNode n : node.getChildren()) {
             List<Integer> nearest = new ArrayList<>();
-            Arrays.stream(n.indexes()).forEach((i) -> nearest.add(i));
-            _nearest.put(n.routing(), nearest);
+            Arrays.stream(n.getIndexes()).forEach((i) -> nearest.add(i));
+            _nearest.put(n.getRouting(), nearest);
         }
 
         _polygons.remove(clickedPolygon);
@@ -219,8 +218,8 @@ public class ExplorerTreeController {
 
     public List<Integer> agglomerateNode(int index) {
 
-        ExplorerTreeNode node = _explorerTree.activeNodes().get(index);
-        ExplorerTreeNode parent = node.parent();
+        ExplorerTreeNode node = _explorerTree.getActiveNodes().get(index);
+        ExplorerTreeNode parent = node.getParent();
 
         List<Integer> indexes = _explorerTree.filterNodes(parent);
         for (Integer v : indexes) {
@@ -236,36 +235,36 @@ public class ExplorerTreeController {
                 reps[j++] = _representative[i];
             }
         }
-        reps[j] = parent.routing();
+        reps[j] = parent.getRouting();
 
         _representative = Arrays.copyOf(reps, reps.length);
-        _polygons.add(parent.polygon());
+        _polygons.add(parent.getPolygon());
 
         return indexes;
     }
 
-    public int[] representative() {
+    public int[] getRepresentative() {
         return _representative;
     }
 
-    public Map<Integer, List<Integer>> nearest() {
+    public Map<Integer, List<Integer>> getNearest() {
         return _nearest;
     }
 
-    public Point2D.Double[] projectionCenter() {
+    public Point2D.Double[] getProjectionCenter() {
         return _projectionCenter;
     }
 
-    public Point2D.Double[] projection() {
+    public Point2D.Double[] getProjection() {
         return _projection;
     }
 
-    public Polygon polygon(int index) {
+    public Polygon getPolygon(int index) {
         return _pointPolygon.get(getNode(index));
     }
 
     public List<Integer> expandNode(int index, int x, int y, int width, int height) {
-        Polygon polygon = clickedPolygon(x, y);
+        Polygon polygon = getClickedPolygon(x, y);
         int indexNew = expandNode(index, polygon);
         return updateDiagram(width, height, indexNew, polygon);
     }
@@ -280,5 +279,43 @@ public class ExplorerTreeController {
 
         return a * Math.cos(period * distance) + q;
     }
+
+    public int getSizeInstances() {
+        return _sizeInstances;
+    }
+
+    public List<Polygon> getPolygons() {
+        return _polygons;
+    }
+
+    public Map<ExplorerTreeNode, Polygon> getPointPolygon() {
+        return _pointPolygon;
+    }
+
+    public void setExplorerTree(ExplorerTree _explorerTree) {
+        this._explorerTree = _explorerTree;
+    }
+
+    public void setDistinctionDistance(int _distinctionDistance) {
+        this._distinctionDistance = _distinctionDistance;
+    }
+
+    public void setRepresentative(int[] _representative) {
+        this._representative = _representative;
+    }
+
+    public void setNearest(Map<Integer, List<Integer>> _nearest) {
+        this._nearest = _nearest;
+    }
+
+    public void setPolygons(List<Polygon> _polygons) {
+        this._polygons = _polygons;
+    }
+
+    public void setPointPolygon(Map<ExplorerTreeNode, Polygon> _pointPolygon) {
+        this._pointPolygon = _pointPolygon;
+    }
+    
+    
 
 }

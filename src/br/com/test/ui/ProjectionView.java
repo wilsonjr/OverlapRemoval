@@ -121,18 +121,18 @@ public class ProjectionView extends JPanel {
                     return;                        
 
                 int notches = e.getWheelRotation();                    
-                if( controller != null && controller.representative() != null && controller.nearest() != null ) {
-                    int index = controller.indexRepresentative(e.getX(), e.getY());
+                if( controller != null && controller.getRepresentative() != null && controller.getNearest() != null ) {
+                    int index = controller.getIndexRepresentative(e.getX(), e.getY());
 
                     if( index != -1 ) {  
                         ExplorerTreeNode node = controller.getNode(index);                            
-                        if( notches > 0 && node.parent() != null )
+                        if( notches > 0 && node.getParent() != null )
                             agglomerateAnimation(index, node);
-                        else if( notches < 0 && !node.children().isEmpty() )
+                        else if( notches < 0 && !node.getChildren().isEmpty() )
                             expandAnimation(index, e);
-                        else if( notches < 0 && node.children().isEmpty() ) {
+                        else if( notches < 0 && node.getChildren().isEmpty() ) {
                             semaphore = false;                                
-                            removeSubsetOverlap(controller.nearest().get(index), index);
+                            removeSubsetOverlap(controller.getNearest().get(index), index);
                             cleanImage();
                             repaint();
                         }                                
@@ -146,21 +146,21 @@ public class ProjectionView extends JPanel {
             public void mousePressed(MouseEvent e) {
                 if( semaphore )
                     return;
-                if( controller != null && controller.representative() != null && controller.nearest() != null ) {
-                    int index = controller.indexRepresentative(e.getX(), e.getY());
+                if( controller != null && controller.getRepresentative() != null && controller.getNearest() != null ) {
+                    int index = controller.getIndexRepresentative(e.getX(), e.getY());
 
                     lastClicked = new Point2D.Double(e.getX(), e.getY());
                     if( index != -1 ) {        
 
                         ExplorerTreeNode node = controller.getNode(index);                            
-                        if( e.isControlDown() && node.parent() != null )
+                        if( e.isControlDown() && node.getParent() != null )
                             agglomerateAnimation(index, node);                                      
-                        else if( !node.children().isEmpty() ) {
+                        else if( !node.getChildren().isEmpty() ) {
                             expandAnimation(index, e);
                             zoomElements(1.5f, e.getPoint(), controller);
-                        } else if( node.children().isEmpty() ) {    
+                        } else if( node.getChildren().isEmpty() ) {    
                             semaphore = false;
-                            removeSubsetOverlap(controller.nearest().get(index), index);
+                            removeSubsetOverlap(controller.getNearest().get(index), index);
                             cleanImage();
                             repaint();
                         }
@@ -178,21 +178,21 @@ public class ProjectionView extends JPanel {
                 if( semaphore )
                     return;
 
-                if( controller != null && controller.representative() != null && controller.nearest() != null ) {                        
+                if( controller != null && controller.getRepresentative() != null && controller.getNearest() != null ) {                        
 
-                    Polygon polygon = controller.clickedPolygon(e.getX(), e.getY());                        
+                    Polygon polygon = controller.getClickedPolygon(e.getX(), e.getY());                        
                     if( polygon != null ) {
                         double dist = Double.MAX_VALUE;
                         int indexDist = 0;
 
-                        for( int i = 0; i < controller.representative().length; ++i ) {
+                        for( int i = 0; i < controller.getRepresentative().length; ++i ) {
 
                             double d = Util.euclideanDistance(e.getX(), e.getY(), 
-                                    points[controller.representative()[i]].x, points[controller.representative()[i]].y);
+                                    points[controller.getRepresentative()[i]].x, points[controller.getRepresentative()[i]].y);
 
                             if( d < dist ) {
                                 dist = d;
-                                indexDist = controller.representative()[i];
+                                indexDist = controller.getRepresentative()[i];
                             }
                         }
 
@@ -205,16 +205,16 @@ public class ProjectionView extends JPanel {
                     repaint();
 
 
-                    int index = controller.indexRepresentative(e.getX(), e.getY());
+                    int index = controller.getIndexRepresentative(e.getX(), e.getY());
                     if( index != -1 ) {
 
                         if( tooltip != null )
                             return;
 
                         ExplorerTreeNode node = controller.getNode(index);                            
-                        if( node.children().isEmpty() ) {  
+                        if( node.getChildren().isEmpty() ) {  
                             semaphore = true;
-                            List<OverlapRect> projection = removeOverlap(controller.nearest().get(index));
+                            List<OverlapRect> projection = removeOverlap(controller.getNearest().get(index));
                             tooltip = new Tooltip(new Point2D.Double(e.getX(), e.getY()), projection);
                             timerTooltip = new Timer(0, new ActionListener() {
                                 private float opacity = 0;
@@ -286,7 +286,7 @@ public class ProjectionView extends JPanel {
 
         semaphore = true;
         movingIndexes = controller.agglomerateNode(index);
-        parentMoving = node.parent().routing();
+        parentMoving = node.getParent().getRouting();
         timer = new Timer(0, new ActionListener() {
             private double i = 0;
 
@@ -295,10 +295,10 @@ public class ProjectionView extends JPanel {
 
                     for( int j = 0; j < movingIndexes.size(); ++j) {
                         int v = movingIndexes.get(j);
-                        double x = (1.0-i)*controller.projection()[v].x +
-                                i*controller.projection()[parentMoving].x;
-                        double y = (1.0-i)*controller.projection()[v].y +
-                                i*controller.projection()[parentMoving].y;
+                        double x = (1.0-i)*controller.getProjection()[v].x +
+                                i*controller.getProjection()[parentMoving].x;
+                        double y = (1.0-i)*controller.getProjection()[v].y +
+                                i*controller.getProjection()[parentMoving].y;
 
                         toDraw.add(new Point2D.Double(x, y));
 
@@ -335,8 +335,8 @@ public class ProjectionView extends JPanel {
 
                     for( int j = 0; j < movingIndexes.size(); ++j) {
                         int v = movingIndexes.get(j);
-                        double x = (1.0-i)*controller.projection()[index].x + i*controller.projection()[v].x;
-                        double y = (1.0-i)*controller.projection()[index].y + i*controller.projection()[v].y;
+                        double x = (1.0-i)*controller.getProjection()[index].x + i*controller.getProjection()[v].x;
+                        double y = (1.0-i)*controller.getProjection()[index].y + i*controller.getProjection()[v].y;
 
                         toDraw.add(new Point2D.Double(x, y));
 
@@ -435,8 +435,8 @@ public class ProjectionView extends JPanel {
     private void zoomElements(float rate, Point u, ExplorerTreeController controller) {
         if (controller != null) {
             
-            int[] representative = controller.representative();
-            Point2D.Double[] projection = controller.projection();
+            int[] representative = controller.getRepresentative();
+            Point2D.Double[] projection = controller.getProjection();
 
             double maxX = projection[representative[0]].x;
             double minX = projection[representative[0]].x;
@@ -648,20 +648,20 @@ public class ProjectionView extends JPanel {
 //                    }
 //                }
 
-            if( selectedRepresentatives != null || controller !=  null && controller.representative() != null ) {
+            if( selectedRepresentatives != null || controller !=  null && controller.getRepresentative() != null ) {
 
-                if( controller != null && controller.nearest() != null ) {
+                if( controller != null && controller.getNearest() != null ) {
 
                  //  Util.paintSphere(centerPoints, selectedRepresentatives, hashRepresentative, g2Buffer);
-                    int[] representative = controller.representative();
-                    Map<Integer, List<Integer>> map = controller.nearest();
-                    Point2D.Double[] projection = controller.projection();
+                    int[] representative = controller.getRepresentative();
+                    Map<Integer, List<Integer>> map = controller.getNearest();
+                    Point2D.Double[] projection = controller.getProjection();
 
                     for( int i = 0; i < representative.length; ++i ) {
 
                         Point2D.Double p = projection[representative[i]];
 
-                        Polygon poly = controller.polygon(representative[i]);//getPolygon((int)r.x, (int)r.y);
+                        Polygon poly = controller.getPolygon(representative[i]);//getPolygon((int)r.x, (int)r.y);
                         if( poly != null ) {
                             g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.3f));
                             g2Buffer.setColor(Color.RED); 
@@ -682,7 +682,7 @@ public class ProjectionView extends JPanel {
                         if( movingRepresentative(representative[i]) )
                             continue;
                         
-                       // Point2D.Double p = controller.getPoint(representative[i]);
+                       // Point2D.Double p = controller.getPoint(getRepresentative[i]);
 
                         g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
 
@@ -741,7 +741,7 @@ public class ProjectionView extends JPanel {
                         Point2D.Double p = toDraw.get(i);
                         g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
                         int index = movingIndexes.get(j--);
-                        int sizeint = controller.sizeRepresentative(controller.nearest().get(index).size());
+                        int sizeint = controller.sizeRepresentative(controller.getNearest().get(index).size());
                         g2Buffer.setColor(Color.RED);
                         g2Buffer.fillOval((int)p.x, (int)p.y, sizeint, sizeint);
                         g2Buffer.setColor(Color.BLACK);

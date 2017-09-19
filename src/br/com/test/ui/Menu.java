@@ -2017,9 +2017,9 @@ public class Menu extends javax.swing.JFrame {
 //            points[i] = new Point2D.Double(rectangles.get(index).getCenterX(), rectangles.get(index).getCenterY());
 //        }
 //        
-//        Point2D.Double[] pointsClickedPolygon = new Point2D.Double[clickedPolygon.npoints];
-//        for( int i = 0; i < clickedPolygon.npoints; ++i )
-//            pointsClickedPolygon[i] = new Point2D.Double(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i]);           
+//        Point2D.Double[] pointsClickedPolygon = new Point2D.Double[getClickedPolygon.npoints];
+//        for( int i = 0; i < getClickedPolygon.npoints; ++i )
+//            pointsClickedPolygon[i] = new Point2D.Double(getClickedPolygon.xpoints[i], getClickedPolygon.ypoints[i]);           
 //        
 //        
 //        List<Point2D.Double> pVoronoi = new ArrayList<>();

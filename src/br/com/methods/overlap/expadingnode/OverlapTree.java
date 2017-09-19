@@ -55,20 +55,20 @@ public class OverlapTree implements OverlapRemoval {
         for (int i = 0; i < nodes.size(); ++i) {
             if (!nodes.get(i).isChild()) {
 
-                OverlapNode overlapNode = removeOverlap(nodes.get(i).children());
+                OverlapNode overlapNode = removeOverlap(nodes.get(i).getChildren());
                 elems.add(overlapNode);
 
             } else {
 
                 List<OverlapNode> instances = new ArrayList<>();
 
-                for (int j = 0; j < nodes.get(i).indexes().length; ++j) {
-//                    instances.add(new OverlapNode(new OverlapRect(nodes.get(i).subprojection()[j].x,
-//                            nodes.get(i).subprojection()[j].y,
-//                            SIZERECT, SIZERECT, nodes.get(i).indexes()[j]))
+                for (int j = 0; j < nodes.get(i).getIndexes().length; ++j) {
+//                    instances.add(new OverlapNode(new OverlapRect(nodes.get(i).getSubprojection()[j].x,
+//                            nodes.get(i).getSubprojection()[j].y,
+//                            SIZERECT, SIZERECT, nodes.get(i).getIndexes()[j]))
 //                    );
                 }
-                int representative = nodes.get(i).representative(controller.projection());
+                int representative = nodes.get(i).getRepresentative(controller.getProjection());
                 OverlapNode node = new OverlapNode(instances);
                 node.removeOverlap(representative);
 
@@ -114,7 +114,7 @@ public class OverlapTree implements OverlapRemoval {
             
             controller.build();
 
-            OverlapNode node = removeOverlap(controller.explorerTree().topNodes());
+            OverlapNode node = removeOverlap(controller.getExplorerTree().getTopNodes());
             ArrayList<OverlapRect> reprojected = new ArrayList<>();
 
             for( int i = 0; i < node.getInstances().size(); ++i ) {
