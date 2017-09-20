@@ -369,134 +369,134 @@ public class ProjectionView extends JPanel {
     }
     
     private void zoomElements(float rate, Point u) {
-        if (rectangles != null) {
-
-            double maxX = rectangles.get(0).getUX();
-            double minX = rectangles.get(0).getUX();
-            double maxY = rectangles.get(0).getUY();
-            double minY = rectangles.get(0).getUY();
-
-            //Encontra o maior e menor valores para X e Y
-            for (RectangleVis v : rectangles) {
-                if (maxX < v.getUX()) {
-                    maxX = v.getUX();
-                } else if (minX > v.getUX()) {
-                    minX = v.getUX();
-                }
-
-                if (maxY < v.getUY()) {
-                    maxY = v.getUY();
-                } else if (minY > v.getUY()) {
-                    minY = v.getUY();
-                }
-                
-            }
-
-            double endX = maxX * rate;
-            double endY = maxY * rate;
-
-            //Normalizo
-            for (RectangleVis v : rectangles) {
-                if (maxX != minX) {
-                    v.setUX((((v.getX() - minX) / (maxX - minX)) * (endX - minX)) + minX);
-                } else {
-                    v.setUX(minX);
-                }
-
-                if (maxY != minY) {
-                    v.setUY(((((v.getY() - minY) / (maxY - minY)) * (endY - minY)) + minY));
-                } else {
-                    v.setUY(minY);
-                }
-            }
-            
-            Point v = new Point((int)((((u.x - minX) / (maxX - minX)) * (endX - minX)) + minX), 
-                                (int)((((u.y - minY) / (maxY - minY)) * (endY - minY)) + minY));
-            
-            int dx = v.x-u.x;
-            int dy = v.y-u.y;
-            
-            for (RectangleVis vertex : rectangles) {                
-                vertex.setUX(vertex.getUX()-dx);
-                vertex.setUY(vertex.getUY()-dy);
-            }
-            
-            
-
-            //Change the size of the panel according to the graph
-            setPreferredSize(new Dimension(sizeGraph().getSize().width * 2, sizeGraph().getSize().height * 2));
-            setSize(new Dimension(sizeGraph().getSize().width * 2, sizeGraph().getSize().height * 2));
-
-            cleanImage();
-            repaint();
-        }
+//        if (rectangles != null) {
+//
+//            double maxX = rectangles.get(0).getUX();
+//            double minX = rectangles.get(0).getUX();
+//            double maxY = rectangles.get(0).getUY();
+//            double minY = rectangles.get(0).getUY();
+//
+//            //Encontra o maior e menor valores para X e Y
+//            for (RectangleVis v : rectangles) {
+//                if (maxX < v.getUX()) {
+//                    maxX = v.getUX();
+//                } else if (minX > v.getUX()) {
+//                    minX = v.getUX();
+//                }
+//
+//                if (maxY < v.getUY()) {
+//                    maxY = v.getUY();
+//                } else if (minY > v.getUY()) {
+//                    minY = v.getUY();
+//                }
+//                
+//            }
+//
+//            double endX = maxX * rate;
+//            double endY = maxY * rate;
+//
+//            //Normalizo
+//            for (RectangleVis v : rectangles) {
+//                if (maxX != minX) {
+//                    v.setUX((((v.getX() - minX) / (maxX - minX)) * (endX - minX)) + minX);
+//                } else {
+//                    v.setUX(minX);
+//                }
+//
+//                if (maxY != minY) {
+//                    v.setUY(((((v.getY() - minY) / (maxY - minY)) * (endY - minY)) + minY));
+//                } else {
+//                    v.setUY(minY);
+//                }
+//            }
+//            
+//            Point v = new Point((int)((((u.x - minX) / (maxX - minX)) * (endX - minX)) + minX), 
+//                                (int)((((u.y - minY) / (maxY - minY)) * (endY - minY)) + minY));
+//            
+//            int dx = v.x-u.x;
+//            int dy = v.y-u.y;
+//            
+//            for (RectangleVis vertex : rectangles) {                
+//                vertex.setUX(vertex.getUX()-dx);
+//                vertex.setUY(vertex.getUY()-dy);
+//            }
+//            
+//            
+//
+//            //Change the size of the panel according to the graph
+//            setPreferredSize(new Dimension(sizeGraph().getSize().width * 2, sizeGraph().getSize().height * 2));
+//            setSize(new Dimension(sizeGraph().getSize().width * 2, sizeGraph().getSize().height * 2));
+//
+//            cleanImage();
+//            repaint();
+//        }
     }
     
     private void zoomElements(float rate, Point u, ExplorerTreeController controller) {
-        if (controller != null) {
-            
-            int[] representative = controller.getRepresentative();
-            Point2D.Double[] projection = controller.getProjection();
-
-            double maxX = projection[representative[0]].x;
-            double minX = projection[representative[0]].x;
-            double maxY = projection[representative[0]].y;
-            double minY = projection[representative[0]].y;
-
-            //Encontra o maior e menor valores para X e Y
-            for( int i = 0; i < representative.length; ++i ) {
-                Point2D.Double p = projection[representative[i]];
-                if (maxX < p.x) {
-                    maxX = p.x;
-                } else if (minX > p.x) {
-                    minX = p.x;
-                }
-
-                if (maxY < p.y) {
-                    maxY = p.y;
-                } else if (minY > p.y) {
-                    minY = p.y;
-                }
-            }
-
-            double endX = maxX * rate;
-            double endY = maxY * rate;
-
-            //Normalizo
-            for( int i = 0; i < representative.length; ++i ) {
-                Point2D.Double p = projection[representative[i]];
-                if (maxX != minX) {
-                    p.x = (((p.x - minX) / (maxX - minX)) * (endX - minX)) + minX;
-                } else {
-                    p.x = minX;
-                }
-
-                if (maxY != minY) {
-                    p.y = (((p.y - minY) / (maxY - minY)) * (endY - minY)) + minY;
-                } else {
-                    p.y = minY;
-                }
-            }
-            
-            Point v = new Point((int)((((u.x - minX) / (maxX - minX)) * (endX - minX)) + minX), 
-                                (int)((((u.y - minY) / (maxY - minY)) * (endY - minY)) + minY));
-            
-            int dx = v.x-u.x;
-            int dy = v.y-u.y;
-            
-            for( int i = 0; i < representative.length; ++i ) {
-                Point2D.Double p = projection[representative[i]];
-                p.x = p.x-dx;
-                p.y = p.y-dy;
-            }
-            
-            //Change the size of the panel according to the graph
-            setPreferredSize(new Dimension(sizeGraph().getSize().width * 2, sizeGraph().getSize().height * 2));
-            setSize(new Dimension(sizeGraph().getSize().width * 2, sizeGraph().getSize().height * 2));
-
-            cleanImage();
-            repaint();
-        }
+//        if (controller != null) {
+//            
+//            int[] representative = controller.getRepresentative();
+//            Point2D.Double[] projection = controller.getProjection();
+//
+//            double maxX = projection[representative[0]].x;
+//            double minX = projection[representative[0]].x;
+//            double maxY = projection[representative[0]].y;
+//            double minY = projection[representative[0]].y;
+//
+//            //Encontra o maior e menor valores para X e Y
+//            for( int i = 0; i < representative.length; ++i ) {
+//                Point2D.Double p = projection[representative[i]];
+//                if (maxX < p.x) {
+//                    maxX = p.x;
+//                } else if (minX > p.x) {
+//                    minX = p.x;
+//                }
+//
+//                if (maxY < p.y) {
+//                    maxY = p.y;
+//                } else if (minY > p.y) {
+//                    minY = p.y;
+//                }
+//            }
+//
+//            double endX = maxX * rate;
+//            double endY = maxY * rate;
+//
+//            //Normalizo
+//            for( int i = 0; i < representative.length; ++i ) {
+//                Point2D.Double p = projection[representative[i]];
+//                if (maxX != minX) {
+//                    p.x = (((p.x - minX) / (maxX - minX)) * (endX - minX)) + minX;
+//                } else {
+//                    p.x = minX;
+//                }
+//
+//                if (maxY != minY) {
+//                    p.y = (((p.y - minY) / (maxY - minY)) * (endY - minY)) + minY;
+//                } else {
+//                    p.y = minY;
+//                }
+//            }
+//            
+//            Point v = new Point((int)((((u.x - minX) / (maxX - minX)) * (endX - minX)) + minX), 
+//                                (int)((((u.y - minY) / (maxY - minY)) * (endY - minY)) + minY));
+//            
+//            int dx = v.x-u.x;
+//            int dy = v.y-u.y;
+//            
+//            for( int i = 0; i < representative.length; ++i ) {
+//                Point2D.Double p = projection[representative[i]];
+//                p.x = p.x-dx;
+//                p.y = p.y-dy;
+//            }
+//            
+//            //Change the size of the panel according to the graph
+//            setPreferredSize(new Dimension(sizeGraph().getSize().width * 2, sizeGraph().getSize().height * 2));
+//            setSize(new Dimension(sizeGraph().getSize().width * 2, sizeGraph().getSize().height * 2));
+//
+//            cleanImage();
+//            repaint();
+//        }
     }
 
 
