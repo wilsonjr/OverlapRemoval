@@ -36,6 +36,8 @@ public class ExplorerTreeController {
     private List<Polygon> _polygons;
 
     private Map<ExplorerTreeNode, Polygon> _pointPolygon = new HashMap<>();
+    
+    private boolean createDiagram;
 
     public ExplorerTreeController(Point2D.Double[] projection, Point2D.Double[] projectionCenter,
             RepresentativeFinder representativeSelection,
@@ -50,6 +52,14 @@ public class ExplorerTreeController {
 
         _nearest = new HashMap<>();
         _polygons = new ArrayList<>();
+    }
+    
+    public boolean isCreateDiagram() {
+        return createDiagram;
+    }
+
+    public void setCreateDiagram(boolean createDiagram) {
+        this.createDiagram = createDiagram;
     }
 
     public void setProjection(Point2D.Double[] _projection) {
@@ -142,9 +152,12 @@ public class ExplorerTreeController {
         Polygon[] diagrams = Util.voronoiDiagram(window, points, pVoronoi);
         System.out.println("Quantidade de pontos: "+points.length);
         System.out.println("Quantidade de diagramas: "+diagrams.length);
-        _polygons.addAll(new ArrayList<>(Arrays.asList(Util.clipBounds(diagrams, involvePolygon, _pointPolygon,
-                pVoronoi, this, pointIndex))));
-
+        
+        if( isCreateDiagram() ) {
+            _polygons.addAll(new ArrayList<>(Arrays.asList(Util.clipBounds(diagrams, involvePolygon, _pointPolygon,
+                    pVoronoi, this, pointIndex))));
+        }
+        
         return addedIndexes;
     }
 

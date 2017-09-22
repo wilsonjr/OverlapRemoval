@@ -1545,6 +1545,7 @@ public class Menu extends javax.swing.JFrame {
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
                          ds3, 4, RECTSIZE, RECTSIZE/2);
                 
+                controller.setCreateDiagram(true);
                 controller.build();                
                 controller.updateDiagram(view.getSize().width, view.getSize().height, 0, null);
                 
