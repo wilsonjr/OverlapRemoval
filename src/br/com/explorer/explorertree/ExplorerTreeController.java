@@ -129,31 +129,32 @@ public class ExplorerTreeController {
         while (iterator.hasNext()) {
             points[k++] = iterator.next();
         }
-
-        Point2D.Double[] involvePolygon;
-
-        if (clickedPolygon == null) {
-            Point2D.Double[] pointsPolygon = new Point2D.Double[_projection.length];
-            for (int i = 0; i < _projection.length; ++i) {
-                pointsPolygon[i] = new Point2D.Double(_projectionCenter[i].x, _projectionCenter[i].y);
-            }
-            involvePolygon = Util.convexHull(pointsPolygon);
-
-        } else {
-
-            involvePolygon = new Point2D.Double[clickedPolygon.npoints];
-            for (int i = 0; i < clickedPolygon.npoints; ++i) {
-                involvePolygon[i] = new Point2D.Double(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i]);
-            }
-
-        }
-
-        List<Point2D.Double> pVoronoi = new ArrayList<>();
-        Polygon[] diagrams = Util.voronoiDiagram(window, points, pVoronoi);
-        System.out.println("Quantidade de pontos: "+points.length);
-        System.out.println("Quantidade de diagramas: "+diagrams.length);
         
         if( isCreateDiagram() ) {
+            Point2D.Double[] involvePolygon;
+
+            if (clickedPolygon == null) {
+                Point2D.Double[] pointsPolygon = new Point2D.Double[_projection.length];
+                for (int i = 0; i < _projection.length; ++i) {
+                    pointsPolygon[i] = new Point2D.Double(_projectionCenter[i].x, _projectionCenter[i].y);
+                }
+                involvePolygon = Util.convexHull(pointsPolygon);
+
+            } else {
+
+                involvePolygon = new Point2D.Double[clickedPolygon.npoints];
+                for (int i = 0; i < clickedPolygon.npoints; ++i) {
+                    involvePolygon[i] = new Point2D.Double(clickedPolygon.xpoints[i], clickedPolygon.ypoints[i]);
+                }
+
+            }
+
+            List<Point2D.Double> pVoronoi = new ArrayList<>();
+            Polygon[] diagrams = Util.voronoiDiagram(window, points, pVoronoi);
+            System.out.println("Quantidade de pontos: "+points.length);
+            System.out.println("Quantidade de diagramas: "+diagrams.length);
+        
+        
             _polygons.addAll(new ArrayList<>(Arrays.asList(Util.clipBounds(diagrams, involvePolygon, _pointPolygon,
                     pVoronoi, this, pointIndex))));
         }
@@ -225,7 +226,7 @@ public class ExplorerTreeController {
             _nearest.put(n.getRouting(), nearest);
         }
 
-        _polygons.remove(clickedPolygon);
+        //_polygons.remove(clickedPolygon);
         return indexNewRepresentative;
     }
 
@@ -277,9 +278,9 @@ public class ExplorerTreeController {
     }
 
     public List<Integer> expandNode(int index, int x, int y, int width, int height) {
-        Polygon polygon = getClickedPolygon(x, y);
-        int indexNew = expandNode(index, polygon);
-        return updateDiagram(width, height, indexNew, polygon);
+        //Polygon polygon = getClickedPolygon(x, y);
+        int indexNew = expandNode(index, null);
+        return updateDiagram(width, height, indexNew, null);
     }
 
     // returns weights in [0.5, 1]

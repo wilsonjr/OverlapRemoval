@@ -119,7 +119,7 @@ public class ExplorerTree {
     
     public void expandNode(int index, Polygon polygon) {
         ExplorerTreeNode node = _activeNodes.get(index);
-        node.setPolygon(polygon);
+        //node.setPolygon(polygon);
         _activeNodes.remove(index);
         
         node.getChildren().stream().forEach((ExplorerTreeNode value) -> { _activeNodes.put(value.getRouting(), value); });        
