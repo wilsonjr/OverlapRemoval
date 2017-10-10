@@ -25,7 +25,6 @@ public class GNAT extends AccessMetric {
     public GNAT(List<Vect> items, int k) {
         super(items);
         
-        
         this.k = k;
     }
     
