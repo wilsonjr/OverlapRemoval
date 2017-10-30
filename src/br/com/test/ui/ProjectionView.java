@@ -95,6 +95,7 @@ public class ProjectionView extends JPanel {
     private List<Integer> nearest = null;
     private boolean hideShowNumbers = false;
     private int[] selectedRepresentatives = null;
+    private Map<Integer, List<Integer>> hashRepresentative = null;
 
     public ProjectionView(List<RectangleVis> rectangles, 
                           List<RectangleVis> afterSeamCarving, 
@@ -1104,6 +1105,11 @@ public class ProjectionView extends JPanel {
     
     public void setPoints(Point2D.Double[] points) {
         this.points = points;
+    }
+
+    public void setParameters(int[] selectedRepresentatives, Map<Integer, List<Integer>> hashRepresentative) {
+        this.selectedRepresentatives = selectedRepresentatives;
+        this.hashRepresentative = hashRepresentative;
     }
     
 }
