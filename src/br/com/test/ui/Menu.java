@@ -1501,6 +1501,10 @@ public class Menu extends javax.swing.JFrame {
             points[i].x = rectangles.get(i).x;
             points[i].y = rectangles.get(i).y;
         }
+        ArrayList<Vect> elems = new ArrayList<>();
+        for( int i = 0; i < points.length; ++i )
+            elems.add(new Vect(new double[]{points[i].x, points[i].y}));
+        
         
         JFileChooser jFileChooser = new JFileChooser("C:\\Users\\wilson\\Desktop\\UNESP\\datasets");
         int result = jFileChooser.showOpenDialog(this);
@@ -1541,9 +1545,12 @@ public class Menu extends javax.swing.JFrame {
                 RepresentativeFinder ds3 = (RepresentativeFinder) RepresentativeRegistry.getInstance(DS3.class, distances, 0.02, 0, 0);
                 RepresentativeFinder smrs = new SMRS(attrs);
                 
+                RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, 
+                elems, 8);
+                
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         ds3, 4, RECTSIZE, RECTSIZE/2);
+                         affinityPropagation, 4, RECTSIZE, RECTSIZE/2);
                 
                 controller.setCreateDiagram(true);
                 controller.build();                
