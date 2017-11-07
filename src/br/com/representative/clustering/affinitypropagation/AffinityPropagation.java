@@ -9,12 +9,10 @@ import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
 import br.com.representative.clustering.Partitioning;
 import com.clust4j.algo.AffinityPropagationParameters;
-import com.clust4j.algo.KMeansParameters;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 
 /**
