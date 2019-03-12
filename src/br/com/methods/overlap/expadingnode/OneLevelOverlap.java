@@ -140,24 +140,24 @@ public class OneLevelOverlap implements OverlapRemoval {
 
                } else {
                    
-                   double d1 = Util.euclideanDistance(rects.get(i).x, rects.get(i).y, rects.get(j).x, rects.get(j).y);
-                   double d2 = Util.euclideanDistance(rects2.get(i).x, rects2.get(i).y, rects2.get(j).x, rects2.get(j).y);
-                   
-                   if( d1 < d2 ) {
-                       double ax = r2.x;
-                       double ay = r2.y;
-                       double bx = r1.x;
-                       double by = r1.y;
-                       
-                       double lenAB = d1;
-                       
-                       double ammountx = (bx-ax)/lenAB*(d2-d1);
-                       double ammounty = (by-ay)/lenAB*(d2-d1);
-                       
-                       r1.x = bx+ammountx;
-                       r1.y = by+ammounty;
-                       
-                   }
+//                   double d1 = Util.euclideanDistance(rects.get(i).x, rects.get(i).y, rects.get(j).x, rects.get(j).y);
+//                   double d2 = Util.euclideanDistance(rects2.get(i).x, rects2.get(i).y, rects2.get(j).x, rects2.get(j).y);
+//                   
+//                   if( d1 < d2 ) {
+//                       double ax = r2.x;
+//                       double ay = r2.y;
+//                       double bx = r1.x;
+//                       double by = r1.y;
+//                       
+//                       double lenAB = d1;
+//                       
+//                       double ammountx = (bx-ax)/lenAB*(d2-d1);
+//                       double ammounty = (by-ay)/lenAB*(d2-d1);
+//                       
+//                       r1.x = bx+ammountx;
+//                       r1.y = by+ammounty;
+//                       
+//                   }
                    
                    
                }

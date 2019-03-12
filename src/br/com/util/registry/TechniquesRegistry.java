@@ -34,7 +34,9 @@ public abstract class TechniquesRegistry {
                 Constructor classConstructor = Class.forName(canonicalName).getConstructor(parameterTypes);
                 classInstantiation = classConstructor.newInstance(initArgs);                
                 
-                map.put(canonicalName, classInstantiation);
+                
+                // This was causing conflict when restarting the API
+                //map.put(canonicalName, classInstantiation);
             } catch( ClassNotFoundException | InstantiationException | IllegalAccessException | 
                      IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e ) {
                  Logger.getLogger(RepresentativeRegistry.class.getName()).log(Level.SEVERE, null, e);

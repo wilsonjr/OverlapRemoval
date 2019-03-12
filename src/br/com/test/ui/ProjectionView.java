@@ -751,7 +751,7 @@ public class ProjectionView extends JPanel {
                 }
                 
                 
-                drawScale(g2Buffer);
+                //drawScale(g2Buffer);
 
                 if( tooltip != null ) {
                     tooltip.draw(g2Buffer);

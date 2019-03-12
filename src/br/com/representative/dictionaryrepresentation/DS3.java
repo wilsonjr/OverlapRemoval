@@ -57,7 +57,7 @@ public class DS3 extends SparseRepresentation {
         double[] rhov = computeRegularizer(D, p);
         double rho = rhov[1]*alpha;
         double mu = Math.pow(10, -1);
-        int maxIter = 1000;
+        int maxIter = 100;
         double errThr = Math.pow(10, -5);        
         
         double[][] Z = ds3(D, p, rho, mu, maxIter, CFD, errThr);

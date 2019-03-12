@@ -25,7 +25,10 @@ public abstract class AccessMetric extends RepresentativeFinder {
         this.finalItems = items;
         this.items = new ArrayList<>();
         
-        items.forEach((v)->this.items.add(v));
+        //items.forEach((v)->this.items.add(v));
+        
+        for( int i = 0; i < items.size(); ++i )
+            this.items.add(items.get(i));
     }
     
     @Override
