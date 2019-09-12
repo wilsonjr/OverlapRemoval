@@ -150,11 +150,17 @@ public class ExplorerTreeNode {
         int[] temp = new int[indexes.length];
         Map<Integer, List<Integer>> mapTemp = Util.createIndex2(indexes, _subprojection);
         int k = 0;
-        
+        System.out.println("mapTemp");
+        System.out.println(mapTemp);
         for( Map.Entry<Integer, List<Integer>> v: mapTemp.entrySet() ) {
             
             List<Integer> list = v.getValue();
             Point2D.Double p = new Point2D.Double(0,0);
+            
+            System.out.println("List: "+list.size());
+            System.out.println("_subprojection: "+_subprojection.length);
+            System.out.println("List: ");
+            System.out.println(list);
             for( int i = 0; i < list.size(); ++i ) {
                 p.x += _subprojection[list.get(i)].x;
                 p.y += _subprojection[list.get(i)].y;

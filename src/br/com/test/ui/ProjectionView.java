@@ -735,6 +735,7 @@ public class ProjectionView extends JPanel {
                         //}
                     }
                 }
+                
 
                 if( !toDraw.isEmpty() ) {
                     int j = movingIndexes.size()-1;
@@ -759,7 +760,23 @@ public class ProjectionView extends JPanel {
 
             }
             
-            
+            System.out.println(selectedRepresentatives);
+                if(  selectedRepresentatives != null  ) {
+                    for( int i = 0; i < selectedRepresentatives.length; ++i ) {
+                        RectangleVis r = rectangles.get(selectedRepresentatives[i]);
+                        g2Buffer.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
+                        g2Buffer.setColor(Color.RED);
+                        g2Buffer.fillOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+                        g2Buffer.setColor(Color.BLACK);
+                        g2Buffer.drawOval((int)r.getUX(), (int)r.getUY(), (int)r.getWidth(), (int)r.getHeight());
+
+                        //if( hideShowNumbers ) {
+                            g2Buffer.setColor(Color.BLACK);
+                            g2Buffer.setFont(new Font("Helvetica", Font.PLAIN, 10));                    
+                            g2Buffer.drawString(String.valueOf(r.numero), (int)r.getUX()+10, (int)r.getUY()+10);  
+                        //}
+                    }
+                }
             
             
 

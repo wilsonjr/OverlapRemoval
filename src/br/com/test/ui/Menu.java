@@ -1,11 +1,9 @@
 package br.com.test.ui;
 
 
-import br.com.explore.explorertree.util.ForceLayout;
 import br.com.explore.explorertree.util.Tooltip;
 import br.com.explorer.explorertree.ExplorerTree;
 import br.com.explorer.explorertree.ExplorerTreeController;
-import br.com.explorer.explorertree.ExplorerTreeNode;
 import br.com.methods.overlap.OverlapRegistry;
 import br.com.methods.overlap.OverlapRemoval;
 import br.com.methods.overlap.expadingnode.OneLevelOverlap;
@@ -21,7 +19,6 @@ import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.RectangleVis;
 import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
-import br.com.projection.spacereduction.SeamCarving;
 import br.com.representative.RepresentativeFinder;
 import br.com.representative.RepresentativeRegistry;
 import br.com.representative.analysis.AnalysisController;
@@ -41,32 +38,19 @@ import br.com.representative.lowrank.KSvd;
 import br.com.representative.metric.GNAT;
 import br.com.representative.metric.MST;
 import br.com.representative.metric.SSS;
+import br.com.representative.sampling.Knuth;
+import br.com.representative.sampling.Reservoir;
+import br.com.representative.sampling.SADIRE;
 import br.com.test.draw.color.GrayScale;
 import br.com.test.draw.color.RainbowScale;
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -76,29 +60,17 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Scanner;
-import java.util.TimerTask;
-import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.Timer;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import math.geom2d.polygon.SimplePolygon2D;
-import nmap.BoundingBox;
-import nmap.Element;
-import nmap.NMap;
 import visualizer.matrix.DenseMatrix;
 import visualizer.matrix.DenseVector;
 import visualizer.projection.ProjectionData;
@@ -107,7 +79,7 @@ import visualizer.projection.ProjectionType;
 import visualizer.projection.ProjectorType;
 import visualizer.projection.distance.DissimilarityType;
 import visualizer.projection.lsp.ControlPointsType;
-import visualizer.util.ChangeRetangulo;
+//import visualizer.util.ChangeRetangulo;
 
 /**
  *
@@ -133,7 +105,7 @@ public class Menu extends javax.swing.JFrame {
     private double iImage = 0;
     private HierarchicalClustering hc;
     
-    private ArrayList<ChangeRetangulo> cRetangulo = null;
+//    private ArrayList<ChangeRetangulo> cRetangulo = null;
     
     private Polygon[] diagrams = null;
     private Polygon hullPolygon = null;
@@ -227,6 +199,8 @@ public class Menu extends javax.swing.JFrame {
         kMedoidJMenuItem = new javax.swing.JMenuItem();
         bisectingKMeansJMenuItem = new javax.swing.JMenuItem();
         dbscanJMenuItem = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         hierarchicalClusteringJMenuItem = new javax.swing.JMenuItem();
         nextDendogramJMenuItem = new javax.swing.JMenuItem();
@@ -465,6 +439,22 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu6.add(dbscanJMenuItem);
+
+        jMenuItem1.setText("Reservoir");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu6.add(jMenuItem1);
+
+        jMenuItem2.setText("SADIRE");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu6.add(jMenuItem2);
         jMenu6.add(jSeparator3);
 
         hierarchicalClusteringJMenuItem.setText("Hierarchical Clustering");
@@ -621,7 +611,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_sairJMenuItemActionPerformed
 
     private void loadDataJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadDataJMenuItemActionPerformed
-        JFileChooser jFileChooser = new JFileChooser("C:\\Users\\wilson\\Desktop\\UNESP\\datasets");
+        JFileChooser jFileChooser = new JFileChooser("D:\\Data");
         int result = jFileChooser.showOpenDialog(this);
         if( result == JFileChooser.APPROVE_OPTION ) {
             try {                 
@@ -1506,7 +1496,7 @@ public class Menu extends javax.swing.JFrame {
             elems.add(new Vect(new double[]{points[i].x, points[i].y}));
         
         
-        JFileChooser jFileChooser = new JFileChooser("C:\\Users\\wilson\\Desktop\\UNESP\\datasets");
+        JFileChooser jFileChooser = new JFileChooser("D:\\Data\\datasets");
         int result = jFileChooser.showOpenDialog(this);
         if( result == JFileChooser.APPROVE_OPTION ) {
             try {                 
@@ -1529,7 +1519,7 @@ public class Menu extends javax.swing.JFrame {
                 }
                 
                 // clustering techniques
-//                RepresentativeFinder kmeans = new KMeans(Arrays.asList(points), new FarPointsMedoidApproach(), (int)(points.length*0.1));
+               // RepresentativeFinder kmeans = new KMeans(Arrays.asList(points), new FarPointsMedoidApproach(), (int)(points.length*0.1));
 //                RepresentativeFinder kmedoid = new KMedoid(Arrays.asList(points), new FarPointsMedoidApproach(), (int)(points.length*0.1));
 //                RepresentativeFinder bisectingKMeans = new BisectingKMeans(Arrays.asList(points), new FarPointsMedoidApproach(), (int) (points.length*0.1));
 //                RepresentativeFinder dbscan = new Dbscan(Arrays.asList(points), 100, (int)(60.0/100.0)*7);
@@ -1548,9 +1538,17 @@ public class Menu extends javax.swing.JFrame {
                 RepresentativeFinder affinityPropagation = (RepresentativeFinder) RepresentativeRegistry.getInstance(AffinityPropagation.class, 
                 elems, 8);
                 
+                RepresentativeFinder kmeans = (RepresentativeFinder) RepresentativeRegistry.getInstance(KMeans.class, 
+                elems, new FarPointsMedoidApproach(), (int)(elems.size()*0.0332)  );
+                
+                RepresentativeFinder reservoir = (RepresentativeFinder) RepresentativeRegistry.getInstance(Reservoir.class,  elems, (int)(elems.size()*0.0332));
+                RepresentativeFinder knuth = (RepresentativeFinder) RepresentativeRegistry.getInstance(Knuth.class, elems, (int)(elems.size()*0.0332));
+                
+                RepresentativeFinder sadire = (RepresentativeFinder) RepresentativeRegistry.getInstance(SADIRE.class, elems, 20, 1);
+                
                 controller = new ExplorerTreeController(points, 
                          rectangles.stream().map((e)->new Point2D.Double(e.getCenterX(), e.getCenterY())).toArray(Point2D.Double[]::new),
-                         affinityPropagation, 4, RECTSIZE, RECTSIZE/2);
+                         sadire, 4, RECTSIZE, RECTSIZE/2);
                 
                 controller.setCreateDiagram(true);
                 controller.build();                
@@ -2003,6 +2001,47 @@ public class Menu extends javax.swing.JFrame {
             
         }
     }//GEN-LAST:event_analysisJMenuItemActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+        ArrayList<Vect> elems = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i )
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
+                
+        RepresentativeFinder kmedoid = (RepresentativeFinder) RepresentativeRegistry.getInstance(Reservoir.class, 
+                elems, (int)(elems.size()*0.0332));
+        kmedoid.execute();
+        //currentCluster = ((KMedoid)kmedoid).getClusters();        
+        selectedRepresentatives = kmedoid.getRepresentatives();
+        System.out.println("Size: "+selectedRepresentatives.length);
+        //selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+        hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
+        view.setParameters(selectedRepresentatives, hashRepresentative);
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+        ArrayList<Vect> elems = new ArrayList<>();
+        for( int i = 0; i < rects.size(); ++i )
+            elems.add(new Vect(new double[]{rects.get(i).getCenterX(), rects.get(i).getCenterY()}));
+                
+        RepresentativeFinder sadire = (RepresentativeFinder) RepresentativeRegistry.getInstance(SADIRE.class, elems);
+        sadire.execute();
+        //currentCluster = ((KMedoid)kmedoid).getClusters();        
+        selectedRepresentatives = sadire.getRepresentatives();
+        System.out.println("Size: "+selectedRepresentatives.length);
+        //selectedRepresentatives = Util.distinct(selectedRepresentatives, points, (int) (rectangles.get(0).getWidth()/2));
+        hashRepresentative = Util.createIndex(selectedRepresentatives, elems.stream().map((v)->v).toArray(Vect[]::new));
+        view.setParameters(selectedRepresentatives, hashRepresentative);
+        if( view != null ) {
+            view.cleanImage();
+            view.repaint();
+        }
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
     
 //    
 //    public void updateDiagram() {
@@ -2140,6 +2179,8 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu7;
     private javax.swing.JMenu jMenu8;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator10;
     private javax.swing.JPopupMenu.Separator jSeparator11;
