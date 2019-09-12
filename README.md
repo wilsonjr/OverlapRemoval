@@ -1,5 +1,6 @@
 # OverlapRemoval
-Framework to remove overlap of markers in multidimensional projection.
+
+A library to select sampling sets and remove overlapping in 2D projections.
 
 ## Techniques
 
@@ -21,7 +22,7 @@ Framework to remove overlap of markers in multidimensional projection.
 
 ## Dependencies
 
-You need to use the following dependencies although we provide you with the project.
+We've used the following dependencies in the project:
 
 **DT1.2**: [Delaunay Triangulation](http://doc.jzy3d.org/javadoc/0.8.4/org/jzy3d/plot3d/builder/delaunay/jdt/Delaunay_Triangulation.html)
 
