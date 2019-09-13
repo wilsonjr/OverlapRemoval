@@ -37,7 +37,7 @@ public class SADIRE extends Partitioning {
             maxY = Math.max(v.get(1), maxY);
         }
         
-        QuadTree.PointRegionQuadTree quadtree = new QuadTree.PointRegionQuadTree(0, 0, maxX+10, maxY+10, items.size());
+        QuadTree.PointRegionQuadTree<XYPoint> quadtree = new QuadTree.PointRegionQuadTree(0, 0, maxX+10, maxY+10, items.size());
                 
         
         for( int i = 0; i < items.size(); ++i ) {
