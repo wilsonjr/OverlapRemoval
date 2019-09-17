@@ -19,8 +19,9 @@ import java.util.List;
 public class SADIRE extends Partitioning {
     private final int alpha;
     private final int size;
+    private final int type = 1; // 1 - first on list, 2 - medoid, and 3 - random 
 
-    public SADIRE(List<Vect> items, int size, int alpha) {
+    public SADIRE(List<Vect> items, int size, int alpha, int type) {
         super(items);
         
         this.alpha = alpha;
@@ -82,8 +83,7 @@ public class SADIRE extends Partitioning {
                                                              delta, delta));
             
             if( sizeSearch == 1 ) {
-                
-                A.add(new Element(cells.get(i), points.get((int) Math.floor(Math.random()*points.size())), points, true));
+                A.add(new Element(cells.get(i), getPoint(points), points, true));                
             } else {
                 
             }
@@ -136,7 +136,7 @@ public class SADIRE extends Partitioning {
             if( A.get(i).active ) {
                 A.get(i).active = false;
 
-                XYPoint point = A.get(i).points.get((int) Math.floor(Math.random() * A.get(i).points.size()));
+                XYPoint point = getPoint(A.get(i).points);// A.get(i).points.get((int) Math.floor(Math.random() * A.get(i).points.size()));
 
                 double minDistance = 1000000.0;
                 XYPoint neighbor = null;
@@ -174,6 +174,40 @@ public class SADIRE extends Partitioning {
         }
 
         return null;
+    }
+
+    private XYPoint getPoint(List<XYPoint> points) {
+        if( type == 1 )
+            return points.get(0);
+       
+        if( type == 2 ) {
+
+            float x = 0.0f;
+            float y = 0.0f;
+
+            for( XYPoint p: points ) {
+                x += p.x;
+                y += p.y;
+            }
+
+            x /= points.size();
+            y /= points.size();
+
+            XYPoint medoid = points.get(0);
+            float distance = (float) Math.sqrt(Math.pow(x-medoid.x, 2.0f) + Math.pow(y-medoid.y, 2.0f));
+
+            for( int j = 0; j < points.size(); ++j ) {
+                float d = (float) Math.sqrt(Math.pow(x-points.get(j).x, 2.0f) + Math.pow(y-points.get(j).y, 2.0f));
+                if( d < distance ) {
+                    distance = d;
+                    medoid = points.get(j);
+                }
+            }
+            
+            return medoid;
+        }  else {
+            return points.get((int) Math.floor(Math.random()*points.size()));
+        }
     }
     
     
