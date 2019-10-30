@@ -68,9 +68,13 @@ public class ExplorerTreeNode {
     
     public void createSubTree() {
         
+        System.out.printf("%d <= %d\n", _indexes.length, _minChildren);
         
-        if( _indexes.length <= _minChildren ) // this node can represent its set of instances
+        if( _indexes.length <= (int)(1.5*_minChildren) ) {// this node can represent its set of instances
+            System.out.println("Sai");
             return;
+        }
+        System.out.println("Entrei");
         
         // in order to apply the getRepresentative selection to the getSubprojection, we need to filter the elements so that the
         // algorithm can be applied on the getSubprojection
@@ -82,37 +86,61 @@ public class ExplorerTreeNode {
         if( nthLevelRepresentatives.length > 0 ) {
         
             // select medoids since the selected representatives must have high chances to overlap
-//    		nthLevelRepresentatives = selectMedoid(nthLevelRepresentatives);
+    	    nthLevelRepresentatives = selectMedoid(nthLevelRepresentatives);
             
+            System.out.println("1. nthLevelRepresentatives");
+            System.out.println(Arrays.toString(nthLevelRepresentatives));
             // apply distinction algorithm
 //            nthLevelRepresentatives = Util.distinct2(nthLevelRepresentatives, _subprojection, _distinctionDistance);
             
+            System.out.println("2. nthLevelRepresentatives");
+            System.out.println(Arrays.toString(nthLevelRepresentatives));
+            
+            
             Map<Integer, List<Integer>> map = Util.createIndex2(nthLevelRepresentatives, _subprojection);            
-            Map<Integer, List<Integer>> copyMap = new HashMap<>();
-            for( Map.Entry<Integer, List<Integer>> v: map.entrySet() ) {
-                copyMap.put(v.getKey(), v.getValue());
-            }
             
-            // remove representatives which represent only < _minChildren
-            // Util.removeDummyRepresentive2(map, (int) (_lowerBound*_minChildren));
+            System.out.println("1. map");
+            System.out.println(map);
+//            Map<Integer, List<Integer>> copyMap = new HashMap<>();;
+//            for( Map.Entry<Integer, List<Integer>> v: map.entrySet() ) {
+//                copyMap.put(v.getKey(), v.getValue());
+//            }
+//            
+//            // remove representatives which represent only < _minChildren
+//             Util.removeDummyRepresentive2(map, _minChildren);
+            System.out.println("2. map");
+            System.out.println(map);
             
-            // agglomerate representatives
+//            // agglomerate representatives
 //            if( map.size() <= 1  ) {
 //                Map<Integer, List<Integer>> agglomerateMap = agglomerateRepresentative(copyMap);
 //                map = agglomerateMap;                
 //            }
-//            
-//            nthLevelRepresentatives = map.entrySet().stream().mapToInt((value)->value.getKey()).toArray();
-//            //nthLevelRepresentatives = selectMedoid(nthLevelRepresentatives);
-//            nthLevelRepresentatives = Util.distinct2(nthLevelRepresentatives, _subprojection, _distinctionDistance);            
+////            
+            nthLevelRepresentatives = map.entrySet().stream().mapToInt((value)->value.getKey()).toArray();
+            System.out.println("3. nthLevelRepresentatives");
+            System.out.println(Arrays.toString(nthLevelRepresentatives));
+            //nthLevelRepresentatives = selectMedoid(nthLevelRepresentatives);
+//            nthLevelRepresentatives = Util.distinct2(nthLevelRepresentatives, _subprojection, _distinctionDistance);            ;;
+            System.out.println("4. nthLevelRepresentatives");
+            System.out.println(Arrays.toString(nthLevelRepresentatives));
             
             if( nthLevelRepresentatives.length == 1 ) {// this will lead to a infinite loop...             
+                
+                
                 if( _indexes.length < 2*_minChildren )
                     return;
                 
                 map = tryToDivideCluster();
+                System.out.println("3. map");
+                System.out.println(map);
                 nthLevelRepresentatives = map.entrySet().stream().mapToInt((value)->value.getKey()).toArray(); 
-                nthLevelRepresentatives = Util.distinct2(nthLevelRepresentatives, _subprojection, _distinctionDistance);
+                System.out.println("5. nthLevelRepresentatives");
+                 System.out.println(Arrays.toString(nthLevelRepresentatives));
+            
+//                nthLevelRepresentatives = Util.distinct2(nthLevelRepresentatives, _subprojection, _distinctionDistance);
+//                System.out.println("6. nthLevelRepresentatives");
+//                System.out.println(Arrays.toString(nthLevelRepresentatives));;
                 if( nthLevelRepresentatives.length == 1 )  // we don't propagate again since it will cause a infinite loop
                     return;                
             }
@@ -120,12 +148,21 @@ public class ExplorerTreeNode {
             
             // store the nearest neighbors for each getRepresentative
             map = Util.createIndex2(nthLevelRepresentatives, _subprojection);             
-            
+            System.out.println("4. map");
+                System.out.println(map);
+                
             map.entrySet().forEach((item)-> {
                 int representative = item.getKey();
                 // get the getIndexes of the elements that it represents
                 List<Integer> indexesChildren = item.getValue();
-               
+                
+                System.out.println("-----------------------------------------");
+                System.out.println("Adding representatives ");
+                System.out.println(">> "+representative);
+                System.out.println("children.size(): "+indexesChildren.size());
+                System.out.println("-----------------------------------------");
+                System.out.println();
+                
                 Point2D.Double[] points = new Point2D.Double[indexesChildren.size()];
 
                 // create getSubprojection 
@@ -148,7 +185,7 @@ public class ExplorerTreeNode {
 //    public void createSubTree() {
 //        
 //        
-//        if( _indexes.length < _lowerBound*_minChildren ) // this node can represent its set of instances
+//        if( _indexes.length < 2*_lowerBound*_minChildren ) // this node can represent its set of instances
 //            return;
 //        
 //        // in order to apply the getRepresentative selection to the getSubprojection, we need to filter the elements so that the
@@ -230,6 +267,8 @@ public class ExplorerTreeNode {
         int[] temp = new int[indexes.length];
         Map<Integer, List<Integer>> mapTemp = Util.createIndex2(indexes, _subprojection);
         int k = 0;
+        System.out.println("indexes");
+        System.out.println(Arrays.toString(indexes));
         System.out.println("mapTemp");
         System.out.println(mapTemp);
         for( Map.Entry<Integer, List<Integer>> v: mapTemp.entrySet() ) {
@@ -522,18 +561,19 @@ public class ExplorerTreeNode {
 
     private Map<Integer, List<Integer>> tryToDivideCluster() {
         System.out.println("Entrei aqui pela "+(nodeCount++)+"-ésima vez.");
-        
-        KMedoid kmedoid = new KMedoid(Arrays.asList(Vect.convert(_subprojection)), new FarPointsMedoidApproach(), _indexes.length/_minChildren);        
+        System.out.println(Arrays.toString(_subprojection));
+        KMedoid kmedoid = new KMedoid(Arrays.asList(Vect.convert(_subprojection)), new FarPointsMedoidApproach(), (int)Math.sqrt(_subprojection.length)/2);        
         kmedoid.execute();
         
         int[] representative = kmedoid.getRepresentatives();
-        
-        Map<Integer, List<Integer>> newMap = new HashMap<>();
-        for( int i = 0; i < representative.length; ++i ) {
-            newMap.put(representative[i], kmedoid.getClusters().get(i));
-        }
+        Map<Integer, List<Integer>> newMap = Util.createIndex2(representative, _subprojection); 
+//        Map<Integer, List<Integer>> newMap = new HashMap<>();;
+//        for( int i = 0; i < representative.length; ++i ) {
+//            newMap.put(representative[i], kmedoid.getClusters().get(i));
+//            System.out.println("Cluster "+representative[i]+" with "+kmedoid.getClusters().get(i).size()+" instances.");
+//        }
         System.out.println("HELLOOOOO");
-        Map<Integer, List<Integer>> mapMedoid = agglomerateDummyClusters(newMap);
+//        Map<Integer, List<Integer>> mapMedoid = agglomerateDummyClusters(newMap);
         return newMap;
     }
 

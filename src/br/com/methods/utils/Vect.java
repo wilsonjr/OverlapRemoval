@@ -63,4 +63,27 @@ public class Vect {
         
         return elems;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Vect other = (Vect) obj;
+        return Arrays.equals(this._vector, other._vector);
+    }
+    
+    
 }
