@@ -42,12 +42,41 @@ We've used the following dependencies in the project:
 If you use the code, please cite us:
 
 @article{MarcilioJr2019,
+
 author = {Wilson E Marcílio-Jr and Danilo M Eler and Rogério E Garcia and Ives R Venturini Pola},
+
 title ={Evaluation of approaches proposed to avoid overlap of markers in visualizations based on multidimensional projection techniques},
+
 journal = {Information Visualization},
+
 volume = {18},
+
 number = {4},
+
 pages = {426-438},
+
 year = {2019},
+
 doi = {10.1177/1473871619845093}
+
+}
+
+
+If you use the SADIRE sampling selection, please use the following citation:
+
+
+@article{MarcilioJr2020,
+
+  title={SADIRE: a context-preserving sampling technique for dimensionality reduction visualizations},
+  
+  author={Marcilio-Jr, W. E., Eler, D. M.},
+  
+  journal={J Vis},
+  
+  year={2020},
+  
+  volume={23},
+  
+  pages={999-1013}
+  
 }
