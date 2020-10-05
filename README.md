@@ -35,3 +35,19 @@ We've used the following dependencies in the project:
 **Jama**: [Jama](http://math.nist.gov/javanumerics/jama/)
 
 **EJML**: [EJML](https://ejml.org/wiki/index.php?title=Main_Page)
+
+
+## Citation
+
+If you use the code, please cite us:
+
+@article{MarcilioJr2019,
+author = {Wilson E Marcílio-Jr and Danilo M Eler and Rogério E Garcia and Ives R Venturini Pola},
+title ={Evaluation of approaches proposed to avoid overlap of markers in visualizations based on multidimensional projection techniques},
+journal = {Information Visualization},
+volume = {18},
+number = {4},
+pages = {426-438},
+year = {2019},
+doi = {10.1177/1473871619845093}
+}
