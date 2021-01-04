@@ -1,6 +1,6 @@
 # OverlapRemoval: a library for reducing overlap in 2D visualizations
 
-Overplotting is a serious concern of everyone working with visualization. In this library, there are a few techniques that address the problem of overlapping markers in 2D projections. The techniques are designed to reduce overlapping while preserve the relationship among data instances.
+Overplotting is a serious concern of everyone working with visualization. In this library, there are a few techniques that address the problem of overlapping markers in 2D projections. The techniques are designed to reduce overlapping while preserving the relationship among data instances.
 
 ## Techniques
 
