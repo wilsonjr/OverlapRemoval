@@ -7,6 +7,7 @@ package br.com.test.ui;
 
 import br.com.methods.overlap.OverlapRegistry;
 import br.com.methods.overlap.OverlapRemoval;
+import br.com.methods.overlap.prism.PRISM;
 import br.com.methods.overlap.projsnippet.ProjSnippet;
 import br.com.methods.overlap.rwordle.RWordleC;
 import br.com.methods.overlap.rwordle.RWordleL;
@@ -106,14 +107,34 @@ public class RunTests {
         
         List<String> results = new ArrayList<String>(); 
         
-        // Define name and object of techniques
-        String[] technique_name = new String[]{"RWordle-L", "ProjSnippet"};
+//        /****
+//         * PC WILSON
+//         */
+//        String[] technique_name = new String[]{"RWordle-L", "ProjSnippet"};
+//        OverlapRemoval[] technique = new OverlapRemoval[]{
+//            (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false),
+//            new ProjSnippet(0.2, 60)
+//        };
+        
+        
+//        /****
+//         * PC DANILO
+//         */
+//        String[] technique_name = new String[]{"PRISM"};
+//        OverlapRemoval[] technique = new OverlapRemoval[]{
+//            (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1)
+//        };
+        
+        
+        /****
+         * PC GLADYS
+         */
+        String[] technique_name = new String[]{"RWordle-C"};
         OverlapRemoval[] technique = new OverlapRemoval[]{
-            (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false),
-            new ProjSnippet(0.2, 60)
+            (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class)
         };
 
-        String path1 = "/home/wilson/Área de Trabalho/OverlapRemoval/datasets_dgrid/ex02"; 
+        String path1 = "/home/wilson/Área de Trabalho/OverlapRemoval/datasets_dgrid/"; 
         File[] files = new File(path1).listFiles();
         //If this pathname does not denote a directory, then listFiles() returns null. 
 
