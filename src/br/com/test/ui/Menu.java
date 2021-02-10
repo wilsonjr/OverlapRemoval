@@ -15,10 +15,13 @@ import br.com.methods.overlap.projsnippet.ProjSnippet;
 import br.com.methods.overlap.rwordle.RWordleC;
 import br.com.methods.overlap.rwordle.RWordleL;
 import br.com.methods.overlap.vpsc.VPSC;
+import br.com.methods.utils.Intersector;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.RectangleVis;
 import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
+import br.com.overlayanalisys.layoutsimilarity.LayoutSimilarity;
+import br.com.overlayanalisys.neighorhoodpreservation.NeighborhoodPreservation;
 import br.com.representative.RepresentativeFinder;
 import br.com.representative.RepresentativeRegistry;
 import br.com.representative.analysis.AnalysisController;
@@ -60,6 +63,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -610,29 +615,59 @@ public class Menu extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_sairJMenuItemActionPerformed
 
+        
+    
+    
+    
     private void loadDataJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadDataJMenuItemActionPerformed
-        JFileChooser jFileChooser = new JFileChooser("D:\\Data");
-        int result = jFileChooser.showOpenDialog(this);
-        if( result == JFileChooser.APPROVE_OPTION ) {
+//        JFileChooser jFileChooser = new JFileChooser("/home/wilson/Área de Trabalho/OverlapRemoval/datasets");
+//        int result = jFileChooser.showOpenDialog(this);
+//        if( result == JFileChooser.APPROVE_OPTION ) {
+            System.out.println("HElloo");
             try {                 
                 items = new ArrayList<>();
-                File file = jFileChooser.getSelectedFile();
-                Scanner scn = new Scanner(file);
+                List<Point2D.Double> pts = new ArrayList<>();
+//                File file = jFileChooser.getSelectedFile();
+                Scanner scn = new Scanner(new File("/home/wilson/Área de Trabalho/OverlapRemoval/datasets/a.coord"));
                 rectangles.clear();
                 //RainbowScale rbS = new RainbowScale();
                 GrayScale rbS = new GrayScale();
-                List<Point2D.Double> pts = new ArrayList<>();
+                
                 int id = 0;
+                    
+                
                 while( scn.hasNext() ) {
                     String[] linha = scn.nextLine().split(";");
                     double x = Double.parseDouble(linha[1]);
                     double y = Double.parseDouble(linha[2]);
-                    int grupo = id;//Integer.parseInt(linha[3]);
+                    int grupo = (int) Double.parseDouble(linha[3]);
 
                     rectangles.add(new RectangleVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo*10)%255), id++));   
+                    
+                }
+                
+                float[][] proj = new float[rectangles.size()][2];
+                for( int i = 0; i < proj.length; ++i ) {
+                    proj[i][0] = (float) rectangles.get(i).x;
+                    proj[i][1] = (float) rectangles.get(i).y;
+                }
+                float[][] updated_proj = normalizeVertex(50, 550, proj);
+                
+                
+                for( int i = 0; i < updated_proj.length; ++i ) {
+                    
+                    rectangles.get(i).x = updated_proj[i][0];
+                    rectangles.get(i).y = updated_proj[i][1];
+                    
+                    float x = updated_proj[i][0];
+                    float y = updated_proj[i][1];
+                            
+                    
                     items.add(new Vect(new double[]{x, y}));
                     pts.add(new Point2D.Double(x, y));
                 }
+                
+                
                 
                 points = pts.stream().toArray(Point2D.Double[]::new);
                 view.setPoints(points);
@@ -652,24 +687,120 @@ public class Menu extends javax.swing.JFrame {
                     view.cleanImage();
                     view.repaint();            
                 }
-            } catch( FileNotFoundException e ) {
-
+            } catch( Exception e ) {
+                System.out.println(e);
             }
-        }
+//        }
     }//GEN-LAST:event_loadDataJMenuItemActionPerformed
 
     private void rwordleCJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordleCJMenuItemActionPerformed
+       
+        
+        /******
+         * PRE-PROCESSING STEPS
+         */
+        // choose where to center the coordinates after overlap removal
+        // here, I am using the origin
+        double[] center_middle = {0, 0};
+        
+        
+        // save the initial positions for metric computation
+        ArrayList<OverlapRect> initial_positions = Util.toRectangle(rectangles);
+        double[] center0 = Util.getCenter(initial_positions);
+        Util.translate(initial_positions, center_middle[0]-center0[0], center_middle[1]-center0[1]);
+        
+        double xmin = Collections.min(initial_positions, Comparator.comparing(s -> s.x)).x;
+        double xmax = Collections.max(initial_positions, Comparator.comparing(s -> s.x)).x;
+        
+        double ymin = Collections.min(initial_positions, Comparator.comparing(s -> s.y)).y;
+        double ymax = Collections.max(initial_positions, Comparator.comparing(s -> s.y)).y;
+        
+        // convert the coordinates to use the overlap removal techniques
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
-        double[] center0 = Util.getCenter(rects);
-        //OverlapRemoval rw = new RWordleC();
-        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class);
+        
+        
+        
+       
+        
+        /******
+         * APPLYING OVERLAP REMOVAL 
+         */
+        // Choose a overlap removal technique
+//        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class);
+        OverlapRemoval rw = new ProjSnippet(0.7, 60);
+        // apply the algorithm
         Map<OverlapRect, OverlapRect> projected = rw.apply(rects);
+        
+        // get the projected values
         ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
+        
+        // get the center
         double[] center1 = Util.getCenter(projectedValues);
         
-        double ammountX = center0[0]-center1[0];
-        double ammountY = center0[1]-center1[1];
+        // translate the projection to the origin (we define it in the pre-processing steps)
+        double ammountX = center_middle[0]-center1[0];
+        double ammountY = center_middle[1]-center1[1];
         Util.translate(projectedValues, ammountX, ammountY);
+        
+        
+        /******
+         * APPLYING THE BOUNDING BOX
+         */        
+        // define width and height of bounding b.
+        // Here, I am using the one its greater: projection's bounding box or 300x300 pixels
+        double width = Math.max(xmax-xmin, 300);
+        double height = Math.max(ymax-ymin, 300);
+        
+        // define upper x, upper y, lower x, lower y coordinates (visual space)
+        double ux = center_middle[0] - width/2 - initial_positions.get(0).width;
+        double uy = center_middle[1] - height/2 - initial_positions.get(0).height;
+        double lx = center_middle[0] + width/2 + initial_positions.get(0).width;
+        double ly = center_middle[1] + height/2 + initial_positions.get(0).height;
+        
+        
+        
+        
+        
+        // check if the new coordinate (after overlap removal) lie outside the bouding box
+        // if so, set the position on the borders
+        
+        
+        
+        for( int i = 0; i < projectedValues.size(); ++i ) {
+            // create a Intersector 
+            Intersector boundingb = new Intersector(ux, uy, lx, ly,  initial_positions.get(i).x, initial_positions.get(i).y);
+            if( !boundingb.isInside(projectedValues.get(i).x, projectedValues.get(i).y) ) {
+                double[] new_coords = boundingb.mouseUp(projectedValues.get(i).x, projectedValues.get(i).y);
+                
+                // necessary for the case when initial and final positions are outside the bounding box
+                if( new_coords == null ) {
+                    Intersector bb = new Intersector(ux, uy, lx, ly,  center_middle[0], center_middle[1]);
+                    new_coords = bb.mouseUp(projectedValues.get(i).x, projectedValues.get(i).y);
+                }
+                
+                projectedValues.get(i).setUX(new_coords[0]);
+                projectedValues.get(i).setUY(new_coords[1]);
+            } 
+        }
+        
+        double ls = new LayoutSimilarity().execute(initial_positions, projectedValues);
+        
+        NeighborhoodPreservation np = new NeighborhoodPreservation(30);
+        
+        double mean_np = np.execute(initial_positions, projectedValues);
+        List<Double> np_values = np.getNP();
+        
+        System.out.println("Layout similarity: "+ls);
+        
+        System.out.println("Mean NP: "+mean_np);
+        
+        for( int i = 0; i < np_values.size(); ++i ) {
+            System.out.println("k: "+(i+1)+", np: "+np_values.get(i));
+            
+        }
+        
+        
+        
         
         Util.normalize(projectedValues);
         Util.toRectangleVis(rectangles, projectedValues);
@@ -736,13 +867,13 @@ public class Menu extends javax.swing.JFrame {
     
 
     private void prismJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prismJMenuItemActionPerformed
-        int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
-        boolean applySeamCarving = Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
+//        int algo = Integer.parseInt(JOptionPane.showInputDialog("Deseja utilizar uma estrutura de matriz esparsa?\n0-Não\n1-Sim"));
+//        boolean applySeamCarving = Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
         
         double[] center0 = Util.getCenter(rects);
         //OverlapRemoval prism = new PRISM(algo);
-        OverlapRemoval prism = (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, algo);
+        OverlapRemoval prism = (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1);
         Map<OverlapRect, OverlapRect> projected = prism.applyAndShowTime(rects);
         ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
         
@@ -753,8 +884,8 @@ public class Menu extends javax.swing.JFrame {
         Util.translate(projectedValues, ammountX, ammountY);        
         Util.normalize(projectedValues);
                 
-        if( applySeamCarving )
-            OverlapView.addSeamCarvingResult(projectedValues);
+//        if( applySeamCarving )
+//            OverlapView.addSeamCarvingResult(projectedValues);
         
         Util.toRectangleVis(rectangles, projectedValues);
         

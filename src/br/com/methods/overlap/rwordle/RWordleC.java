@@ -119,6 +119,9 @@ public class RWordleC implements OverlapRemoval {
             
             projected.add(new OverlapRect(areaS.getBounds().x, areaS.getBounds().y, areaS.getBounds().getWidth(), 
                                         areaS.getBounds().getHeight(), shapes.get(i).getOriginalId()));
+            if( Util.bounding_box != null ) {
+                Util.putInsideBox(projected, Util.bounding_box);
+            }
         }
         
         

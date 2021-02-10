@@ -67,8 +67,8 @@ public class KNN {
 
         long finish = System.currentTimeMillis();
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO,
-                "KNN time: " + (finish - start) / 1000.0f + "s");
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO,
+//                "KNN time: " + (finish - start) / 1000.0f + "s");
 
         return neighbors;
     }

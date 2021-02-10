@@ -140,7 +140,7 @@ public class PRISM implements OverlapRemoval {
         // form a proximity graph Gp of x0 by Delaunay triangulation        
         PRISMPoint[] points = new PRISMPoint[projected.size()];
        
-        int maxIterations = 10000;
+        int maxIterations = 100;
         
         do {
             for( int i = 0; i < projected.size(); ++i )

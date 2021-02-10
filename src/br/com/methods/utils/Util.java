@@ -55,7 +55,7 @@ public class Util {
     private static boolean finished;
     private static TreeSet<Integer> lwZeroRow;
     private static TreeSet<Integer> lzZeroRow;
-    
+    public static float[][] bounding_box = null;
     /**
      * Verifica se o método PRISM já pode ser parado
      * @return true se sim,
@@ -1168,6 +1168,27 @@ public class Util {
         Point2D.Double centralPoint = new Point2D.Double(i.x + delta1/delta, i.y + delta2/delta);
         
         return Util.euclideanDistance(centralPoint.x, centralPoint.y, p.x, p.y) <= Util.euclideanDistance(centralPoint.x, centralPoint.y, i.x, i.y);        
+    }
+    
+    public static ArrayList<OverlapRect> putInsideBox(ArrayList<OverlapRect> rects, float[][] bounding_box)
+    {
+        
+        for( int i = 0; i < rects.size(); ++i ) {
+            
+            if( rects.get(i).getUX() < bounding_box[0][0] )
+                rects.get(i).setUX((double) bounding_box[0][0]);
+            if( rects.get(i).getUX() > bounding_box[1][0] )
+                rects.get(i).setUX((double) bounding_box[1][0]);
+            
+            if( rects.get(i).getUY() < bounding_box[0][1] )
+                rects.get(i).setUY((double) bounding_box[0][1]);
+            if( rects.get(i).getUY() > bounding_box[1][1] )
+                rects.get(i).setUY((double) bounding_box[1][1]);
+        }
+        
+        
+        return rects;
+        
     }
     
     public static ArrayList<OverlapRect> getProjectedValues(Map<OverlapRect, OverlapRect> projected) {

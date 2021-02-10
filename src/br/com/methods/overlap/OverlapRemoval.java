@@ -21,6 +21,9 @@ import java.util.logging.Logger;
  * @author wilson
  */
 public interface OverlapRemoval {
+    
+    
+    
     public Map<OverlapRect, OverlapRect> apply(List<OverlapRect> rects);
     
     default public Map<OverlapRect, OverlapRect> applyAndShowTime(List<OverlapRect> rects) {

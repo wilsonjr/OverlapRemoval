@@ -218,15 +218,15 @@ vector<double> read_elems()
     #ifdef DEBUG
         ifstream ifs("points.rect");
     #endif // DEBUG
-
     #ifndef DEBUG
         ifstream ifs("projsnippet_routine/points.rect");
     #endif // DEBUG
 
 
-    if( ifs ) {
+    if( ifs) {
         int qtd = 0;
         ifs >> qtd;
+	cout << qtd << endl;
         for( int i = 0; i < qtd; ++i ) {
             ifs >> x >> y >> w >> h;
             elems.push_back(test_w*x);
@@ -244,7 +244,6 @@ vector<double> read_elems()
 
         ifs.close();
     }
-
     return elems;
 }
 
@@ -278,6 +277,7 @@ vector<vector<double> > read_matrix() {
 }
 
 int main(int argc, char** argv) {
+	cout << "HELLO "<< endl;
     vector<double> x = read_elems();
     L = read_matrix();
     int n = x.size();
@@ -295,13 +295,13 @@ int main(int argc, char** argv) {
     nlopt::opt opt(nlopt::LD_MMA, n);
     vector<double> lb(n, 0);
     vector<double> up(n, test_w*(media*(n/2)+(menor+30)));
-    opt.set_lower_bounds(lb);
+     opt.set_lower_bounds(lb);
     opt.set_upper_bounds(up);
-    opt.set_stopval(0.00001);
+     opt.set_stopval(0.00001);
     opt.set_maxeval(5000);
-    opt.set_maxtime(900);
-    opt.set_ftol_abs(0.00001);
-    opt.set_ftol_rel(0.00001);
+     opt.set_maxtime(900);
+     opt.set_ftol_abs(0.00001);
+     opt.set_ftol_rel(0.00001);
     opt.set_min_objective(objective_function, NULL);
 
     double minf = 0;
