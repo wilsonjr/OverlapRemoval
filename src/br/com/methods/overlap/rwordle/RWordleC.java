@@ -79,6 +79,9 @@ public class RWordleC implements OverlapRemoval {
             double angle = 2.;            
             boolean flag;  
             
+            int current_try = 1;
+            int max_tries = 5000;
+            
             Area areaS = null;
             do {
                 
@@ -114,7 +117,7 @@ public class RWordleC implements OverlapRemoval {
                  * we think that reduce the growth rate at each iteration is a good guess
                  */
                 angle += 0.3; 
-            } while( !flag );
+            } while( !flag && current_try++ < max_tries);
                         
             
             projected.add(new OverlapRect(areaS.getBounds().x, areaS.getBounds().y, areaS.getBounds().getWidth(), 

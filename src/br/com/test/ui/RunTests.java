@@ -39,9 +39,10 @@ import java.util.logging.Logger;
  * @author wilson
  */
 public class RunTests {
-    private final static int RECTSIZE = 10;
-    private final static int NORM_X = 50;
-    private final static int NORM_Y = 550;
+    private final static int RECTSIZE = 90;
+    private final static int BEGIN_NORM = 50;
+    private final static int END_NORM = 550;
+    private static List<Integer> labels;
     
     public static ArrayList<RectangleVis> load_dataset(String path) {
         
@@ -52,7 +53,8 @@ public class RunTests {
             Scanner scn = new Scanner(new File(path));
             rectangles.clear();
             RainbowScale rbS = new RainbowScale();
-
+            labels = new ArrayList<>();
+            
             int id = 0;
             while( scn.hasNext() ) {
                 String temp = scn.nextLine();
@@ -68,8 +70,10 @@ public class RunTests {
                 double x = Double.parseDouble(linha[1]);
                 double y = Double.parseDouble(linha[2]);
                 int grupo = (int) Double.parseDouble(linha[3]);
+                
 
                 rectangles.add(new RectangleVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo*10)%255), id++)); 
+                labels.add(grupo);
             }
 
             float[][] proj = new float[rectangles.size()][2];
@@ -77,7 +81,7 @@ public class RunTests {
                 proj[i][0] = (float) rectangles.get(i).x;
                 proj[i][1] = (float) rectangles.get(i).y;
             }
-            float[][] updated_proj = normalizeVertex(50, 550, proj);
+            float[][] updated_proj = normalizeVertex(BEGIN_NORM, END_NORM, proj);
 
 
             for( int i = 0; i < updated_proj.length; ++i ) {
@@ -110,11 +114,11 @@ public class RunTests {
 //        /****
 //         * PC WILSON
 //         */
-//        String[] technique_name = new String[]{"RWordle-L", "ProjSnippet"};
-//        OverlapRemoval[] technique = new OverlapRemoval[]{
-//            (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false),
-//            new ProjSnippet(0.2, 60)
-//        };
+        String[] technique_name = new String[]{"RWordle-L", "ProjSnippet"};
+        OverlapRemoval[] technique = new OverlapRemoval[]{
+            (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false),
+            new ProjSnippet(0.5, 10)
+        };
         
         
 //        /****
@@ -129,10 +133,10 @@ public class RunTests {
         /****
          * PC GLADYS
          */
-        String[] technique_name = new String[]{"RWordle-C"};
-        OverlapRemoval[] technique = new OverlapRemoval[]{
-            (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class)
-        };
+//        String[] technique_name = new String[]{"RWordle-C"};
+//        OverlapRemoval[] technique = new OverlapRemoval[]{
+//            (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class)
+//        };
 
         String path1 = "/home/wilson/Área de Trabalho/OverlapRemoval/datasets_dgrid/"; 
         File[] files = new File(path1).listFiles();
@@ -188,11 +192,12 @@ public class RunTests {
         
         
         // for all datasets...
-        for( int index = 0; index < 2; ++index ) {                
+        for( int index = 0; index < 1; ++index ) {                
             
             System.out.println("Loading dataset: "+(path1+"/"+results.get(index)));
             
             ArrayList<RectangleVis> rectangles = load_dataset(path1+"/"+results.get(index));
+            ArrayList<RectangleVis> temp_rect = load_dataset(path1+"/"+results.get(index));
             /******
              * PRE-PROCESSING STEPS
              */
@@ -222,8 +227,8 @@ public class RunTests {
              */        
             // define width and height of bounding b.
             // Here, I am using the one its greater: projection's bounding box or 300x300 pixels
-            double width = Math.max(xmax-xmin, 300);
-            double height = Math.max(ymax-ymin, 300);
+            double width = Math.max(xmax-xmin, rectangles.size()*RECTSIZE);
+            double height = Math.max(ymax-ymin, rectangles.size()*RECTSIZE);
 
             // define upper x, upper y, lower x, lower y coordinates (visual space)
             double ux = center_middle[0] - width/2 - initial_positions.get(0).width;
@@ -324,6 +329,8 @@ public class RunTests {
                 System.out.println("Saving results...");
 
                 System.out.println();
+                
+                Util.toRectangleVis(temp_rect, projectedValues);
                
                
                 try
@@ -360,10 +367,30 @@ public class RunTests {
                         return;
                     }
                 }
+                FileWriter points = null;
+                try {
+                    
+                    points = new FileWriter(results.get(index)+"_points_"+technique_name[index_technique]+".csv", false);
+                    points.write("x,y,width,height,label\n");
+                    
+                    for( int k = 0; k < temp_rect.size(); ++k )
+                        points.write(temp_rect.get(k).getUX()+","+temp_rect.get(k).getUY()+","+temp_rect.get(k).getWidth()+","+temp_rect.get(k).getHeight()+","+labels.get(k)+"\n");
+                    
+                } catch( IOException ioe ) {
+                    System.out.println("IOException: "+ioe.getMessage());
+                    
+                } finally {
+                    try {
+                        
+                        if( points != null  )
+                            points.close();
+                        
+                    } catch( IOException e ) {
+                       System.out.println(e);
+                       return;
+                    }
+                }
 
-               System.out.println("Layout similarity: "+ls);
-
-               System.out.println("Mean NP: "+mean_np);
 
             }
 

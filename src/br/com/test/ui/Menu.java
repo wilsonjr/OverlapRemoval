@@ -100,7 +100,7 @@ public class Menu extends javax.swing.JFrame {
     private boolean loadedData = false;
     private ArrayList<Point> hexPoints;
     private static final int HEXBOARD_SIZE = 20;
-    private static final int RECTSIZE = 8;
+    private static final int RECTSIZE = 90;
     private int menor;
     private List<List<List<Integer>>> clusters = null;
     private List<List<Integer>> currentCluster = null;
@@ -651,7 +651,7 @@ public class Menu extends javax.swing.JFrame {
                     proj[i][0] = (float) rectangles.get(i).x;
                     proj[i][1] = (float) rectangles.get(i).y;
                 }
-                float[][] updated_proj = normalizeVertex(50, 550, proj);
+                float[][] updated_proj = normalizeVertex(0, 1000, proj);
                 
                 
                 for( int i = 0; i < updated_proj.length; ++i ) {

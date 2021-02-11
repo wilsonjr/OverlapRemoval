@@ -126,7 +126,8 @@ public class RWordleL implements OverlapRemoval {
             double adjust = .5;
             
             boolean flag;  
-            
+            int max_tries = 5000;
+            int current_try = 1;
             Area areaS = null;
             do {
                 
@@ -157,7 +158,7 @@ public class RWordleL implements OverlapRemoval {
                     }                        
                 } 
                 angle += (0.3); 
-            } while( !flag );
+            } while( !flag  &&  current_try++ < max_tries );
                         
             projected.add(new OverlapRect(areaS.getBounds().x, areaS.getBounds().y, 
                                         areaS.getBounds().width, areaS.getBounds().height, novos.get(i).getId()));

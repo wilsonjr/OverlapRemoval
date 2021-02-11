@@ -1,13 +1,7 @@
 Dataset,Technique,Metric,Value
-ex-size[630]-dense_groups[3]-number_groups[5]-aspect_ratio[4].data,RWordle-L,Layout Similarity,2.4692426399077334
-ex-size[630]-dense_groups[3]-number_groups[5]-aspect_ratio[4].data,RWordle-L,Mean NP,0.016335988552375103
-ex-size[630]-dense_groups[3]-number_groups[5]-aspect_ratio[4].data,RWordle-L,Time (s),28.027
-ex-size[630]-dense_groups[3]-number_groups[5]-aspect_ratio[4].data,ProjSnippet,Layout Similarity,2.449433363354022
-ex-size[630]-dense_groups[3]-number_groups[5]-aspect_ratio[4].data,ProjSnippet,Mean NP,0.08283624595573608
-ex-size[630]-dense_groups[3]-number_groups[5]-aspect_ratio[4].data,ProjSnippet,Time (s),2.135
-ex-size[628]-dense_groups[0]-number_groups[4]-aspect_ratio[3].data,RWordle-L,Layout Similarity,1.7015591162313495
-ex-size[628]-dense_groups[0]-number_groups[4]-aspect_ratio[3].data,RWordle-L,Mean NP,0.013943076642534098
-ex-size[628]-dense_groups[0]-number_groups[4]-aspect_ratio[3].data,RWordle-L,Time (s),5.011
-ex-size[628]-dense_groups[0]-number_groups[4]-aspect_ratio[3].data,ProjSnippet,Layout Similarity,3.4830780464028974
-ex-size[628]-dense_groups[0]-number_groups[4]-aspect_ratio[3].data,ProjSnippet,Mean NP,0.03753818269489797
-ex-size[628]-dense_groups[0]-number_groups[4]-aspect_ratio[3].data,ProjSnippet,Time (s),3.205
+ex-size[630]-dense_groups[3]-number_groups[5]-aspect_ratio[4].data,RWordle-L,Layout Similarity,2.1297344783406764
+ex-size[630]-dense_groups[3]-number_groups[5]-aspect_ratio[4].data,RWordle-L,Mean NP,0.017693963298387967
+ex-size[630]-dense_groups[3]-number_groups[5]-aspect_ratio[4].data,RWordle-L,Time (s),333.787
+ex-size[630]-dense_groups[3]-number_groups[5]-aspect_ratio[4].data,ProjSnippet,Layout Similarity,2.274058877608587
+ex-size[630]-dense_groups[3]-number_groups[5]-aspect_ratio[4].data,ProjSnippet,Mean NP,0.019706061965128748
+ex-size[630]-dense_groups[3]-number_groups[5]-aspect_ratio[4].data,ProjSnippet,Time (s),2.546
