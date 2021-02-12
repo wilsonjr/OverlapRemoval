@@ -139,6 +139,12 @@ public class RWordleL implements OverlapRemoval {
                 double x = (novos.get(i).getCenterX()+xlinha) + Math.sin(angle)*angle*adjust;
                 double y = (novos.get(i).getCenterY()+ylinha) + Math.cos(angle)*angle*adjust;                
                 
+                
+                if( Util.bounding_box != null ) {
+                    x = Util.checkBoundX((float) x);
+                    y = Util.checkBoundY((float) y);
+                } 
+                                
                  /**
                  * creates a area object for simple check for overlaps
                  */    

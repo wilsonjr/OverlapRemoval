@@ -52,7 +52,7 @@ public class Util {
     private static final double EPS = 10e-4;
     private static final int LIMIT = 10000;
     public  static final double ZERO = 0.0000000;
-    private static boolean finished;
+    public static boolean finished;
     private static TreeSet<Integer> lwZeroRow;
     private static TreeSet<Integer> lzZeroRow;
     public static float[][] bounding_box = null;
@@ -904,6 +904,32 @@ public class Util {
             }
         }
     }
+    
+    public static double[] getCenter(PRISMPoint[] rects) {
+        double xmin = rects[0].getRect().getUX(), xmax = rects[0].getRect().getLX(), 
+               ymin = rects[0].getRect().getUY(), ymax = rects[0].getRect().getLY();                      
+        
+        for( PRISMPoint r: rects ) {
+            if( r.getRect().getUX() < xmin ) 
+                xmin = r.getRect().getUX();
+            if( r.getRect().getLX() > xmax )
+                xmax = r.getRect().getLX();
+            if( r.getRect().getUY() < ymin )
+                ymin = r.getRect().getUY();
+            if( r.getRect().getLY() > ymax )
+                ymax = r.getRect().getLY();
+        }
+        
+        /**
+         * Compute the center of mass of set 
+         */        
+        double centerX = (xmin+xmax)/2;
+        double centerY = (ymin+ymax)/2;
+        
+        
+        double[] center = {centerX, centerY};
+        return center;
+    }
         
     /**
      * Recupera a coordenada central da projeção
@@ -936,6 +962,12 @@ public class Util {
         return center;
     }
     
+    
+    public static void translate(OverlapRect rect, double ammountX, double ammountY) {
+        rect.setUX(rect.getUX()+ammountX);
+        rect.setUY(rect.getUY()+ammountY);
+    }
+    
     /**
      * Realiza a translação da projeção.
      * @param rects Projeção corrente
@@ -963,7 +995,8 @@ public class Util {
         double[] y = new double[layout.length];
        
         double stress0 = stress(edges);
-        int limit = layout.length;
+//        int limit = layout.length;
+        int limit = 1;
         
         do {            
             YaleMatrix lz = generateLzYale(edges, layout.length);
@@ -1001,22 +1034,30 @@ public class Util {
             retorno = Util.conjugateGradient(matrizy, ry, vy, py, by);
             
             for( int i = 0; i < by.length; ++i ) {
-                layout[i].getRect().setUX(vx[2][i]-layout[i].getRect().getWidth()/2.);
-                layout[i].getRect().setUY(vy[2][i]-layout[i].getRect().getHeight()/2.);
+                
+//                   System.out.printf("Stress: %.3f\n", vx[2][i]);
+                   
+                
+                  layout[i].getRect().setUX(vx[2][i]-layout[i].getRect().getWidth()/2.);
+                  layout[i].getRect().setUY(vy[2][i]-layout[i].getRect().getHeight()/2.);
+                    
+             
+                
             }
 
             double stress1 = stress(edges);
-            if( Math.abs(stress0-stress1) < stress1*EPS )
+            if( Math.abs(stress0-stress1) < 0.01 )
                 return layout;
             
             stress0 = stress1;            
             
             boolean flag = true;
             for( int i = 0; i < edges.length && flag; ++i ) 
-                if( Util.tij(edges[i].getU().getRect(), edges[i].getV().getRect()) != 1.00000000000 )
+                if( Util.tij(edges[i].getU().getRect(), edges[i].getV().getRect()) > 1.00000000000 ) {
                     flag = false;
+                }
             
-            System.out.println("Stress majorization iteration number: "+limit);
+            //System.out.println("Stress majorization iteration number: "+limit);
             if( flag ) {
                 finished = true;
                 return layout;
@@ -2103,6 +2144,24 @@ public class Util {
             projection[i] = new Point2D.Double(newproj[i][0], newproj[i][1]);                    
         
         return projection;
+    }
+
+    public static float checkBoundX(float x) {
+        if( x < bounding_box[0][0] )
+            return bounding_box[0][0];
+        if( x > bounding_box[1][0] )
+            return bounding_box[1][0];
+        return x;
+    }
+    
+    
+
+    public static float checkBoundY(float x) {
+        if( x < bounding_box[0][1] )
+            return bounding_box[0][1];
+        if( x > bounding_box[1][1] )
+            return bounding_box[1][1];
+        return x;
     }
     
              

@@ -60,7 +60,7 @@ public class Intersector {
 
     public boolean checkIn(int codigo) {
 
-            for( var i = 3; i >= 0; --i )
+            for( int i = 3; i >= 0; --i )
                     if( (codigo & (1 << i)) != 0 )
                         return false;
 
@@ -68,7 +68,7 @@ public class Intersector {
     }
     
     public int setCodigo(double x, double y) {
-            var codigo = 0;
+            int codigo = 0;
 
             if( x < Math.min(this.x1_rect, this.x2_rect) ) {
                     codigo |= (1);

@@ -76,7 +76,8 @@ public class RWordleC implements OverlapRemoval {
         ArrayList<OverlapRect> projected = new ArrayList<>();
         for( int i = 0; i < shapes.size(); ++i ) {
             /* this is a assumption */
-            double angle = 2.;            
+            double angle = 3.;            
+            
             boolean flag;  
             
             int current_try = 1;
@@ -89,9 +90,17 @@ public class RWordleC implements OverlapRemoval {
                 
                 /**
                  * Moves elements according with a spiral while has overlaps
-                 */                 
+                 */  
+                
+                
                 double x = shapes.get(i).getRect().getCenterX() + Math.sin(angle)*angle*0.5;
-                double y = shapes.get(i).getRect().getCenterY() + Math.cos(angle)*angle*0.5;               
+                double y = shapes.get(i).getRect().getCenterY() + Math.cos(angle)*angle*0.5;  
+                
+                
+                if( Util.bounding_box != null ) {
+                    x = Util.checkBoundX((float) x);
+                    y = Util.checkBoundY((float) y);
+                } 
                                 
                 /**
                  * creates a area object for simple check for overlaps

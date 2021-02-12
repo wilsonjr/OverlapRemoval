@@ -38,6 +38,9 @@ import br.com.methods.overlap.OverlapRemoval;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.Util;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -84,8 +87,14 @@ public class VPSC implements OverlapRemoval {
         VPSC.solveVPSC(vars, restricoes);
         
         // move rectangles in x coordinate
-        for( int i = 0; i < projected.size(); ++i ) 
-            projected.get(i).moveX(vars.get(i).getPosition());
+        for( int i = 0; i < projected.size(); ++i ) {
+            
+            if( Util.bounding_box != null ) {
+                projected.get(i).moveX(Util.checkBoundX((float)vars.get(i).getPosition()));
+            }
+            else 
+                projected.get(i).moveX(vars.get(i).getPosition());
+        }
               
         // init all variables         
         for( int i = 0; i < vars.size(); ++i ) 
@@ -97,8 +106,12 @@ public class VPSC implements OverlapRemoval {
         
         // solve vpsc for y and move rectangles in y direction to remove all overlap remaining
         VPSC.solveVPSC(vars, restricoes);
-        for( int i = 0; i < projected.size(); ++i )  
-            projected.get(i).moveY(vars.get(i).getPosition());           
+        for( int i = 0; i < projected.size(); ++i )  {
+            if( Util.bounding_box != null)
+                projected.get(i).moveY(Util.checkBoundY((float)vars.get(i).getPosition()));
+            else 
+                projected.get(i).moveY(vars.get(i).getPosition());
+        }           
         
         
         Map<OverlapRect, OverlapRect> projectedToReprojected = new HashMap<>();
@@ -221,7 +234,11 @@ public class VPSC implements OverlapRemoval {
             eventos[j++] = (new Event("CLOSE", no, retangulos.get(i).getLX()));
         }
           
-       Util.quickSort(eventos, 0, eventos.length-1);
+//               Util.quickSort(eventos, 0, eventos.length-1);
+        
+        Arrays.sort(eventos, (Event o1, Event o2) -> {
+            return Double.compare(o1.getPosition(),o2.getPosition());
+        });
 
         for( int i = 1; i < eventos.length; ++i )
             if( eventos[i-1].getNo().getRect() == eventos[i].getNo().getRect() && eventos[i-1].getTipo().equals("OPEN") ) {
@@ -317,6 +334,7 @@ public class VPSC implements OverlapRemoval {
         /**
          * Adiciona os eventos de abertura e fechamento dos retangulos 
          */
+        System.out.println("to aqui");
         Event[] eventos = new Event[retangulos.size()*2];
         for( int i = 0, j = 0; i < retangulos.size(); ++i ) {
             vars.get(i).setDesiredPosition(retangulos.get(i).getCenterX());            
@@ -324,10 +342,14 @@ public class VPSC implements OverlapRemoval {
             eventos[j++] = new Event("OPEN", no, retangulos.get(i).getUY());
             eventos[j++] = new Event("CLOSE", no, retangulos.get(i).getLY());            
         }
-        
+        System.out.println("passou quick 1");
         // [e1,..., e2n] := events sorted by posn
-        Util.quickSort(eventos, 0, eventos.length-1);
+//        Util.quickSort(eventos, 0, eventos.length-1);
         
+        Arrays.sort(eventos, (Event o1, Event o2) -> {
+            return Double.compare(o1.getPosition(),o2.getPosition());
+        });
+        System.out.println("passou quick 2");
         // elementos consecutivos que fazem parte do mesmo retangulo, o evento OPEN deve vir primeiro
         for( int i = 1; i < eventos.length; ++i ) 
             if( eventos[i-1].getNo().getRect() == eventos[i].getNo().getRect() && eventos[i-1].getTipo().equals("OPEN") ) {

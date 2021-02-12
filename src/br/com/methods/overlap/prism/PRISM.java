@@ -96,9 +96,11 @@ public class PRISM implements OverlapRemoval {
          */
         ArrayList<Constraint> restricoesx = new ArrayList<>();
         ArrayList<Constraint> restricoesy = new ArrayList<>();
+        System.out.println("GenerateCx");
         VPSC.generateCx(projected, varsx, restricoesx);
+        System.out.println("GenerateCy");
         VPSC.generateCy(projected, varsy, restricoesy);        
-        
+        System.out.println("Passou");
         // aumenta o grafo de proximidade com as arestas encontradas pelo VPSC
         PRISMEdge[] newOverlaps = new PRISMEdge[restricoesx.size()+restricoesy.size()];
         for( int i = 0; i < restricoesx.size(); ++i ) {
@@ -134,13 +136,18 @@ public class PRISM implements OverlapRemoval {
     private static List<OverlapRect> apply(List<OverlapRect> rects, boolean augmentGp, int algorithm) {
         ArrayList<OverlapRect> projected = new ArrayList<>();
         
-        for( int i = 0; i < rects.size(); ++i )
+        for( int i = 0; i < rects.size(); ++i ) {
             projected.add(new OverlapRect(rects.get(i).getUX(), rects.get(i).getUY(), rects.get(i).getWidth(), rects.get(i).getHeight()));
-                
+            
+//            System.out.printf("Orig: (%.3f, %.3f) -- (%.3f, %.3f)\n", rects.get(i).getUX(), rects.get(i).getUY(), 
+//                    rects.get(i).getCenterX()-rects.get(i).getWidth()/2, 
+//                    rects.get(i).getCenterY()-rects.get(i).getHeight()/2);
+            
+        }
         // form a proximity graph Gp of x0 by Delaunay triangulation        
         PRISMPoint[] points = new PRISMPoint[projected.size()];
        
-        int maxIterations = 100;
+        int maxIterations = 35;
         
         do {
             for( int i = 0; i < projected.size(); ++i )
@@ -151,8 +158,10 @@ public class PRISM implements OverlapRemoval {
             ArrayList<PRISMEdge> edges = new ArrayList<>();
             if( rects.size() > 2 ) {
                 Delaunay_Triangulation dt = new Delaunay_Triangulation(points);
+                System.out.println("values: ");
+                System.out.println(dt);
                 Iterator<Triangle_dt> trianglesIterator = dt.trianglesIterator();
-                
+                System.out.println("passei");
                 while( trianglesIterator.hasNext() ) {
                     Triangle_dt t = trianglesIterator.next();
                     if( !t.isHalfplane() ) {            
@@ -179,6 +188,7 @@ public class PRISM implements OverlapRemoval {
                 System.out.println("Augmenting Proximity Graph");
                 
                 PRISMEdge[] restEdge = findRestOverlaps(projected);
+                System.out.println("Já encontrei");
                 for( int i = 0; i < restEdge.length; ++i ) 
                     if( !edges.contains(restEdge[i]) ) 
                         edges.add(restEdge[i]);
@@ -188,8 +198,9 @@ public class PRISM implements OverlapRemoval {
             boolean flag = false;
             for( int i = 0; i < edges.size(); ++i ) {
                 arestas[i] = edges.get(i);                
-                if( Util.tij(arestas[i].getU().getRect(), arestas[i].getV().getRect()) != 1.0000000 )
+                if( Util.tij(arestas[i].getU().getRect(), arestas[i].getV().getRect()) > 1.0000000 ) {
                     flag = true;
+                }
             }
             
             if( flag ) {
@@ -201,11 +212,66 @@ public class PRISM implements OverlapRemoval {
                 else 
                     pontos = Util.stressMajorizationYale(arestas, points);
                 
+                
+                
+                
                 if( pontos != null ) {
+                    
+                    if( Util.bounding_box != null ) {
+                        double[] center_middle = new double[]{0, 0};
+                        double[] center0 = Util.getCenter(pontos);
+                        
+                        
+                        for( int i = 0; i < pontos.length; ++i ) {
+                            float x_before = (float) pontos[i].getRect().getUX();
+                            float y_before = (float) pontos[i].getRect().getUY();
+                            
+                            Util.translate(pontos[i].getRect(), center_middle[0]-center0[0], center_middle[1]-center0[1]);
+                            
+                            float x_after = (float) pontos[i].getRect().getUX();
+                            float y_after = (float) pontos[i].getRect().getUY();
+                            
+//                            System.out.printf("(%.3f, %.3f) -----> (%.3f, %.3f)\n", x_before, y_before, x_after, y_after);
+                        }
+                        
+                        
+//                        Util.finished = false;
+                        for( int i = 0; i < pontos.length; ++i ) {
+                            
+                            float begin_x = (float)(pontos[i].getRect().getCenterX() - pontos[i].getRect().getWidth()/2.);
+                            float x = Util.checkBoundX(begin_x);
+                            pontos[i].getRect().setUX(x);
+                            
+                            
+                            float begin_y = (float)(pontos[i].getRect().getCenterY() - pontos[i].getRect().getHeight()/2.);
+                            float y = Util.checkBoundY(begin_y);
+                            pontos[i].getRect().setUY(y);
+                            
+                            
+//                            System.out.printf("from (%.3f, %.3f) -> (%.3f, %.3f)\n", begin_x, begin_y, x, y);
+                        }
+                        
+                        boolean flag_finished = true;
+                        for( int i = 0; i < edges.size() && flag_finished; ++i ) {
+                            PRISMEdge aresta = edges.get(i);
+                            if( Util.tij(aresta.getU().getRect(), aresta.getV().getRect()) > 1.00000000000 ) {
+                                flag_finished = false;
+                            }
+                        }
+
+                        if( flag_finished ) {
+                            Util.finished = true;
+                        }
+//                        
+                        
+                    }
+                    
+                    
+                    
                     for( int i = 0; i < pontos.length; ++i ) {
                         points[i] = pontos[i];
-                        projected.get(i).setUX(pontos[i].getRect().getCenterX()-pontos[i].getRect().getWidth()/2.);
-                        projected.get(i).setUY(pontos[i].getRect().getCenterY()-pontos[i].getRect().getHeight()/2.);
+                        projected.get(i).setUX(pontos[i].getRect().getCenterX() - pontos[i].getRect().getWidth()/2.);
+                        projected.get(i).setUY(pontos[i].getRect().getCenterY() - pontos[i].getRect().getHeight()/2.);
                     }
                     
                     if( Util.getFinished() )                         
@@ -217,6 +283,8 @@ public class PRISM implements OverlapRemoval {
             System.out.println("Finished 'Iteration' number "+maxIterations);
             
         } while( --maxIterations > 0 );
+        
+        System.out.println("Terminei");
         
         return projected;
     }

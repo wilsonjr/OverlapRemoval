@@ -76,6 +76,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import math.geom2d.polygon.SimplePolygon2D;
+import org.eclipse.elk.alg.graphviz.dot.transform.OverlapMode;
+import org.eclipse.elk.alg.graphviz.layouter.GraphvizMetaDataProvider;
 import visualizer.matrix.DenseMatrix;
 import visualizer.matrix.DenseVector;
 import visualizer.projection.ProjectionData;
@@ -100,7 +102,7 @@ public class Menu extends javax.swing.JFrame {
     private boolean loadedData = false;
     private ArrayList<Point> hexPoints;
     private static final int HEXBOARD_SIZE = 20;
-    private static final int RECTSIZE = 90;
+    private static final int RECTSIZE = 10;
     private int menor;
     private List<List<List<Integer>>> clusters = null;
     private List<List<Integer>> currentCluster = null;
@@ -628,7 +630,7 @@ public class Menu extends javax.swing.JFrame {
                 items = new ArrayList<>();
                 List<Point2D.Double> pts = new ArrayList<>();
 //                File file = jFileChooser.getSelectedFile();
-                Scanner scn = new Scanner(new File("/home/wilson/Área de Trabalho/OverlapRemoval/datasets/a.coord"));
+                Scanner scn = new Scanner(new File("D:\\Projects\\OverlapRemoval\\datasets\\a.coord"));
                 rectangles.clear();
                 //RainbowScale rbS = new RainbowScale();
                 GrayScale rbS = new GrayScale();
@@ -651,7 +653,7 @@ public class Menu extends javax.swing.JFrame {
                     proj[i][0] = (float) rectangles.get(i).x;
                     proj[i][1] = (float) rectangles.get(i).y;
                 }
-                float[][] updated_proj = normalizeVertex(0, 1000, proj);
+                float[][] updated_proj = normalizeVertex(0, 100*RECTSIZE, proj);
                 
                 
                 for( int i = 0; i < updated_proj.length; ++i ) {
@@ -708,7 +710,7 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<OverlapRect> initial_positions = Util.toRectangle(rectangles);
         double[] center0 = Util.getCenter(initial_positions);
         Util.translate(initial_positions, center_middle[0]-center0[0], center_middle[1]-center0[1]);
-        
+                                            
         double xmin = Collections.min(initial_positions, Comparator.comparing(s -> s.x)).x;
         double xmax = Collections.max(initial_positions, Comparator.comparing(s -> s.x)).x;
         
@@ -717,9 +719,24 @@ public class Menu extends javax.swing.JFrame {
         
         // convert the coordinates to use the overlap removal techniques
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+        Util.translate(rects, center_middle[0]-center0[0], center_middle[1]-center0[1]);
         
+         /******
+         * APPLYING THE BOUNDING BOX
+         */        
+        // define width and height of bounding b.
+        // Here, I am using the one its greater: projection's bounding box or 300x300 pixels
+        System.out.println((xmax-xmin)+" "+(ymax-ymin));
+        double width = Math.max(xmax-xmin, 300);//RECTSIZE*100);
+        double height = Math.max(ymax-ymin, 300);//RECTSIZE*100);
         
-        
+        // define upper x, upper y, lower x, lower y coordinates (visual space)
+        double ux = center_middle[0] - width/2;// - initial_positions.get(0).width;
+        double uy = center_middle[1] - height/2;// - initial_positions.get(0).height;
+        double lx = center_middle[0] + width/2;// + initial_positions.get(0).width;
+        double ly = center_middle[1] + height/2;// + initial_positions.get(0).height;
+        System.out.printf("((%.3f, %.3f), (%.3f, %.3f))\n", ux, uy, lx, ly);
+        Util.bounding_box = new float[][]{{(float)ux, (float)uy}, {(float)lx, (float)ly}};
        
         
         /******
@@ -727,8 +744,12 @@ public class Menu extends javax.swing.JFrame {
          */
         // Choose a overlap removal technique
 //        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class);
-        OverlapRemoval rw = new ProjSnippet(0.7, 60);
+//        OverlapRemoval rw = new ProjSnippet(0.7, 60);
         // apply the algorithm
+        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false);   
+//        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1);
+//        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class);
+        
         Map<OverlapRect, OverlapRect> projected = rw.apply(rects);
         
         // get the projected values
@@ -743,20 +764,7 @@ public class Menu extends javax.swing.JFrame {
         Util.translate(projectedValues, ammountX, ammountY);
         
         
-        /******
-         * APPLYING THE BOUNDING BOX
-         */        
-        // define width and height of bounding b.
-        // Here, I am using the one its greater: projection's bounding box or 300x300 pixels
-        double width = Math.max(xmax-xmin, 300);
-        double height = Math.max(ymax-ymin, 300);
-        
-        // define upper x, upper y, lower x, lower y coordinates (visual space)
-        double ux = center_middle[0] - width/2 - initial_positions.get(0).width;
-        double uy = center_middle[1] - height/2 - initial_positions.get(0).height;
-        double lx = center_middle[0] + width/2 + initial_positions.get(0).width;
-        double ly = center_middle[1] + height/2 + initial_positions.get(0).height;
-        
+       
         
         
         
@@ -766,38 +774,38 @@ public class Menu extends javax.swing.JFrame {
         
         
         
-        for( int i = 0; i < projectedValues.size(); ++i ) {
-            // create a Intersector 
-            Intersector boundingb = new Intersector(ux, uy, lx, ly,  initial_positions.get(i).x, initial_positions.get(i).y);
-            if( !boundingb.isInside(projectedValues.get(i).x, projectedValues.get(i).y) ) {
-                double[] new_coords = boundingb.mouseUp(projectedValues.get(i).x, projectedValues.get(i).y);
-                
-                // necessary for the case when initial and final positions are outside the bounding box
-                if( new_coords == null ) {
-                    Intersector bb = new Intersector(ux, uy, lx, ly,  center_middle[0], center_middle[1]);
-                    new_coords = bb.mouseUp(projectedValues.get(i).x, projectedValues.get(i).y);
-                }
-                
-                projectedValues.get(i).setUX(new_coords[0]);
-                projectedValues.get(i).setUY(new_coords[1]);
-            } 
-        }
-        
-        double ls = new LayoutSimilarity().execute(initial_positions, projectedValues);
-        
-        NeighborhoodPreservation np = new NeighborhoodPreservation(30);
-        
-        double mean_np = np.execute(initial_positions, projectedValues);
-        List<Double> np_values = np.getNP();
-        
-        System.out.println("Layout similarity: "+ls);
-        
-        System.out.println("Mean NP: "+mean_np);
-        
-        for( int i = 0; i < np_values.size(); ++i ) {
-            System.out.println("k: "+(i+1)+", np: "+np_values.get(i));
-            
-        }
+//        for( int i = 0; i < projectedValues.size(); ++i ) {
+//            // create a Intersector 
+//            Intersector boundingb = new Intersector(ux, uy, lx, ly,  initial_positions.get(i).x, initial_positions.get(i).y);
+//            if( !boundingb.isInside(projectedValues.get(i).x, projectedValues.get(i).y) ) {
+//                double[] new_coords = boundingb.mouseUp(projectedValues.get(i).x, projectedValues.get(i).y);
+//                
+//                // necessary for the case when initial and final positions are outside the bounding box
+//                if( new_coords == null ) {
+//                    Intersector bb = new Intersector(ux, uy, lx, ly,  center_middle[0], center_middle[1]);
+//                    new_coords = bb.mouseUp(projectedValues.get(i).x, projectedValues.get(i).y);
+//                }
+//                
+//                projectedValues.get(i).setUX(new_coords[0]);
+//                projectedValues.get(i).setUY(new_coords[1]);
+//            } 
+//        }
+//        
+//        double ls = new LayoutSimilarity().execute(initial_positions, projectedValues);
+//        
+//        NeighborhoodPreservation np = new NeighborhoodPreservation(30);
+//        
+//        double mean_np = np.execute(initial_positions, projectedValues);
+//        List<Double> np_values = np.getNP();
+//        
+//        System.out.println("Layout similarity: "+ls);
+//        
+//        System.out.println("Mean NP: "+mean_np);
+//        
+//        for( int i = 0; i < np_values.size(); ++i ) {
+//            System.out.println("k: "+(i+1)+", np: "+np_values.get(i));
+//            
+//        }
         
         
         
