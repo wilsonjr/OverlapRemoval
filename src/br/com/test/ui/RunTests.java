@@ -40,8 +40,8 @@ import java.util.logging.Logger;
  */
 public class RunTests {
     private final static int RECTSIZE = 90;
-    private final static int BEGIN_NORM = 50;
-    private final static int END_NORM = 550;
+    private static int BEGIN_NORM = 0;
+    private static int END_NORM = 1000;
     private static List<Integer> labels;
     
     public static ArrayList<RectangleVis> load_dataset(String path) {
@@ -220,7 +220,7 @@ public class RunTests {
             // convert the coordinates to use the overlap removal techniques
             ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
             
-            
+            Util.translate(rects, center_middle[0]-center0[0], center_middle[1]-center0[1]);
             
             /******
              * APPLYING THE BOUNDING BOX

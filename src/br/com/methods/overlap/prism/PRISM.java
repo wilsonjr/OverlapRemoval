@@ -222,16 +222,8 @@ public class PRISM implements OverlapRemoval {
                         double[] center0 = Util.getCenter(pontos);
                         
                         
-                        for( int i = 0; i < pontos.length; ++i ) {
-                            float x_before = (float) pontos[i].getRect().getUX();
-                            float y_before = (float) pontos[i].getRect().getUY();
-                            
+                        for( int i = 0; i < pontos.length; ++i ) {                            
                             Util.translate(pontos[i].getRect(), center_middle[0]-center0[0], center_middle[1]-center0[1]);
-                            
-                            float x_after = (float) pontos[i].getRect().getUX();
-                            float y_after = (float) pontos[i].getRect().getUY();
-                            
-//                            System.out.printf("(%.3f, %.3f) -----> (%.3f, %.3f)\n", x_before, y_before, x_after, y_after);
                         }
                         
                         
