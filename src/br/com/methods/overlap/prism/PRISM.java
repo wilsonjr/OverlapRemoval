@@ -147,7 +147,7 @@ public class PRISM implements OverlapRemoval {
         // form a proximity graph Gp of x0 by Delaunay triangulation        
         PRISMPoint[] points = new PRISMPoint[projected.size()];
        
-        int maxIterations = 35;
+        int maxIterations = 10;
         
         do {
             for( int i = 0; i < projected.size(); ++i )
@@ -158,10 +158,7 @@ public class PRISM implements OverlapRemoval {
             ArrayList<PRISMEdge> edges = new ArrayList<>();
             if( rects.size() > 2 ) {
                 Delaunay_Triangulation dt = new Delaunay_Triangulation(points);
-                System.out.println("values: ");
-                System.out.println(dt);
                 Iterator<Triangle_dt> trianglesIterator = dt.trianglesIterator();
-                System.out.println("passei");
                 while( trianglesIterator.hasNext() ) {
                     Triangle_dt t = trianglesIterator.next();
                     if( !t.isHalfplane() ) {            
@@ -188,7 +185,6 @@ public class PRISM implements OverlapRemoval {
                 System.out.println("Augmenting Proximity Graph");
                 
                 PRISMEdge[] restEdge = findRestOverlaps(projected);
-                System.out.println("Já encontrei");
                 for( int i = 0; i < restEdge.length; ++i ) 
                     if( !edges.contains(restEdge[i]) ) 
                         edges.add(restEdge[i]);
@@ -218,6 +214,7 @@ public class PRISM implements OverlapRemoval {
                 if( pontos != null ) {
                     
                     if( Util.bounding_box != null ) {
+                        Util.finished = false;
                         double[] center_middle = new double[]{0, 0};
                         double[] center0 = Util.getCenter(pontos);
                         

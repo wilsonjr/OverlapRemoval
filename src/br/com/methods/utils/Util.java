@@ -50,7 +50,7 @@ import visualizer.projection.distance.DissimilarityType;
 public class Util {
     private static final double E = 10e-6;
     private static final double EPS = 10e-4;
-    private static final int LIMIT = 10000;
+    private static final int LIMIT = 1000;
     public  static final double ZERO = 0.0000000;
     public static boolean finished;
     private static TreeSet<Integer> lwZeroRow;
@@ -1046,7 +1046,7 @@ public class Util {
             }
 
             double stress1 = stress(edges);
-            if( Math.abs(stress0-stress1) < 0.01 )
+            if( Math.abs(stress0-stress1) < 0.00001 )
                 return layout;
             
             stress0 = stress1;            

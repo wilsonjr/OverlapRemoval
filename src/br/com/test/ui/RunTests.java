@@ -11,6 +11,7 @@ import br.com.methods.overlap.prism.PRISM;
 import br.com.methods.overlap.projsnippet.ProjSnippet;
 import br.com.methods.overlap.rwordle.RWordleC;
 import br.com.methods.overlap.rwordle.RWordleL;
+import br.com.methods.overlap.vpsc.VPSC;
 import br.com.methods.utils.Intersector;
 import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.RectangleVis;
@@ -39,7 +40,7 @@ import java.util.logging.Logger;
  * @author wilson
  */
 public class RunTests {
-    private final static int RECTSIZE = 90;
+    private final static int RECTSIZE = 10;
     private static int BEGIN_NORM = 0;
     private static int END_NORM = 1000;
     private static List<Integer> labels;
@@ -109,15 +110,16 @@ public class RunTests {
     
     public static void main(String[] args) {
         
-        List<String> results = new ArrayList<String>(); 
+        List<String> results = new ArrayList<>(); 
         
 //        /****
 //         * PC WILSON
 //         */
-        String[] technique_name = new String[]{"RWordle-L", "ProjSnippet"};
+        String[] technique_name = new String[]{"RWordle-L", "PRISM", "VPSC"};
         OverlapRemoval[] technique = new OverlapRemoval[]{
             (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false),
-            new ProjSnippet(0.5, 10)
+            (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1),
+            (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class)
         };
         
         
@@ -138,7 +140,7 @@ public class RunTests {
 //            (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class)
 //        };
 
-        String path1 = "/home/wilson/Área de Trabalho/OverlapRemoval/datasets_dgrid/"; 
+        String path1 = "D:\\Projects\\OverlapRemoval\\datasets_dgrid\\"; 
         File[] files = new File(path1).listFiles();
         //If this pathname does not denote a directory, then listFiles() returns null. 
 
@@ -192,7 +194,7 @@ public class RunTests {
         
         
         // for all datasets...
-        for( int index = 0; index < 1; ++index ) {                
+        for( int index = 0; index < results.size(); ++index ) {                
             
             System.out.println("Loading dataset: "+(path1+"/"+results.get(index)));
             
@@ -227,14 +229,26 @@ public class RunTests {
              */        
             // define width and height of bounding b.
             // Here, I am using the one its greater: projection's bounding box or 300x300 pixels
-            double width = Math.max(xmax-xmin, rectangles.size()*RECTSIZE);
-            double height = Math.max(ymax-ymin, rectangles.size()*RECTSIZE);
-
+            double aspect_ratio = 1.0f;
+            
+            String[] name_components = results.get(index).split("-");
+            if( name_components.length == 5 ) {
+                
+                String ar = name_components[4].split("\\[")[1].substring(0, 1);
+                aspect_ratio = Double.parseDouble(ar);
+            }
+            
+            System.out.println(results.get(index)+" >> "+aspect_ratio);
+            
+            int image_size = END_NORM * END_NORM;
+            int width = (int) Math.floor(Math.sqrt(image_size / aspect_ratio));
+            int height = (int) Math.ceil(image_size / (float) width);
+            
             // define upper x, upper y, lower x, lower y coordinates (visual space)
-            double ux = center_middle[0] - width/2 - initial_positions.get(0).width;
-            double uy = center_middle[1] - height/2 - initial_positions.get(0).height;
-            double lx = center_middle[0] + width/2 + initial_positions.get(0).width;
-            double ly = center_middle[1] + height/2 + initial_positions.get(0).height;
+            double ux = center_middle[0] - width/2;
+            double uy = center_middle[1] - height/2;
+            double lx = center_middle[0] + width/2;
+            double ly = center_middle[1] + height/2;
             
             
             try

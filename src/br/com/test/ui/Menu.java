@@ -622,15 +622,16 @@ public class Menu extends javax.swing.JFrame {
     
     
     private void loadDataJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadDataJMenuItemActionPerformed
-//        JFileChooser jFileChooser = new JFileChooser("/home/wilson/Área de Trabalho/OverlapRemoval/datasets");
-//        int result = jFileChooser.showOpenDialog(this);
-//        if( result == JFileChooser.APPROVE_OPTION ) {
+        JFileChooser jFileChooser = new JFileChooser("D:\\Projects\\OverlapRemoval\\datasets_dgrid\\");
+        int result = jFileChooser.showOpenDialog(this);
+        if( result == JFileChooser.APPROVE_OPTION ) {
             System.out.println("HElloo");
             try {                 
                 items = new ArrayList<>();
                 List<Point2D.Double> pts = new ArrayList<>();
-//                File file = jFileChooser.getSelectedFile();
-                Scanner scn = new Scanner(new File("D:\\Projects\\OverlapRemoval\\datasets\\a.coord"));
+                File file = jFileChooser.getSelectedFile();
+//                Scanner scn = new Scanner(new File("D:\\Projects\\OverlapRemoval\\datasets\\a.coord"));
+                Scanner scn = new Scanner(file);
                 rectangles.clear();
                 //RainbowScale rbS = new RainbowScale();
                 GrayScale rbS = new GrayScale();
@@ -644,7 +645,7 @@ public class Menu extends javax.swing.JFrame {
                     double y = Double.parseDouble(linha[2]);
                     int grupo = (int) Double.parseDouble(linha[3]);
 
-                    rectangles.add(new RectangleVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo*10)%255), id++));   
+                    rectangles.add(new RectangleVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo * 10) % 255), id++));   
                     
                 }
                 
@@ -692,7 +693,7 @@ public class Menu extends javax.swing.JFrame {
             } catch( Exception e ) {
                 System.out.println(e);
             }
-//        }
+        }
     }//GEN-LAST:event_loadDataJMenuItemActionPerformed
 
     private void rwordleCJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rwordleCJMenuItemActionPerformed
@@ -746,8 +747,8 @@ public class Menu extends javax.swing.JFrame {
 //        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class);
 //        OverlapRemoval rw = new ProjSnippet(0.7, 60);
         // apply the algorithm
-        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false);   
-//        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1);
+//        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false);   
+        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1);
 //        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class);
         
         Map<OverlapRect, OverlapRect> projected = rw.apply(rects);
