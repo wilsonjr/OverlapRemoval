@@ -96,11 +96,8 @@ public class PRISM implements OverlapRemoval {
          */
         ArrayList<Constraint> restricoesx = new ArrayList<>();
         ArrayList<Constraint> restricoesy = new ArrayList<>();
-        System.out.println("GenerateCx");
         VPSC.generateCx(projected, varsx, restricoesx);
-        System.out.println("GenerateCy");
         VPSC.generateCy(projected, varsy, restricoesy);        
-        System.out.println("Passou");
         // aumenta o grafo de proximidade com as arestas encontradas pelo VPSC
         PRISMEdge[] newOverlaps = new PRISMEdge[restricoesx.size()+restricoesy.size()];
         for( int i = 0; i < restricoesx.size(); ++i ) {
@@ -273,7 +270,6 @@ public class PRISM implements OverlapRemoval {
             
         } while( --maxIterations > 0 );
         
-        System.out.println("Terminei");
         
         return projected;
     }

@@ -334,7 +334,6 @@ public class VPSC implements OverlapRemoval {
         /**
          * Adiciona os eventos de abertura e fechamento dos retangulos 
          */
-        System.out.println("to aqui");
         Event[] eventos = new Event[retangulos.size()*2];
         for( int i = 0, j = 0; i < retangulos.size(); ++i ) {
             vars.get(i).setDesiredPosition(retangulos.get(i).getCenterX());            
@@ -342,14 +341,12 @@ public class VPSC implements OverlapRemoval {
             eventos[j++] = new Event("OPEN", no, retangulos.get(i).getUY());
             eventos[j++] = new Event("CLOSE", no, retangulos.get(i).getLY());            
         }
-        System.out.println("passou quick 1");
         // [e1,..., e2n] := events sorted by posn
 //        Util.quickSort(eventos, 0, eventos.length-1);
         
         Arrays.sort(eventos, (Event o1, Event o2) -> {
             return Double.compare(o1.getPosition(),o2.getPosition());
         });
-        System.out.println("passou quick 2");
         // elementos consecutivos que fazem parte do mesmo retangulo, o evento OPEN deve vir primeiro
         for( int i = 1; i < eventos.length; ++i ) 
             if( eventos[i-1].getNo().getRect() == eventos[i].getNo().getRect() && eventos[i-1].getTipo().equals("OPEN") ) {
