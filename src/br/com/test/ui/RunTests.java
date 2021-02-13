@@ -155,13 +155,13 @@ public class RunTests {
         FileWriter fw_metrics = null, fw_np = null, fw_boundingbox = null;
         try
         {
-            fw_metrics = new FileWriter("result_metrics.csv", false); 
+            fw_metrics = new FileWriter("results\\result_metrics.csv", false); 
             fw_metrics.write("Dataset,Technique,Metric,Value\n");
             
-            fw_np = new FileWriter("result_np_knn.csv", false);
+            fw_np = new FileWriter("results\\result_np_knn.csv", false);
             fw_np.write("Dataset,Technique,Neighbors,Value\n");
             
-            fw_boundingbox = new FileWriter("result_boundingbox.csv", false);
+            fw_boundingbox = new FileWriter("results\\result_boundingbox.csv", false);
             fw_boundingbox.write("Dataset,ux,uy,lx,ly\n");
             
             
@@ -253,7 +253,7 @@ public class RunTests {
             
             try
             {
-                fw_boundingbox = new FileWriter("result_boundingbox.csv", true);
+                fw_boundingbox = new FileWriter("results\\result_boundingbox.csv", true);
                 fw_boundingbox.write(results.get(index)+","+ux+","+uy+","+lx+","+ly+"\n");
             }
             catch(IOException ioe)
@@ -349,12 +349,12 @@ public class RunTests {
                
                 try
                 {
-                    fw_metrics = new FileWriter("result_metrics.csv", true); 
+                    fw_metrics = new FileWriter("results\\result_metrics.csv", true); 
                     fw_metrics.write(results.get(index)+","+technique_name[index_technique]+",Layout Similarity,"+ls+"\n");   
                     fw_metrics.write(results.get(index)+","+technique_name[index_technique]+",Mean NP,"+mean_np+"\n");   
                     fw_metrics.write(results.get(index)+","+technique_name[index_technique]+",Time (s),"+secs+"\n");   
 
-                    fw_np = new FileWriter("result_np_knn.csv", true);
+                    fw_np = new FileWriter("results\\result_np_knn.csv", true);
                     
                     for( int i = 0; i < np_values.size(); ++i ) {
                         fw_np.write(results.get(index)+","+technique_name[index_technique]+","+(i+1)+","+np_values.get(i)+"\n");
@@ -384,7 +384,7 @@ public class RunTests {
                 FileWriter points = null;
                 try {
                     
-                    points = new FileWriter(results.get(index)+"_points_"+technique_name[index_technique]+".csv", false);
+                    points = new FileWriter("results\\"+results.get(index)+"_points_"+technique_name[index_technique]+".csv", false);
                     points.write("x,y,width,height,label\n");
                     
                     for( int k = 0; k < temp_rect.size(); ++k )

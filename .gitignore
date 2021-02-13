@@ -2,6 +2,7 @@
 .project
 bin/
 datasets/
+results/
 
 
 <<<<<<< HEAD
