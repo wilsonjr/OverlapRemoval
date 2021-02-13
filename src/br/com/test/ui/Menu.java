@@ -76,8 +76,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import math.geom2d.polygon.SimplePolygon2D;
-import org.eclipse.elk.alg.graphviz.dot.transform.OverlapMode;
-import org.eclipse.elk.alg.graphviz.layouter.GraphvizMetaDataProvider;
 import visualizer.matrix.DenseMatrix;
 import visualizer.matrix.DenseVector;
 import visualizer.projection.ProjectionData;
@@ -622,7 +620,7 @@ public class Menu extends javax.swing.JFrame {
     
     
     private void loadDataJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadDataJMenuItemActionPerformed
-        JFileChooser jFileChooser = new JFileChooser("D:\\Projects\\OverlapRemoval\\datasets_dgrid\\");
+        JFileChooser jFileChooser = new JFileChooser("/home/wilson/Área de Trabalho/OverlapRemoval/");
         int result = jFileChooser.showOpenDialog(this);
         if( result == JFileChooser.APPROVE_OPTION ) {
             System.out.println("HElloo");
@@ -905,19 +903,59 @@ public class Menu extends javax.swing.JFrame {
     
 
     private void projSnippetJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projSnippetJMenuItemActionPerformed
+        
+        double[] center_middle = {0, 0};
+        
+        
+        // save the initial positions for metric computation
+        ArrayList<OverlapRect> initial_positions = Util.toRectangle(rectangles);
+        double[] center0 = Util.getCenter(initial_positions);
+        Util.translate(initial_positions, center_middle[0]-center0[0], center_middle[1]-center0[1]);
+                                            
+        double xmin = Collections.min(initial_positions, Comparator.comparing(s -> s.x)).x;
+        double xmax = Collections.max(initial_positions, Comparator.comparing(s -> s.x)).x;
+        
+        double ymin = Collections.min(initial_positions, Comparator.comparing(s -> s.y)).y;
+        double ymax = Collections.max(initial_positions, Comparator.comparing(s -> s.y)).y;
+        
+        // convert the coordinates to use the overlap removal techniques
         ArrayList<OverlapRect> rects = Util.toRectangle(rectangles);
+        Util.translate(rects, center_middle[0]-center0[0], center_middle[1]-center0[1]);
+        
+         /******
+         * APPLYING THE BOUNDING BOX
+         */        
+        // define width and height of bounding b.
+        // Here, I am using the one its greater: projection's bounding box or 300x300 pixels
+        System.out.println((xmax-xmin)+" "+(ymax-ymin));
+        double width = RECTSIZE*100;
+        double height = RECTSIZE*100;
+        
+        // define upper x, upper y, lower x, lower y coordinates (visual space)
+        double ux = center_middle[0] - width/2;// - initial_positions.get(0).width;
+        double uy = center_middle[1] - height/2;// - initial_positions.get(0).height;
+        double lx = center_middle[0] + width/2;// + initial_positions.get(0).width;
+        double ly = center_middle[1] + height/2;// + initial_positions.get(0).height;
+        System.out.printf("((%.3f, %.3f), (%.3f, %.3f))\n", ux, uy, lx, ly);
+        Util.bounding_box = new float[][]{{(float)ux, (float)uy}, {(float)lx, (float)ly}};
+        
+        
+        
         
         int i = 0;
         for( OverlapRect r: rects )
             r.setId(i++);
-        double[] center0 = Util.getCenter(rects);
+        
+        
+        
+        
+        
         //ArrayList<Retangulo> projected = ProjSnippet.e_o(rects, Double.parseDouble(projSnippetAlphaJTextField.getText()));
         
         String alpha_value = JOptionPane.showInputDialog("Por favor, insira o valor para 'alpha':");
         String k_value = JOptionPane.showInputDialog("Por favor, insira o valor de 'k':");
-        boolean applySeamCarving = Integer.parseInt(JOptionPane.showInputDialog("Apply SeamCarving?")) == 1;
         
-        OverlapRemoval ps = new ProjSnippet(Double.parseDouble(alpha_value), Integer.parseInt(k_value)+1);
+        OverlapRemoval ps = new ProjSnippet(Double.parseDouble(alpha_value), Integer.parseInt(k_value)+1, Math.min(ux, uy), Math.max(lx, ly));
         //OverlapRemoval ps = (OverlapRemoval) OverlapRegistry.getInstance(Double.parseDouble(alpha_value), Integer.parseInt(k_value)+1);
         
         Map<OverlapRect, OverlapRect> projected = ps.apply(rects);
@@ -931,8 +969,6 @@ public class Menu extends javax.swing.JFrame {
             Util.translate(projectedValues, ammountX, ammountY);
             Util.normalize(projectedValues);
             
-            if( applySeamCarving )
-                OverlapView.addSeamCarvingResult(projectedValues);
             
             Util.toRectangleVis(rectangles, projectedValues);
 

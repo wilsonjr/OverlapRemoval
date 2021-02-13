@@ -45,7 +45,7 @@ public class RunTests {
     private static int END_NORM = 1000;
     private static List<Integer> labels;
     
-    public static ArrayList<RectangleVis> load_dataset(String path) {
+    public static ArrayList<RectangleVis> load_dataset(String path, int width, int height) {
         
         
         try {                 
@@ -82,7 +82,7 @@ public class RunTests {
                 proj[i][0] = (float) rectangles.get(i).x;
                 proj[i][1] = (float) rectangles.get(i).y;
             }
-            float[][] updated_proj = normalizeVertex(BEGIN_NORM, END_NORM, proj);
+            float[][] updated_proj = normalizeVertex(BEGIN_NORM, END_NORM, proj, width, height);
 
 
             for( int i = 0; i < updated_proj.length; ++i ) {
@@ -115,8 +115,9 @@ public class RunTests {
 //        /****
 //         * PC WILSON
 //         */
-        String[] technique_name = new String[]{"RWordle-L", "PRISM", "VPSC"};
+        String[] technique_name = new String[]{"ProjSnippet", "RWordle-L", "PRISM", "VPSC"};
         OverlapRemoval[] technique = new OverlapRemoval[]{
+            (OverlapRemoval) new ProjSnippet(0.0, 10),
             (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false),
             (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1),
             (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class)
@@ -140,7 +141,7 @@ public class RunTests {
 //            (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class)
 //        };
 
-        String path1 = "D:\\Projects\\OverlapRemoval\\datasets_dgrid\\"; 
+        String path1 = "/home/wilson/Área de Trabalho/OverlapRemoval/datasets_dgrid/"; 
         File[] files = new File(path1).listFiles();
         //If this pathname does not denote a directory, then listFiles() returns null. 
 
@@ -155,13 +156,13 @@ public class RunTests {
         FileWriter fw_metrics = null, fw_np = null, fw_boundingbox = null;
         try
         {
-            fw_metrics = new FileWriter("results\\result_metrics.csv", false); 
+            fw_metrics = new FileWriter("results/result_metrics.csv", false); 
             fw_metrics.write("Dataset,Technique,Metric,Value\n");
             
-            fw_np = new FileWriter("results\\result_np_knn.csv", false);
+            fw_np = new FileWriter("results/result_np_knn.csv", false);
             fw_np.write("Dataset,Technique,Neighbors,Value\n");
             
-            fw_boundingbox = new FileWriter("results\\result_boundingbox.csv", false);
+            fw_boundingbox = new FileWriter("results/result_boundingbox.csv", false);
             fw_boundingbox.write("Dataset,ux,uy,lx,ly\n");
             
             
@@ -194,18 +195,39 @@ public class RunTests {
         
         
         // for all datasets...
-        for( int index = 0; index < results.size(); ++index ) {                
+        for( int index = 0; index < results.size(); ++index ) {           
+            
+            double aspect_ratio = 1.0f;
+            
+            String[] name_components = results.get(index).split("-");
+            if( name_components.length == 5 ) {
+                
+                String ar = name_components[4].split("\\[")[1].substring(0, 1);
+                aspect_ratio = Double.parseDouble(ar);
+            }
+            
+            System.out.println(results.get(index)+" >> "+aspect_ratio);
+            
+            int image_size = END_NORM * END_NORM;
+            int width = (int) Math.floor(Math.sqrt(image_size / aspect_ratio));
+            int height = (int) Math.ceil(image_size / (float) width);
+            
             
             System.out.println("Loading dataset: "+(path1+"/"+results.get(index)));
             
-            ArrayList<RectangleVis> rectangles = load_dataset(path1+"/"+results.get(index));
-            ArrayList<RectangleVis> temp_rect = load_dataset(path1+"/"+results.get(index));
+            ArrayList<RectangleVis> rectangles = load_dataset(path1+"/"+results.get(index), width, height);
+            ArrayList<RectangleVis> temp_rect = load_dataset(path1+"/"+results.get(index), width, height);
             /******
              * PRE-PROCESSING STEPS
              */
             // choose where to center the coordinates after overlap removal
             // here, I am using the origin
             double[] center_middle = {0, 0};
+            
+//            for( OverlapRect r: rectangles ) {
+//                     System.out.println("*>> "+r.x+" "+(r.y)+" "+r.getWidth()+" "+r.getHeight()+"\n");
+//                    
+//                }
 
 
             // save the initial positions for metric computation
@@ -229,31 +251,18 @@ public class RunTests {
              */        
             // define width and height of bounding b.
             // Here, I am using the one its greater: projection's bounding box or 300x300 pixels
-            double aspect_ratio = 1.0f;
-            
-            String[] name_components = results.get(index).split("-");
-            if( name_components.length == 5 ) {
-                
-                String ar = name_components[4].split("\\[")[1].substring(0, 1);
-                aspect_ratio = Double.parseDouble(ar);
-            }
-            
-            System.out.println(results.get(index)+" >> "+aspect_ratio);
-            
-            int image_size = END_NORM * END_NORM;
-            int width = (int) Math.floor(Math.sqrt(image_size / aspect_ratio));
-            int height = (int) Math.ceil(image_size / (float) width);
-            
+           
             // define upper x, upper y, lower x, lower y coordinates (visual space)
             double ux = center_middle[0] - width/2;
             double uy = center_middle[1] - height/2;
             double lx = center_middle[0] + width/2;
             double ly = center_middle[1] + height/2;
             
-            
+//            System.out.println("1 >> "+xmin+", "+ymin+", "+xmax+", "+ymax);
+//            System.out.println("2 >> "+ux+", "+uy+", "+lx+", "+ly);
             try
             {
-                fw_boundingbox = new FileWriter("results\\result_boundingbox.csv", true);
+                fw_boundingbox = new FileWriter("results/result_boundingbox.csv", true);
                 fw_boundingbox.write(results.get(index)+","+ux+","+uy+","+lx+","+ly+"\n");
             }
             catch(IOException ioe)
@@ -274,6 +283,11 @@ public class RunTests {
 
 
             for( int index_technique = 0; index_technique < technique_name.length; ++index_technique ) {
+                
+                if( index_technique == 0 ) { // projsnippet
+                    ((ProjSnippet)technique[index_technique]).setMinCoord(Math.min(ux, uy));
+                    ((ProjSnippet)technique[index_technique]).setMaxCoord(Math.max(lx, ly));
+                }
                 
                 System.out.println("Applying overlap removal using: "+technique_name[index_technique]);
                 
@@ -349,12 +363,12 @@ public class RunTests {
                
                 try
                 {
-                    fw_metrics = new FileWriter("results\\result_metrics.csv", true); 
+                    fw_metrics = new FileWriter("results/result_metrics.csv", true); 
                     fw_metrics.write(results.get(index)+","+technique_name[index_technique]+",Layout Similarity,"+ls+"\n");   
                     fw_metrics.write(results.get(index)+","+technique_name[index_technique]+",Mean NP,"+mean_np+"\n");   
                     fw_metrics.write(results.get(index)+","+technique_name[index_technique]+",Time (s),"+secs+"\n");   
 
-                    fw_np = new FileWriter("results\\result_np_knn.csv", true);
+                    fw_np = new FileWriter("results/result_np_knn.csv", true);
                     
                     for( int i = 0; i < np_values.size(); ++i ) {
                         fw_np.write(results.get(index)+","+technique_name[index_technique]+","+(i+1)+","+np_values.get(i)+"\n");
@@ -384,7 +398,7 @@ public class RunTests {
                 FileWriter points = null;
                 try {
                     
-                    points = new FileWriter("results\\"+results.get(index)+"_points_"+technique_name[index_technique]+".csv", false);
+                    points = new FileWriter("results/"+results.get(index)+"_points_"+technique_name[index_technique]+".csv", false);
                     points.write("x,y,width,height,label\n");
                     
                     for( int k = 0; k < temp_rect.size(); ++k )
@@ -425,7 +439,7 @@ public class RunTests {
         
     }
 
-    public static float[][] normalizeVertex(float begin, float end, float[][] proj) {
+    public static float[][] normalizeVertex(float begin, float end, float[][] proj, int width, int height) {
         
         float[][] newproj = new float[proj.length][proj[0].length];
         float maxX = proj[0][0];
@@ -455,10 +469,13 @@ public class RunTests {
         
 
         ///////Fazer a largura ficar proporcional a altura
-        float endX = ((maxX - minX) * end);
-        if (maxY != minY) {
-            endX = ((maxX - minX) * end) / (maxY - minY);
-        }
+//        float endX = ((maxX - minX) * end);
+//        if (maxY != minY) {
+//            endX = ((maxX - minX) * end) / (maxY - minY);
+//        }
+
+        float endX = width;
+        float endY = height;
         //////////////////////////////////////////////////
 
         //Normalizo        
@@ -470,7 +487,7 @@ public class RunTests {
             }
 
             if (maxY != minY) {
-                newproj[i][1] = ((((proj[i][1] - minY) / (maxY - minY)) * (end - begin)) + begin);
+                newproj[i][1] = ((((proj[i][1] - minY) / (maxY - minY)) * (endY - begin)) + begin);
             } else {
                 newproj[i][1] = begin;
             }

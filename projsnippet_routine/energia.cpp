@@ -13,7 +13,7 @@
 #include <chrono>
 #include <numeric>
 
-//#define DEBUG
+// #define DEBUG
 
 #define X_PLUS(x) (x < 0.0 ? 0 : x)
 #define D_XPLUS_DX(x) (x < 0.0 ? 0 : 1)
@@ -26,7 +26,8 @@ vector<vector<double> > L;
 vector<double> orig_x, deltx;
 vector<double> orig_y, delty;
 double alpha;
-double test_w = 5;
+double test_w = 1;
+double min_coord,max_coord;
 
 vector<double> Lxy(const vector<vector<double> >& l, const vector<double>& xy)
 {
@@ -241,7 +242,10 @@ vector<double> read_elems()
         x = test_w;
         elems.push_back(x);
         ifs >> alpha;
-
+        ifs >> min_coord;
+        ifs >> max_coord;
+        min_coord -= width[0];
+        max_coord += width[0];
         ifs.close();
     }
     return elems;
@@ -293,8 +297,8 @@ int main(int argc, char** argv) {
     media /= (2.0*width.size());
 
     nlopt::opt opt(nlopt::LD_MMA, n);
-    vector<double> lb(n, 0);
-    vector<double> up(n, test_w*(media*(n/2)+(menor+30)));
+    vector<double> lb(n, min_coord);
+    vector<double> up(n, max_coord);
      opt.set_lower_bounds(lb);
     opt.set_upper_bounds(up);
      opt.set_stopval(0.00001);
@@ -308,6 +312,7 @@ int main(int argc, char** argv) {
 
     #ifdef DEBUG
         std::chrono::steady_clock::time_point begin_time = std::chrono::steady_clock::now();
+        cout << "initing optimzation" << endl;
         nlopt::result result = opt.optimize(x, minf);
         std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
         std::cout << "Time (s):" << std::chrono::duration_cast<std::chrono::nanoseconds>(end_time-begin_time).count()/1.0e9 << std::endl;

@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +43,9 @@ public class ProjSnippet implements OverlapRemoval {
      private int kNeighbours;
      private double alpha;
      
+     private double min_coord;
+     private double max_coord;
+     
      /**
       * @param alpha Parâmetro que controla a contribuição das energias de sobreposição e vizinhança
       * @param kNeighbours Número de vizinhos mais próximas para formação do grafo e, consequentemente, a matriz L.
@@ -48,6 +53,23 @@ public class ProjSnippet implements OverlapRemoval {
      public ProjSnippet(double alpha, int kNeighbours) {
          this.alpha = alpha;
          this.kNeighbours = kNeighbours;
+         
+         
+     }
+     
+     public ProjSnippet(double alpha, int kNeighbours, double min_coord, double max_coord) 
+     {
+         this(alpha, kNeighbours);
+         this.min_coord = min_coord;
+         this.max_coord = max_coord;
+     }
+     
+     public void setMaxCoord(double v) {
+         max_coord = v;
+     }
+     
+     public void setMinCoord(double v) {
+         min_coord = v;
      }
           
      
@@ -63,6 +85,10 @@ public class ProjSnippet implements OverlapRemoval {
      public Map<OverlapRect, OverlapRect> apply(List<OverlapRect> retangulos) {
         resultado = -1;
         
+        
+        System.out.println("min_coord: "+min_coord);
+        System.out.println("max_coord: "+max_coord);
+        
         double[][] l = formGraph(retangulos);
         ArrayList<OverlapRect> projected = new ArrayList<>();        
         
@@ -77,10 +103,13 @@ public class ProjSnippet implements OverlapRemoval {
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             try( BufferedWriter bw = new BufferedWriter(fw) ) {
                 bw.write(retangulos.size()+"\n");
-                for( OverlapRect r: retangulos )
-                    bw.write(r.x+" "+(r.y+r.height)+" "+r.getWidth()+" "+r.getHeight()+"\n");
+                for( OverlapRect r: retangulos ) {
+                    bw.write(r.x+" "+(r.y+r.height)+" "+r.getWidth()+" "+r.getHeight()+"\n");                    
+                }
                 bw.write("1\n"); // w inicial
-                bw.write(String.valueOf(alpha));
+                bw.write(String.valueOf(alpha)+'\n');
+                bw.write(String.valueOf(min_coord)+'\n');
+                bw.write(String.valueOf(max_coord)+'\n');
             }
             
             /**
@@ -121,13 +150,14 @@ public class ProjSnippet implements OverlapRemoval {
                 Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            System.out.println("Recuperando resultados...");
+            System.out.println("Recuperando resultados...: "+resultado);
             if( resultado == 0 ) {
                 Scanner scn = new Scanner(new File("./projsnippet_routine/point_solve.rect"));
                 int idx = 0;
-                
+                System.out.println("Entrei aqui...");
                 if( scn.hasNext() ) {
                     scn.nextInt();                
+                    System.out.println("Entrei 2...");
                     while( scn.hasNext() ) {
                     
                         double ux = Double.parseDouble(scn.next());
@@ -137,6 +167,8 @@ public class ProjSnippet implements OverlapRemoval {
                             projected.add(new OverlapRect(ux, uy, retangulos.get(idx).getWidth(), retangulos.get(idx).getHeight()));
                             scn.next(); scn.next();
                             idx++;
+                            
+//                            System.out.println(ux+", "+uy+", "+retangulos.get(idx).getWidth()+", "+retangulos.get(idx).getHeight());
                         }
                     }                    
                 }
@@ -150,7 +182,7 @@ public class ProjSnippet implements OverlapRemoval {
             } 
             
         } catch( IOException e ) {
-            
+            System.out.println("Exception: "+e.getMessage());
         }
         
         return null;       
