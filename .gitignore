@@ -1,9 +1,9 @@
 .classpath
 .project
 bin/
-datasets/
-results/
-
+datasets*
+results*
+original*
 
 <<<<<<< HEAD
 /dist/

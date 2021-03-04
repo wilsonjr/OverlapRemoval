@@ -3,6 +3,7 @@ package br.com.methods.utils;
 import Jama.Matrix;
 import br.com.explorer.explorertree.ExplorerTreeController;
 import br.com.explorer.explorertree.ExplorerTreeNode;
+import br.com.methods.overlap.pfsp.Graph;
 import br.com.methods.overlap.prism.PRISMEdge;
 import br.com.methods.overlap.prism.PRISMPoint;
 import br.com.methods.overlap.prism.SetPoint;
@@ -126,6 +127,7 @@ public class Util {
             ori.get(rects.get(i).getId()).setLevel(rects.get(i).getLevel());
             ori.get(rects.get(i).getId()).numero = rects.get(i).getId();
             ori.get(rects.get(i).getId()).setHealth(rects.get(i).getHealth());
+            ori.get(rects.get(i).getId()).setId(rects.get(i).getId());
         }   
     }
      
@@ -229,7 +231,7 @@ public class Util {
         for( int i = 1; i < residuo.length; ++i )
             if( maior < Math.abs(residuo[i]) )
                 maior = Math.abs(residuo[i]);
-        return maior <= E;
+        return maior <= 0.0001;
     }
         
     private static void multMatrizVetor(double[][] A, double[] b, double[] v, double[] r) {
@@ -1046,19 +1048,20 @@ public class Util {
             }
 
             double stress1 = stress(edges);
-            if( Math.abs(stress0-stress1) < 0.00001 )
+            if( Math.abs(stress0-stress1) <= 0.00001 )
                 return layout;
             
             stress0 = stress1;            
             
             boolean flag = true;
             for( int i = 0; i < edges.length && flag; ++i ) 
-                if( Util.tij(edges[i].getU().getRect(), edges[i].getV().getRect()) > 1.00000000000 ) {
+                if( Util.tij(edges[i].getU().getRect(), edges[i].getV().getRect())-1.0 > 0.00001 ) {
                     flag = false;
                 }
             
-            //System.out.println("Stress majorization iteration number: "+limit);
+//            System.out.println("Stress majorization iteration number: "+limit);;
             if( flag ) {
+                System.out.println("******************************TERMINEI AQUI, OLHEM POR FAVOR*************************************");
                 finished = true;
                 return layout;
             }
@@ -1239,6 +1242,18 @@ public class Util {
         //    System.out.println(element.getValue().x+", "+element.getValue().y);
             projectedValues.add(element.getValue());
             projectedValues.get(projectedValues.size()-1).setId(element.getKey().getId());
+        });
+        System.out.println("********************");
+        return projectedValues;
+    }
+    
+    public static ArrayList<OverlapRect> getProjectedValues(Graph graph) {
+        ArrayList<OverlapRect> projectedValues = new ArrayList<>();
+        System.out.println("********************");
+        graph.nodes.stream().forEach((element)->{   
+        //    System.out.println(element.getValue().x+", "+element.getValue().y);
+            projectedValues.add(new OverlapRect(element.x - element.width/2.0, element.y - element.height/2, 
+                                                element.width, element.height, element.id));
         });
         System.out.println("********************");
         return projectedValues;

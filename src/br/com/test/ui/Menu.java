@@ -10,6 +10,9 @@ import br.com.methods.overlap.expadingnode.OneLevelOverlap;
 import br.com.methods.overlap.hexboard.HexBoardExecutor;
 import br.com.methods.overlap.incboard.IncBoardExecutor;
 import br.com.methods.overlap.incboard.PointItem;
+import br.com.methods.overlap.pfsp.Graph;
+import br.com.methods.overlap.pfsp.Node;
+import br.com.methods.overlap.pfsp.PFSPrime;
 import br.com.methods.overlap.prism.PRISM;
 import br.com.methods.overlap.projsnippet.ProjSnippet;
 import br.com.methods.overlap.rwordle.RWordleC;
@@ -22,6 +25,7 @@ import br.com.methods.utils.Util;
 import br.com.methods.utils.Vect;
 import br.com.overlayanalisys.layoutsimilarity.LayoutSimilarity;
 import br.com.overlayanalisys.neighorhoodpreservation.NeighborhoodPreservation;
+import br.com.overlayanalisys.overlapfactor.OverlapFactor;
 import br.com.representative.RepresentativeFinder;
 import br.com.representative.RepresentativeRegistry;
 import br.com.representative.analysis.AnalysisController;
@@ -623,7 +627,6 @@ public class Menu extends javax.swing.JFrame {
         JFileChooser jFileChooser = new JFileChooser("/home/wilson/Área de Trabalho/OverlapRemoval/");
         int result = jFileChooser.showOpenDialog(this);
         if( result == JFileChooser.APPROVE_OPTION ) {
-            System.out.println("HElloo");
             try {                 
                 items = new ArrayList<>();
                 List<Point2D.Double> pts = new ArrayList<>();
@@ -635,38 +638,52 @@ public class Menu extends javax.swing.JFrame {
                 GrayScale rbS = new GrayScale();
                 
                 int id = 0;
+                
+                scn.nextLine();
                     
                 
                 while( scn.hasNext() ) {
-                    String[] linha = scn.nextLine().split(";");
+                    String[] linha = scn.nextLine().split(",");
                     double x = Double.parseDouble(linha[1]);
                     double y = Double.parseDouble(linha[2]);
-                    int grupo = (int) Double.parseDouble(linha[3]);
+                    int grupo = (int) Double.parseDouble(linha[5]);
 
                     rectangles.add(new RectangleVis(x, y, RECTSIZE, RECTSIZE, rbS.getColor((grupo * 10) % 255), id++));   
-                    
-                }
-                
-                float[][] proj = new float[rectangles.size()][2];
-                for( int i = 0; i < proj.length; ++i ) {
-                    proj[i][0] = (float) rectangles.get(i).x;
-                    proj[i][1] = (float) rectangles.get(i).y;
-                }
-                float[][] updated_proj = normalizeVertex(0, 100*RECTSIZE, proj);
-                
-                
-                for( int i = 0; i < updated_proj.length; ++i ) {
-                    
-                    rectangles.get(i).x = updated_proj[i][0];
-                    rectangles.get(i).y = updated_proj[i][1];
-                    
-                    float x = updated_proj[i][0];
-                    float y = updated_proj[i][1];
-                            
                     
                     items.add(new Vect(new double[]{x, y}));
                     pts.add(new Point2D.Double(x, y));
                 }
+                
+//                float[][] proj = new float[rectangles.size()][2];
+//                for( int i = 0; i < proj.length; ++i ) {
+//                    proj[i][0] = (float) rectangles.get(i).x;
+//                    proj[i][1] = (float) rectangles.get(i).y;
+//                }
+//                int END_NORM = 1000;
+//                
+//                
+//                int image_size = END_NORM * END_NORM;
+//                float aspect_ratio = 1.0f;
+//                int height = (int) Math.floor(Math.sqrt(image_size / aspect_ratio));
+//                int width = (int) Math.ceil(image_size / (float) height);
+//                System.out.println("width: "+width);
+//                System.out.println("height: "+height);
+//                
+//                float[][] updated_proj = normalizeVertex(0, END_NORM, proj, width, height);
+//                
+//                
+//                for( int i = 0; i < updated_proj.length; ++i ) {
+//                    
+//                    rectangles.get(i).x = updated_proj[i][0];
+//                    rectangles.get(i).y = updated_proj[i][1];
+//                    
+//                    float x = updated_proj[i][0];
+//                    float y = updated_proj[i][1];
+//                            
+//                    
+//                    items.add(new Vect(new double[]{x, y}));
+//                    pts.add(new Point2D.Double(x, y));
+//                }
                 
                 
                 
@@ -735,7 +752,8 @@ public class Menu extends javax.swing.JFrame {
         double lx = center_middle[0] + width/2;// + initial_positions.get(0).width;
         double ly = center_middle[1] + height/2;// + initial_positions.get(0).height;
         System.out.printf("((%.3f, %.3f), (%.3f, %.3f))\n", ux, uy, lx, ly);
-        Util.bounding_box = new float[][]{{(float)ux, (float)uy}, {(float)lx, (float)ly}};
+//        Util.bounding_box = new float[][]{{(float)ux, (float)uy}, {(float)lx, (float)ly}};;
+        Util.bounding_box = null;;
        
         
         /******
@@ -743,13 +761,37 @@ public class Menu extends javax.swing.JFrame {
          */
         // Choose a overlap removal technique
 //        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class);
-//        OverlapRemoval rw = new ProjSnippet(0.7, 60);
-        // apply the algorithm
-//        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false);   
+////        OverlapRemoval rw = new ProjSnippet(0.7, 60);
+//        // apply the algorithm
+////        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false);   
         OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1);
-//        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class);
-        
+////        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class);
+//        double[] x = rects.stream().mapToDouble(u -> u.getCenterX()).toArray();
+//        double[] y = rects.stream().mapToDouble(u -> u.getCenterY()).toArray();
+//        double[] widths = rects.stream().mapToDouble(u -> u.getWidth()).toArray();
+//        double[] heights = rects.stream().mapToDouble(u -> u.getHeight()).toArray();
+//        
+//        OverlapFactor of = new OverlapFactor(x, y, widths, heights);
+//        double overlap_factor = of.fit_transform();
+//        System.out.printf("overlap_factor: %.4f\n", overlap_factor);
+//        
         Map<OverlapRect, OverlapRect> projected = rw.apply(rects);
+        System.out.println("passei aqui");
+        
+//        List<Node> nodes = new ArrayList<>();
+//        rects.forEach(or -> {
+//            nodes.add(new Node(or.getCenterX(), or.getCenterY(), or.width, or.height, or.getId()));
+//        });
+//        
+//        Graph graph = new Graph(nodes);
+//        
+//        PFSPrime pfsp = new PFSPrime();
+//        
+//        System.out.println("OLAAAA");
+//        Graph projected = pfsp.apply(graph);
+        
+        
+
         
         // get the projected values
         ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
@@ -928,8 +970,8 @@ public class Menu extends javax.swing.JFrame {
         // define width and height of bounding b.
         // Here, I am using the one its greater: projection's bounding box or 300x300 pixels
         System.out.println((xmax-xmin)+" "+(ymax-ymin));
-        double width = RECTSIZE*100;
-        double height = RECTSIZE*100;
+        double width = xmax-xmin;
+        double height = ymax-ymin;
         
         // define upper x, upper y, lower x, lower y coordinates (visual space)
         double ux = center_middle[0] - width/2;// - initial_positions.get(0).width;
@@ -1920,7 +1962,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_expandingEdgeJMenuItemActionPerformed
 
     
-    public float[][] normalizeVertex(float begin, float end, float[][] proj) {
+    public static float[][] normalizeVertex(float begin, float end, float[][] proj, int width, int height) {
         
         float[][] newproj = new float[proj.length][proj[0].length];
         float maxX = proj[0][0];
@@ -1950,10 +1992,13 @@ public class Menu extends javax.swing.JFrame {
         
 
         ///////Fazer a largura ficar proporcional a altura
-        float endX = ((maxX - minX) * end);
-        if (maxY != minY) {
-            endX = ((maxX - minX) * end) / (maxY - minY);
-        }
+//        float endX = ((maxX - minX) * end);
+//        if (maxY != minY) {
+//            endX = ((maxX - minX) * end) / (maxY - minY);
+//        }
+
+        float endX = width;
+        float endY = height;
         //////////////////////////////////////////////////
 
         //Normalizo        
@@ -1965,7 +2010,7 @@ public class Menu extends javax.swing.JFrame {
             }
 
             if (maxY != minY) {
-                newproj[i][1] = ((((proj[i][1] - minY) / (maxY - minY)) * (end - begin)) + begin);
+                newproj[i][1] = ((((proj[i][1] - minY) / (maxY - minY)) * (endY - begin)) + begin);
             } else {
                 newproj[i][1] = begin;
             }
@@ -2010,7 +2055,7 @@ public class Menu extends javax.swing.JFrame {
                 float begin = 10 * 5 + 10;
                 float value = 768.5f*9.f/150f;
                 float end = ((float) 768.5) / 1.65f;
-                float[][] newproj = normalizeVertex(begin, end, proj);
+                float[][] newproj = normalizeVertex(begin, end, proj, 1000, 1000);
                 DenseMatrix projecao = new DenseMatrix();
                 ArrayList<String> att = new ArrayList<>();
                 att.add("X");
