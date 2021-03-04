@@ -123,7 +123,7 @@ public class RunTests {
         
         
         
-        String[] technique_name = new String[]{"PFSPrime","ProjSnippet", "RWordle-L", "RWordle-C", "PRISM", "VPSC"};
+        String[] technique_name = new String[]{"PFSPrime", "ProjSnippet", "RWordle-L", "RWordle-C", "PRISM", "VPSC"};
         OverlapRemoval[] technique = new OverlapRemoval[]{
             (OverlapRemoval) new PFSPrime(),
             (OverlapRemoval) new ProjSnippet(0.0, 10),
