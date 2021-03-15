@@ -58,6 +58,7 @@ import java.awt.Shape;
 import java.awt.Toolkit;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -764,7 +765,7 @@ public class Menu extends javax.swing.JFrame {
 ////        OverlapRemoval rw = new ProjSnippet(0.7, 60);
 //        // apply the algorithm
 ////        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false);   
-        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1);
+//        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1);
 ////        OverlapRemoval rw = (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class);
 //        double[] x = rects.stream().mapToDouble(u -> u.getCenterX()).toArray();
 //        double[] y = rects.stream().mapToDouble(u -> u.getCenterY()).toArray();
@@ -775,24 +776,31 @@ public class Menu extends javax.swing.JFrame {
 //        double overlap_factor = of.fit_transform();
 //        System.out.printf("overlap_factor: %.4f\n", overlap_factor);
 //        
-        Map<OverlapRect, OverlapRect> projected = rw.apply(rects);
+//        Map<OverlapRect, OverlapRect> projected = rw.apply(rects);
         System.out.println("passei aqui");
         
-//        List<Node> nodes = new ArrayList<>();
-//        rects.forEach(or -> {
-//            nodes.add(new Node(or.getCenterX(), or.getCenterY(), or.width, or.height, or.getId()));
-//        });
-//        
-//        Graph graph = new Graph(nodes);
-//        
-//        PFSPrime pfsp = new PFSPrime();
+        List<Node> nodes = new ArrayList<>();
+        rects.forEach(or -> {
+            nodes.add(new Node(or.getCenterX(), or.getCenterY(), or.width, or.height, or.getId()));
+        });
+        
+        Graph graph = new Graph(nodes);
+        
+        PFSPrime pfsp = new PFSPrime();
 //        
 //        System.out.println("OLAAAA");
-//        Graph projected = pfsp.apply(graph);
-        
-        
-
-        
+        Graph projected = pfsp.apply(graph);
+//        Rectangle2D.Double[] aux_rect = new Rectangle2D.Double[rects.size()];
+//        for( int i = 0; i < rects.size(); ++i )
+//            aux_rect[i] = new Rectangle2D.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY(), rects.get(i).width, rects.get(i).height);
+//        Point2D.Double[] points = NodeOverlapRemovalByShape.RemoveOverlap(aux_rect, 0);
+//        for( int i = 0; i < rects.size(); ++i ) {
+//            rects.get(i).setUX(points[i].x - rects.get(i).width/2);
+//            rects.get(i).setUY(points[i].y - rects.get(i).height/2);
+//        }
+//            
+//        ArrayList<OverlapRect> projectedValues = rects;
+//        
         // get the projected values
         ArrayList<OverlapRect> projectedValues = Util.getProjectedValues(projected);
         

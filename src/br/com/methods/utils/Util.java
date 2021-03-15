@@ -130,6 +130,21 @@ public class Util {
             ori.get(rects.get(i).getId()).setId(rects.get(i).getId());
         }   
     }
+    
+    public static void toRectangleVis2(ArrayList<RectangleVis> ori, ArrayList<OverlapRect> rects) {
+        
+        for( int i = 0; i < rects.size(); ++i ) {    
+            ori.get(i).setUX(rects.get(i).getUX());
+            ori.get(i).setUY(rects.get(i).getUY());
+            ori.get(i).setWidth(rects.get(i).getWidth());
+            ori.get(i).setHeight(rects.get(i).getHeight());
+            ori.get(i).setPivot(rects.get(i).isPivot());
+            ori.get(i).setLevel(rects.get(i).getLevel());
+            ori.get(i).numero = rects.get(i).getId();
+            ori.get(i).setHealth(rects.get(i).getHealth());
+            ori.get(i).setId(rects.get(i).getId());
+        }   
+    }
      
     /**
      * Quicksort dos eventos a ser ordenada por sua posição

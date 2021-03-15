@@ -19,7 +19,9 @@ import br.com.methods.utils.OverlapRect;
 import br.com.methods.utils.RectangleVis;
 import br.com.methods.utils.Util;
 import br.com.test.draw.color.RainbowScale;
+import de.visone.visualization.layout.overlapRemoval.NodeOverlapRemovalByShape;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -35,7 +37,7 @@ import java.util.Scanner;
  *
  * @author wilson
  */
-public class RunTests {
+public class RunTestsReArrange {
     private final static int RECTSIZE = 10;
     private static int BEGIN_NORM = 0;
     private static int END_NORM = 1000;
@@ -51,7 +53,7 @@ public class RunTests {
             rectangles.clear();
             RainbowScale rbS = new RainbowScale();
             labels = new ArrayList<>();
-            ids = new ArrayList<>();
+             ids = new ArrayList<>();
             
 //            int id = 0;
 //            while( scn.hasNext() ) {
@@ -125,19 +127,11 @@ public class RunTests {
         
         
         
-        String[] technique_name = new String[]{"PFSPrime", "ProjSnippet", "RWordle-L", "RWordle-C", "PRISM", "VPSC"};
-        OverlapRemoval[] technique = new OverlapRemoval[]{
-            (OverlapRemoval) new PFSPrime(),
-            (OverlapRemoval) new ProjSnippet(0.0, 10),
-            (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false),
-            (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class),
-            (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1),
-            (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class)
-        };
+        String[] technique_name = new String[]{"ReArrange"};
 
-//        String[] technique_name = new String[]{"VPSC"};
+//        String[] technique_name = new String[]{"ProjSnippet"};
 //        OverlapRemoval[] technique = new OverlapRemoval[]{
-//            (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class)
+//            (OverlapRemoval) new ProjSnippet(0.0, 10)
 //        };
         
         
@@ -159,7 +153,7 @@ public class RunTests {
         FileWriter fw_metrics = null;
         try
         {
-            fw_metrics = new FileWriter("results/result_metrics.csv", false); 
+            fw_metrics = new FileWriter("results_rearrange/result_metrics.csv", false); 
             fw_metrics.write("Dataset,Technique,Metric,Value\n");           
             
         }
@@ -229,16 +223,7 @@ public class RunTests {
            
 
             for( int index_technique = 0; index_technique < technique_name.length; ++index_technique ) {
-                OverlapRemoval or = technique[index_technique];
-                
-                if( or instanceof ProjSnippet ) { // projsnippet
-//                    ((ProjSnippet)technique[index_technique]).setMinCoord(Math.min(ux, uy));
-//                    ((ProjSnippet)technique[index_technique]).setMaxCoord(Math.max(lx, ly));;     
-                    double max_side = Math.max(xmax-xmin, ymax-ymin);
-                    ((ProjSnippet)technique[index_technique]).setMinCoord(-max_side*10);
-                    ((ProjSnippet)technique[index_technique]).setMaxCoord(max_side*10);
-                }
-                
+                                
                 System.out.println("Applying overlap removal using: "+technique_name[index_technique]);
                 
                 
@@ -251,30 +236,27 @@ public class RunTests {
 
                 // apply the algorithm
                 
-                ArrayList<OverlapRect> projectedValues = null;
-                double secs = 0.0;
-                if( or instanceof PFSPrime ) {
-                    
-                    long startTime = System.currentTimeMillis();
-                    Graph projected = ((PFSPrime)or).apply(graph);
-                    long endTime = System.currentTimeMillis();
-                    secs = ((endTime-startTime)/1000.0);
-                    System.out.printf("Computed in %.4f seconds.\n", secs);
-                    // get the projected values
-                    projectedValues = Util.getProjectedValues(projected);
-                    
-                } else {
-                    
-                    long startTime = System.currentTimeMillis();
-                    Map<OverlapRect, OverlapRect> projected = or.apply(rects);
-                    long endTime = System.currentTimeMillis();
-                    secs = ((endTime-startTime)/1000.0);
-                    System.out.printf("Computed in %.4f seconds.\n", secs);
-                    // get the projected values
-                    projectedValues = Util.getProjectedValues(projected);
-                    
+                
+               
+                
+                
+                
+                Rectangle2D.Double[] aux_rect = new Rectangle2D.Double[rects.size()];
+                for( int i = 0; i < rects.size(); ++i )
+                    aux_rect[i] = new Rectangle2D.Double(rects.get(i).getCenterX(), rects.get(i).getCenterY(), rects.get(i).width, rects.get(i).height);
+                
+                long startTime = System.currentTimeMillis();
+                Point2D.Double[] points_without_overlap = NodeOverlapRemovalByShape.RemoveOverlap(aux_rect, 0);
+                long endTime = System.currentTimeMillis();
+                
+                double secs = ((endTime-startTime)/1000.0);
+                for( int i = 0; i < rects.size(); ++i ) {
+                    rects.get(i).setUX(points_without_overlap[i].x - rects.get(i).width/2);
+                    rects.get(i).setUY(points_without_overlap[i].y - rects.get(i).height/2);
                 }
-                Util.normalize(projectedValues);
+            
+                ArrayList<OverlapRect> projectedValues = rects;
+                
                 
                 projectedValues.sort((OverlapRect a, OverlapRect b) -> Integer.compare(a.getId(), b.getId()));
                 
@@ -292,7 +274,7 @@ public class RunTests {
                 FileWriter points = null;
                 try {
                     
-                    points = new FileWriter("results/"+technique_name[index_technique]+"/"+datasets.get(index)+"_"+technique_name[index_technique]+".csv", false);
+                    points = new FileWriter("results_rearrange/"+technique_name[index_technique]+"/"+datasets.get(index)+"_"+technique_name[index_technique]+".csv", false);
                     points.write("id,ux,uy,width,height,label\n");
                     
                     for( int k = 0; k < projectedValues.size(); ++k ) {
@@ -316,7 +298,7 @@ public class RunTests {
                 
                 try
                 {
-                    fw_metrics = new FileWriter("results/result_metrics.csv", true); 
+                    fw_metrics = new FileWriter("results_rearrange/result_metrics.csv", true); 
                     fw_metrics.write(datasets.get(index)+","+technique_name[index_technique]+",Time (s),"+secs+"\n");   
 
                   
