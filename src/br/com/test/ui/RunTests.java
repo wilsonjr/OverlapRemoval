@@ -125,23 +125,25 @@ public class RunTests {
         
         
         
-        String[] technique_name = new String[]{"PFSPrime", "ProjSnippet", "RWordle-L", "RWordle-C", "PRISM", "VPSC"};
-        OverlapRemoval[] technique = new OverlapRemoval[]{
-            (OverlapRemoval) new PFSPrime(),
-            (OverlapRemoval) new ProjSnippet(0.0, 10),
-            (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false),
-            (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class),
-            (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1),
-            (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class)
-        };
-
-//        String[] technique_name = new String[]{"VPSC"};
+//        String[] technique_name = new String[]{"PFSPrime", "ProjSnippet", "RWordle-L", "RWordle-C", "PRISM", "VPSC"};
 //        OverlapRemoval[] technique = new OverlapRemoval[]{
+//            (OverlapRemoval) new PFSPrime(),
+//            (OverlapRemoval) new ProjSnippet(0.0, 10),
+//            (OverlapRemoval) OverlapRegistry.getInstance(RWordleL.class, 0, false),
+//            (OverlapRemoval) OverlapRegistry.getInstance(RWordleC.class),
+//            (OverlapRemoval) OverlapRegistry.getInstance(PRISM.class, 1),
 //            (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class)
 //        };
+
+        String[] technique_name = new String[]{"PFSPrime", "VPSC"};
+        OverlapRemoval[] technique = new OverlapRemoval[]{
+            (OverlapRemoval) new PFSPrime(),
+            (OverlapRemoval) OverlapRegistry.getInstance(VPSC.class)
+        };
         
         
-        String path1 = "/home/wilson/Área de Trabalho/OverlapRemoval/original-final/"; 
+//        String path1 = "/home/wilson/Área de Trabalho/OverlapRemoval/original-final/"; 
+        String path1 = "original-large/";
         File[] files = new File(path1).listFiles();
         //If this pathname does not denote a directory, then listFiles() returns null. 
         
@@ -159,7 +161,7 @@ public class RunTests {
         FileWriter fw_metrics = null;
         try
         {
-            fw_metrics = new FileWriter("results/result_metrics.csv", false); 
+            fw_metrics = new FileWriter("results-large/result_metrics.csv", false); 
             fw_metrics.write("Dataset,Technique,Metric,Value\n");           
             
         }
@@ -292,7 +294,7 @@ public class RunTests {
                 FileWriter points = null;
                 try {
                     
-                    points = new FileWriter("results/"+technique_name[index_technique]+"/"+datasets.get(index)+"_"+technique_name[index_technique]+".csv", false);
+                    points = new FileWriter("results-large/"+technique_name[index_technique]+"/"+datasets.get(index)+"_"+technique_name[index_technique]+".csv", false);
                     points.write("id,ux,uy,width,height,label\n");
                     
                     for( int k = 0; k < projectedValues.size(); ++k ) {
@@ -316,7 +318,7 @@ public class RunTests {
                 
                 try
                 {
-                    fw_metrics = new FileWriter("results/result_metrics.csv", true); 
+                    fw_metrics = new FileWriter("results-large/result_metrics.csv", true); 
                     fw_metrics.write(datasets.get(index)+","+technique_name[index_technique]+",Time (s),"+secs+"\n");   
 
                   

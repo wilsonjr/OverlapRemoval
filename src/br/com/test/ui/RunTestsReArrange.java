@@ -135,7 +135,8 @@ public class RunTestsReArrange {
 //        };
         
         
-        String path1 = "/home/wilson/Área de Trabalho/OverlapRemoval/original-final/"; 
+//        String path1 = "/home/wilson/Área de Trabalho/OverlapRemoval/original-final/"; 
+        String path1 = "original-large/";
         File[] files = new File(path1).listFiles();
         //If this pathname does not denote a directory, then listFiles() returns null. 
         
@@ -153,7 +154,7 @@ public class RunTestsReArrange {
         FileWriter fw_metrics = null;
         try
         {
-            fw_metrics = new FileWriter("results_rearrange/result_metrics.csv", false); 
+            fw_metrics = new FileWriter("results-large/result_metrics-rearrange.csv", false); 
             fw_metrics.write("Dataset,Technique,Metric,Value\n");           
             
         }
@@ -274,7 +275,7 @@ public class RunTestsReArrange {
                 FileWriter points = null;
                 try {
                     
-                    points = new FileWriter("results_rearrange/"+technique_name[index_technique]+"/"+datasets.get(index)+"_"+technique_name[index_technique]+".csv", false);
+                    points = new FileWriter("results-large/"+technique_name[index_technique]+"/"+datasets.get(index)+"_"+technique_name[index_technique]+".csv", false);
                     points.write("id,ux,uy,width,height,label\n");
                     
                     for( int k = 0; k < projectedValues.size(); ++k ) {
@@ -298,7 +299,7 @@ public class RunTestsReArrange {
                 
                 try
                 {
-                    fw_metrics = new FileWriter("results_rearrange/result_metrics.csv", true); 
+                    fw_metrics = new FileWriter("results-large/result_metrics-rearrange.csv", true); 
                     fw_metrics.write(datasets.get(index)+","+technique_name[index_technique]+",Time (s),"+secs+"\n");   
 
                   
