@@ -189,7 +189,11 @@ public class RunTests {
             System.out.printf("====================DATASET %d/%d======================\n", (index+1), datasets.size());
             System.out.println("=======================================================");
             
-            
+            File f = new File("results-large/VPSC/"+datasets.get(index)+"_VPSC.csv");
+            if(f.exists() && !f.isDirectory()) { 
+                System.out.println("Already analyzed this file =]");
+                continue;
+            }
             
             
             System.out.println("Loading dataset: "+(path1+"/"+datasets.get(index)));
