@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # OverlapRemoval
 
 A library to select sampling sets and remove overlapping in 2D projections.
@@ -102,4 +101,3 @@ We've used the following dependencies in the project:
 **Jama**: [Jama](http://math.nist.gov/javanumerics/jama/)
 
 **EJML**: [EJML](https://ejml.org/wiki/index.php?title=Main_Page)
->>>>>>> b3bdc2b146aad7ed8004d576623b639b6ce557d5
